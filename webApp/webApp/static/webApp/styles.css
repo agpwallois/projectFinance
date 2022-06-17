@@ -1,0 +1,45 @@
+*{
+	font-family: Monokai, Helvetica, sans-serif;
+ 	font-size: 12;
+}
+
+html{
+ 	margin: 0px;
+}
+
+body{
+	height:100%;
+}
+
+header { 
+    border-right: 1px solid rgb(228, 230, 235);
+	background-color: rgb(255, 255, 255); 
+	padding: 10px;
+	height:40px;
+	margin: 0px;
+}
+
+wrapper{
+	display: flex;	
+	flex-direction: row;
+	flex-wrap: wrap;
+	height:100%;
+	margin: 0px;
+}
+
+sidebar { 
+	flex: 20%;
+	background-color: rgb(235, 237, 239); 
+	padding: 10px; 
+	height: 100%;
+}
+
+content { 
+	flex: 75%;
+	padding: 10px;  
+	background-color: rgb(48, 56, 65);
+	color: rgb(216, 222, 214);
+	font-size: bold;
+}
+
+
