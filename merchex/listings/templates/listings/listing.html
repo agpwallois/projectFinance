@@ -1,0 +1,15 @@
+# listings/templates/listings/hello.html
+
+
+{% extends 'listings/base.html'%}
+{% block content %}
+
+        <h1>Hello Django !</h1>
+        <p>Mes groupes préférés sont :
+        <!-- TODO : liste des groupes -->
+        {% for listing in listings %}
+        <li>{{ listing.title|upper }}</li>
+        {% endfor %}
+        </p>
+        
+{% endblock %}
