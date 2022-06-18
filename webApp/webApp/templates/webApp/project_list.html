@@ -1,11 +1,55 @@
 {% extends 'webApp/base.html' %}
 
-{% block content %}
+{% load static %}
 
-<ul>
- {% for project in projects %}
-<li><a href="{% url 'project-detail' project.id %}">{{ project.name }}</a></li>
- {% endfor %} 
-</ul>
+{% block landingcss %}
+    <link rel="stylesheet" href="{% static 'webApp/style_landing.css' %}" />
+
+
+    {% block content %}
+
+        <!-- Page Content  -->
+    <div id="content_landing">
+
+
+
+
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+
+              <button type="button" class="btn btn-sm btn-info">
+        <a href="{% url 'admin:index' %}">Create or delete projects</a>
+    </button>
+    
+
+                </div>
+            </nav>
+
+        <table class="table table-sm table-hover">
+            <thead class="table-light">
+                <th>Project</th>
+                <th>Country</th>
+                <th>Type</th>
+            </thead>
+
+         {% for project in projects %}
+            <tr>
+            <td><a href="{% url 'project-detail' project.id %}">{{ project.name }}</a></td>
+            <td><a>{{ project.country }}</a></td>
+            <td><a>{{ project.genre }}</a></td>
+             {% endfor %} 
+            </tr>
+        </table> 
+
+
+    
+
+
+
+    </div>
+
+
+    {% endblock %}
 
 {% endblock %}
+

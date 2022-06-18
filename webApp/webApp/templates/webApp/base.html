@@ -12,9 +12,13 @@
     <!-- Custom Scroller CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
+    <link rel="stylesheet" href="{% static 'webApp/style.css' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static 'webApp/favicon.ico' %}"/>
+
+    {% block landingcss %}{% endblock %}
+
     </head>
 
-    <link rel="stylesheet" href="{% static 'webApp/style2.css' %}" />
 
 <body>
 

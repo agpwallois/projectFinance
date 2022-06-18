@@ -20,6 +20,7 @@ class Project(models.Model):
 
     name = models.fields.CharField(max_length=100)
     genre = models.fields.CharField(choices=Type.choices, max_length=5)
+    country = models.fields.CharField(max_length=20)
     start_year = models.fields.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3000)])
     length = models.fields.IntegerField()
     periodicity = models.fields.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
