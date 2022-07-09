@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+
+<nav id="sidebar">
+    <div class="sidebar"><h3>{{ Sproject.name }}</h3>
+
+    	<form method="POST" id="post-form">{% csrf_token %}
+			<div class="fieldWrapper" id="the_post">
+				<input type="submit" value="Post" class="btn btn-primary btn-lg">
+
+				<div id="accordion">
+					<div class="card">
+					    <div class="card-header" id="headingOne">
+					      <h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					          Timeline
+					        </button>
+					      </h5>
+					    </div>
+
+					    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+						    <div class="card-body">
+				 				{{ timeline_form.as_ul }}
+				            </div>
+			    		</div>
+		  			</div>
+
+					<div class="card">
+						<div class="card-header" id="headingTwo">
+					    	<h5 class="mb-0">
+						        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						          Revenues
+						        </button>
+					      	</h5>
+					    </div>
+					    
+					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+						    <div class="card-body">
+								{{ revenues_form.as_ul }}
+							</div>   
+		      			</div>
+	    			</div>
+
+    				<div class="card">
+					<div class="card-header" id="headingThree">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+					          Operating costs
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+					    <div class="card-body">
+							{{ revenues_form.as_ul }}
+						</div>   
+	      			</div>
+    			</div>
+
+
+	  			</div>
+	  		</div>
+  		</form>  
+  	</div>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="content">
+	<nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+        	<button type="button" id="sidebarCollapse" class="btn btn-primary btn-lg">
+                <span>Toggle Sidebar</span>
+            </button>
+        </div>
+    </nav>
+
+    <nav>
+    	<div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-summary-tab" data-toggle="tab" href="#nav-summary" role="tab" aria-controls="nav-summary" aria-selected="true">Summary</a>
+            <a class="nav-item nav-link" id="nav-graphs-tab" data-toggle="tab" href="#nav-graphs" role="tab" aria-controls="nav-graphs" aria-selected="false">Charts</a>
+            <a class="nav-item nav-link" id="nav-calculation-tab" data-toggle="tab" href="#nav-calculation" role="tab" aria-controls="nav-calculation" aria-selected="false">Calculation</a>
+        </div>
+   	</nav>
+
+	<div class="tab-content" id="nav-tabContent">
+		<div class="tab-pane fade show active" id="nav-summary" role="tabpanel" aria-labelledby="nav-summary-tab">
+
+			<h2>Income statement</h2>
+
+			<table class="table table-striped" id="outTable">
+				<tbody id="myTable">
+		
+				</tbody>
+			</table>
+ 			
+ 			<h2>Financing plan</h2>
+		</div>
+
+		<div class="tab-pane fade" id="nav-graphs" role="tabpanel" aria-labelledby="nav-graphs-tab">
+		{% block jquery %}
+			{% include 'charts.html' %}
+		{% endblock %}
+		</div>
+
+		<div class="tab-pane fade" id="nav-calculation" role="tabpanel" aria-labelledby="nav-calculation-tab">
+
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+     $("#post-form").submit();
+});
+
+	$(document).on('submit','#post-form', function(e){
+		e.preventDefault(),
+		$.ajax({
+			type:'POST',
+			url:"",
+			data: $(this).serialize(),
+			success:function(json){
+				console.log(json);
+				var result = '';
+  				$.each(json, function(key, data) {
+  					result += "<tr>";
+  					result += "<td>" + key + "</td>";
+  					$.each(data, function(index, data) {
+    					result += "<td>" + data + "</td>";
+    				});
+  					result += "</tr>";
+  				});
+  				$("#myTable").html(result);
+
+  				myChart.data.labels = json.Year;
+  				myChart.data.datasets[0].data = json.Revenues;
+				myChart.update()
+
+				myChart2.data.labels = json.Year;
+  				myChart2.data.datasets[0].data = json.Revenues;
+				myChart2.update()
+
+			},
+			error: function(){
+				alert('error test')
+			}
+		});
+	    return false;
+	});
+
+
+    
+
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+            theme: "minimal-dark"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar, #content').toggleClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+    
+</script>
+
+{% endblock %}
+
+
