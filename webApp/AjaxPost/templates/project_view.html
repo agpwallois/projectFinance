@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block sidebar %}
 
@@ -7,7 +8,10 @@
 
     	<form method="POST" id="post-form">{% csrf_token %}
 			<div class="fieldWrapper" id="the_post">
-				<input type="submit" value="Post" class="btn btn-primary btn-lg">
+
+				<div>
+				<input type="submit" value="Post" class="btn btn-primary btn-lg" id="btn-form">
+				</div>
 
 				<div id="accordion">
 					<div class="card">
@@ -21,43 +25,150 @@
 
 					    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
 						    <div class="card-body">
-				 				{{ timeline_form.as_ul }}
+				 				{{ timeline_form|crispy }}
+				            </div>
+			    		</div>
+		  			</div>
+
+		  			<div class="card">
+					    <div class="card-header" id="headingTwo">
+					      <h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+					          Construction
+					        </button>
+					      </h5>
+					    </div>
+
+					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+						    <div class="card-body">
+						    	{% crispy construction_form %}
 				            </div>
 			    		</div>
 		  			</div>
 
 					<div class="card">
-						<div class="card-header" id="headingTwo">
+						<div class="card-header" id="headingThree">
 					    	<h5 class="mb-0">
-						        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
 						          Revenues
 						        </button>
 					      	</h5>
 					    </div>
 					    
-					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+					    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
 						    <div class="card-body">
-								{{ revenues_form.as_ul }}
+								{{ revenues_form|crispy }}
 							</div>   
 		      			</div>
 	    			</div>
 
-    				<div class="card">
-					<div class="card-header" id="headingThree">
+    			<div class="card">
+					<div class="card-header" id="headingFour">
 				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
 					          Operating costs
 					        </button>
 				      	</h5>
 				    </div>
 				    
-				    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+				    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
 					    <div class="card-body">
-							{{ revenues_form.as_ul }}
+							{{ opex_form.as_ul }}
 						</div>   
 	      			</div>
     			</div>
 
+    			<div class="card">
+					<div class="card-header" id="headingFive">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+					          HMR
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
+
+    			<div class="card">
+					<div class="card-header" id="headingSix">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+					          Debt
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
+
+    			<div class="card">
+					<div class="card-header" id="headingSeven">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+					          Tax
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
+
+ 				<div class="card">
+					<div class="card-header" id="headingEight">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+					          Accounting
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseEight" class="collapse" aria-labelledby="headingEight" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
+
+
+    			<div class="card">
+					<div class="card-header" id="headingNine">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+					          Equity
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseNine" class="collapse" aria-labelledby="headingNine" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
+
+
+    			<div class="card">
+					<div class="card-header" id="headingTen">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+					          Macro
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseTen" class="collapse" aria-labelledby="headingTen" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
 
 	  			</div>
 	  		</div>
@@ -115,8 +226,8 @@
 <script type="text/javascript">
 
 	$(document).ready(function(){
-     $("#post-form").submit();
-});
+    	$("#post-form").submit();
+	});
 
 	$(document).on('submit','#post-form', function(e){
 		e.preventDefault(),
@@ -142,7 +253,7 @@
 				myChart.update()
 
 				myChart2.data.labels = json.Year;
-  				myChart2.data.datasets[0].data = json.Revenues;
+  				myChart2.data.datasets[0].data = json.Opex;
 				myChart2.update()
 
 			},
@@ -152,9 +263,6 @@
 		});
 	    return false;
 	});
-
-
-    
 
 </script>
 

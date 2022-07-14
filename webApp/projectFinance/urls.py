@@ -15,12 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from webApp import views
 from AjaxPost import views as AjaxPost
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='project-admin'),
-    path('projects/', views.ProjectView.as_view(), name='project-list'),
-    path('projects/<int:id>/', views.project_detail, name='project-detail'), 
+    path('projects/', AjaxPost.ProjectView.as_view(), name='project-list'),
     path('project_view/<int:id>/', AjaxPost.project_view, name='project_view'),
     ]

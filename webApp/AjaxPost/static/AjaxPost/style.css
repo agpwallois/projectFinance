@@ -63,7 +63,7 @@ header {
 }
 
 #sidebar {
-    width: 250px;
+    width: 400px;
     border-right: 1px solid rgb(211, 220, 228);
     position: fixed;
     left: 0;
@@ -81,7 +81,7 @@ header {
 }
 
 #sidebar.active {
-    margin-left: -250px;
+    margin-left: -400px;
 }
 
 #sidebar p {
@@ -89,12 +89,27 @@ header {
 }
 
 
+#accordion {
+  padding-right: 5px;
+  padding-top: 5px;
+}
+
+.card-header {
+  height: 30;
+  padding: 0;
+}
+
+#btn-form{
+    
+
+}
+
 /* ---------------------------------------------------
     CONTENT STYLE
 ----------------------------------------------------- */
 
 #content {
-    width: calc(100% - 250px);
+    width: calc(100% - 400px);
     padding: 40px;
     min-height: 100vh;
     transition: all 0.3s;
@@ -109,9 +124,14 @@ header {
 }
 
 .h2 {
-    font-size: 200px;
+    font-size: 2000px;
     font-weight: 700;
     line-height: 40px;
+}
+
+#myTable{
+    font-size: 12px;
+
 }
 
 /* ---------------------------------------------------
@@ -120,7 +140,7 @@ header {
 
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;
+        margin-left: -400px;
     }
     #sidebar.active {
         margin-left: 0;
@@ -129,7 +149,7 @@ header {
         width: 100%;
     }
     #content.active {
-        width: calc(100% - 250px);
+        width: calc(100% - 400px);
     }
     #sidebarCollapse span {
         display: none;
@@ -150,15 +170,9 @@ header {
     width: 50%;
 }
 
-#accordion {
-  padding-right: 10;
-}
+
 
 .btn {
   font-size: 12px;
 }
 
-.card-header {
-  height: 30;
-  padding: 0;
-}

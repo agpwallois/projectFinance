@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block landingcss %}
+    <link rel="stylesheet" href="{% static 'AjaxPost/style_landing.css' %}" />
+
+    {% block content %}
+
+        <!-- Page Content  -->
+    <div id="content_landing">
+
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+
+              <button type="button" class="btn btn-primary btn-lg">
+        <a href="{% url 'admin:index' %}">Create or delete projects</a>
+    </button>
+
+                </div>
+            </nav>
+
+        <table class="table table-sm table-hover">
+            <thead class="table-light">
+                <th>Project</th>
+            </thead>
+
+         {% for project in projects %}
+            <tr>
+            <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
+             {% endfor %} 
+            </tr>
+        </table> 
+    </div>
+
+    {% endblock %}
+
+{% endblock %}
+
