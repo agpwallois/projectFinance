@@ -6,11 +6,12 @@
 <nav id="sidebar">
     <div class="sidebar"><h3>{{ Sproject.name }}</h3>
 
+
     	<form method="POST" id="post-form">{% csrf_token %}
 			<div class="fieldWrapper" id="the_post">
 
 				<div>
-				<input type="submit" value="Post" class="btn btn-primary btn-lg" id="btn-form">
+				<input type="submit" value="Submit" class="btn btn-primary btn-lg" id="btn-form">
 				</div>
 
 				<div id="accordion">
@@ -18,14 +19,14 @@
 					    <div class="card-header" id="headingOne">
 					      <h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-					          Timeline
+					          Timing
 					        </button>
 					      </h5>
 					    </div>
 
 					    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
 						    <div class="card-body">
-				 				{{ timeline_form|crispy }}
+						    	{{ timeline_form|crispy }}
 				            </div>
 			    		</div>
 		  			</div>
@@ -34,14 +35,15 @@
 					    <div class="card-header" id="headingTwo">
 					      <h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
-					          Construction
+					          Capacity & Production
 					        </button>
 					      </h5>
 					    </div>
 
 					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
 						    <div class="card-body">
-						    	{% crispy construction_form %}
+						    	{{ production_form|crispy }}
+
 				            </div>
 			    		</div>
 		  			</div>
@@ -50,14 +52,14 @@
 						<div class="card-header" id="headingThree">
 					    	<h5 class="mb-0">
 						        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						          Revenues
+						          Construction costs
 						        </button>
 					      	</h5>
 					    </div>
 					    
 					    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
 						    <div class="card-body">
-								{{ revenues_form|crispy }}
+						    	{{ construction_form|crispy }}
 							</div>   
 		      			</div>
 	    			</div>
@@ -66,14 +68,14 @@
 					<div class="card-header" id="headingFour">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-					          Operating costs
+					          Revenues
 					        </button>
 				      	</h5>
 				    </div>
 				    
 				    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
 					    <div class="card-body">
-							{{ opex_form.as_ul }}
+							{{ revenues_form|crispy }}
 						</div>   
 	      			</div>
     			</div>
@@ -82,13 +84,14 @@
 					<div class="card-header" id="headingFive">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-					          HMR
+					          Operating costs
 					        </button>
 				      	</h5>
 				    </div>
 				    
 				    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
 					    <div class="card-body">
+					    	{{ opex_form.as_ul }}
 						</div>   
 	      			</div>
     			</div>
@@ -97,7 +100,7 @@
 					<div class="card-header" id="headingSix">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-					          Debt
+					          HMR
 					        </button>
 				      	</h5>
 				    </div>
@@ -112,7 +115,7 @@
 					<div class="card-header" id="headingSeven">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-					          Tax
+					          Senior Debt
 					        </button>
 				      	</h5>
 				    </div>
@@ -127,7 +130,7 @@
 					<div class="card-header" id="headingEight">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
-					          Accounting
+					          Tax
 					        </button>
 				      	</h5>
 				    </div>
@@ -143,7 +146,7 @@
 					<div class="card-header" id="headingNine">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
-					          Equity
+					          Accounting
 					        </button>
 				      	</h5>
 				    </div>
@@ -159,12 +162,28 @@
 					<div class="card-header" id="headingTen">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
-					          Macro
+					          Equity
 					        </button>
 				      	</h5>
 				    </div>
 				    
 				    <div id="collapseTen" class="collapse" aria-labelledby="headingTen" data-parent="#accordion">
+					    <div class="card-body">
+						</div>   
+	      			</div>
+    			</div>
+
+
+    			<div class="card">
+					<div class="card-header" id="headingEleven">
+				    	<h5 class="mb-0">
+					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+					          Macro
+					        </button>
+				      	</h5>
+				    </div>
+				    
+				    <div id="collapseEleven" class="collapse" aria-labelledby="headingEleven" data-parent="#accordion">
 					    <div class="card-body">
 						</div>   
 	      			</div>
@@ -258,7 +277,7 @@
 
 			},
 			error: function(){
-				alert('error test')
+				alert('error Ajax')
 			}
 		});
 	    return false;
