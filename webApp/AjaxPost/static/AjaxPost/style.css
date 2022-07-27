@@ -163,13 +163,13 @@ header {
 
 .charts-container {
     display: flex;
+    height : 300px;
 }
 
 .graph {
     display: flex;
     width: 50%;
 }
-
 
 
 .btn {

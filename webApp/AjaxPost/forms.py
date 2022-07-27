@@ -77,7 +77,31 @@ class ConstructionForm(forms.ModelForm):
 class RevenuesForm(forms.ModelForm):
 	class Meta:
 	 model = SProject
-	 fields = ['revenues','inflation']
+	 fields = [
+	 'start_contract',
+	 'end_contract',
+	 'contract_price',
+	 'contract_indexation_start_date',
+     'contract_indexation',
+	 ]
+	 widgets = {
+		'start_contract': forms.DateInput(
+		attrs={'class': 'form-control', 
+		   'placeholder': 'Select a date',
+		   'type': 'date'
+		  }),
+		'end_contract': forms.DateInput(
+		attrs={'class': 'form-control', 
+		   'placeholder': 'Select a date',
+		   'type': 'date'
+		  }),
+		'contract_indexation_start_date': forms.DateInput(
+		attrs={'class': 'form-control', 
+		   'placeholder': 'Select a date',
+		   'type': 'date'
+		  }),
+	}
+
 
 class OpexForm(forms.ModelForm):
 	class Meta:

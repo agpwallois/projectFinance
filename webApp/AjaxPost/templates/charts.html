@@ -2,12 +2,17 @@
 
 <div class="charts-container">
 
-<div class="graph"><canvas id="myChart"></canvas></div>
-<div class="graph"><canvas id="myChart2"></canvas></div>
-
+    <div class="graph"><canvas id="myChart"></canvas></div>
+    <div class="graph"><canvas id="myChart2"></canvas></div>
 
 </div>
 
+<div class="charts-container">
+
+    <div class="graph"><canvas id="myChart3"></canvas></div>
+    <div class="graph"><canvas id="myChart4"></canvas></div>
+
+</div>
 
 <!-- Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
@@ -16,11 +21,12 @@
 
 const ctx = document.getElementById('myChart');
 const myChart = new Chart(ctx, {
-    type: 'bar',
     data: {
         labels: ["1","2","3","4","5","6"],
         datasets: [{
-            label: 'EUR',
+            type: 'bar',
+            label: 'MWh',
+            yAxisID: 'A',
             data: [1,2,3,4,5,6],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
@@ -39,25 +45,67 @@ const myChart = new Chart(ctx, {
                 'rgba(255, 159, 64, 1)'
             ],
             borderWidth: 1
-        }]
+        },{
+
+            type: 'line',
+            label: '%',
+            yAxisID: 'B',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }
+        ]
     },
     options: {
+
+        responsive:true,
+        maintainAspectRatio: false,
+
+      plugins:{
+        legend: {
+            position: 'top',
+        },
+
+         title: {
+            display: true,
+            text: 'Production and degradation'
+        }},
+
         scales: {
-            y: {
-                beginAtZero: true
-            }
+            A: {
+                position: 'left',
+                beginAtZero: true,
+            },
+            B: {
+                position: 'right',
+                beginAtZero: true,
+            },
         }
     }
 });
-
 
 const ctx2 = document.getElementById('myChart2');
 const myChart2 = new Chart(ctx2, {
-    type: 'bar',
+    type: 'pie',
     data: {
-        labels: ["1","2","3","4","5","6"],
+        labels: ["January","February","March","April","May","June","July","August","September","October","November","December"],
         datasets: [{
-            label: 'EUR',
+            label: '%',
             data: [1,2,3,4,5,6],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
@@ -79,13 +127,110 @@ const myChart2 = new Chart(ctx2, {
         }]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+
+        responsive:true,
+        maintainAspectRatio: false,
+
+       plugins:{
+            legend: {
+                position: 'right',
+            },
+
+            title: {
+                display: true,
+                text: 'Seasonality'
+            }},
     }
 });
+
+const ctx3 = document.getElementById('myChart3');
+const myChart3 = new Chart(ctx3, {
+    type: 'pie',
+    data: {
+        labels: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+        datasets: [{
+            label: '%',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+
+        responsive:true,
+        maintainAspectRatio: false,
+       
+       plugins:{
+            legend: {
+                position: 'bottom',
+            },
+
+            title: {
+                display: true,
+                text: 'Seasonality'
+            }},
+    }
+});
+
+const ctx4 = document.getElementById('myChart4');
+const myChart4 = new Chart(ctx4, {
+    type: 'pie',
+    data: {
+        labels: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+        datasets: [{
+            label: '%',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+
+        responsive:true,
+        maintainAspectRatio: false,
+       
+       plugins:{
+            legend: {
+                position: 'bottom',
+            },
+
+            title: {
+                display: true,
+                text: 'Seasonality'
+            }},
+    }
+});
+
 
 </script>
 

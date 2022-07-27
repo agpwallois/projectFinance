@@ -19,6 +19,7 @@ from AjaxPost import views as AjaxPost
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='project-admin'),
+    path('testrr/', AjaxPost.test, name='test'),
     path('projects/', AjaxPost.ProjectView.as_view(), name='project-list'),
     path('project_view/<int:id>/', AjaxPost.project_view, name='project_view'),
     ]

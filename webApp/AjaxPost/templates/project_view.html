@@ -68,7 +68,7 @@
 					<div class="card-header" id="headingFour">
 				    	<h5 class="mb-0">
 					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-					          Revenues
+					          Offtake contract
 					        </button>
 				      	</h5>
 				    </div>
@@ -267,12 +267,12 @@
   				});
   				$("#myTable").html(result);
 
-  				myChart.data.labels = json.Year;
-  				myChart.data.datasets[0].data = json.Revenues;
+  				myChart.data.labels = json.EoP;
+  				myChart.data.datasets[0].data = json.production;
+  				myChart.data.datasets[1].data = json.arr_degradation;
 				myChart.update()
 
-				myChart2.data.labels = json.Year;
-  				myChart2.data.datasets[0].data = json.Opex;
+  				myChart2.data.datasets[0].data = json.seasonality;
 				myChart2.update()
 
 			},
