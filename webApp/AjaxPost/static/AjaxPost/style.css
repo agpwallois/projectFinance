@@ -33,6 +33,9 @@ a:focus {
 }
 
 
+h1 {
+    font-size: 10px;
+}
 
 
 /* ---------------------------------------------------
@@ -123,11 +126,6 @@ header {
     width: 100%;
 }
 
-.h2 {
-    font-size: 2000px;
-    font-weight: 700;
-    line-height: 40px;
-}
 
 #myTable{
     font-size: 12px;
@@ -176,3 +174,42 @@ header {
   font-size: 12px;
 }
 
+.row-inline-wrapper{
+    display: flex;
+    top: 0px;
+    }
+
+.row-inline-label{
+    display: flex;
+    width: 50%;
+    padding-top: 10px;
+    }
+
+.row-inline-field{
+    display: flex;
+    width: 50%;
+    padding-top: 0px;
+
+    }
+
+.form{
+    display: block;
+    width: 75%;
+    padding: 0.375rem 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+.form:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+}

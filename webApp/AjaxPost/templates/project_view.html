@@ -4,7 +4,7 @@
 {% block sidebar %}
 
 <nav id="sidebar">
-    <div class="sidebar"><h3>{{ Sproject.name }}</h3>
+    <div class="sidebar"><h3>{{ project.name }}</h3>
 
 
     	<form method="POST" id="post-form">{% csrf_token %}
@@ -26,7 +26,58 @@
 
 					    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
 						    <div class="card-body">
-						    	{{ timeline_form|crispy }}
+							    	<div class="row-inline-wrapper">
+							    		<div class="row-inline-label">
+											<h1>Start of construction</h1>
+					        			</div>
+
+							    		<div class="row-inline-label">
+											<h1>End of construction</h1>
+					        			</div>
+
+					        		</div>
+
+					        		<div class="row-inline-wrapper">
+							    		<div class="row-inline-field">
+							 		{{ project_form.start_construction }}
+							 		{{ project_form.start_construction.errors }}
+
+					        			</div>
+
+							    		<div class="row-inline-field">
+							 		{{ project_form.end_construction }}
+							 		{{ project_form.end_construction.errors }}
+
+					        			</div>
+
+					        		</div>
+
+					        		<div class="row-inline-wrapper">
+							    		<div class="row-inline-label">
+											<h1>Operating life (years)</h1>
+					        			</div>
+
+							    		<div class="row-inline-label">
+											<h1>{{ project_form.operating_life }}</h1>
+											<h1>{{ project_form.operating_life.errors }}</h1>
+
+					        			</div>
+
+					        		</div>
+
+					        		<div class="row-inline-wrapper">
+							    		<div class="row-inline-field">
+							 				<h1>Periodicity</h1>
+					        			</div>
+
+							    		<div class="row-inline-field">
+							 				{{ project_form.periodicity }}
+							 				{{ project_form.periodicity.errors }}
+
+					        			</div>
+
+					        		</div>
+
 				            </div>
 			    		</div>
 		  			</div>
@@ -42,9 +93,176 @@
 
 					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
 						    <div class="card-body">
-						    	{{ production_form|crispy }}
+					        	<h5>Capacity & Production</h5>
 
-				            </div>
+			    				<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Installed capacity (kWp)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											<h1>Annual degradation (%)</h1>
+				        			</div>
+					        	</div>
+
+				        		<div class="row-inline-wrapper">
+						    		<div class="row-inline-field">
+						 				{{ project_form.panels_capacity }}
+						 				{{ project_form.panels_capacity.errors }}
+
+				        			</div>
+						    		<div class="row-inline-field">
+						 				{{ project_form.annual_degradation }}
+						 				{{ project_form.annual_degradation.errors }}
+
+				        			</div>
+				        		</div>
+
+			    				<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>P50 (kWp/kWh)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.p50 }}
+				        			</div>
+					        	</div>
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>p90_10y (kWp/kWh)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.p90_10y }}
+				        			</div>
+					        	</div>
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>P99_10y (kWp/kWh)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.P99_10y }}
+				        			</div>
+					        	</div>		
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Availability (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.availability }}
+				        			</div>
+					        	</div>	
+
+					        	<h5>Seasonality</h5>
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>January (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m1 }}
+				        			</div>
+					        	</div>
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>February (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m2 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>March (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m3 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>April (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m4 }}
+				        			</div>
+					        	</div>
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>May (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m5 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>June (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m6 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>July (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m7 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>August (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m8 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>September (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m9 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>October (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m10 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>November (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m11 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>December (%)</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.seasonality_m12 }}
+				        			</div>
+					        	</div>	
+
+
+			            	</div>
 			    		</div>
 		  			</div>
 
@@ -59,7 +277,117 @@
 					    
 					    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
 						    <div class="card-body">
-						    	{{ construction_form|crispy }}
+
+					        	<h5>Monthly construction schedule</h5>
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 1</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m1 }}
+
+				        			</div>
+					        	</div>
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 2</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m2 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 3</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m3 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 4</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m4 }}
+				        			</div>
+					        	</div>
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 5</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m5 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 6</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m6 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 7</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m7 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 8</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m8 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 9</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m9 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 10</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m10 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 11</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m11 }}
+				        			</div>
+					        	</div>	
+
+					        	<div class="row-inline-wrapper">
+							    	<div class="row-inline-label">
+											<h1>Month 12</h1>
+					        		</div>
+						    		<div class="row-inline-label">
+											{{ project_form.costs_m12 }}
+				        			</div>
+					        	</div>	
+
+
 							</div>   
 		      			</div>
 	    			</div>
@@ -75,7 +403,16 @@
 				    
 				    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
 					    <div class="card-body">
-							{{ revenues_form|crispy }}
+
+
+								{{ project_form.start_contract }}
+								{{ project_form.end_contract }}
+								{{ project_form.contract_price }}
+								{{ project_form.contract_indexation_start_date }}
+								{{ project_form.contract_indexation }}
+
+
+						
 						</div>   
 	      			</div>
     			</div>
@@ -91,7 +428,6 @@
 				    
 				    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
 					    <div class="card-body">
-					    	{{ opex_form.as_ul }}
 						</div>   
 	      			</div>
     			</div>

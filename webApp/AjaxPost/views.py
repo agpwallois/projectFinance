@@ -4,8 +4,8 @@ from django.http.response import HttpResponse
 from django.views.generic import ListView
 
 from django.shortcuts import render, redirect
-from .forms import SProjectForm, TimelineForm, ProductionForm, ConstructionForm, RevenuesForm, OpexForm
-from .models import SProject
+from .forms import ProjectForm, TimelineForm, ProductionForm, ConstructionForm, RevenuesForm
+from .models import Project
 
 import calendar
 import datetime
@@ -20,7 +20,7 @@ from django.core import serializers
 
 
 class ProjectView(ListView):
-	model = SProject
+	model = Project
 	template_name = 'project_list.html'
 	context_object_name = "projects"
 
@@ -64,32 +64,20 @@ def test(request):
 
 
 def project_view(request,id):
-	timeline_form = TimelineForm()
-	production_form = ProductionForm()
-	construction_form = ConstructionForm()
-	revenues_form = RevenuesForm()
-	opex_form = OpexForm()
-
-	Sproject = SProject.objects.get(id=id)
+	
+	project_form = ProjectForm()
+	project = Project.objects.get(id=id)
 
 	if request.method == "POST":
-		timeline_form = TimelineForm(request.POST, instance=Sproject)
-		production_form = ProductionForm(request.POST, instance=Sproject)
-		construction_form = ConstructionForm(request.POST, instance=Sproject)
-		revenues_form = RevenuesForm(request.POST, instance=Sproject)
-		opex_form = OpexForm(request.POST, instance=Sproject)
+		project_form = ProjectForm(request.POST, instance=project)
 
-		if timeline_form.is_valid() and production_form.is_valid() and construction_form.is_valid() and revenues_form.is_valid() and opex_form.is_valid():
-			timeline_form.save()
-			production_form.save()
-			construction_form.save()
-			revenues_form.save()
-			opex_form.save()
+		if project_form.is_valid():
+			project_form.save()
 
 			inp_construction_start = request.POST['start_construction']
 			inp_construction_end = request.POST['end_construction']
 			inp_life = int(request.POST['operating_life'])
-			inp_periodicity = request.POST['periodicity']
+			inp_periodicity = int(request.POST['periodicity'])
 
 			inp_capacity = int(request.POST['panels_capacity'])				
 			inp_degradation = float(request.POST['annual_degradation'])
@@ -132,8 +120,6 @@ def project_view(request,id):
 			inp_contract_price = request.POST['contract_price']
 			inp_contract_indexation_start_date = request.POST['contract_indexation_start_date']
 			inp_contract_indexation_rate = float(request.POST['contract_indexation'])
-
-			inp_opex = request.POST['opex']
 
 			arr_start_period = np.array([])
 			arr_end_period = np.array([])
@@ -268,23 +254,15 @@ def project_view(request,id):
 
 						},safe=False, status=200)
 		else:
-			errors = timeline_form.errors.as_json()
+			errors = project_form.errors.as_json()
 			return JsonResponse({"errors": errors}, status=400)
 
 	else:
-		timeline_form = TimelineForm(instance=Sproject)
-		production_form = ProductionForm(instance=Sproject)
-		construction_form = ConstructionForm(instance=Sproject)
-		revenues_form = RevenuesForm(instance=Sproject)
-		opex_form = OpexForm(instance=Sproject)
+		project_form = ProjectForm(instance=project)
 
 	context={
-		'timeline_form': timeline_form,
-		'production_form': production_form,
-		'construction_form': construction_form,
-		'revenues_form': revenues_form,
-		'Sproject':Sproject,
-		'opex_form':opex_form,
+		'project_form': project_form,
+		'project':project,
 		}
 	
 	return render(request, "project_view.html", context)

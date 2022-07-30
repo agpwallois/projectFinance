@@ -1,9 +1,12 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime
+
+
+
   
 
-class SProject(models.Model):
+class Project(models.Model):
 
 	def __str__(self):
 		return f'{self.name}'
@@ -12,6 +15,17 @@ class SProject(models.Model):
 		Wind = 'Wind'
 		Solar = 'Solar'
 		Road = 'Road'
+
+	class Production(models.TextChoices):
+		P50 = 'P50'
+		P90 = 'P90'
+		P99 = 'P99'
+
+	class ElecPrice(models.TextChoices):
+		Low = 'Low'
+		Medium = 'Medium'
+		High = 'High'
+
 
 	name = models.fields.CharField(max_length=100)
 	genre = models.fields.CharField(choices=Type.choices, max_length=5)
@@ -27,6 +41,7 @@ class SProject(models.Model):
 	p50 = models.fields.IntegerField(default="2000")
 	p90_10y = models.fields.IntegerField(default="2000")
 	P99_10y = models.fields.IntegerField(default="2000")
+
 	availability = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.99)
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m2 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.05)
@@ -41,9 +56,6 @@ class SProject(models.Model):
 	seasonality_m11 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m12 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.02)
 
-	costs_at_NTP = models.fields.IntegerField(default="0")
-	costs_at_FC = models.fields.IntegerField(default="0")
-	costs_at_COD = models.fields.IntegerField(default="0")
 	costs_m1 = models.fields.IntegerField(default="0")
 	costs_m2 = models.fields.IntegerField(default="0")
 	costs_m3 = models.fields.IntegerField(default="0")
@@ -64,3 +76,8 @@ class SProject(models.Model):
 	contract_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
 
 	opex = models.fields.IntegerField()
+
+
+
+
+
