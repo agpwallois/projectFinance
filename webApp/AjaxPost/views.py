@@ -4,7 +4,7 @@ from django.http.response import HttpResponse
 from django.views.generic import ListView
 
 from django.shortcuts import render, redirect
-from .forms import ProjectForm, TimelineForm, ProductionForm, ConstructionForm, RevenuesForm
+from .forms import ProjectForm
 from .models import Project
 
 import calendar

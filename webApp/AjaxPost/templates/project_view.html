@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 
 {% block sidebar %}
 
@@ -40,14 +39,10 @@
 					        		<div class="row-inline-wrapper">
 							    		<div class="row-inline-field">
 							 		{{ project_form.start_construction }}
-							 		{{ project_form.start_construction.errors }}
-
 					        			</div>
 
 							    		<div class="row-inline-field">
 							 		{{ project_form.end_construction }}
-							 		{{ project_form.end_construction.errors }}
-
 					        			</div>
 
 					        		</div>
@@ -58,8 +53,7 @@
 					        			</div>
 
 							    		<div class="row-inline-label">
-											<h1>{{ project_form.operating_life }}</h1>
-											<h1>{{ project_form.operating_life.errors }}</h1>
+											{{ project_form.operating_life }}
 
 					        			</div>
 
@@ -72,7 +66,6 @@
 
 							    		<div class="row-inline-field">
 							 				{{ project_form.periodicity }}
-							 				{{ project_form.periodicity.errors }}
 
 					        			</div>
 
@@ -404,12 +397,64 @@
 				    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
 					    <div class="card-body">
 
+				    		<div class="row-inline-wrapper">
+					    		<div class="row-inline-label">
+									<h1>Start of contract</h1>
+			        			</div>
 
-								{{ project_form.start_contract }}
-								{{ project_form.end_contract }}
-								{{ project_form.contract_price }}
-								{{ project_form.contract_indexation_start_date }}
-								{{ project_form.contract_indexation }}
+					    		<div class="row-inline-label">
+									<h1>End of contract</h1>
+			        			</div>
+
+					        </div>
+
+			        		<div class="row-inline-wrapper">
+					    		<div class="row-inline-field">
+					 				{{ project_form.start_contract }}
+			        			</div>
+
+					    		<div class="row-inline-field">
+					 				{{ project_form.end_contract }}
+			        			</div>
+
+			        		</div>
+
+				    		<div class="row-inline-wrapper">
+					    		<div class="row-inline-label">
+									<h1>Contract start price</h1>
+			        			</div>
+
+					    		<div class="row-inline-label">
+									<h1>{{ project_form.contract_price }}</h1>
+			        			</div>
+
+					        </div>
+							
+							<div class="row-inline-wrapper">
+					    		<div class="row-inline-label">
+									<h1>Contract indexation base date</h1>
+			        			</div>
+
+					    		<div class="row-inline-label">
+									<h1>Contract indexation p.a. (%)</h1>
+			        			</div>
+
+					        </div>
+
+			        		<div class="row-inline-wrapper">
+					    		<div class="row-inline-field">
+					 				{{ project_form.contract_indexation_start_date }}
+			        			</div>
+
+					    		<div class="row-inline-field">
+					 				{{ project_form.contract_indexation }}
+			        			</div>
+
+			        		</div>
+								
+								
+								
+
 
 
 						
@@ -428,6 +473,17 @@
 				    
 				    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
 					    <div class="card-body">
+
+							<div class="row-inline-wrapper">
+					    		<div class="row-inline-label">
+									<h1>Operating costs</h1>
+			        			</div>
+
+					    		<div class="row-inline-label">
+									<h1>{{ project_form.opex }}</h1>
+			        			</div>
+
+					        </div>
 						</div>   
 	      			</div>
     			</div>
@@ -521,6 +577,8 @@
 				    
 				    <div id="collapseEleven" class="collapse" aria-labelledby="headingEleven" data-parent="#accordion">
 					    <div class="card-body">
+					    	{{ project_form.name }}
+
 						</div>   
 	      			</div>
     			</div>
