@@ -34,7 +34,7 @@ a:focus {
 
 
 h1 {
-    font-size: 10px;
+    font-size: 0.75rem;
 }
 
 
@@ -76,7 +76,7 @@ header {
     background: rgb(245, 247, 249);
     color: rgb(92, 105, 117);
     transition: all 0.3s;
-    font-size: 10px;
+    font-size: 0.75rem;
     padding-bottom: 40px;
     padding-left: 10px;
     padding-top: 10px;
@@ -128,7 +128,7 @@ header {
 
 
 #myTable{
-    font-size: 12px;
+    font-size: 0.75rem;
 
 }
 
@@ -176,20 +176,14 @@ header {
 
 .row-inline-wrapper{
     display: flex;
-    top: 0px;
     }
 
-.row-inline-label{
-    display: flex;
-    width: 50%;
-    padding-top: 10px;
+.row-inline-two{
+    flex: 1 1 0;
     }
 
-.row-inline-field{
-    display: flex;
-    width: 50%;
-    padding-top: 0px;
-
+.row-inline-four{
+    flex: 1 1 0;
     }
 
 .form{

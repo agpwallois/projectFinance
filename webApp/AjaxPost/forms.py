@@ -17,6 +17,7 @@ class ProjectForm(forms.ModelForm):
 		'start_contract': forms.DateInput(attrs={'type': 'date',}),
 		'end_contract': forms.DateInput(attrs={'type': 'date',}),
 		'contract_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
+		'price_elec_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 		'periodicity': forms.RadioSelect(choices=PERIODICITY_CHOICES),
 	}
 	 
