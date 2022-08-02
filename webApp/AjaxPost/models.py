@@ -165,6 +165,8 @@ class Project(models.Model):
 	price_elec_high_y30 = models.fields.IntegerField(default="0")
 
 	opex = models.fields.IntegerField()
+	opex_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
+	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
 
 
 

@@ -14,6 +14,20 @@
 
 </div>
 
+<div class="charts-container">
+
+    <div class="graph"><canvas id="myChart5"></canvas></div>
+    <div class="graph"><canvas id="myChart6"></canvas></div>
+
+</div>
+
+<div class="charts-container">
+
+    <div class="graph"><canvas id="myChart7"></canvas></div>
+    <div class="graph"><canvas id="myChart8"></canvas></div>
+
+</div>
+
 <!-- Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
 
@@ -181,27 +195,17 @@ const myChart3 = new Chart(ctx3, {
 
 const ctx4 = document.getElementById('myChart4');
 const myChart4 = new Chart(ctx4, {
-    type: 'pie',
+    type: 'bar',
     data: {
         labels: ["1","2","3","4","5","6"],
         datasets: [{
-            label: '%',
+            label: 'kEUR',
             data: [1,2,3,4,5,6],
             backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
             ],
             borderColor: [
-                'rgba(255, 99, 132, 1)',
                 'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
             ],
             borderWidth: 1
         }]
@@ -213,13 +217,73 @@ const myChart4 = new Chart(ctx4, {
        
        plugins:{
             legend: {
-                position: 'bottom',
+                position: 'top',
             },
 
             title: {
                 display: true,
-                text: 'Seasonality'
+                text: 'Operating costs'
             }},
+    }
+});
+
+const ctx5 = document.getElementById('myChart5');
+const myChart5 = new Chart(ctx5, {
+    data: {
+        labels: ["1","2","3","4","5","6"],
+        datasets: [{
+            type: 'bar',
+            label: 'EBITDA (kEUR)',
+            yAxisID: 'A',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+            ],
+            borderWidth: 1
+        },{
+
+            type: 'line',
+            label: 'EBITDA margin (%)',
+            yAxisID: 'B',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+            ],
+            borderWidth: 1
+        }
+        ]
+    },
+    options: {
+
+        responsive:true,
+        maintainAspectRatio: false,
+
+      plugins:{
+        legend: {
+            position: 'top',
+        },
+
+         title: {
+            display: true,
+            text: 'EBITDA and EBITDA margin'
+        }},
+
+        scales: {
+            A: {
+                position: 'left',
+                beginAtZero: true,
+            },
+            B: {
+                position: 'right',
+                beginAtZero: true,
+            },
+        }
     }
 });
 

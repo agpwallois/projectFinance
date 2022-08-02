@@ -19,6 +19,8 @@ class ProjectForm(forms.ModelForm):
 		'contract_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 		'price_elec_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 		'periodicity': forms.RadioSelect(choices=PERIODICITY_CHOICES),
+		'opex_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
+
 	}
 	 
 	def __init__(self, *args, **kwargs):

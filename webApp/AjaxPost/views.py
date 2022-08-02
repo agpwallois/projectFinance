@@ -18,8 +18,6 @@ import pandas as pd
 import numpy as np
 from django.core import serializers
 
-
-
 class ProjectView(ListView):
 	model = Project
 	template_name = 'project_list.html'
@@ -126,18 +124,22 @@ def project_view(request,id):
 
 			""" Construction costs inputs """
 
-			inp_costs_m1 = request.POST['end_construction']
-			inp_costs_m2 = request.POST['end_construction']
-			inp_costs_m3 = request.POST['end_construction']
-			inp_costs_m4 = request.POST['end_construction']
-			inp_costs_m5 = request.POST['end_construction']
-			inp_costs_m6 = request.POST['end_construction']
-			inp_costs_m7 = request.POST['end_construction']
-			inp_costs_m8 = request.POST['end_construction']
-			inp_costs_m9 = request.POST['end_construction']
-			inp_costs_m10 = request.POST['end_construction']
-			inp_costs_m11 = request.POST['end_construction']
-			inp_costs_m12 = request.POST['end_construction']
+			construction_costs = np.array([
+			float(request.POST['costs_m1']),
+			float(request.POST['costs_m2']),
+			float(request.POST['costs_m3']),
+			float(request.POST['costs_m4']),
+			float(request.POST['costs_m5']),
+			float(request.POST['costs_m6']),
+			float(request.POST['costs_m7']),
+			float(request.POST['costs_m8']),
+			float(request.POST['costs_m9']),
+			float(request.POST['costs_m10']),
+			float(request.POST['costs_m11']),
+			float(request.POST['costs_m12']),
+			])
+
+			sum_construction_costs = np.sum(construction_costs)
 
 			r = relativedelta(end_construction,start_period)
 			months_construction = (r.years * 12) + r.months + 1
@@ -263,6 +265,13 @@ def project_view(request,id):
 			float(request.POST['price_elec_high_y30']),
 			])
 
+			""" Operating costs """
+
+			inp_opex = float(request.POST['opex'])
+			inp_opex_indexation_start_date = request.POST['opex_indexation_start_date']
+			date_opex_indexation_start = datetime.datetime.strptime(inp_opex_indexation_start_date, "%Y-%m-%d").date()
+			inp_opex_indexation_rate = float(request.POST['opex_indexation'])
+
 			""" Arrays instanciation """
 
 			arr_start_period = np.array([])
@@ -272,9 +281,9 @@ def project_view(request,id):
 			arr_period_type = np.array([])
 			arr_days = np.array([])
 			arr_pct_year = np.array([])
+			arr_pct_year_operations = np.array([])
 			arr_years_from_COD_BOP = np.array([])
 			arr_years_from_COD_EOP = np.array([])
-			pct_year_cumul = 0
 
 			arr_days_months = np.array([])
 			arr_seasonality = np.array([])
@@ -288,13 +297,31 @@ def project_view(request,id):
 			arr_electricity_price = np.array([])
 			arr_electricity_price_indexation = np.array([])
 
-
 			arr_revenues_contracted = np.array([])
 			arr_revenues_merchant = np.array([])
+			
+			arr_opex = np.array([])
+			arr_opex_indexation = np.array([])
 
+			arr_EBITDA = np.array([]) 
+			arr_EBITDA_margin = np.array([])
+
+			arr_construction = np.array([])
+			arr_construction_costs = np.array([])
+
+			arr_depreciation = np.array([])
+
+
+
+			""" Variables instanciation """
+
+			pct_year_cumul = 0
 			cumul_year_contract_indexation = 0
 			cumul_year_electricity_price_indexation = 0
+			cumul_year_opex_indexation = 0
+			cumul_construction_costs = 0
 
+			days_in_operation = (final_date - date_COD).days
 	
 			""" Construction period """
 
@@ -303,13 +330,17 @@ def project_view(request,id):
 				end_period = min(end_construction,start_period.replace(day = calendar.monthrange(start_period.year, start_period.month)[1]))
 				arr_end_period = np.append(arr_end_period,end_period)
 
-
-
 				days_period = (end_period + datetime.timedelta(days=1) - start_period).days
 				arr_days = np.append(arr_days,days_period)
 				
 				days_year = 366 if calendar.isleap(end_period.year) else 365
 				arr_pct_year = np.append(arr_pct_year,days_period/days_year)
+				
+				arr_construction = np.append(arr_construction,construction_costs[i])
+				cumul_construction_costs += construction_costs[i]
+				arr_construction_costs = np.append(arr_construction_costs,cumul_construction_costs)
+
+				arr_depreciation = np.append(arr_depreciation,0)
 
 				arr_years_from_COD_BOP = np.append(arr_years_from_COD_BOP,0)
 				arr_years_from_COD_EOP = np.append(arr_years_from_COD_EOP,0)
@@ -318,14 +349,18 @@ def project_view(request,id):
 				arr_electricity_price = np.append(arr_electricity_price,0)
 				arr_days_contract_in_period_pct = np.append(arr_days_contract_in_period_pct,0)
 				arr_period_type = np.append(arr_period_type,0)
-
+				arr_pct_year_operations = np.append(arr_pct_year_operations,0)
+				arr_opex = np.append(arr_opex,0)
+				arr_revenues_merchant = np.append(arr_revenues_merchant,0)
+				arr_revenues_contracted = np.append(arr_revenues_contracted,0)
 
 				cumul_year_contract_indexation += create_array_indexation(date_contract_indexation_start,final_date,start_period,end_period)
 				cumul_year_electricity_price_indexation += create_array_indexation(date_price_elec_indexation_start,final_date,start_period,end_period)
-
+				cumul_year_opex_indexation += create_array_indexation(date_opex_indexation_start,final_date,start_period,end_period)
+				
 				arr_contract_indexation = np.append(arr_contract_indexation,(1+inp_contract_indexation_rate)**cumul_year_contract_indexation)
 				arr_electricity_price_indexation = np.append(arr_electricity_price_indexation,(1+inp_price_elec_indexation)**cumul_year_electricity_price_indexation)
-
+				arr_opex_indexation = np.append(arr_opex_indexation,(1+inp_opex_indexation_rate)**cumul_year_opex_indexation)
 
 				start_period = end_period + datetime.timedelta(days=1)
 
@@ -345,18 +380,18 @@ def project_view(request,id):
 				days_each_month_year = compute_days_per_month(start_period,end_period)
 				arr_seasonality = np.append(arr_seasonality,np.sum(days_each_month_year*seasonality))
 
-
-
 				days_period = (end_period + datetime.timedelta(days=1) - start_period).days
 				arr_days = np.append(arr_days,days_period)
+
+				days_period_pct_of_operations = days_period/days_in_operation
+				arr_depreciation = np.append(arr_depreciation,cumul_construction_costs*days_period_pct_of_operations)
 
 				days_year = 366 if calendar.isleap(end_period.year) else 365
 				pct_year = days_period/days_year
 				arr_pct_year = np.append(arr_pct_year,pct_year)
+				arr_pct_year_operations = np.append(arr_pct_year_operations,pct_year)
 
 				pct_year_cumul = pct_year_cumul + pct_year
-
-
 
 				arr_years_from_COD_EOP = np.append(arr_years_from_COD_EOP,pct_year_cumul)
 				arr_years_from_COD_BOP = np.append(arr_years_from_COD_BOP,pct_year_cumul-pct_year)
@@ -368,10 +403,12 @@ def project_view(request,id):
 
 				cumul_year_contract_indexation += create_array_indexation(date_contract_indexation_start,final_date,start_period,end_period)
 				cumul_year_electricity_price_indexation += create_array_indexation(date_price_elec_indexation_start,final_date,start_period,end_period)
+				cumul_year_opex_indexation += create_array_indexation(date_opex_indexation_start,final_date,start_period,end_period)
 
-				arr_contract_indexation = np.append(arr_contract_indexation,(1+inp_contract_indexation_rate)**cumul_year_contract_indexation)
-				arr_electricity_price_indexation = np.append(arr_electricity_price_indexation,(1+inp_price_elec_indexation)**cumul_year_electricity_price_indexation)
-				
+				arr_contract_indexation = np.append(arr_contract_indexation,(1+inp_contract_indexation_rate/100)**cumul_year_contract_indexation)
+				arr_electricity_price_indexation = np.append(arr_electricity_price_indexation,(1+inp_price_elec_indexation/100)**cumul_year_electricity_price_indexation)
+				arr_opex_indexation = np.append(arr_opex_indexation,(1+inp_opex_indexation_rate/100)**cumul_year_opex_indexation)
+
 				start_period = end_period + datetime.timedelta(days=1)
 				arr_period_type = np.append(arr_period_type,1)
 
@@ -388,7 +425,9 @@ def project_view(request,id):
 					if key == str(end_period.year):
 						arr_electricity_price = np.append(arr_electricity_price,dic_price_elec_medium[key])
 
-				""" Revenues """
+				arr_opex = np.append(arr_opex,inp_opex)
+
+			""" Revenues """
 
 			arr_revenues_contracted = np.multiply(production,arr_days_contract_in_period_pct)
 			arr_revenues_contracted = np.multiply(arr_revenues_contracted,arr_contract_indexation)*inp_contract_price/1000
@@ -399,8 +438,17 @@ def project_view(request,id):
 
 			arr_revenues_total = np.add(arr_revenues_contracted,arr_revenues_merchant)
 
+			""" Operating costs """
 
-			data_dump_sidebar = np.array([date_COD,final_date,sum_seasonality,])
+			arr_opex = np.multiply(arr_opex,arr_pct_year_operations)
+			arr_opex = np.multiply(arr_opex,arr_opex_indexation)
+
+			""" EBITDA """
+
+			arr_EBITDA = np.subtract(arr_revenues_total,arr_opex)
+			arr_EBITDA_margin = np.divide(arr_EBITDA,arr_revenues_total, out=np.zeros_like(arr_EBITDA), where=arr_revenues_total!=0)*100
+
+			data_dump_sidebar = np.array([date_COD,final_date,sum_seasonality,sum_construction_costs])
 			
 			return JsonResponse(
 							{
@@ -429,7 +477,17 @@ def project_view(request,id):
 
 							"arr_revenues_contracted":arr_revenues_contracted.tolist(),
 							"arr_revenues_merchant":arr_revenues_merchant.tolist(),
+							"arr_opex":arr_opex.tolist(),
 
+							"arr_revenues_total":arr_revenues_total.tolist(),
+
+							"arr_EBITDA":arr_EBITDA.tolist(),
+							"arr_EBITDA_margin":arr_EBITDA_margin.tolist(),
+
+							"arr_construction":arr_construction.tolist(),
+							"arr_construction_costs":arr_construction_costs.tolist(),
+
+							"arr_depreciation":arr_depreciation.tolist(),
 
 
 						},safe=False, status=200)
@@ -447,8 +505,6 @@ def project_view(request,id):
 	
 	return render(request, "project_view.html", context)
 	
-
-
 
 def create_array_indexation(start_date_indexation, end_date_indexation, start_period, end_period):
 

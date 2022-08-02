@@ -305,6 +305,16 @@
 						    <div class="card-body">
 
 					        	<h5>Monthly construction schedule</h5>
+
+       							<div class="row-inline-wrapper">
+							    	<div class="row-inline-two">
+											<h1>Sum (kEUR)</h1>
+					        		</div>
+						    		<div class="row-inline-two">
+							    			<div id="sumConstructionCosts"></div>
+				        			</div>
+					        	</div>
+
 					        	<div class="row-inline-wrapper">
 							    	<div class="row-inline-two">
 											<h1>Month 1</h1>
@@ -1028,7 +1038,29 @@
 
 							<div class="row-inline-wrapper">
 					    		<div class="row-inline-two">
-									<h1>Operating costs</h1>
+									<h1>Operating costs indexation base date</h1>
+			        			</div>
+
+					    		<div class="row-inline-two">
+									<h1>Operating costs indexation p.a. (%)</h1>
+			        			</div>
+
+					        </div>
+
+			        		<div class="row-inline-wrapper">
+					    		<div class="row-inline-two">
+					 				{{ project_form.opex_indexation_start_date }}
+			        			</div>
+
+					    		<div class="row-inline-two">
+					 				{{ project_form.opex_indexation }}
+			        			</div>
+
+			        		</div>
+
+							<div class="row-inline-wrapper">
+					    		<div class="row-inline-two">
+									<h1>Operating costs p.a.</h1>
 			        			</div>
 
 					    		<div class="row-inline-two">
@@ -1170,13 +1202,20 @@
 
 			<h2>Income statement</h2>
 
-			<table class="table table-striped" id="outTable">
-				<tbody id="myTable">
+			<table class="table">
+				<tbody id="myTableIS">
 		
 				</tbody>
 			</table>
  			
  			<h2>Financing plan</h2>
+
+ 			<table class="table table-striped" id="outTable">
+				<tbody id="myTableFP">
+		
+				</tbody>
+			</table>
+
 		</div>
 
 		<div class="tab-pane fade" id="nav-graphs" role="tabpanel" aria-labelledby="nav-graphs-tab">
@@ -1197,7 +1236,20 @@
     	$("#post-form").submit();
 	});
 
+	var income_statement = {"BoP":0,
+							"EoP":0,
+							"arr_revenues_contracted":0,
+							"arr_revenues_merchant":0,
+							"arr_revenues_total":0,
+							"arr_opex":0,
+							"arr_EBITDA":0,}
+
+	var financing_plan = {"BoP":0,
+						  "EoP":0,
+						  "arr_construction":0,}
+
 	$(document).on('submit','#post-form', function(e){
+
 		e.preventDefault(),
 		$.ajax({
 			type:'POST',
@@ -1205,19 +1257,37 @@
 			data: $(this).serialize(),
 			success:function(json){
 				console.log(json);
-				var result = '';
+				var result_IS = '';
   				$.each(json, function(key, data) {
-  					result += "<tr>";
-  					result += "<td>" + key + "</td>";
-  					$.each(data, function(index, data) {
-    					result += "<td>" + data + "</td>";
-    				});
-  					result += "</tr>";
+  					if(key in income_statement) {
+	  					result_IS += "<tr>";
+	  					result_IS += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_IS += "<td>" + data + "</td>";
+	    				});
+	  					result_IS += "</tr>";
+  					}
   				});
-  				$("#myTable").html(result);
+  				$("#myTableIS").html(result_IS);
+  				
+  				var result_FP = '';
+  				$.each(json, function(key, data) {
+  					if(key in financing_plan) {
+	  					result_FP += "<tr>";
+	  					result_FP += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_FP += "<td>" + data + "</td>";
+	    				});
+	  					result_FP += "</tr>";
+  					}
+  				});
+  				$("#myTableFP").html(result_FP);
+
   				$("#dateCOD").html(json.data_dump_sidebar[0]);
    				$("#dateRetirement").html(json.data_dump_sidebar[1]);
    				$("#sumSeasonality").html(json.data_dump_sidebar[2]);
+   				$("#sumConstructionCosts").html(json.data_dump_sidebar[3]);
+
 				$("#elecPriceLabel1").html(json.arr_years_electricity_prices[0]);
 				$("#elecPriceLabel2").html(json.arr_years_electricity_prices[1]);
 				$("#elecPriceLabel3").html(json.arr_years_electricity_prices[2]);
@@ -1265,6 +1335,16 @@
   				myChart3.data.datasets[0].data = json.arr_revenues_contracted;
   				myChart3.data.datasets[1].data = json.arr_revenues_merchant;
 				myChart3.update()
+
+  				myChart4.data.labels = json.EoP;
+  				myChart4.data.datasets[0].data = json.arr_opex;
+				myChart4.update()
+
+				myChart5.data.labels = json.EoP;
+  				myChart5.data.datasets[0].data = json.arr_EBITDA;
+  				myChart5.data.datasets[1].data = json.arr_EBITDA_margin;
+				myChart5.update()
+
 
 
 			},

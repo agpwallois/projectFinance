@@ -37,6 +37,10 @@ h1 {
     font-size: 0.75rem;
 }
 
+h2 {
+    font-size: 1rem;
+}
+
 
 /* ---------------------------------------------------
     HEADER STYLE
@@ -127,9 +131,20 @@ header {
 }
 
 
-#myTable{
+.table{
     font-size: 0.75rem;
+}
 
+td {
+    line-height: 0px;
+    text-align: center;
+    width: 40px;
+}
+
+td:nth-child(1) {  
+    text-align: left;
+    font-weight: bold;
+    width: 100px;
 }
 
 /* ---------------------------------------------------
