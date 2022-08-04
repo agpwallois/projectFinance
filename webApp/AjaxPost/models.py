@@ -34,6 +34,7 @@ class Project(models.Model):
 	p50 = models.fields.IntegerField(default="2000")
 	p90_10y = models.fields.IntegerField(default="2000")
 	P99_10y = models.fields.IntegerField(default="2000")
+	production_choice = models.fields.IntegerField(default="2")
 
 	availability = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.99)
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
@@ -70,6 +71,8 @@ class Project(models.Model):
 
 	price_elec_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
+	price_elec_choice = models.fields.IntegerField(default="2")
+
 
 	price_elec_low_y1 = models.fields.IntegerField(default="0")
 	price_elec_low_y2 = models.fields.IntegerField(default="0")
@@ -168,7 +171,21 @@ class Project(models.Model):
 	opex_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
 
+	debt_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
+	debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
+	debt_swap_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.5)
+	debt_reference_rate_buffer = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)
+	
+	debt_upfront_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
+	debt_commitment_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
+	
+	debt_target_DSCR = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1.15)
+	debt_gearing_max = models.fields.DecimalField(max_digits=4, decimal_places=2, default=90)
+	debt_negative_tail = models.fields.IntegerField(default="0")
 
+	debt_tenor = models.fields.IntegerField(default="20")
+
+	corporate_income_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=30) 
 
 
 

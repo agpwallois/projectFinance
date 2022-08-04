@@ -98,11 +98,15 @@ def project_view(request,id):
 			""" Capacity and Production inputs """
 
 			inp_capacity = int(request.POST['panels_capacity'])				
-			inp_degradation = float(request.POST['annual_degradation'])
+			inp_degradation = float(request.POST['annual_degradation'])/100
 
-			inp_p50 = request.POST.get('P50',False)
-			inp_p90_10y = int(request.POST['p90_10y'])	
-			inp_P99_10y = int(request.POST['P99_10y'])	
+			if int(request.POST['production_choice']) == 1:
+				inp_production = int(request.POST['p50'])
+			elif int(request.POST['production_choice']) == 2:
+				inp_production = int(request.POST['p90_10y'])
+			else: 
+				inp_production = int(request.POST['P99_10y'])
+
 			inp_availability = float(request.POST['availability'])	
 
 			seasonality = np.array([
@@ -154,7 +158,7 @@ def project_view(request,id):
 			date_contract_end = datetime.datetime.strptime(inp_contract_end, "%Y-%m-%d").date()
 
 			inp_contract_price = float(request.POST['contract_price'])
-			inp_contract_indexation_rate = float(request.POST['contract_indexation'])
+			inp_contract_indexation_rate = float(request.POST['contract_indexation'])/100
 
 			inp_contract_indexation_start_date = request.POST['contract_indexation_start_date']
 			date_contract_indexation_start = datetime.datetime.strptime(inp_contract_indexation_start_date, "%Y-%m-%d").date()
@@ -166,117 +170,144 @@ def project_view(request,id):
 
 			arr_years_electricity_prices = create_array_electricity_prices(date_COD)
 
-			price_elec_low = np.array([
-			float(request.POST['price_elec_low_y1']),
-			float(request.POST['price_elec_low_y2']),
-			float(request.POST['price_elec_low_y3']),
-			float(request.POST['price_elec_low_y4']),
-			float(request.POST['price_elec_low_y5']),
-			float(request.POST['price_elec_low_y6']),
-			float(request.POST['price_elec_low_y7']),
-			float(request.POST['price_elec_low_y8']),
-			float(request.POST['price_elec_low_y9']),
-			float(request.POST['price_elec_low_y10']),
-			float(request.POST['price_elec_low_y11']),
-			float(request.POST['price_elec_low_y12']),
-			float(request.POST['price_elec_low_y13']),
-			float(request.POST['price_elec_low_y14']),
-			float(request.POST['price_elec_low_y15']),
-			float(request.POST['price_elec_low_y16']),
-			float(request.POST['price_elec_low_y17']),
-			float(request.POST['price_elec_low_y18']),
-			float(request.POST['price_elec_low_y19']),
-			float(request.POST['price_elec_low_y20']),
-			float(request.POST['price_elec_low_y21']),
-			float(request.POST['price_elec_low_y22']),
-			float(request.POST['price_elec_low_y23']),
-			float(request.POST['price_elec_low_y24']),
-			float(request.POST['price_elec_low_y25']),
-			float(request.POST['price_elec_low_y26']),
-			float(request.POST['price_elec_low_y27']),
-			float(request.POST['price_elec_low_y28']),
-			float(request.POST['price_elec_low_y29']),
-			float(request.POST['price_elec_low_y30']),
-			])
-
-			dic_price_elec_medium = {
-			"2022":float(request.POST['price_elec_med_y1']),
-			"2023":float(request.POST['price_elec_med_y2']),
-			"2024":float(request.POST['price_elec_med_y3']),
-			"2025":float(request.POST['price_elec_med_y4']),
-			"2026":float(request.POST['price_elec_med_y5']),
-			"2027":float(request.POST['price_elec_med_y6']),
-			"2028":float(request.POST['price_elec_med_y7']),
-			"2029":float(request.POST['price_elec_med_y8']),
-			"2030":float(request.POST['price_elec_med_y9']),
-			"2031":float(request.POST['price_elec_med_y10']),
-			"2032":float(request.POST['price_elec_med_y11']),
-			"2033":float(request.POST['price_elec_med_y12']),
-			"2034":float(request.POST['price_elec_med_y13']),
-			"2035":float(request.POST['price_elec_med_y14']),
-			"2036":float(request.POST['price_elec_med_y15']),
-			"2037":float(request.POST['price_elec_med_y16']),
-			"2038":float(request.POST['price_elec_med_y17']),
-			"2039":float(request.POST['price_elec_med_y18']),
-			"2040":float(request.POST['price_elec_med_y19']),
-			"2041":float(request.POST['price_elec_med_y20']),
-			"2042":float(request.POST['price_elec_med_y21']),
-			"2043":float(request.POST['price_elec_med_y22']),
-			"2044":float(request.POST['price_elec_med_y23']),
-			"2045":float(request.POST['price_elec_med_y24']),
-			"2046":float(request.POST['price_elec_med_y25']),
-			"2047":float(request.POST['price_elec_med_y26']),
-			"2048":float(request.POST['price_elec_med_y27']),
-			"2049":float(request.POST['price_elec_med_y28']),
-			"2050":float(request.POST['price_elec_med_y29']),
-			"2051":float(request.POST['price_elec_med_y30']),
-			}
-
-			price_elec_high = np.array([
-			float(request.POST['price_elec_high_y1']),
-			float(request.POST['price_elec_high_y2']),
-			float(request.POST['price_elec_high_y3']),
-			float(request.POST['price_elec_high_y4']),
-			float(request.POST['price_elec_high_y5']),
-			float(request.POST['price_elec_high_y6']),
-			float(request.POST['price_elec_high_y7']),
-			float(request.POST['price_elec_high_y8']),
-			float(request.POST['price_elec_high_y9']),
-			float(request.POST['price_elec_high_y10']),
-			float(request.POST['price_elec_high_y11']),
-			float(request.POST['price_elec_high_y12']),
-			float(request.POST['price_elec_high_y13']),
-			float(request.POST['price_elec_high_y14']),
-			float(request.POST['price_elec_high_y15']),
-			float(request.POST['price_elec_high_y16']),
-			float(request.POST['price_elec_high_y17']),
-			float(request.POST['price_elec_high_y18']),
-			float(request.POST['price_elec_high_y19']),
-			float(request.POST['price_elec_high_y20']),
-			float(request.POST['price_elec_high_y21']),
-			float(request.POST['price_elec_high_y22']),
-			float(request.POST['price_elec_high_y23']),
-			float(request.POST['price_elec_high_y24']),
-			float(request.POST['price_elec_high_y25']),
-			float(request.POST['price_elec_high_y26']),
-			float(request.POST['price_elec_high_y27']),
-			float(request.POST['price_elec_high_y28']),
-			float(request.POST['price_elec_high_y29']),
-			float(request.POST['price_elec_high_y30']),
-			])
+			if int(request.POST['price_elec_choice']) == 1:
+				dic_price_elec = {
+				"2022":float(request.POST['price_elec_low_y1']),
+				"2023":float(request.POST['price_elec_low_y2']),
+				"2024":float(request.POST['price_elec_low_y3']),
+				"2025":float(request.POST['price_elec_low_y4']),
+				"2026":float(request.POST['price_elec_low_y5']),
+				"2027":float(request.POST['price_elec_low_y6']),
+				"2028":float(request.POST['price_elec_low_y7']),
+				"2029":float(request.POST['price_elec_low_y8']),
+				"2030":float(request.POST['price_elec_low_y9']),
+				"2031":float(request.POST['price_elec_low_y10']),
+				"2032":float(request.POST['price_elec_low_y11']),
+				"2033":float(request.POST['price_elec_low_y12']),
+				"2034":float(request.POST['price_elec_low_y13']),
+				"2035":float(request.POST['price_elec_low_y14']),
+				"2036":float(request.POST['price_elec_low_y15']),
+				"2037":float(request.POST['price_elec_low_y16']),
+				"2038":float(request.POST['price_elec_low_y17']),
+				"2039":float(request.POST['price_elec_low_y18']),
+				"2040":float(request.POST['price_elec_low_y19']),
+				"2041":float(request.POST['price_elec_low_y20']),
+				"2042":float(request.POST['price_elec_low_y21']),
+				"2043":float(request.POST['price_elec_low_y22']),
+				"2044":float(request.POST['price_elec_low_y23']),
+				"2045":float(request.POST['price_elec_low_y24']),
+				"2046":float(request.POST['price_elec_low_y25']),
+				"2047":float(request.POST['price_elec_low_y26']),
+				"2048":float(request.POST['price_elec_low_y27']),
+				"2049":float(request.POST['price_elec_low_y28']),
+				"2050":float(request.POST['price_elec_low_y29']),
+				"2051":float(request.POST['price_elec_low_y30']),
+				}
+			elif int(request.POST['price_elec_choice']) == 2:
+				dic_price_elec = {
+				"2022":float(request.POST['price_elec_med_y1']),
+				"2023":float(request.POST['price_elec_med_y2']),
+				"2024":float(request.POST['price_elec_med_y3']),
+				"2025":float(request.POST['price_elec_med_y4']),
+				"2026":float(request.POST['price_elec_med_y5']),
+				"2027":float(request.POST['price_elec_med_y6']),
+				"2028":float(request.POST['price_elec_med_y7']),
+				"2029":float(request.POST['price_elec_med_y8']),
+				"2030":float(request.POST['price_elec_med_y9']),
+				"2031":float(request.POST['price_elec_med_y10']),
+				"2032":float(request.POST['price_elec_med_y11']),
+				"2033":float(request.POST['price_elec_med_y12']),
+				"2034":float(request.POST['price_elec_med_y13']),
+				"2035":float(request.POST['price_elec_med_y14']),
+				"2036":float(request.POST['price_elec_med_y15']),
+				"2037":float(request.POST['price_elec_med_y16']),
+				"2038":float(request.POST['price_elec_med_y17']),
+				"2039":float(request.POST['price_elec_med_y18']),
+				"2040":float(request.POST['price_elec_med_y19']),
+				"2041":float(request.POST['price_elec_med_y20']),
+				"2042":float(request.POST['price_elec_med_y21']),
+				"2043":float(request.POST['price_elec_med_y22']),
+				"2044":float(request.POST['price_elec_med_y23']),
+				"2045":float(request.POST['price_elec_med_y24']),
+				"2046":float(request.POST['price_elec_med_y25']),
+				"2047":float(request.POST['price_elec_med_y26']),
+				"2048":float(request.POST['price_elec_med_y27']),
+				"2049":float(request.POST['price_elec_med_y28']),
+				"2050":float(request.POST['price_elec_med_y29']),
+				"2051":float(request.POST['price_elec_med_y30']),
+				}
+			else: 
+				dic_price_elec = {
+				"2022":float(request.POST['price_elec_high_y1']),
+				"2023":float(request.POST['price_elec_high_y2']),
+				"2024":float(request.POST['price_elec_high_y3']),
+				"2025":float(request.POST['price_elec_high_y4']),
+				"2026":float(request.POST['price_elec_high_y5']),
+				"2027":float(request.POST['price_elec_high_y6']),
+				"2028":float(request.POST['price_elec_high_y7']),
+				"2029":float(request.POST['price_elec_high_y8']),
+				"2030":float(request.POST['price_elec_high_y9']),
+				"2031":float(request.POST['price_elec_high_y10']),
+				"2032":float(request.POST['price_elec_high_y11']),
+				"2033":float(request.POST['price_elec_high_y12']),
+				"2034":float(request.POST['price_elec_high_y13']),
+				"2035":float(request.POST['price_elec_high_y14']),
+				"2036":float(request.POST['price_elec_high_y15']),
+				"2037":float(request.POST['price_elec_high_y16']),
+				"2038":float(request.POST['price_elec_high_y17']),
+				"2039":float(request.POST['price_elec_high_y18']),
+				"2040":float(request.POST['price_elec_high_y19']),
+				"2041":float(request.POST['price_elec_high_y20']),
+				"2042":float(request.POST['price_elec_high_y21']),
+				"2043":float(request.POST['price_elec_high_y22']),
+				"2044":float(request.POST['price_elec_high_y23']),
+				"2045":float(request.POST['price_elec_high_y24']),
+				"2046":float(request.POST['price_elec_high_y25']),
+				"2047":float(request.POST['price_elec_high_y26']),
+				"2048":float(request.POST['price_elec_high_y27']),
+				"2049":float(request.POST['price_elec_high_y28']),
+				"2050":float(request.POST['price_elec_high_y29']),
+				"2051":float(request.POST['price_elec_high_y30']),
+				}
 
 			""" Operating costs """
 
 			inp_opex = float(request.POST['opex'])
 			inp_opex_indexation_start_date = request.POST['opex_indexation_start_date']
 			date_opex_indexation_start = datetime.datetime.strptime(inp_opex_indexation_start_date, "%Y-%m-%d").date()
-			inp_opex_indexation_rate = float(request.POST['opex_indexation'])
+			inp_opex_indexation_rate = float(request.POST['opex_indexation'])/100
+
+
+			""" Senior debt """
+
+			inp_debt_commitment_fee = float(request.POST['debt_commitment_fee'])/100
+
+			inp_all_in_interest = np.array([
+				float(request.POST['debt_margin']),
+				float(request.POST['debt_swap_rate']),
+				float(request.POST['debt_swap_margin']),
+				float(request.POST['debt_reference_rate_buffer']),
+				])
+
+			inp_debt_interest_rate = np.sum(inp_all_in_interest)/100
+
+			inp_debt_tenor = float(request.POST['debt_tenor'])
+			date_debt_maturity = start_period + relativedelta(months=+int(inp_debt_tenor*12)-1)
+			date_debt_maturity = date_debt_maturity.replace(day = calendar.monthrange(date_debt_maturity.year, date_debt_maturity.month)[1])
+
+			""" Tax and accounting """
+
+			inp_corporate_income_tax_rate = float(request.POST['corporate_income_tax'])/100
 
 			""" Arrays instanciation """
 
 			arr_start_period = np.array([])
 			arr_end_period = np.array([])
 			arr_period_type = np.array([])
+
+			arr_start_period_financing_plan = np.array([])
+			arr_end_period_financing_plan = np.array([])
+
 
 			arr_period_type = np.array([])
 			arr_days = np.array([])
@@ -312,6 +343,21 @@ def project_view(request,id):
 			arr_depreciation = np.array([])
 
 
+			arr_debt_amount_available = np.array([])
+			arr_debt_upfront_fee = np.array([])
+			arr_debt_commitment_fee = np.array([])
+
+			arr_debt_BoP = np.array([])
+			arr_debt_drawn = np.array([])
+			arr_debt_repayment = np.array([])
+			arr_debt_EoP = np.array([])
+			arr_debt_interest = np.array([])
+			arr_debt_interest_construction = np.array([])
+			arr_debt_interest_operations = np.array([])
+
+
+			arr_debt_amortisation = np.array([])
+
 
 			""" Variables instanciation """
 
@@ -320,15 +366,23 @@ def project_view(request,id):
 			cumul_year_electricity_price_indexation = 0
 			cumul_year_opex_indexation = 0
 			cumul_construction_costs = 0
+			cumul_debt_drawn = 0
+			cumul_debt_repayment = 0
 
 			days_in_operation = (final_date - date_COD).days
+
+			debt_amount = 100000
 	
 			""" Construction period """
 
 			for i in range(0, months_construction):
 				arr_start_period = np.append(arr_start_period,start_period)
+				arr_start_period_financing_plan = np.append(arr_start_period_financing_plan,start_period)
+				
 				end_period = min(end_construction,start_period.replace(day = calendar.monthrange(start_period.year, start_period.month)[1]))
+				
 				arr_end_period = np.append(arr_end_period,end_period)
+				arr_end_period_financing_plan = np.append(arr_end_period_financing_plan,end_period)
 
 				days_period = (end_period + datetime.timedelta(days=1) - start_period).days
 				arr_days = np.append(arr_days,days_period)
@@ -339,6 +393,32 @@ def project_view(request,id):
 				arr_construction = np.append(arr_construction,construction_costs[i])
 				cumul_construction_costs += construction_costs[i]
 				arr_construction_costs = np.append(arr_construction_costs,cumul_construction_costs)
+
+
+				""" Senior debt """
+				arr_debt_amortisation = np.append(arr_debt_amortisation,0)
+
+				arr_debt_BoP = np.append(arr_debt_BoP,cumul_debt_drawn)
+				arr_debt_interest = np.append(arr_debt_interest,cumul_debt_drawn*inp_debt_interest_rate*days_period/360)
+				arr_debt_interest_construction = np.append(arr_debt_interest_construction,cumul_debt_drawn*inp_debt_interest_rate*days_period/360)
+				arr_debt_interest_operations = np.append(arr_debt_interest_operations,0) 
+
+				debt_drawn = construction_costs[i]
+				cumul_debt_drawn = cumul_construction_costs
+				arr_debt_drawn = np.append(arr_debt_drawn,debt_drawn)
+				debt_amount_available = max(0,debt_amount-cumul_debt_drawn)
+
+				if i == 0: 
+					arr_debt_amount_available = np.append(arr_debt_amount_available,debt_amount)
+				else: 
+					arr_debt_amount_available = np.append(arr_debt_amount_available,debt_amount_available)
+
+				arr_debt_commitment_fee = np.append(arr_debt_commitment_fee,debt_amount_available*inp_debt_commitment_fee*days_period/360)
+				arr_debt_repayment = np.append(arr_debt_repayment,0)
+
+				arr_debt_EoP = np.append(arr_debt_EoP,cumul_debt_drawn)
+
+				""" XXX """
 
 				arr_depreciation = np.append(arr_depreciation,0)
 
@@ -397,7 +477,6 @@ def project_view(request,id):
 				arr_years_from_COD_BOP = np.append(arr_years_from_COD_BOP,pct_year_cumul-pct_year)
 				arr_years_from_COD_avg = np.add(arr_years_from_COD_BOP,arr_years_from_COD_EOP)/2
 
-
 				days_contract_in_period_pct = create_array_indexation(date_contract_start,date_contract_end,start_period,end_period)/pct_year
 				arr_days_contract_in_period_pct = np.append(arr_days_contract_in_period_pct,days_contract_in_period_pct)
 
@@ -405,25 +484,51 @@ def project_view(request,id):
 				cumul_year_electricity_price_indexation += create_array_indexation(date_price_elec_indexation_start,final_date,start_period,end_period)
 				cumul_year_opex_indexation += create_array_indexation(date_opex_indexation_start,final_date,start_period,end_period)
 
-				arr_contract_indexation = np.append(arr_contract_indexation,(1+inp_contract_indexation_rate/100)**cumul_year_contract_indexation)
-				arr_electricity_price_indexation = np.append(arr_electricity_price_indexation,(1+inp_price_elec_indexation/100)**cumul_year_electricity_price_indexation)
-				arr_opex_indexation = np.append(arr_opex_indexation,(1+inp_opex_indexation_rate/100)**cumul_year_opex_indexation)
+				arr_contract_indexation = np.append(arr_contract_indexation,(1+inp_contract_indexation_rate)**cumul_year_contract_indexation)
+				arr_electricity_price_indexation = np.append(arr_electricity_price_indexation,(1+inp_price_elec_indexation)**cumul_year_electricity_price_indexation)
+				arr_opex_indexation = np.append(arr_opex_indexation,(1+inp_opex_indexation_rate)**cumul_year_opex_indexation)
+
+
+				""" Senior debt """
+				if end_period < date_debt_maturity:
+					debt_amortisation = 1
+				else: 
+					debt_amortisation = 0
+
+				arr_debt_amortisation = np.append(arr_debt_amortisation,debt_amortisation)
+
+				debt_BoP = max(cumul_debt_drawn-cumul_debt_repayment,0)
+				arr_debt_BoP = np.append(arr_debt_BoP,debt_BoP)
+
+				arr_debt_amount_available = np.append(arr_debt_amount_available,0)
+				arr_debt_commitment_fee = np.append(arr_debt_commitment_fee,0)
+				arr_debt_drawn = np.append(arr_debt_drawn,0)
+				arr_debt_interest = np.append(arr_debt_interest,debt_BoP*inp_debt_interest_rate*days_period/360)
+				arr_debt_interest_operations = np.append(arr_debt_interest_operations,debt_BoP*inp_debt_interest_rate*days_period/360) 
+
+
+				cumul_debt_repayment += 1000
+				arr_debt_repayment = np.append(arr_debt_repayment,cumul_debt_repayment)
+
+				arr_debt_EoP = np.append(arr_debt_EoP,max(cumul_debt_drawn-cumul_debt_repayment,0))
+				
+				""" XXX """
 
 				start_period = end_period + datetime.timedelta(days=1)
 				arr_period_type = np.append(arr_period_type,1)
 
 				""" Production """
 
-				arr_degradation = np.append(arr_degradation,1/(1+inp_degradation/100)**pct_year_cumul)
+				arr_degradation = np.append(arr_degradation,1/(1+inp_degradation)**pct_year_cumul)
 				arr_capacity_after_degradation = arr_degradation * inp_capacity
 
-				production = np.multiply(arr_capacity_after_degradation,arr_seasonality)*inp_p90_10y*10**-3
+				production = np.multiply(arr_capacity_after_degradation,arr_seasonality)*inp_production*10**-3
 
 				""" Electricity price """
 
-				for key in dic_price_elec_medium.keys():
+				for key in dic_price_elec.keys():
 					if key == str(end_period.year):
-						arr_electricity_price = np.append(arr_electricity_price,dic_price_elec_medium[key])
+						arr_electricity_price = np.append(arr_electricity_price,dic_price_elec[key])
 
 				arr_opex = np.append(arr_opex,inp_opex)
 
@@ -447,13 +552,35 @@ def project_view(request,id):
 
 			arr_EBITDA = np.subtract(arr_revenues_total,arr_opex)
 			arr_EBITDA_margin = np.divide(arr_EBITDA,arr_revenues_total, out=np.zeros_like(arr_EBITDA), where=arr_revenues_total!=0)*100
+			arr_EBIT = np.subtract(arr_EBITDA,arr_depreciation)
+			arr_EBT = np.subtract(arr_EBIT,arr_debt_interest_operations)
+			arr_corpore_tax = -np.multiply(arr_EBT,inp_corporate_income_tax_rate)
+			arr_net_income = np.subtract(arr_EBT,arr_corpore_tax)
 
-			data_dump_sidebar = np.array([date_COD,final_date,sum_seasonality,sum_construction_costs])
+
+			arr_revenues_contracted = arr_revenues_contracted.round(decimals=2)
+			arr_revenues_merchant = arr_revenues_merchant.round(decimals=2)
+			arr_revenues_total = arr_revenues_total.round(decimals=2)
+			arr_opex = arr_opex.round(decimals=2)
+			arr_EBITDA = arr_EBITDA.round(decimals=2)
+			arr_depreciation = arr_depreciation.round(decimals=2)
+			arr_EBIT = arr_EBIT.round(decimals=2)
+			arr_debt_interest = arr_debt_interest.round(decimals=2)
+			arr_debt_interest_construction = arr_debt_interest_construction.round(decimals=2)
+			arr_debt_interest_operations = arr_debt_interest_operations.round(decimals=2)
+			arr_EBT = arr_EBIT.round(decimals=2)
+			arr_corpore_tax = arr_corpore_tax.round(decimals=2)
+			arr_net_income = arr_net_income.round(decimals=2)
+
+			data_dump_sidebar = np.array([date_COD,final_date,sum_seasonality,sum_construction_costs,date_debt_maturity])
 			
 			return JsonResponse(
 							{
 							"BoP":arr_start_period.tolist(),
 							"EoP":arr_end_period.tolist(),
+							"BoP_FP":arr_start_period_financing_plan.tolist(),
+							"EoP_FP":arr_end_period_financing_plan.tolist(),
+
 							"data_dump_sidebar":data_dump_sidebar.tolist(),
 							"Operations":arr_period_type.tolist(),
 							"seasonality":seasonality.tolist(),
@@ -473,6 +600,7 @@ def project_view(request,id):
 							"arr_electricity_price":arr_electricity_price.tolist(),
 
 							"arr_contract_indexation":arr_contract_indexation.tolist(),
+
 							"arr_electricity_price_indexation":arr_electricity_price_indexation.tolist(),
 
 							"arr_revenues_contracted":arr_revenues_contracted.tolist(),
@@ -488,6 +616,24 @@ def project_view(request,id):
 							"arr_construction_costs":arr_construction_costs.tolist(),
 
 							"arr_depreciation":arr_depreciation.tolist(),
+							"arr_EBIT":arr_EBIT.tolist(),
+
+							"arr_debt_amortisation":arr_debt_amortisation.tolist(),
+							"arr_debt_amount_available":arr_debt_amount_available.tolist(),
+							"arr_debt_commitment_fee":arr_debt_commitment_fee.tolist(),
+
+							"arr_debt_BoP":arr_debt_BoP.tolist(),
+							"arr_debt_drawn":arr_debt_drawn.tolist(),
+							"arr_debt_repayment":arr_debt_repayment.tolist(),
+							"arr_debt_EoP":arr_debt_EoP.tolist(),
+							"arr_debt_interest":arr_debt_interest.tolist(),
+							"arr_debt_interest_construction":arr_debt_interest_construction.tolist(),
+							"arr_debt_interest_operations":arr_debt_interest_operations.tolist(),
+
+							"arr_EBT":arr_EBT.tolist(),
+							"arr_corpore_tax":arr_corpore_tax.tolist(),
+							"arr_net_income":arr_net_income.tolist(),
+
 
 
 						},safe=False, status=200)

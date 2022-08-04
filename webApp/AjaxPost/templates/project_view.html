@@ -159,6 +159,19 @@
 				        			</div>
 					        	</div>		
 
+
+				        		<div class="row-inline-wrapper">
+						    		<div class="row-inline-two">
+						 				<h1>Production selected</h1>
+				        			</div>
+
+						    		<div class="row-inline-two">
+						 				{{ project_form.production_choice }}
+
+				        			</div>
+
+					        	</div>
+
 					        	<div class="row-inline-wrapper">
 							    	<div class="row-inline-two">
 											<h1>Availability (%)</h1>
@@ -498,29 +511,38 @@
 									<h5>Electricity market price</h5>
 
 								
-									<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
-											<h1>Electricity price indexation base date</h1>
-					        			</div>
+								<div class="row-inline-wrapper">
+						    		<div class="row-inline-two">
+										<h1>Electricity price indexation base date</h1>
+				        			</div>
 
-							    		<div class="row-inline-two">
-											<h1>Electricity prices indexation rate (%)</h1>
-					        			</div>
+						    		<div class="row-inline-two">
+										<h1>Electricity prices indexation rate (%)</h1>
+				        			</div>
 
-					        		</div>
+				        		</div>
 
-					        		<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
-							 		{{ project_form.price_elec_indexation_start_date }}
-					        			</div>
+				        		<div class="row-inline-wrapper">
+						    		<div class="row-inline-two">
+						 		{{ project_form.price_elec_indexation_start_date }}
+				        			</div>
 
-							    		<div class="row-inline-two">
-							 		{{ project_form.price_elec_indexation }}
-					        			</div>
+						    		<div class="row-inline-two">
+						 		{{ project_form.price_elec_indexation }}
+				        			</div>
 
-					        		</div>
+				        		</div>
 
-						
+								<div class="row-inline-wrapper">
+						    		<div class="row-inline-two">
+						 				<h1>Electricity prices selected</h1>
+				        			</div>
+
+						    		<div class="row-inline-two">
+						 				{{ project_form.price_elec_choice }}
+				        			</div>
+
+				        		</div>
 
 			    				<div class="row-inline-wrapper">
 
@@ -1098,6 +1120,113 @@
 				    
 				    <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordion">
 					    <div class="card-body">
+
+					  		<h5>Timing</h5>
+
+			    		<div class="row-inline-wrapper">
+					    	<div class="row-inline-two">
+									<h1>Door to door tenor</h1>
+			        		</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_tenor }}
+		        			</div>
+			        	</div>
+        				<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+								<h1>Maturity</h1>
+		        			</div>
+
+				    		<div class="row-inline-two">
+				    			<div id="debtMaturity"></div>
+		        			</div>
+
+		        		</div>
+
+					  		<h5>Pricing</h5>
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Upfront fee</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_upfront_fee }}
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Commitment fee</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_commitment_fee }}
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Credit margin</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_margin }}
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Swap rate</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_swap_rate }}
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Reference rate buffer</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_reference_rate_buffer }}
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Swap margin</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_swap_margin }}
+		        			</div>
+		        		</div>
+
+					  		<h5>Sizing</h5>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Minimum DSCR</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+									<h1>Maximum gearing</h1>
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_target_DSCR }}
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_gearing_max }}
+		        			</div>
+		        		</div>
+
+		        		<div class="row-inline-wrapper">
+				    		<div class="row-inline-two">
+									<h1>Negative tail</h1>
+		        			</div>
+				    		<div class="row-inline-two">
+				 				{{ project_form.debt_negative_tail }}
+		        			</div>
+		        		</div>
+
+
 						</div>   
 	      			</div>
     			</div>
@@ -1113,6 +1242,14 @@
 				    
 				    <div id="collapseEight" class="collapse" aria-labelledby="headingEight" data-parent="#accordion">
 					    <div class="card-body">
+						    	<div class="row-inline-wrapper">
+					    		<div class="row-inline-two">
+										<h1>Corporate income tax (%)</h1>
+			        			</div>
+					    		<div class="row-inline-two">
+					 				{{ project_form.corporate_income_tax }}
+			        			</div>
+		        		</div>
 						</div>   
 	      			</div>
     			</div>
@@ -1210,8 +1347,24 @@
  			
  			<h2>Financing plan</h2>
 
- 			<table class="table table-striped" id="outTable">
+ 			<table class="table">
 				<tbody id="myTableFP">
+		
+				</tbody>
+			</table>
+
+ 			<h2>Cash flow statement</h2>
+
+ 			<table class="table">
+				<tbody id="myTableCF">
+		
+				</tbody>
+			</table>
+
+ 			<h2>Senior debt</h2>
+
+ 			<table class="table">
+				<tbody id="myTableSeniorDebt">
 		
 				</tbody>
 			</table>
@@ -1226,6 +1379,13 @@
 
 		<div class="tab-pane fade" id="nav-calculation" role="tabpanel" aria-labelledby="nav-calculation-tab">
 
+
+			<table class="table">
+				<tbody id="myTableAll">
+		
+				</tbody>
+			</table>
+
 		</div>
 	</div>
 </div>
@@ -1238,15 +1398,36 @@
 
 	var income_statement = {"BoP":0,
 							"EoP":0,
+							"arr_days":0,
 							"arr_revenues_contracted":0,
 							"arr_revenues_merchant":0,
 							"arr_revenues_total":0,
 							"arr_opex":0,
-							"arr_EBITDA":0,}
+							"arr_EBITDA":0,
+							"arr_depreciation":0,
+							"arr_EBIT":0,
+							"arr_debt_interest_operations":0,
+							"arr_EBT":0,
+							"arr_corpore_tax":0,
+							"arr_net_income":0,							
+							}
 
-	var financing_plan = {"BoP":0,
-						  "EoP":0,
-						  "arr_construction":0,}
+	var financing_plan = {"BoP_FP":0,
+						  "EoP_FP":0,
+						  "arr_construction":0,
+						  "arr_debt_interest_construction":0,}
+
+	var cash_flow_statement = {"arr_EBITDA":0,}
+
+	var senior_debt = {"arr_debt_amortisation":0,
+						"arr_debt_amount_available":0,
+						"arr_debt_commitment_fee":0,
+						"arr_debt_BoP":0,
+						"arr_debt_drawn":0,
+						"arr_debt_repayment":0,
+						"arr_debt_EoP":0,
+						"arr_debt_interest":0,
+						}	
 
 	$(document).on('submit','#post-form', function(e){
 
@@ -1282,11 +1463,53 @@
   					}
   				});
   				$("#myTableFP").html(result_FP);
+  				
+  				var result_CF = '';
+  				$.each(json, function(key, data) {
+  					if(key in cash_flow_statement) {
+	  					result_CF += "<tr>";
+	  					result_CF += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_CF += "<td>" + data + "</td>";
+	    				});
+	  					result_CF += "</tr>";
+  					}
+  				});
+  				$("#myTableCF").html(result_CF);
+
+
+  				var result_SD = '';
+  				$.each(json, function(key, data) {
+  					if(key in senior_debt) {
+	  					result_SD += "<tr>";
+	  					result_SD += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_SD += "<td>" + data + "</td>";
+	    				});
+	  					result_SD += "</tr>";
+  					}
+  				});
+  				$("#myTableSeniorDebt").html(result_SD);
+
+  				var result_all = '';
+  				$.each(json, function(key, data) {
+  					result_all += "<tr>";
+  					result_all += "<td>" + key + "</td>";
+  					$.each(data, function(index, data) {
+    					result_all += "<td>" + data + "</td>";
+    				});
+  					result_all += "</tr>";
+  				});
+  				$("#myTableAll").html(result_all);
+
+
 
   				$("#dateCOD").html(json.data_dump_sidebar[0]);
    				$("#dateRetirement").html(json.data_dump_sidebar[1]);
    				$("#sumSeasonality").html(json.data_dump_sidebar[2]);
    				$("#sumConstructionCosts").html(json.data_dump_sidebar[3]);
+   				$("#debtMaturity").html(json.data_dump_sidebar[4]);
+
 
 				$("#elecPriceLabel1").html(json.arr_years_electricity_prices[0]);
 				$("#elecPriceLabel2").html(json.arr_years_electricity_prices[1]);
@@ -1344,6 +1567,11 @@
   				myChart5.data.datasets[0].data = json.arr_EBITDA;
   				myChart5.data.datasets[1].data = json.arr_EBITDA_margin;
 				myChart5.update()
+
+				myChart6.data.labels = json.EoP_FP;
+  				myChart6.data.datasets[0].data = json.arr_construction;
+  				myChart6.data.datasets[1].data = json.arr_construction_costs;
+				myChart6.update()
 
 
 
