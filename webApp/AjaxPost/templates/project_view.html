@@ -5,31 +5,26 @@
 <nav id="sidebar">
     <div class="sidebar"><h3>{{ project.name }}</h3>
 
-
     	<form method="POST" id="post-form">{% csrf_token %}
 			<div class="fieldWrapper" id="the_post">
 
-				<div>
+				<div  class="btn-wrapper">
+				<div class="d-flex justify-content-end">
 				<input type="submit" value="Submit" class="btn btn-primary btn-lg" id="btn-form">
 				</div>
+				</div>
 
-				<div id="accordion">
-					<div class="card">
-					    <div class="card-header" id="headingOne">
-					      <h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-					          Timing
-					        </button>
-					      </h5>
-					    </div>
-
-					    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-						    <div class="card-body">
-
-				
-
-
-							    	<div class="row-inline-wrapper">
+				<div class="accordion" id="accordionSidebar">
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingOne">
+				      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+				        Timing
+				      </button>
+				    </h2>
+				    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        
+				      <div class="row-inline-wrapper">
 							    		<div class="row-inline-two">
 											<h1>Start of construction</h1>
 					        			</div>
@@ -97,22 +92,20 @@
 
 					        		</div>
 
-				            </div>
-			    		</div>
-		  			</div>
 
-		  			<div class="card">
-					    <div class="card-header" id="headingTwo">
-					      <h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
-					          Capacity and Production
-					        </button>
-					      </h5>
-					    </div>
 
-					    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-						    <div class="card-body">
-					        	<h5>Capacity & Production</h5>
+				      </div>
+				    </div>
+				  </div>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingTwo">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+				        Capacity and Production
+				      </button>
+				    </h2>
+				    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        <h5>Capacity and production Production</h5>
 
 			    				<div class="row-inline-wrapper">
 							    	<div class="row-inline-two">
@@ -300,24 +293,18 @@
 				        			</div>
 					        	</div>	
 
-
-			            	</div>
-			    		</div>
-		  			</div>
-
-					<div class="card">
-						<div class="card-header" id="headingThree">
-					    	<h5 class="mb-0">
-						        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						          Construction costs
-						        </button>
-					      	</h5>
-					    </div>
-					    
-					    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-						    <div class="card-body">
-
-					        	<h5>Monthly construction schedule</h5>
+				      </div>
+				    </div>
+				  </div>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingThree">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+				        Construction costs
+				      </button>
+				    </h2>
+				    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				       <h5>Monthly construction schedule</h5>
 
        							<div class="row-inline-wrapper">
 							    	<div class="row-inline-two">
@@ -435,24 +422,19 @@
 											{{ project_form.costs_m12 }}
 				        			</div>
 					        	</div>	
-
-
-							</div>   
-		      			</div>
-	    			</div>
-
-    			<div class="card">
-					<div class="card-header" id="headingFour">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-					          Offtake contract and Electricity price
-					        </button>
-				      	</h5>
+				      </div>
 				    </div>
-				    
-				    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
-					    <div class="card-body">
-					        	<h5>Offtake contract</h5>
+				  </div>
+				  
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingFour">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+				        Offtake and Market prices
+				      </button>
+				    </h2>
+				    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				    <h5>Offtake contract</h5>
 
 				    		<div class="row-inline-wrapper">
 					    		<div class="row-inline-two">
@@ -1039,26 +1021,18 @@
 					        	</div>
 	
 
-
-
-						
-						</div>   
-	      			</div>
-    			</div>
-
-    			<div class="card">
-					<div class="card-header" id="headingFive">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-					          Operating costs
-					        </button>
-				      	</h5>
+				      </div>
 				    </div>
-				    
-				    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
-					    <div class="card-body">
-
-							<div class="row-inline-wrapper">
+				  </div>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingFive">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+				        Operating costs
+				      </button>
+				    </h2>
+				    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				       <div class="row-inline-wrapper">
 					    		<div class="row-inline-two">
 									<h1>Operating costs indexation base date</h1>
 			        			</div>
@@ -1090,38 +1064,31 @@
 			        			</div>
 
 					        </div>
-						</div>   
-	      			</div>
-    			</div>
-
-    			<div class="card">
-					<div class="card-header" id="headingSix">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-					          HMR
-					        </button>
-				      	</h5>
+				      </div>
 				    </div>
-				    
-				    <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordion">
-					    <div class="card-body">
-						</div>   
-	      			</div>
-    			</div>
-
-    			<div class="card">
-					<div class="card-header" id="headingSeven">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-					          Senior Debt
-					        </button>
-				      	</h5>
+				  </div>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingSix">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+				        HMR
+				      </button>
+				    </h2>
+				    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+				      </div>
 				    </div>
-				    
-				    <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordion">
-					    <div class="card-body">
+				  </div>
 
-					  		<h5>Timing</h5>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingSeven">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+				        Senior Debt
+				      </button>
+				    </h2>
+				    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        	<h5>Timing</h5>
 
 			    		<div class="row-inline-wrapper">
 					    	<div class="row-inline-two">
@@ -1226,86 +1193,70 @@
 		        			</div>
 		        		</div>
 
-
-						</div>   
-	      			</div>
-    			</div>
-
- 				<div class="card">
-					<div class="card-header" id="headingEight">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
-					          Tax
-					        </button>
-				      	</h5>
+				      </div>
 				    </div>
-				    
-				    <div id="collapseEight" class="collapse" aria-labelledby="headingEight" data-parent="#accordion">
-					    <div class="card-body">
-						    	<div class="row-inline-wrapper">
+				  </div>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingEight">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+				        Tax
+				      </button>
+				    </h2>
+				    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        	<div class="row-inline-wrapper">
 					    		<div class="row-inline-two">
 										<h1>Corporate income tax (%)</h1>
 			        			</div>
 					    		<div class="row-inline-two">
 					 				{{ project_form.corporate_income_tax }}
 			        			</div>
-		        		</div>
-						</div>   
-	      			</div>
-    			</div>
+				      		</div>
+				   	 </div>
+				  	</div>
+				  	</div>
 
-
-    			<div class="card">
-					<div class="card-header" id="headingNine">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
-					          Accounting
-					        </button>
-				      	</h5>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingNine">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+				        Accounting
+				      </button>
+				    </h2>
+				    <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+				      </div>
 				    </div>
-				    
-				    <div id="collapseNine" class="collapse" aria-labelledby="headingNine" data-parent="#accordion">
-					    <div class="card-body">
-						</div>   
-	      			</div>
-    			</div>
+				  </div>
 
-
-    			<div class="card">
-					<div class="card-header" id="headingTen">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
-					          Equity
-					        </button>
-				      	</h5>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingTen">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+				        Equity
+				      </button>
+				    </h2>
+				    <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+				        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+				      </div>
 				    </div>
-				    
-				    <div id="collapseTen" class="collapse" aria-labelledby="headingTen" data-parent="#accordion">
-					    <div class="card-body">
-						</div>   
-	      			</div>
-    			</div>
+				  </div>				  
 
 
-    			<div class="card">
-					<div class="card-header" id="headingEleven">
-				    	<h5 class="mb-0">
-					        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
-					          Macro
-					        </button>
-				      	</h5>
+				  <div class="accordion-item">
+				    <h2 class="accordion-header" id="headingEleven">
+				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+				        Macro
+				      </button>
+				    </h2>
+				    <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
+				      <div class="accordion-body">
+								        		{{ project_form.name }}
+
+				      </div>
 				    </div>
-				    
-				    <div id="collapseEleven" class="collapse" aria-labelledby="headingEleven" data-parent="#accordion">
-					    <div class="card-body">
-
-
-
-					        		{{ project_form.name }}
-	
-						</div>   
-	      			</div>
-    			</div>
+				  </div>	
+				</div>
 
 	  			</div>
 	  		</div>
@@ -1320,24 +1271,33 @@
 <div id="content">
 	<nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-        	<button type="button" id="sidebarCollapse" class="btn btn-primary btn-lg">
-                <span>Toggle Sidebar</span>
-            </button>
+        	<button type="button" id="sidebarCollapse" class="btn btn-primary btn-lg"><</button>
         </div>
     </nav>
 
-    <nav>
-    	<div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link active" id="nav-summary-tab" data-toggle="tab" href="#nav-summary" role="tab" aria-controls="nav-summary" aria-selected="true">Summary</a>
-            <a class="nav-item nav-link" id="nav-graphs-tab" data-toggle="tab" href="#nav-graphs" role="tab" aria-controls="nav-graphs" aria-selected="false">Charts</a>
-            <a class="nav-item nav-link" id="nav-calculation-tab" data-toggle="tab" href="#nav-calculation" role="tab" aria-controls="nav-calculation" aria-selected="false">Calculation</a>
-        </div>
-   	</nav>
+	<nav>
+	<ul class="nav nav-tabs">
+	  <li class="nav-item">
+	    <a class="nav-link active" aria-current="page" href="#nav-summary">Summary</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" href="#nav-graphs">Charts</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" href="#nav-calculation">Calculation</a>
+	  </li>
+	</ul>
+	</nav>
 
-	<div class="tab-content" id="nav-tabContent">
-		<div class="tab-pane fade show active" id="nav-summary" role="tabpanel" aria-labelledby="nav-summary-tab">
+<div class="tab-content">
+  <div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
 
-			<h2>Income statement</h2>
+  		<table class="table">
+			<tbody id="summary"></tbody>
+		</table>
+
+
+  		<h2>Income statement</h2>
 
 			<table class="table">
 				<tbody id="myTableIS">
@@ -1369,26 +1329,35 @@
 				</tbody>
 			</table>
 
-		</div>
+			<h2>Sizing and sculpting</h2>
 
-		<div class="tab-pane fade" id="nav-graphs" role="tabpanel" aria-labelledby="nav-graphs-tab">
-		{% block jquery %}
-			{% include 'charts.html' %}
-		{% endblock %}
-		</div>
-
-		<div class="tab-pane fade" id="nav-calculation" role="tabpanel" aria-labelledby="nav-calculation-tab">
-
-
-			<table class="table">
-				<tbody id="myTableAll">
+ 			<table class="table">
+				<tbody id="myTableSizing">
 		
 				</tbody>
 			</table>
 
 		</div>
-	</div>
+
+  </div>
+  <div class="tab-pane" id="nav-graphs" role="tabpanel" aria-labelledby="profile-tab">
+  			{% block jquery %}
+			{% include 'charts.html' %}
+		{% endblock %}
+
+  </div>
+  <div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
+  	
+
+  		<table class="table">
+				<tbody id="myTableAll">
+		
+				</tbody>
+			</table>
+  </div>
 </div>
+
+
 
 <script type="text/javascript">
 
@@ -1415,9 +1384,18 @@
 	var financing_plan = {"BoP_FP":0,
 						  "EoP_FP":0,
 						  "arr_construction":0,
+						  "arr_construction_costs":0,
 						  "arr_debt_interest_construction":0,}
 
 	var cash_flow_statement = {"arr_EBITDA":0,}
+
+	var sizing = {"arr_CFADS":0,
+				  "arr_target_DS":0,
+				  "arr_period_discount_factor":0,
+
+				  "arr_cumul_period_discount_factor":0,
+				  "arr_debt_interest_operations":0,
+				  "arr_debt_target_repayment":0,}
 
 	var senior_debt = {"arr_debt_amortisation":0,
 						"arr_debt_amount_available":0,
@@ -1428,6 +1406,19 @@
 						"arr_debt_EoP":0,
 						"arr_debt_interest":0,
 						}	
+
+
+
+	var summary = {"data_dump_summary":0,
+						"arr_debt_amount_available":0,
+						"arr_debt_commitment_fee":0,
+						"arr_debt_BoP":0,
+						"arr_debt_drawn":0,
+						"arr_debt_repayment":0,
+						"arr_debt_EoP":0,
+						"arr_debt_interest":0,
+						}	
+
 
 	$(document).on('submit','#post-form', function(e){
 
@@ -1477,6 +1468,20 @@
   				});
   				$("#myTableCF").html(result_CF);
 
+  				var result_Sizing = '';
+  				$.each(json, function(key, data) {
+  					if(key in sizing) {
+	  					result_Sizing += "<tr>";
+	  					result_Sizing += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_Sizing += "<td>" + data + "</td>";
+	    				});
+	  					result_Sizing += "</tr>";
+  					}
+  				});
+
+  				$("#myTableSizing").html(result_Sizing);
+
 
   				var result_SD = '';
   				$.each(json, function(key, data) {
@@ -1502,47 +1507,18 @@
   				});
   				$("#myTableAll").html(result_all);
 
-
-
-  				$("#dateCOD").html(json.data_dump_sidebar[0]);
-   				$("#dateRetirement").html(json.data_dump_sidebar[1]);
-   				$("#sumSeasonality").html(json.data_dump_sidebar[2]);
-   				$("#sumConstructionCosts").html(json.data_dump_sidebar[3]);
-   				$("#debtMaturity").html(json.data_dump_sidebar[4]);
-
-
-				$("#elecPriceLabel1").html(json.arr_years_electricity_prices[0]);
-				$("#elecPriceLabel2").html(json.arr_years_electricity_prices[1]);
-				$("#elecPriceLabel3").html(json.arr_years_electricity_prices[2]);
-				$("#elecPriceLabel4").html(json.arr_years_electricity_prices[3]);
-				$("#elecPriceLabel5").html(json.arr_years_electricity_prices[4]);
-				$("#elecPriceLabel6").html(json.arr_years_electricity_prices[5]);
-				$("#elecPriceLabel7").html(json.arr_years_electricity_prices[6]);
-				$("#elecPriceLabel8").html(json.arr_years_electricity_prices[7]);
-				$("#elecPriceLabel9").html(json.arr_years_electricity_prices[8]);
-				$("#elecPriceLabel10").html(json.arr_years_electricity_prices[9]);
-				$("#elecPriceLabel11").html(json.arr_years_electricity_prices[10]);
-				$("#elecPriceLabel12").html(json.arr_years_electricity_prices[11]);
-				$("#elecPriceLabel13").html(json.arr_years_electricity_prices[12]);
-				$("#elecPriceLabel14").html(json.arr_years_electricity_prices[13]);
-				$("#elecPriceLabel15").html(json.arr_years_electricity_prices[14]);
-				$("#elecPriceLabel16").html(json.arr_years_electricity_prices[15]);
-				$("#elecPriceLabel17").html(json.arr_years_electricity_prices[16]);
-				$("#elecPriceLabel18").html(json.arr_years_electricity_prices[17]);
-				$("#elecPriceLabel19").html(json.arr_years_electricity_prices[18]);
-				$("#elecPriceLabel20").html(json.arr_years_electricity_prices[19]);
-				$("#elecPriceLabel21").html(json.arr_years_electricity_prices[20]);
-				$("#elecPriceLabel22").html(json.arr_years_electricity_prices[21]);
-				$("#elecPriceLabel23").html(json.arr_years_electricity_prices[22]);
-				$("#elecPriceLabel24").html(json.arr_years_electricity_prices[23]);
-				$("#elecPriceLabel25").html(json.arr_years_electricity_prices[24]);
-				$("#elecPriceLabel26").html(json.arr_years_electricity_prices[25]);
-				$("#elecPriceLabel27").html(json.arr_years_electricity_prices[26]);
-				$("#elecPriceLabel28").html(json.arr_years_electricity_prices[27]);
-				$("#elecPriceLabel29").html(json.arr_years_electricity_prices[28]);
-				$("#elecPriceLabel30").html(json.arr_years_electricity_prices[29]);
-
-
+  				var result_summary = '';
+  				$.each(json, function(key, data) {
+  					if(key in summary) {
+	  					result_summary += "<tr>";
+	  					result_summary += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_summary += "<td>" + data + "</td>";
+	    				});
+	  					result_summary += "</tr>";
+  					}
+  				});
+  				$("#summary").html(result_summary);
 
 
 
@@ -1560,7 +1536,7 @@
 				myChart3.update()
 
   				myChart4.data.labels = json.EoP;
-  				myChart4.data.datasets[0].data = json.arr_opex;
+  				myChart4.data.datasets[0].data = json.arr_operating_costs;
 				myChart4.update()
 
 				myChart5.data.labels = json.EoP;
@@ -1596,10 +1572,17 @@
             $('#sidebar, #content').toggleClass('active');
             $('.collapse.in').toggleClass('in');
             $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            if ($(this).text() == '<') {
+                $(this).text('>');
+            } else {
+                $(this).text('<');
+            }
         });
+
     });
     
 </script>
+
 
 {% endblock %}
 

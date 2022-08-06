@@ -66,7 +66,6 @@ header {
     display: flex;
     width: 100%;
     height: 100%;
-
 }
 
 #sidebar {
@@ -91,24 +90,19 @@ header {
     margin-left: -400px;
 }
 
-#sidebar p {
-    color: rgb(92, 105, 117);
+#accordionSidebar {
+    padding: 5px;
 }
 
-
-#accordion {
-  padding-right: 5px;
-  padding-top: 5px;
+.accordion-button {
+  padding: 5px;
+  background: rgb(245, 247, 249);
+  color: rgb(92, 105, 117);
+  font-size: 0.75rem;
 }
 
-.card-header {
-  height: 30;
-  padding: 0;
-}
-
-#btn-form{
-    
-
+#btn-wrapper{
+  background-color: red;
 }
 
 /* ---------------------------------------------------
@@ -147,11 +141,8 @@ td:nth-child(1) {
     font-weight: bold;
     min-width: 15em;
     max-width: 15em;
-
 }
-    position: sticky;
-    left: 0;
-    background: white;
+
 
 /* ---------------------------------------------------
     MEDIAQUERIES
