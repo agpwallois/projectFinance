@@ -55,3 +55,15 @@ header {
     color: rgb(59, 69, 78);
 }
 
+.table{
+    font-size: 0.75rem;
+}
+
+td {
+    line-height: 8px;
+}
+
+td:nth-child(1) {  
+    text-align: left;
+    font-weight: normal;
+}
