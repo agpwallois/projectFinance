@@ -1387,8 +1387,8 @@
     	$("#post-form").submit();
 	});
 
-	var income_statement = {"BoP":0,
-							"EoP":0,
+	var income_statement = {"arr_start_period":0,
+							"arr_end_period":0,
 							"arr_days":0,
 							"arr_revenues_contracted":0,
 							"arr_revenues_merchant":0,
@@ -1403,15 +1403,15 @@
 							"arr_net_income":0,							
 							}
 
-	var financing_plan_uses = {"BoP_FP":0,
-						  "EoP_FP":0,
-						  "arr_construction":0,
+	var financing_plan_uses = {"arr_start_period_financing_plan":0,
+						  "arr_end_period_financing_plan":0,
 						  "arr_construction_costs":0,
+						  "arr_cumul_construction_costs":0,
 						  "arr_debt_interest_construction":0,}
 
 
-	var financing_plan_sources = {"BoP_FP":0,
-					  "EoP_FP":0,
+	var financing_plan_sources = {"arr_start_period_financing_plan":0,
+					  "arr_end_period_financing_plan":0,
 					  "arr_debt_drawn":0,
 					  "arr_equity_drawn":0,}
 
@@ -1600,7 +1600,48 @@
   				});
   				$("#summary").html(result_summary);
 
-  				myChart.data.labels = json.EoP;
+
+
+  				$("#dateCOD").html(json.data_dump_sidebar[0]);
+  				$("#dateRetirement").html(json.data_dump_sidebar[1]);
+  				$("#sumSeasonality").html(json.data_dump_sidebar[2]);
+  				$("#sumConstructionCosts").html(json.data_dump_sidebar[3]);
+  				$("#debtMaturity").html(json.data_dump_sidebar[4]);
+
+  				$("#elecPriceLabel1").html(json.arr_years_electricity_prices[0]);
+  				$("#elecPriceLabel2").html(json.arr_years_electricity_prices[1]);
+  				$("#elecPriceLabel3").html(json.arr_years_electricity_prices[2]);
+  				$("#elecPriceLabel4").html(json.arr_years_electricity_prices[3]);
+  				$("#elecPriceLabel5").html(json.arr_years_electricity_prices[4]);
+  				$("#elecPriceLabel6").html(json.arr_years_electricity_prices[5]);
+  				$("#elecPriceLabel7").html(json.arr_years_electricity_prices[6]);
+  				$("#elecPriceLabel8").html(json.arr_years_electricity_prices[7]);
+  				$("#elecPriceLabel9").html(json.arr_years_electricity_prices[8]);
+  				$("#elecPriceLabel10").html(json.arr_years_electricity_prices[9]);
+  				$("#elecPriceLabel11").html(json.arr_years_electricity_prices[10]);
+  				$("#elecPriceLabel12").html(json.arr_years_electricity_prices[11]);
+  				$("#elecPriceLabel13").html(json.arr_years_electricity_prices[12]);
+  				$("#elecPriceLabel14").html(json.arr_years_electricity_prices[13]);
+  				$("#elecPriceLabel15").html(json.arr_years_electricity_prices[14]);
+  				$("#elecPriceLabel16").html(json.arr_years_electricity_prices[15]);
+  				$("#elecPriceLabel17").html(json.arr_years_electricity_prices[16]);
+  				$("#elecPriceLabel18").html(json.arr_years_electricity_prices[17]);
+  				$("#elecPriceLabel19").html(json.arr_years_electricity_prices[18]);
+  				$("#elecPriceLabel20").html(json.arr_years_electricity_prices[19]);
+  				$("#elecPriceLabel21").html(json.arr_years_electricity_prices[20]);
+  				$("#elecPriceLabel22").html(json.arr_years_electricity_prices[21]);
+  				$("#elecPriceLabel23").html(json.arr_years_electricity_prices[22]);
+  				$("#elecPriceLabel24").html(json.arr_years_electricity_prices[23]);
+  				$("#elecPriceLabel25").html(json.arr_years_electricity_prices[24]);
+  				$("#elecPriceLabel26").html(json.arr_years_electricity_prices[25]);
+  				$("#elecPriceLabel27").html(json.arr_years_electricity_prices[26]);
+  				$("#elecPriceLabel28").html(json.arr_years_electricity_prices[27]);
+  				$("#elecPriceLabel29").html(json.arr_years_electricity_prices[28]);
+  				$("#elecPriceLabel30").html(json.arr_years_electricity_prices[29]);
+
+
+
+  				myChart.data.labels = json.arr_end_period;
   				myChart.data.datasets[0].data = json.production;
   				myChart.data.datasets[1].data = json.arr_degradation;
 				myChart.update()
@@ -1608,26 +1649,26 @@
   				myChart2.data.datasets[0].data = json.seasonality;
 				myChart2.update()
 
-  				myChart3.data.labels = json.EoP;
+  				myChart3.data.labels = json.arr_end_period;
   				myChart3.data.datasets[0].data = json.arr_revenues_contracted;
   				myChart3.data.datasets[1].data = json.arr_revenues_merchant;
 				myChart3.update()
 
-  				myChart4.data.labels = json.EoP;
+  				myChart4.data.labels = json.arr_end_period;
   				myChart4.data.datasets[0].data = json.arr_operating_costs;
 				myChart4.update()
 
-				myChart5.data.labels = json.EoP;
+				myChart5.data.labels = json.arr_end_period;
   				myChart5.data.datasets[0].data = json.arr_EBITDA;
   				myChart5.data.datasets[1].data = json.arr_EBITDA_margin;
 				myChart5.update()
 
-				myChart6.data.labels = json.EoP_FP;
-  				myChart6.data.datasets[0].data = json.arr_construction;
-  				myChart6.data.datasets[1].data = json.arr_construction_costs;
+				myChart6.data.labels = json.arr_end_period_financing_plan;
+  				myChart6.data.datasets[0].data = json.arr_construction_costs;
+  				myChart6.data.datasets[1].data = json.arr_cumul_construction_costs;
 				myChart6.update()
 
-				myChart7.data.labels = json.EoP;
+				myChart7.data.labels = json.arr_end_period;
   				myChart7.data.datasets[0].data = json.arr_debt_service;
   				myChart7.data.datasets[1].data = json.arr_DSCR;
 				myChart7.update()
