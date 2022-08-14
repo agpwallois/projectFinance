@@ -293,10 +293,10 @@ def project_view(request,id):
 			arr_debt_target_repayment_above_zero = np.array([])
 			DSCR_sculpting = 2
 
-			arr_EBITDA = np.array([]) 
-			arr_EBITDA_margin = np.array([])
-			arr_revenues_contracted = np.array([])
-			arr_revenues_merchant = np.array([])
+			arr_is_EBITDA = np.array([]) 
+			arr_is_EBITDA_margin = np.array([])
+			arr_is_revenues_contracted = np.array([])
+			arr_is_revenues_merchant = np.array([])
 
 			arr_CFADS = np.array([])
 			arr_target_DS_sizing = np.array([])
@@ -322,39 +322,39 @@ def project_view(request,id):
 				arr_debt_repayment= arr_debt_target_repayment
 				
 				arr_capacity_after_degradation = np.array([])
-				arr_construction_costs = np.array([])
-				arr_cumul_construction_costs = np.array([])
+				arr_fp_uses_construction_costs = np.array([])
+				arr_fp_uses_cumul_construction_costs = np.array([])
 				arr_cumul_years_in_period = np.array([])
-				arr_days_in_period = np.array([])
-				arr_days_under_contract_in_period = np.array([])
+				arr_time_days_in_period = np.array([])
+				arr_time_days_under_contract_in_period = np.array([])
 				arr_degradation = np.array([])
 
-				arr_end_period = np.array([])
-				arr_end_period_financing_plan = np.array([])
+				arr_time_end_period = np.array([])
+				arr_time_end_period_financing_plan = np.array([])
 
-				arr_operations = np.array([])
-				arr_seasonality = np.array([])
+				arr_time_operations = np.array([])
+				arr_time_seasonality = np.array([])
 
-				arr_start_period = np.array([])
-				arr_start_period_financing_plan = np.array([])
+				arr_time_start_period = np.array([])
+				arr_time_start_period_financing_plan = np.array([])
 				arr_debt_cumul_period_discount_factor = np.array([])
 
-				arr_years_from_COD_avg = np.array([])
-				arr_years_from_COD_BOP = np.array([])
-				arr_years_from_COD_EOP = np.array([])			
-				arr_years_in_period = np.array([])
-				arr_years_in_period_operations = np.array([])
+				arr_time_years_from_COD_avg = np.array([])
+				arr_time_years_from_COD_BOP = np.array([])
+				arr_time_years_from_COD_EOP = np.array([])			
+				arr_time_years_in_period = np.array([])
+				arr_time_years_in_period_operations = np.array([])
 
 				arr_indexation_contract = np.array([])
-				arr_days_in_period_contract_in_period_pct = np.array([])
+				arr_time_days_in_period_contract_in_period_pct = np.array([])
 				
 				arr_electricity_price = np.array([])
 				arr_indexation_electricity_price = np.array([])
 
-				arr_opex = np.array([])
+				arr_is_opex = np.array([])
 				arr_indexation_opex = np.array([])
 
-				arr_depreciation = np.array([])
+				arr_is_depreciation = np.array([])
 
 				arr_debt_amount_available = np.array([])
 				arr_debt_upfront_fee = np.array([])
@@ -375,25 +375,25 @@ def project_view(request,id):
 				for i in range(0, months_construction):
 
 					"""Compute start and end date of period"""
-					arr_start_period = np.append(arr_start_period,start_period)
+					arr_time_start_period = np.append(arr_time_start_period,start_period)
 					end_period = compute_end_period(start_period,inp_periodicity,0,end_construction)
-					arr_end_period = np.append(arr_end_period,end_period)
+					arr_time_end_period = np.append(arr_time_end_period,end_period)
 
-					arr_start_period_financing_plan = np.append(arr_start_period_financing_plan,start_period)
-					arr_end_period_financing_plan = np.append(arr_end_period_financing_plan,end_period)
+					arr_time_start_period_financing_plan = np.append(arr_time_start_period_financing_plan,start_period)
+					arr_time_end_period_financing_plan = np.append(arr_time_end_period_financing_plan,end_period)
 
 					"""Compute number of days in period"""
 					days_in_period = compute_days_in_period(start_period,end_period)
-					arr_days_in_period = np.append(arr_days_in_period,days_in_period)
+					arr_time_days_in_period = np.append(arr_time_days_in_period,days_in_period)
 					
 					"""Compute year fraction in period"""
 					years_in_period = compute_years_in_period(start_period,end_period)
-					arr_years_in_period = np.append(arr_years_in_period,years_in_period)
+					arr_time_years_in_period = np.append(arr_time_years_in_period,years_in_period)
 
 					"""Create construction costs arrays"""
-					arr_construction_costs = np.append(arr_construction_costs,inp_construction_costs[i])
+					arr_fp_uses_construction_costs = np.append(arr_fp_uses_construction_costs,inp_construction_costs[i])
 					cumul_construction_costs += inp_construction_costs[i]
-					arr_cumul_construction_costs = np.append(arr_cumul_construction_costs,cumul_construction_costs)
+					arr_fp_uses_cumul_construction_costs = np.append(arr_fp_uses_cumul_construction_costs,cumul_construction_costs)
 
 					""" Senior debt """
 					arr_debt_BoP = np.append(arr_debt_BoP,cumul_debt_drawn)
@@ -419,23 +419,23 @@ def project_view(request,id):
 
 					""" XXX """
 					arr_debt_amortisation = np.append(arr_debt_amortisation,0)
-					arr_operations = np.append(arr_operations,0)
-					arr_depreciation = np.append(arr_depreciation,0)
+					arr_time_operations = np.append(arr_time_operations,0)
+					arr_is_depreciation = np.append(arr_is_depreciation,0)
 
-					arr_years_from_COD_avg = np.append(arr_years_from_COD_avg,0)
-					arr_years_from_COD_BOP = np.append(arr_years_from_COD_BOP,0)
-					arr_years_from_COD_EOP = np.append(arr_years_from_COD_EOP,0)
+					arr_time_years_from_COD_avg = np.append(arr_time_years_from_COD_avg,0)
+					arr_time_years_from_COD_BOP = np.append(arr_time_years_from_COD_BOP,0)
+					arr_time_years_from_COD_EOP = np.append(arr_time_years_from_COD_EOP,0)
 					arr_degradation = np.append(arr_degradation,0)
-					arr_seasonality = np.append(arr_seasonality,0)
+					arr_time_seasonality = np.append(arr_time_seasonality,0)
 					arr_electricity_price = np.append(arr_electricity_price,0)
-					arr_days_in_period_contract_in_period_pct = np.append(arr_days_in_period_contract_in_period_pct,0)
-					arr_opex = np.append(arr_opex,0)
-					arr_revenues_merchant = np.append(arr_revenues_merchant,0)
-					arr_revenues_contracted = np.append(arr_revenues_contracted,0)
+					arr_time_days_in_period_contract_in_period_pct = np.append(arr_time_days_in_period_contract_in_period_pct,0)
+					arr_is_opex = np.append(arr_is_opex,0)
+					arr_is_revenues_merchant = np.append(arr_is_revenues_merchant,0)
+					arr_is_revenues_contracted = np.append(arr_is_revenues_contracted,0)
 					arr_debt_interest_operations = np.append(arr_debt_interest_operations,0) 
 					arr_cumul_years_in_period = np.append(arr_cumul_years_in_period,0)
-					arr_days_under_contract_in_period = np.append(arr_days_under_contract_in_period,0)
-					arr_years_in_period_operations = np.append(arr_years_in_period_operations,0)
+					arr_time_days_under_contract_in_period = np.append(arr_time_days_under_contract_in_period,0)
+					arr_time_years_in_period_operations = np.append(arr_time_years_in_period_operations,0)
 
 					cumul_years_contract_indexation += create_timeline_array(date_contract_indexation_start,date_operations_end,start_period,end_period)
 					cumul_years_electricity_price_indexation += create_timeline_array(date_price_elec_indexation_start,date_operations_end,start_period,end_period)
@@ -450,40 +450,40 @@ def project_view(request,id):
 				for i in range(0, int_operating_periods):
 					
 					"""Compute start and end date of period"""
-					arr_start_period = np.append(arr_start_period,start_period)
+					arr_time_start_period = np.append(arr_time_start_period,start_period)
 					end_period = compute_end_period(start_period,inp_periodicity,1,date_operations_end)
-					arr_end_period = np.append(arr_end_period,end_period)
+					arr_time_end_period = np.append(arr_time_end_period,end_period)
 
-					arr_start_period_financing_plan = np.append(arr_start_period_financing_plan,"n.a.")
-					arr_end_period_financing_plan = np.append(arr_end_period_financing_plan,"n.a.")
+					arr_time_start_period_financing_plan = np.append(arr_time_start_period_financing_plan,"n.a.")
+					arr_time_end_period_financing_plan = np.append(arr_time_end_period_financing_plan,"n.a.")
 
 					"""Compute number of days in period"""
 					days_in_period = compute_days_in_period(start_period,end_period)
-					arr_days_in_period = np.append(arr_days_in_period,days_in_period)
+					arr_time_days_in_period = np.append(arr_time_days_in_period,days_in_period)
 					
 					"""Compute year fraction in period"""
 					years_in_period = compute_years_in_period(start_period,end_period)
-					arr_years_in_period = np.append(arr_years_in_period,years_in_period)
+					arr_time_years_in_period = np.append(arr_time_years_in_period,years_in_period)
 					cumul_years_in_period += years_in_period
 					arr_cumul_years_in_period = np.append(arr_cumul_years_in_period,cumul_years_in_period)
-					arr_years_in_period_operations = np.append(arr_years_in_period_operations,years_in_period)
+					arr_time_years_in_period_operations = np.append(arr_time_years_in_period_operations,years_in_period)
 
-					arr_years_from_COD_EOP = np.append(arr_years_from_COD_EOP,cumul_years_in_period)
-					arr_years_from_COD_BOP = np.append(arr_years_from_COD_BOP,cumul_years_in_period-years_in_period)
-					arr_years_from_COD_avg = np.add(arr_years_from_COD_BOP,arr_years_from_COD_EOP)/2
+					arr_time_years_from_COD_EOP = np.append(arr_time_years_from_COD_EOP,cumul_years_in_period)
+					arr_time_years_from_COD_BOP = np.append(arr_time_years_from_COD_BOP,cumul_years_in_period-years_in_period)
+					arr_time_years_from_COD_avg = np.add(arr_time_years_from_COD_BOP,arr_time_years_from_COD_EOP)/2
 			
 					"""Compute seasonality in period"""
 					days_in_month = compute_days_in_month(start_period,end_period)
-					arr_seasonality = np.append(arr_seasonality,np.sum(days_in_month*seasonality))
+					arr_time_seasonality = np.append(arr_time_seasonality,np.sum(days_in_month*seasonality))
 
 					pct_total_operations_in_period = days_in_period/days_in_operation
 					
 					"""Operations flag"""
-					arr_operations = np.append(arr_operations,1)
+					arr_time_operations = np.append(arr_time_operations,1)
 
 					"""Contract flag"""
 					days_under_contract_in_period = create_timeline_array(date_contract_start,date_contract_end,start_period,end_period)
-					arr_days_under_contract_in_period = np.append(arr_days_under_contract_in_period,days_under_contract_in_period)
+					arr_time_days_under_contract_in_period = np.append(arr_time_days_under_contract_in_period,days_under_contract_in_period)
 
 					cumul_years_contract_indexation += create_timeline_array(date_contract_indexation_start,date_operations_end,start_period,end_period)
 					cumul_years_electricity_price_indexation += create_timeline_array(date_price_elec_indexation_start,date_operations_end,start_period,end_period)
@@ -493,7 +493,7 @@ def project_view(request,id):
 					arr_indexation_electricity_price = np.append(arr_indexation_electricity_price,(1+inp_price_elec_indexation)**cumul_years_electricity_price_indexation)
 					arr_indexation_opex = np.append(arr_indexation_opex,(1+inp_opex_indexation_rate)**cumul_years_opex_indexation)
 					
-					arr_depreciation = np.append(arr_depreciation,cumul_construction_costs*pct_total_operations_in_period)
+					arr_is_depreciation = np.append(arr_is_depreciation,cumul_construction_costs*pct_total_operations_in_period)
 					
 					""" Senior debt """
 					if end_period < date_debt_maturity:
@@ -523,42 +523,42 @@ def project_view(request,id):
 
 					arr_capacity_after_degradation = arr_degradation * inp_capacity
 
-					production = inp_production/1000*arr_capacity_after_degradation*arr_seasonality
+					production = inp_production/1000*arr_capacity_after_degradation*arr_time_seasonality
 
 					""" Electricity price """
 					for key in dic_price_elec.keys():
 						if key == str(end_period.year):
 							arr_electricity_price = np.append(arr_electricity_price,dic_price_elec[key])
 
-					arr_opex = np.append(arr_opex,inp_opex)
+					arr_is_opex = np.append(arr_is_opex,inp_opex)
 
 				""" Revenues """
 				""" A REMETTRE INDEXATION PRIX ELECTRICITE """
-				arr_revenues_contracted = inp_contract_price*production*arr_days_under_contract_in_period/1000
-				arr_revenues_merchant = arr_electricity_price*1*production*(1-arr_days_under_contract_in_period)/1000
-				arr_revenues_total = np.add(arr_revenues_contracted,arr_revenues_merchant)
+				arr_is_revenues_contracted = inp_contract_price*production*arr_time_days_under_contract_in_period/1000
+				arr_is_revenues_merchant = arr_electricity_price*1*production*(1-arr_time_days_under_contract_in_period)/1000
+				arr_is_revenues_total = np.add(arr_is_revenues_contracted,arr_is_revenues_merchant)
 
 				""" Operating costs """
 				""" A REMETTRE INDEXATION OPEX"""
-				arr_operating_costs = arr_opex*1*arr_years_in_period_operations
+				arr_is_operating_costs = arr_is_opex*1*arr_time_years_in_period_operations
 
 				""" EBITDA """
-				arr_EBITDA = arr_revenues_total-arr_operating_costs
-				arr_EBITDA_margin = np.divide(arr_EBITDA,arr_revenues_total, out=np.zeros_like(arr_EBITDA), where=arr_revenues_total!=0)*100
-				arr_EBIT = arr_EBITDA-arr_depreciation
-				arr_EBT = arr_EBIT-arr_debt_interest_operations
-				arr_corporate_tax = -arr_EBT*inp_corporate_income_tax_rate
-				arr_net_income = arr_EBT-arr_corporate_tax
+				arr_is_EBITDA = arr_is_revenues_total-arr_is_operating_costs
+				arr_is_EBITDA_margin = np.divide(arr_is_EBITDA,arr_is_revenues_total, out=np.zeros_like(arr_is_EBITDA), where=arr_is_revenues_total!=0)*100
+				arr_is_EBIT = arr_is_EBITDA-arr_is_depreciation
+				arr_is_EBT = arr_is_EBIT-arr_debt_interest_operations
+				arr_is_corporate_tax = -arr_is_EBT*inp_corporate_income_tax_rate
+				arr_is_net_income = arr_is_EBT-arr_is_corporate_tax
 
-				arr_CFADS = (arr_EBIT-arr_corporate_tax)*arr_debt_amortisation
+				arr_CFADS = (arr_is_EBIT-arr_is_corporate_tax)*arr_debt_amortisation
 				arr_target_DS_sizing = arr_CFADS/inp_target_DSCR
 				arr_target_DS_sculpting = arr_CFADS/DSCR_sculpting
 
 				arr_debt_target_repayment = (arr_target_DS_sculpting-arr_debt_interest_operations)*arr_debt_amortisation
 				arr_debt_target_repayment_above_zero = np.clip(arr_debt_target_repayment,0,a_max=None)
 
-				arr_debt_avg_interest = np.divide(arr_debt_interest_operations,arr_debt_BoP,out=np.zeros_like(arr_debt_interest_operations), where=arr_debt_BoP!=0)/arr_days_in_period*360
-				arr_debt_period_discount_factor = (1/(1+(arr_debt_avg_interest*arr_days_in_period/360)))*arr_debt_amortisation
+				arr_debt_avg_interest = np.divide(arr_debt_interest_operations,arr_debt_BoP,out=np.zeros_like(arr_debt_interest_operations), where=arr_debt_BoP!=0)/arr_time_days_in_period*360
+				arr_debt_period_discount_factor = (1/(1+(arr_debt_avg_interest*arr_time_days_in_period/360)))*arr_debt_amortisation
 
 				for i in range(len(arr_debt_amortisation)):
 					if i == 0:
@@ -588,21 +588,21 @@ def project_view(request,id):
 							"data_dump_sidebar":data_dump_sidebar.tolist(),
 							"data_dump_summary":data_dump_summary.tolist(),
 							
-							"arr_start_period":arr_start_period.tolist(),
-							"arr_end_period":arr_end_period.tolist(),
+							"arr_time_start_period":arr_time_start_period.tolist(),
+							"arr_time_end_period":arr_time_end_period.tolist(),
 
-							"arr_start_period_financing_plan":arr_start_period_financing_plan.tolist(),
-							"arr_end_period_financing_plan":arr_end_period_financing_plan.tolist(),
-							"arr_days_in_period":arr_days_in_period.tolist(),
+							"arr_time_start_period_financing_plan":arr_time_start_period_financing_plan.tolist(),
+							"arr_time_end_period_financing_plan":arr_time_end_period_financing_plan.tolist(),
+							"arr_time_days_in_period":arr_time_days_in_period.tolist(),
 
-							"arr_operations":arr_operations.tolist(),
-							"arr_days_under_contract_in_period":arr_days_under_contract_in_period.tolist(),
-							"arr_years_from_COD_BOP":arr_years_from_COD_BOP.tolist(),
-							"arr_years_from_COD_EOP":arr_years_from_COD_EOP.tolist(),
-							"arr_years_from_COD_avg":arr_years_from_COD_avg.tolist(),
+							"arr_time_operations":arr_time_operations.tolist(),
+							"arr_time_days_under_contract_in_period":arr_time_days_under_contract_in_period.tolist(),
+							"arr_time_years_from_COD_BOP":arr_time_years_from_COD_BOP.tolist(),
+							"arr_time_years_from_COD_EOP":arr_time_years_from_COD_EOP.tolist(),
+							"arr_time_years_from_COD_avg":arr_time_years_from_COD_avg.tolist(),
 
-							"arr_years_in_period":arr_years_in_period.tolist(),
-							"arr_years_in_period_operations":arr_years_in_period_operations.tolist(),
+							"arr_time_years_in_period":arr_time_years_in_period.tolist(),
+							"arr_time_years_in_period_operations":arr_time_years_in_period_operations.tolist(),
 
 							"production":production.tolist(),
 
@@ -610,45 +610,53 @@ def project_view(request,id):
 							"arr_capacity_after_degradation":arr_capacity_after_degradation.tolist(),
 
 							"seasonality":seasonality.tolist(),
-							"arr_seasonality":arr_seasonality.tolist(),
+							"arr_time_seasonality":arr_time_seasonality.tolist(),
 
 							"arr_electricity_price":arr_electricity_price.tolist(),
 							"arr_years_electricity_prices":arr_years_electricity_prices.tolist(),
 
-							"arr_revenues_contracted":arr_revenues_contracted.tolist(),
-							"arr_revenues_merchant":arr_revenues_merchant.tolist(),
-							"arr_revenues_total":arr_revenues_total.tolist(),
-							"arr_opex":arr_opex.tolist(),
-							"arr_operating_costs":arr_operating_costs.tolist(),
-							"arr_EBITDA":arr_EBITDA.tolist(),
-							"arr_EBITDA_margin":arr_EBITDA_margin.tolist(),
-							"arr_depreciation":arr_depreciation.tolist(),
-							"arr_EBIT":arr_EBIT.tolist(),
-							"arr_EBT":arr_EBT.tolist(),
-							"arr_corporate_tax":arr_corporate_tax.tolist(),
-							"arr_net_income":arr_net_income.tolist(),
-
+							"arr_is_revenues_contracted":arr_is_revenues_contracted.tolist(),
+							"arr_is_revenues_merchant":arr_is_revenues_merchant.tolist(),
+							"arr_is_revenues_total":arr_is_revenues_total.tolist(),
+							"arr_is_opex":arr_is_opex.tolist(),
+							"arr_is_operating_costs":arr_is_operating_costs.tolist(),
+							"arr_is_EBITDA":arr_is_EBITDA.tolist(),
+							"arr_is_EBITDA_margin":arr_is_EBITDA_margin.tolist(),
+							"arr_is_depreciation":arr_is_depreciation.tolist(),
+							"arr_is_EBIT":arr_is_EBIT.tolist(),
+							"arr_is_EBT":arr_is_EBT.tolist(),
+							"arr_is_corporate_tax":arr_is_corporate_tax.tolist(),
+							"arr_is_net_income":arr_is_net_income.tolist(),
 
 							"arr_CFADS":arr_CFADS.tolist(),
 
-							"arr_construction_costs":arr_construction_costs.tolist(),
-
-							"arr_cumul_construction_costs":arr_cumul_construction_costs.tolist(),
-							"arr_debt_amortisation":arr_debt_amortisation.tolist(),
-
-						
+							"arr_fp_uses_construction_costs":arr_fp_uses_construction_costs.tolist(),
+							"arr_fp_uses_cumul_construction_costs":arr_fp_uses_cumul_construction_costs.tolist(),
+							
 							"arr_indexation_contract":arr_indexation_contract.tolist(),
 							"arr_indexation_electricity_price":arr_indexation_electricity_price.tolist(),
 							"arr_indexation_opex":arr_indexation_opex.tolist(),
 
-							"arr_target_DS_sculpting":arr_target_DS_sculpting.tolist(),
+							"arr_debt_amount_available":arr_debt_amount_available.tolist(),
+							"arr_debt_commitment_fee":arr_debt_commitment_fee.tolist(),
+
+
+							"arr_debt_BoP":arr_debt_BoP.tolist(),
+							"arr_debt_drawn":arr_debt_drawn.tolist(),
+							"arr_debt_repayment":arr_debt_repayment.tolist(),
+							"arr_debt_EoP":arr_debt_EoP.tolist(),
+							"arr_debt_interest":arr_debt_interest.tolist(),
+							"arr_debt_interest_operations":arr_debt_interest_operations.tolist(),
+
+							"arr_debt_amortisation":arr_debt_amortisation.tolist(),
 							"arr_target_DS_sizing":arr_target_DS_sizing.tolist(),
+							"arr_target_DS_sculpting":arr_target_DS_sculpting.tolist(),
 							"arr_debt_avg_interest":arr_debt_avg_interest.tolist(),
 							"arr_debt_period_discount_factor":arr_debt_period_discount_factor.tolist(),
-						
+							"arr_debt_cumul_period_discount_factor":arr_debt_cumul_period_discount_factor.tolist(),							
 							"arr_debt_target_repayment":arr_debt_target_repayment.tolist(),
 							"arr_debt_target_repayment_above_zero":arr_debt_target_repayment_above_zero.tolist(),
-							"arr_debt_cumul_period_discount_factor":arr_debt_cumul_period_discount_factor.tolist(),
+
 
 
 						},safe=False, status=200)
@@ -701,8 +709,8 @@ def compute_commitment_fee(amount_available, commitment_fee_rate, days_in_period
 def compute_days_in_month(start_date, end_date):
 
 	dates_in_period = pd.date_range(start=start_date, end=end_date).values.astype('datetime64[D]').tolist()
-	arr_days_in_period_per_months = np.array([])
-	arr_days_in_period = np.array([])
+	arr_time_days_in_period_per_months = np.array([])
+	arr_time_days_in_period = np.array([])
 	days_in_month = 0
 
 	for i in range(1,13):
@@ -714,13 +722,13 @@ def compute_days_in_month(start_date, end_date):
 					count += 1
 					days_in_month = calendar.monthrange(value.year, value.month)[1]
 			
-			arr_days_in_period_per_months = np.append(arr_days_in_period_per_months,count/days_in_month)
+			arr_time_days_in_period_per_months = np.append(arr_time_days_in_period_per_months,count/days_in_month)
 
 		except ZeroDivisionError:
 
-			arr_days_in_period_per_months = np.append(arr_days_in_period_per_months,0)
+			arr_time_days_in_period_per_months = np.append(arr_time_days_in_period_per_months,0)
 
-	return arr_days_in_period_per_months
+	return arr_time_days_in_period_per_months
 
 def create_array_electricity_prices(start_date):
 	arr_years_electricity_prices = np.array([])

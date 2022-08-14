@@ -1291,11 +1291,24 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
+  		<h2>Summary</h2>
 
   		<table class="table">
 			<tbody id="summary"></tbody>
 		</table>
+  		<h2>Timeline</h2>
+			<table class="table">
+				<tbody id="myTableTimeline">
+		
+				</tbody>
+			</table>
 
+  		<h2>Indexation</h2>
+			<table class="table">
+				<tbody id="myTableIndexation">
+		
+				</tbody>
+			</table>
 
   		<h2>Income statement</h2>
 
@@ -1423,7 +1436,10 @@
 
 				  "arr_cumul_period_discount_factor":0,
 				  "arr_debt_interest_operations":0,
-				  "arr_debt_target_repayment":0,}
+				  "arr_debt_target_repayment":0,
+				  "arr_debt_target_repayment_above_zero":0,
+				  "arr_debt_repayment":0,
+				}
 
 	var senior_debt = {"arr_debt_amortisation":0,
 						"arr_debt_amount_available":0,
@@ -1435,16 +1451,8 @@
 						"arr_debt_interest":0,
 						}	
 
-
-
 	var summary = {"data_dump_summary":0,
-						"arr_debt_amount_available":0,
-						"arr_debt_commitment_fee":0,
-						"arr_debt_BoP":0,
-						"arr_debt_drawn":0,
-						"arr_debt_repayment":0,
-						"arr_debt_EoP":0,
-						"arr_debt_interest":0,
+
 						}	
 
 	var balance_sheet_assets = {"arr_construction_costs":0,
@@ -1469,9 +1477,37 @@
 			data: $(this).serialize(),
 			success:function(json){
 				console.log(json);
+
+  				var result_timeline = '';
+  				$.each(json, function(key, data) {
+  					if(key.startsWith("arr_time")) {
+	  					result_timeline += "<tr>";
+	  					result_timeline += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_timeline += "<td>" + data + "</td>";
+	    				});
+	  					result_timeline += "</tr>";
+  					}
+  				});
+  				$("#myTableTimeline").html(result_timeline);
+
+  				var result_indexation = '';
+  				$.each(json, function(key, data) {
+  					if(key.startsWith("arr_indexation")) {
+	  					result_indexation += "<tr>";
+	  					result_indexation += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_indexation += "<td>" + data + "</td>";
+	    				});
+	  					result_indexation += "</tr>";
+  					}
+  				});
+  				$("#myTableIndexation").html(result_indexation);
+
+
 				var result_IS = '';
   				$.each(json, function(key, data) {
-  					if(key in income_statement) {
+  					if(key.startsWith("arr_is")) {
 	  					result_IS += "<tr>";
 	  					result_IS += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1485,7 +1521,7 @@
 
    				var result_FP_uses = '';
   				$.each(json, function(key, data) {
-  					if(key in financing_plan_uses) {
+  					if(key.startsWith("arr_fp_uses")) {
 	  					result_FP_uses += "<tr>";
 	  					result_FP_uses += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1539,7 +1575,7 @@
 
   				var result_SD = '';
   				$.each(json, function(key, data) {
-  					if(key in senior_debt) {
+  					if(key.startsWith("arr_debt")) {
 	  					result_SD += "<tr>";
 	  					result_SD += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1641,7 +1677,7 @@
 
 
 
-  				myChart.data.labels = json.arr_end_period;
+  				myChart.data.labels = json.arr_time_end_period;
   				myChart.data.datasets[0].data = json.production;
   				myChart.data.datasets[1].data = json.arr_degradation;
 				myChart.update()
@@ -1649,26 +1685,26 @@
   				myChart2.data.datasets[0].data = json.seasonality;
 				myChart2.update()
 
-  				myChart3.data.labels = json.arr_end_period;
-  				myChart3.data.datasets[0].data = json.arr_revenues_contracted;
-  				myChart3.data.datasets[1].data = json.arr_revenues_merchant;
+  				myChart3.data.labels = json.arr_time_end_period;
+  				myChart3.data.datasets[0].data = json.arr_is_revenues_contracted;
+  				myChart3.data.datasets[1].data = json.arr_is_revenues_merchant;
 				myChart3.update()
 
-  				myChart4.data.labels = json.arr_end_period;
-  				myChart4.data.datasets[0].data = json.arr_operating_costs;
+  				myChart4.data.labels = json.arr_time_end_period;
+  				myChart4.data.datasets[0].data = json.arr_is_operating_costs;
 				myChart4.update()
 
-				myChart5.data.labels = json.arr_end_period;
-  				myChart5.data.datasets[0].data = json.arr_EBITDA;
-  				myChart5.data.datasets[1].data = json.arr_EBITDA_margin;
+				myChart5.data.labels = json.arr_time_end_period;
+  				myChart5.data.datasets[0].data = json.arr_is_EBITDA;
+  				myChart5.data.datasets[1].data = json.arr_is_EBITDA_margin;
 				myChart5.update()
 
-				myChart6.data.labels = json.arr_end_period_financing_plan;
-  				myChart6.data.datasets[0].data = json.arr_construction_costs;
-  				myChart6.data.datasets[1].data = json.arr_cumul_construction_costs;
+				myChart6.data.labels = json.arr_time_end_period_financing_plan;
+  				myChart6.data.datasets[0].data = json.arr_fp_uses_construction_costs;
+  				myChart6.data.datasets[1].data = json.arr_fp_uses_cumul_construction_costs;
 				myChart6.update()
 
-				myChart7.data.labels = json.arr_end_period;
+				myChart7.data.labels = json.arr_time_end_period;
   				myChart7.data.datasets[0].data = json.arr_debt_service;
   				myChart7.data.datasets[1].data = json.arr_DSCR;
 				myChart7.update()
