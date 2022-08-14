@@ -1276,120 +1276,92 @@
     </nav>
 
 	<nav>
-	<ul class="nav nav-tabs">
-	  <li class="nav-item">
-	    <a class="nav-link active" aria-current="page" href="#nav-summary">Summary</a>
-	  </li>
-	  <li class="nav-item">
-	    <a class="nav-link" href="#nav-graphs">Charts</a>
-	  </li>
-	  <li class="nav-item">
-	    <a class="nav-link" href="#nav-calculation">Calculation</a>
-	  </li>
-	</ul>
+		<ul class="nav nav-tabs">
+		  <li class="nav-item">
+		    <a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Summary</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Calculation</a>
+		  </li>
+		</ul>
 	</nav>
 
-<div class="tab-content">
-  <div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
-  		<h2>Summary</h2>
+	<div class="tab-content">
+  		<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
+  			
+  			<h2>Summary</h2>
+		  		<table class="table">
+					<tbody id="summary"></tbody>
+				</table>
+  			
+  			<h2>Graphs</h2>
+	 		{% block jquery %}{% include 'charts.html' %}{% endblock %}
 
-  		<table class="table">
-			<tbody id="summary"></tbody>
-		</table>
-  		<h2>Timeline</h2>
-			<table class="table">
-				<tbody id="myTableTimeline">
-		
-				</tbody>
-			</table>
+		</div>
 
-  		<h2>Indexation</h2>
-			<table class="table">
-				<tbody id="myTableIndexation">
-		
-				</tbody>
-			</table>
+		<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
+	  		<h2>Timeline</h2>
+				<table class="table">
+					<tbody id="myTableTimeline"></tbody>
+				</table>
 
-  		<h2>Income statement</h2>
+	  		<h2>Indexation</h2>
+				<table class="table">
+					<tbody id="myTableIndexation"></tbody>
+				</table>
 
-			<table class="table">
-				<tbody id="myTableIS">
-		
-				</tbody>
-			</table>
+  			<h2>Income statement</h2>
+				<table class="table">
+					<tbody id="myTableIS"></tbody>
+				</table>
  			
  			<h2>Financing plan</h2>
- 			<p>Uses</p>
- 			<table class="table">
-				<tbody id="myTableFPUses">
-		
-				</tbody>
-			</table>
+ 				<p>Uses</p>
+		 			<table class="table">
+						<tbody id="myTableFPUses"></tbody>
+					</table>
 
- 			<p>Sources</p>
- 			<table class="table">
-				<tbody id="myTableFPSources">
-		
-				</tbody>
-			</table>
+ 				<p>Sources</p>
+	 			<table class="table">
+					<tbody id="myTableFPSources"></tbody>
+				</table>
 
  			<h2>Cash flow statement</h2>
-
- 			<table class="table">
-				<tbody id="myTableCF">
-		
-				</tbody>
-			</table>
+	 			<table class="table">
+					<tbody id="myTableCF"></tbody>
+				</table>
 
  			<h2>Senior debt</h2>
-
  			<table class="table">
-				<tbody id="myTableSeniorDebt">
-		
-				</tbody>
+				<tbody id="myTableSeniorDebt"></tbody>
 			</table>
 
 			<h2>Sizing and sculpting</h2>
-
  			<table class="table">
-				<tbody id="myTableSizing">
-		
-				</tbody>
+				<tbody id="myTableSizing"></tbody>
 			</table>
-
 
 			<h2>Balance sheet</h2>
-			<p>Assets</p>
- 			<table class="table">
-				<tbody id="myTableBalanceSheetAssets">
-		
-				</tbody>
+				<p>Assets</p>
+		 			<table class="table">
+						<tbody id="myTableBalanceSheetAssets"></tbody>
+					</table>
+
+				<p>Liabilities</p>
+		 			<table class="table">
+						<tbody id="myTableBalanceSheetLiabilities"></tbody>
+					</table>
+
+			<h2>Audit</h2>
+	 			<table class="table">
+					<tbody id="myTableAudit"></tbody>
+				</table>
+
+	  		<table class="table">
+					<tbody id="myTableAll"></tbody>
 			</table>
-
-			<p>Liabilities</p>
- 			<table class="table">
-				<tbody id="myTableBalanceSheetLiabilities">
-		
-				</tbody>
-			</table>
-		</div>
-
-  </div>
-  <div class="tab-pane" id="nav-graphs" role="tabpanel" aria-labelledby="profile-tab">
-  			{% block jquery %}
-			{% include 'charts.html' %}
-		{% endblock %}
-
-  </div>
-  <div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
-  	
-
-  		<table class="table">
-				<tbody id="myTableAll">
-		
-				</tbody>
-			</table>
-  </div>
+	 	</div>
+    </div>
 </div>
 
 
@@ -1400,73 +1372,7 @@
     	$("#post-form").submit();
 	});
 
-	var income_statement = {"arr_start_period":0,
-							"arr_end_period":0,
-							"arr_days":0,
-							"arr_revenues_contracted":0,
-							"arr_revenues_merchant":0,
-							"arr_revenues_total":0,
-							"arr_opex":0,
-							"arr_EBITDA":0,
-							"arr_depreciation":0,
-							"arr_EBIT":0,
-							"arr_debt_interest_operations":0,
-							"arr_EBT":0,
-							"arr_corpore_tax":0,
-							"arr_net_income":0,							
-							}
-
-	var financing_plan_uses = {"arr_start_period_financing_plan":0,
-						  "arr_end_period_financing_plan":0,
-						  "arr_construction_costs":0,
-						  "arr_cumul_construction_costs":0,
-						  "arr_debt_interest_construction":0,}
-
-
-	var financing_plan_sources = {"arr_start_period_financing_plan":0,
-					  "arr_end_period_financing_plan":0,
-					  "arr_debt_drawn":0,
-					  "arr_equity_drawn":0,}
-
-	var cash_flow_statement = {"arr_EBITDA":0,}
-
-	var sizing = {"arr_CFADS":0,
-				  "arr_target_DS":0,
-				  "arr_period_discount_factor":0,
-
-				  "arr_cumul_period_discount_factor":0,
-				  "arr_debt_interest_operations":0,
-				  "arr_debt_target_repayment":0,
-				  "arr_debt_target_repayment_above_zero":0,
-				  "arr_debt_repayment":0,
-				}
-
-	var senior_debt = {"arr_debt_amortisation":0,
-						"arr_debt_amount_available":0,
-						"arr_debt_commitment_fee":0,
-						"arr_debt_BoP":0,
-						"arr_debt_drawn":0,
-						"arr_debt_repayment":0,
-						"arr_debt_EoP":0,
-						"arr_debt_interest":0,
-						}	
-
-	var summary = {"data_dump_summary":0,
-
-						}	
-
-	var balance_sheet_assets = {"arr_construction_costs":0,
-						
-
-						}	
 	
-
-	var balance_sheet_liabilities = {"arr_debt_EoP":0,
-						
-
-						}	
-
-
 
 	$(document).on('submit','#post-form', function(e){
 
@@ -1497,7 +1403,7 @@
 	  					result_indexation += "<tr>";
 	  					result_indexation += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_indexation += "<td>" + data + "</td>";
+	    					result_indexation += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_indexation += "</tr>";
   					}
@@ -1511,7 +1417,7 @@
 	  					result_IS += "<tr>";
 	  					result_IS += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_IS += "<td>" + data + "</td>";
+	    					result_IS += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_IS += "</tr>";
   					}
@@ -1534,7 +1440,7 @@
   				
   				var result_FP_sources = '';
   				$.each(json, function(key, data) {
-  					if(key in financing_plan_sources) {
+  					if(key.startsWith("arr_fp_sources")) {
 	  					result_FP_sources += "<tr>";
 	  					result_FP_sources += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1547,7 +1453,7 @@
 
   				var result_CF = '';
   				$.each(json, function(key, data) {
-  					if(key in cash_flow_statement) {
+  					if(key.startsWith("arr_cash_flow")) {
 	  					result_CF += "<tr>";
 	  					result_CF += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1560,11 +1466,11 @@
 
   				var result_Sizing = '';
   				$.each(json, function(key, data) {
-  					if(key in sizing) {
+  					if(key.startsWith("arr_sizing")) {
 	  					result_Sizing += "<tr>";
 	  					result_Sizing += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_Sizing += "<td>" + data + "</td>";
+	    					result_Sizing += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_Sizing += "</tr>";
   					}
@@ -1579,7 +1485,7 @@
 	  					result_SD += "<tr>";
 	  					result_SD += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_SD += "<td>" + data + "</td>";
+	    					result_SD += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_SD += "</tr>";
   					}
@@ -1588,11 +1494,11 @@
 
    				var result_BS_assets = '';
   				$.each(json, function(key, data) {
-  					if(key in balance_sheet_assets) {
+  					if(key.startsWith("arr_assets")) {
 	  					result_BS_assets += "<tr>";
 	  					result_BS_assets += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_BS_assets += "<td>" + data + "</td>";
+	    					result_BS_assets += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_BS_assets += "</tr>";
   					}
@@ -1601,11 +1507,11 @@
 
    				var result_BS_liabilities = '';
   				$.each(json, function(key, data) {
-  					if(key in balance_sheet_liabilities) {
+  					if(key.startsWith("arr_liabilities")) {
 	  					result_BS_liabilities += "<tr>";
 	  					result_BS_liabilities += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_BS_liabilities += "<td>" + data + "</td>";
+	    					result_BS_liabilities += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_BS_liabilities += "</tr>";
   					}
@@ -1625,7 +1531,7 @@
 
   				var result_summary = '';
   				$.each(json, function(key, data) {
-  					if(key in summary) {
+  					if(key.startsWith("summary_debt")) {
 	  					result_summary += "<tr>";
 	  					result_summary += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1636,6 +1542,18 @@
   				});
   				$("#summary").html(result_summary);
 
+   				var result_Audit = '';
+  				$.each(json, function(key, data) {
+  					if(key.startsWith("audit")) {
+	  					result_Audit += "<tr>";
+	  					result_Audit += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_Audit += "<td>" + data + "</td>";
+	    				});
+	  					result_Audit += "</tr>";
+  					}
+  				});
+  				$("#myTableAudit").html(result_Audit);
 
 
   				$("#dateCOD").html(json.data_dump_sidebar[0]);
@@ -1701,13 +1619,19 @@
 
 				myChart6.data.labels = json.arr_time_end_period_financing_plan;
   				myChart6.data.datasets[0].data = json.arr_fp_uses_construction_costs;
-  				myChart6.data.datasets[1].data = json.arr_fp_uses_cumul_construction_costs;
+  				myChart6.data.datasets[1].data = json.arr_assets_cumul_construction_costs;
 				myChart6.update()
 
 				myChart7.data.labels = json.arr_time_end_period;
-  				myChart7.data.datasets[0].data = json.arr_debt_service;
-  				myChart7.data.datasets[1].data = json.arr_DSCR;
+  				myChart7.data.datasets[0].data = json.arr_debt_interest;
+  				myChart7.data.datasets[1].data = json.arr_debt_repayment;
+   				myChart7.data.datasets[2].data = json.arr_ratios_DSCR;
 				myChart7.update()
+
+				myChart8.data.labels = json.arr_time_end_period;
+  				myChart8.data.datasets[0].data = json.arr_debt_service;
+  				myChart8.data.datasets[1].data = json.arr_sizing_CFADS;
+				myChart8.update()
 
 			},
 			error: function(){

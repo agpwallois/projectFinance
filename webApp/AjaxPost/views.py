@@ -147,7 +147,7 @@ def project_view(request,id):
 			inp_price_elec_indexation_start_date = request.POST['price_elec_indexation_start_date']
 			date_price_elec_indexation_start = datetime.datetime.strptime(inp_price_elec_indexation_start_date, "%Y-%m-%d").date()
 
-			inp_price_elec_indexation = float(request.POST['price_elec_indexation'])
+			inp_price_elec_indexation = float(request.POST['price_elec_indexation'])/100
 
 			arr_years_electricity_prices = create_array_electricity_prices(date_COD)
 
@@ -288,9 +288,9 @@ def project_view(request,id):
 
 			days_in_operation = (date_operations_end - date_COD).days
 			debt_amount = 500
-			debt_amount_DSCR = 1000
-			arr_debt_target_repayment = np.array([])
-			arr_debt_target_repayment_above_zero = np.array([])
+			debt_amount_constrained = 1000
+			arr_sizing_debt_target_repayment = np.array([])
+			arr_sizing_debt_target_repayment_above_zero = np.array([])
 			DSCR_sculpting = 2
 
 			arr_is_EBITDA = np.array([]) 
@@ -298,15 +298,15 @@ def project_view(request,id):
 			arr_is_revenues_contracted = np.array([])
 			arr_is_revenues_merchant = np.array([])
 
-			arr_CFADS = np.array([])
-			arr_target_DS_sizing = np.array([])
-			arr_DSCR = np.array([])
+			arr_sizing_CFADS = np.array([])
+			arr_sizing_target_DS_sizing = np.array([])
+			arr_ratios_DSCR = np.array([])
 			arr_debt_service = np.array([])
 
 			for i in range(0,months_construction+int_operating_periods):
-				arr_debt_target_repayment = np.append(arr_debt_target_repayment,1)
+				arr_sizing_debt_target_repayment = np.append(arr_sizing_debt_target_repayment,1)
 
-			while debt_amount != debt_amount_DSCR:
+			while debt_amount != debt_amount_constrained:
 
 				start_period = datetime.datetime.strptime(inp_construction_start, "%Y-%m-%d").date()
 				cumul_construction_costs = 0
@@ -318,12 +318,12 @@ def project_view(request,id):
 				cumul_years_opex_indexation = 0
 				cumul_years_in_period = 0
 
-				debt_amount = debt_amount_DSCR
-				arr_debt_repayment= arr_debt_target_repayment
+				debt_amount = debt_amount_constrained
+				arr_debt_repayment= arr_sizing_debt_target_repayment
 				
 				arr_capacity_after_degradation = np.array([])
 				arr_fp_uses_construction_costs = np.array([])
-				arr_fp_uses_cumul_construction_costs = np.array([])
+				arr_assets_cumul_construction_costs = np.array([])
 				arr_cumul_years_in_period = np.array([])
 				arr_time_days_in_period = np.array([])
 				arr_time_days_under_contract_in_period = np.array([])
@@ -337,7 +337,7 @@ def project_view(request,id):
 
 				arr_time_start_period = np.array([])
 				arr_time_start_period_financing_plan = np.array([])
-				arr_debt_cumul_period_discount_factor = np.array([])
+				arr_sizing_debt_cumul_period_discount_factor = np.array([])
 
 				arr_time_years_from_COD_avg = np.array([])
 				arr_time_years_from_COD_BOP = np.array([])
@@ -365,11 +365,11 @@ def project_view(request,id):
 				arr_debt_EoP = np.array([])
 				arr_debt_interest = np.array([])
 				arr_debt_interest_construction = np.array([])
-				arr_debt_interest_operations = np.array([])
-				arr_debt_amortisation = np.array([])
+				arr_sizing_debt_interest_operations = np.array([])
+				arr_sizing_debt_amortisation = np.array([])
 
 
-				arr_equity_drawn = np.array([])
+				arr_fp_sources_equity_drawn = np.array([])
 				arr_degradation = np.array([])
 
 				for i in range(0, months_construction):
@@ -393,7 +393,7 @@ def project_view(request,id):
 					"""Create construction costs arrays"""
 					arr_fp_uses_construction_costs = np.append(arr_fp_uses_construction_costs,inp_construction_costs[i])
 					cumul_construction_costs += inp_construction_costs[i]
-					arr_fp_uses_cumul_construction_costs = np.append(arr_fp_uses_cumul_construction_costs,cumul_construction_costs)
+					arr_assets_cumul_construction_costs = np.append(arr_assets_cumul_construction_costs,cumul_construction_costs)
 
 					""" Senior debt """
 					arr_debt_BoP = np.append(arr_debt_BoP,cumul_debt_drawn)
@@ -407,7 +407,7 @@ def project_view(request,id):
 					cumul_debt_drawn += debt_drawn
 					cumul_equity_drawn += equity_drawn
 					arr_debt_drawn = np.append(arr_debt_drawn,debt_drawn)
-					arr_equity_drawn = np.append(arr_equity_drawn,equity_drawn)
+					arr_fp_sources_equity_drawn = np.append(arr_fp_sources_equity_drawn,equity_drawn)
 
 					if i == 0: 
 						arr_debt_amount_available = np.append(arr_debt_amount_available,debt_amount)
@@ -418,7 +418,7 @@ def project_view(request,id):
 					arr_debt_EoP = np.append(arr_debt_EoP,cumul_debt_drawn)
 
 					""" XXX """
-					arr_debt_amortisation = np.append(arr_debt_amortisation,0)
+					arr_sizing_debt_amortisation = np.append(arr_sizing_debt_amortisation,0)
 					arr_time_operations = np.append(arr_time_operations,0)
 					arr_is_depreciation = np.append(arr_is_depreciation,0)
 
@@ -432,7 +432,7 @@ def project_view(request,id):
 					arr_is_opex = np.append(arr_is_opex,0)
 					arr_is_revenues_merchant = np.append(arr_is_revenues_merchant,0)
 					arr_is_revenues_contracted = np.append(arr_is_revenues_contracted,0)
-					arr_debt_interest_operations = np.append(arr_debt_interest_operations,0) 
+					arr_sizing_debt_interest_operations = np.append(arr_sizing_debt_interest_operations,0) 
 					arr_cumul_years_in_period = np.append(arr_cumul_years_in_period,0)
 					arr_time_days_under_contract_in_period = np.append(arr_time_days_under_contract_in_period,0)
 					arr_time_years_in_period_operations = np.append(arr_time_years_in_period_operations,0)
@@ -492,7 +492,12 @@ def project_view(request,id):
 					arr_indexation_contract = np.append(arr_indexation_contract,(1+inp_contract_indexation_rate)**cumul_years_contract_indexation)
 					arr_indexation_electricity_price = np.append(arr_indexation_electricity_price,(1+inp_price_elec_indexation)**cumul_years_electricity_price_indexation)
 					arr_indexation_opex = np.append(arr_indexation_opex,(1+inp_opex_indexation_rate)**cumul_years_opex_indexation)
-					
+
+
+					arr_fp_uses_construction_costs = np.append(arr_fp_uses_construction_costs,0)
+					arr_assets_cumul_construction_costs = np.append(arr_assets_cumul_construction_costs,0)
+					arr_fp_sources_equity_drawn = np.append(arr_fp_sources_equity_drawn,0)
+				
 					arr_is_depreciation = np.append(arr_is_depreciation,cumul_construction_costs*pct_total_operations_in_period)
 					
 					""" Senior debt """
@@ -501,7 +506,7 @@ def project_view(request,id):
 					else: 
 						debt_amortisation = 0
 
-					arr_debt_amortisation = np.append(arr_debt_amortisation,debt_amortisation)
+					arr_sizing_debt_amortisation = np.append(arr_sizing_debt_amortisation,debt_amortisation)
 
 					debt_BoP = max(cumul_debt_drawn-cumul_debt_repayment,0)
 					arr_debt_BoP = np.append(arr_debt_BoP,debt_BoP)
@@ -510,7 +515,7 @@ def project_view(request,id):
 					arr_debt_commitment_fee = np.append(arr_debt_commitment_fee,0)
 					arr_debt_drawn = np.append(arr_debt_drawn,0)
 					arr_debt_interest = np.append(arr_debt_interest,debt_BoP*inp_debt_interest_rate*days_in_period/360)
-					arr_debt_interest_operations = np.append(arr_debt_interest_operations,debt_BoP*inp_debt_interest_rate*days_in_period/360) 
+					arr_sizing_debt_interest_operations = np.append(arr_sizing_debt_interest_operations,debt_BoP*inp_debt_interest_rate*days_in_period/360) 
 
 					debt_repayment = arr_debt_repayment[months_construction+i]
 					cumul_debt_repayment += debt_repayment
@@ -546,48 +551,67 @@ def project_view(request,id):
 				arr_is_EBITDA = arr_is_revenues_total-arr_is_operating_costs
 				arr_is_EBITDA_margin = np.divide(arr_is_EBITDA,arr_is_revenues_total, out=np.zeros_like(arr_is_EBITDA), where=arr_is_revenues_total!=0)*100
 				arr_is_EBIT = arr_is_EBITDA-arr_is_depreciation
-				arr_is_EBT = arr_is_EBIT-arr_debt_interest_operations
+				arr_is_EBT = arr_is_EBIT-arr_sizing_debt_interest_operations
 				arr_is_corporate_tax = -arr_is_EBT*inp_corporate_income_tax_rate
 				arr_is_net_income = arr_is_EBT-arr_is_corporate_tax
 
-				arr_CFADS = (arr_is_EBIT-arr_is_corporate_tax)*arr_debt_amortisation
-				arr_target_DS_sizing = arr_CFADS/inp_target_DSCR
-				arr_target_DS_sculpting = arr_CFADS/DSCR_sculpting
+				arr_sizing_CFADS = (arr_is_EBIT-arr_is_corporate_tax)*arr_sizing_debt_amortisation
+				arr_sizing_target_DS_sizing = arr_sizing_CFADS/inp_target_DSCR
+				arr_sizing_target_DS_sculpting = arr_sizing_CFADS/DSCR_sculpting
 
-				arr_debt_target_repayment = (arr_target_DS_sculpting-arr_debt_interest_operations)*arr_debt_amortisation
-				arr_debt_target_repayment_above_zero = np.clip(arr_debt_target_repayment,0,a_max=None)
+				arr_sizing_debt_target_repayment = (arr_sizing_target_DS_sculpting-arr_sizing_debt_interest_operations)*arr_sizing_debt_amortisation
+				arr_sizing_debt_target_repayment_above_zero = np.clip(arr_sizing_debt_target_repayment,0,a_max=None)
 
-				arr_debt_avg_interest = np.divide(arr_debt_interest_operations,arr_debt_BoP,out=np.zeros_like(arr_debt_interest_operations), where=arr_debt_BoP!=0)/arr_time_days_in_period*360
-				arr_debt_period_discount_factor = (1/(1+(arr_debt_avg_interest*arr_time_days_in_period/360)))*arr_debt_amortisation
+				arr_sizing_debt_avg_interest = np.divide(arr_sizing_debt_interest_operations,arr_debt_BoP,out=np.zeros_like(arr_sizing_debt_interest_operations), where=arr_debt_BoP!=0)/arr_time_days_in_period*360
+				arr_sizing_debt_period_discount_factor = (1/(1+(arr_sizing_debt_avg_interest*arr_time_days_in_period/360)))*arr_sizing_debt_amortisation
 
-				for i in range(len(arr_debt_amortisation)):
+				for i in range(len(arr_sizing_debt_amortisation)):
 					if i == 0:
-						arr_debt_cumul_period_discount_factor = np.append(arr_debt_cumul_period_discount_factor,1)
+						arr_sizing_debt_cumul_period_discount_factor = np.append(arr_sizing_debt_cumul_period_discount_factor,1)
 					else:
-						if arr_debt_amortisation[i] == 1:
-							arr_debt_cumul_period_discount_factor = np.append(arr_debt_cumul_period_discount_factor,arr_debt_cumul_period_discount_factor[i-1]*arr_debt_period_discount_factor[i])
+						if arr_sizing_debt_amortisation[i] == 1:
+							arr_sizing_debt_cumul_period_discount_factor = np.append(arr_sizing_debt_cumul_period_discount_factor,arr_sizing_debt_cumul_period_discount_factor[i-1]*arr_sizing_debt_period_discount_factor[i])
 						else: 
-							arr_debt_cumul_period_discount_factor = np.append(arr_debt_cumul_period_discount_factor,1)
+							arr_sizing_debt_cumul_period_discount_factor = np.append(arr_sizing_debt_cumul_period_discount_factor,1)
 
-				arr_debt_cumul_period_discount_factor = arr_debt_cumul_period_discount_factor*arr_debt_amortisation
+				arr_sizing_debt_cumul_period_discount_factor = arr_sizing_debt_cumul_period_discount_factor*arr_sizing_debt_amortisation
 
-				debt_amount_DSCR = np.dot(arr_target_DS_sizing,arr_debt_cumul_period_discount_factor)
-				debt_amount_gearing = cumul_construction_costs
-				npv_CFADS = np.dot(arr_CFADS,arr_debt_cumul_period_discount_factor)
+				
+				arr_sizing_DSCR = np.array([inp_target_DSCR]*(months_construction+int_operating_periods))*arr_sizing_debt_amortisation
+
+				debt_amount_DSCR = np.dot(arr_sizing_target_DS_sizing,arr_sizing_debt_cumul_period_discount_factor)
+				debt_amount_gearing = cumul_construction_costs*inp_debt_gearing_max
+				debt_amount_constrained = min(debt_amount_DSCR,debt_amount_gearing)
+
+				npv_CFADS = np.dot(arr_sizing_CFADS,arr_sizing_debt_cumul_period_discount_factor)
 				DSCR_sculpting = npv_CFADS/cumul_debt_drawn
 				arr_debt_service = (arr_debt_repayment+arr_debt_interest)
-				arr_DSCR = np.divide(arr_CFADS,arr_debt_service, out=np.zeros_like(arr_CFADS), where=arr_debt_service!=0)
+				arr_ratios_DSCR = np.divide(arr_sizing_CFADS,arr_debt_service, out=np.zeros_like(arr_sizing_CFADS), where=arr_debt_service!=0)
+				arr_fp_sources_debt_drawn = arr_debt_drawn
 
+				arr_fp_uses_total = arr_fp_uses_construction_costs	
+
+				arr_fp_sources_total = arr_fp_sources_debt_drawn + arr_fp_sources_equity_drawn
+
+				audit_financing_plan_balanced = (arr_fp_sources_total==arr_fp_uses_total)
+				arr_liabilities_debt = arr_debt_EoP
 
 			data_dump_sidebar = np.array([date_COD,date_operations_end,sum_seasonality,sum_construction_costs,date_debt_maturity])
-			data_dump_summary = np.array([debt_amount_DSCR,debt_amount,DSCR_sculpting,inp_debt_gearing_max])
+			data_dump_summary_debt = np.array([debt_amount,
+												debt_amount_DSCR,
+												debt_amount_gearing])
+
+
+			summary_debt = np.array([debt_amount,])
 
 			return JsonResponse(
 							{
 
 							"data_dump_sidebar":data_dump_sidebar.tolist(),
-							"data_dump_summary":data_dump_summary.tolist(),
-							
+							"data_dump_summary_debt":data_dump_summary_debt.tolist(),
+
+							"summary_debt":summary_debt.tolist(),
+						
 							"arr_time_start_period":arr_time_start_period.tolist(),
 							"arr_time_end_period":arr_time_end_period.tolist(),
 
@@ -627,12 +651,19 @@ def project_view(request,id):
 							"arr_is_EBT":arr_is_EBT.tolist(),
 							"arr_is_corporate_tax":arr_is_corporate_tax.tolist(),
 							"arr_is_net_income":arr_is_net_income.tolist(),
+							
+							"arr_assets_cumul_construction_costs":arr_assets_cumul_construction_costs.tolist(),
 
-							"arr_CFADS":arr_CFADS.tolist(),
+							"arr_liabilities_debt":arr_liabilities_debt.tolist(),
+
 
 							"arr_fp_uses_construction_costs":arr_fp_uses_construction_costs.tolist(),
-							"arr_fp_uses_cumul_construction_costs":arr_fp_uses_cumul_construction_costs.tolist(),
-							
+							"arr_fp_uses_total":arr_fp_uses_total.tolist(),
+
+							"arr_fp_sources_debt_drawn":arr_fp_sources_debt_drawn.tolist(),
+							"arr_fp_sources_equity_drawn":arr_fp_sources_equity_drawn.tolist(),
+							"arr_fp_sources_total":arr_fp_sources_total.tolist(),
+						
 							"arr_indexation_contract":arr_indexation_contract.tolist(),
 							"arr_indexation_electricity_price":arr_indexation_electricity_price.tolist(),
 							"arr_indexation_opex":arr_indexation_opex.tolist(),
@@ -640,22 +671,30 @@ def project_view(request,id):
 							"arr_debt_amount_available":arr_debt_amount_available.tolist(),
 							"arr_debt_commitment_fee":arr_debt_commitment_fee.tolist(),
 
-
 							"arr_debt_BoP":arr_debt_BoP.tolist(),
 							"arr_debt_drawn":arr_debt_drawn.tolist(),
 							"arr_debt_repayment":arr_debt_repayment.tolist(),
 							"arr_debt_EoP":arr_debt_EoP.tolist(),
 							"arr_debt_interest":arr_debt_interest.tolist(),
-							"arr_debt_interest_operations":arr_debt_interest_operations.tolist(),
+							"arr_debt_service":arr_debt_service.tolist(),
+							
+							"arr_sizing_debt_amortisation":arr_sizing_debt_amortisation.tolist(),
+							"arr_sizing_CFADS":arr_sizing_CFADS.tolist(),
+							"arr_sizing_DSCR":arr_sizing_DSCR.tolist(),
+							"arr_sizing_target_DS_sizing":arr_sizing_target_DS_sizing.tolist(),
+							"arr_sizing_debt_avg_interest":arr_sizing_debt_avg_interest.tolist(),
+							"arr_sizing_debt_period_discount_factor":arr_sizing_debt_period_discount_factor.tolist(),
+							"arr_sizing_debt_cumul_period_discount_factor":arr_sizing_debt_cumul_period_discount_factor.tolist(),
 
-							"arr_debt_amortisation":arr_debt_amortisation.tolist(),
-							"arr_target_DS_sizing":arr_target_DS_sizing.tolist(),
-							"arr_target_DS_sculpting":arr_target_DS_sculpting.tolist(),
-							"arr_debt_avg_interest":arr_debt_avg_interest.tolist(),
-							"arr_debt_period_discount_factor":arr_debt_period_discount_factor.tolist(),
-							"arr_debt_cumul_period_discount_factor":arr_debt_cumul_period_discount_factor.tolist(),							
-							"arr_debt_target_repayment":arr_debt_target_repayment.tolist(),
-							"arr_debt_target_repayment_above_zero":arr_debt_target_repayment_above_zero.tolist(),
+							"arr_sizing_debt_interest_operations":arr_sizing_debt_interest_operations.tolist(),
+							"arr_sizing_target_DS_sculpting":arr_sizing_target_DS_sculpting.tolist(),
+							"arr_sizing_debt_target_repayment":arr_sizing_debt_target_repayment.tolist(),
+							"arr_sizing_debt_target_repayment_above_zero":arr_sizing_debt_target_repayment_above_zero.tolist(),
+
+
+							"arr_ratios_DSCR":arr_ratios_DSCR.tolist(),
+
+							"audit_financing_plan_balanced":audit_financing_plan_balanced.tolist(),
 
 
 
