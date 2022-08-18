@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime
+from django.core.exceptions import ValidationError
 
 
 
@@ -27,7 +28,7 @@ class Project(models.Model):
 	start_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	end_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	operating_life = models.fields.IntegerField(default="20")
-	periodicity = models.fields.IntegerField(default="3")
+	periodicity = models.fields.IntegerField(default="6")
 
 	panels_capacity = models.fields.IntegerField(default="2000")
 	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.04)
@@ -186,6 +187,4 @@ class Project(models.Model):
 	debt_tenor = models.fields.IntegerField(default="20")
 
 	corporate_income_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=30) 
-
-
 

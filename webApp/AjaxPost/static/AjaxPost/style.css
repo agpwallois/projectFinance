@@ -177,11 +177,19 @@ td:nth-child(1) {
     height : 300px;
 }
 
-.graph {
+.summary-container {
+    display: flex;
+}
+
+.summary {
     display: flex;
     width: 50%;
 }
 
+.graph {
+    display: flex;
+    width: 50%;
+}
 
 .btn {
   font-size: 12px;

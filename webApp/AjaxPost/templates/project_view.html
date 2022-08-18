@@ -1290,10 +1290,20 @@
   		<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
   			
   			<h2>Summary</h2>
-		  		<table class="table">
-					<tbody id="summary"></tbody>
-				</table>
-  			
+  			  <div class="summary-container">
+
+  				<div class="summary">
+			  		<table class="table">
+						<tbody id="summary_debt"></tbody>
+					</table>
+  				</div>
+  				<div class="summary">
+			  		<table class="table">
+						<tbody id="summary_equity"></tbody>
+					</table>  				
+				</div> 				
+  				</div> 				
+
   			<h2>Graphs</h2>
 	 		{% block jquery %}{% include 'charts.html' %}{% endblock %}
 
@@ -1301,6 +1311,15 @@
 
 		<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
 	  		<h2>Timeline</h2>
+
+				<table class="table">
+					<tbody id="myTableDate"></tbody>
+				</table>
+
+				<table class="table">
+					<tbody id="myTableFlag"></tbody>
+				</table>
+
 				<table class="table">
 					<tbody id="myTableTimeline"></tbody>
 				</table>
@@ -1384,13 +1403,39 @@
 			success:function(json){
 				console.log(json);
 
+  				var result_date = '';
+  				$.each(json, function(key, data) {
+  					if(key.startsWith("arr_date")) {
+	  					result_date += "<tr>";
+	  					result_date += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_date += "<td>" + data + "</td>";
+	    				});
+	  					result_date += "</tr>";
+  					}
+  				});
+  				$("#myTableDate").html(result_date);
+
+  				var result_flag = '';
+  				$.each(json, function(key, data) {
+  					if(key.startsWith("arr_flag")) {
+	  					result_flag += "<tr>";
+	  					result_flag += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_flag += "<td>" + data + "</td>";
+	    				});
+	  					result_flag += "</tr>";
+  					}
+  				});
+  				$("#myTableFlag").html(result_flag);
+
   				var result_timeline = '';
   				$.each(json, function(key, data) {
   					if(key.startsWith("arr_time")) {
 	  					result_timeline += "<tr>";
 	  					result_timeline += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_timeline += "<td>" + data + "</td>";
+	    					result_timeline += "<td>" + data.toFixed(2) + "</td>";
 	    				});
 	  					result_timeline += "</tr>";
   					}
@@ -1529,18 +1574,18 @@
   				});
   				$("#myTableAll").html(result_all);
 
-  				var result_summary = '';
+  				var result_summary_debt = '';
   				$.each(json, function(key, data) {
   					if(key.startsWith("summary_debt")) {
-	  					result_summary += "<tr>";
-	  					result_summary += "<td>" + key + "</td>";
+	  					result_summary_debt += "<tr>";
+	  					result_summary_debt += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_summary += "<td>" + data + "</td>";
+	    					result_summary_debt += "<td>" + data + "</td>";
 	    				});
-	  					result_summary += "</tr>";
+	  					result_summary_debt += "</tr>";
   					}
   				});
-  				$("#summary").html(result_summary);
+  				$("#summary_debt").html(result_summary_debt);
 
    				var result_Audit = '';
   				$.each(json, function(key, data) {
