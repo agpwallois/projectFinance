@@ -1329,6 +1329,12 @@
 					<tbody id="myTableIndexation"></tbody>
 				</table>
 
+  			<h2>Production</h2>
+				<table class="table">
+					<tbody id="myTableProd"></tbody>
+				</table>
+
+
   			<h2>Income statement</h2>
 				<table class="table">
 					<tbody id="myTableIS"></tbody>
@@ -1391,7 +1397,6 @@
     	$("#post-form").submit();
 	});
 
-	
 
 	$(document).on('submit','#post-form', function(e){
 
@@ -1456,6 +1461,20 @@
   				$("#myTableIndexation").html(result_indexation);
 
 
+
+				var result_prod = '';
+  				$.each(json, function(key, data) {
+  					if(key.startsWith("arr_prod")) {
+	  					result_prod += "<tr>";
+	  					result_prod += "<td>" + key + "</td>";
+	  					$.each(data, function(index, data) {
+	    					result_prod += "<td>" + data.toFixed(2) + "</td>";
+	    				});
+	  					result_prod += "</tr>";
+  					}
+  				});
+  				$("#myTableProd").html(result_prod);
+
 				var result_IS = '';
   				$.each(json, function(key, data) {
   					if(key.startsWith("arr_is")) {
@@ -1468,6 +1487,9 @@
   					}
   				});
   				$("#myTableIS").html(result_IS);
+
+
+
 
 
    				var result_FP_uses = '';
@@ -1638,11 +1660,9 @@
   				$("#elecPriceLabel29").html(json.arr_years_electricity_prices[28]);
   				$("#elecPriceLabel30").html(json.arr_years_electricity_prices[29]);
 
-
-
-  				myChart.data.labels = json.arr_time_end_period;
-  				myChart.data.datasets[0].data = json.production;
-  				myChart.data.datasets[1].data = json.arr_degradation;
+  				myChart.data.labels = json.arr_date_end_period;
+  				myChart.data.datasets[0].data = json.arr_prod;
+  				myChart.data.datasets[1].data = json.arr_prod_degrad;
 				myChart.update()
 
   				myChart2.data.datasets[0].data = json.seasonality;

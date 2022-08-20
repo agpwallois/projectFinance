@@ -397,26 +397,6 @@ def project_view(request,id):
 
 				for i in range(0, months_construction):
 
-					"""Compute start and end date of period"""
-					arr_time_start_period = np.append(arr_time_start_period,start_period)
-					end_period = compute_end_period(start_period,inp_periodicity,0,end_construction)
-					arr_time_end_period = np.append(arr_time_end_period,end_period)
-
-					arr_time_start_period_financing_plan = np.append(arr_time_start_period_financing_plan,start_period)
-					arr_time_end_period_financing_plan = np.append(arr_time_end_period_financing_plan,end_period)
-
-					"""Compute number of days in period"""
-					days_in_period = compute_days_in_period(start_period,end_period)
-					arr_time_days_in_period = np.append(arr_time_days_in_period,days_in_period)
-					
-					"""Compute year fraction in period"""
-					years_in_period = compute_years_in_period(start_period,end_period)
-					arr_time_years_in_period = np.append(arr_time_years_in_period,years_in_period)
-
-					"""Create construction costs arrays"""
-					arr_fp_uses_construction_costs = np.append(arr_fp_uses_construction_costs,inp_construction_costs[i])
-					cumul_construction_costs += inp_construction_costs[i]
-					arr_assets_cumul_construction_costs = np.append(arr_assets_cumul_construction_costs,cumul_construction_costs)
 
 					""" Senior debt """
 					arr_debt_BoP = np.append(arr_debt_BoP,cumul_debt_drawn)
@@ -445,20 +425,7 @@ def project_view(request,id):
 					arr_time_operations = np.append(arr_time_operations,0)
 					arr_is_depreciation = np.append(arr_is_depreciation,0)
 
-					arr_time_years_from_COD_avg = np.append(arr_time_years_from_COD_avg,0)
-					arr_time_years_from_COD_BOP = np.append(arr_time_years_from_COD_BOP,0)
-					arr_time_years_from_COD_EOP = np.append(arr_time_years_from_COD_EOP,0)
-					arr_degradation = np.append(arr_degradation,0)
-					arr_time_seasonality = np.append(arr_time_seasonality,0)
-					arr_electricity_price = np.append(arr_electricity_price,0)
-					arr_time_days_in_period_contract_in_period_pct = np.append(arr_time_days_in_period_contract_in_period_pct,0)
-					arr_is_opex = np.append(arr_is_opex,0)
-					arr_is_revenues_merchant = np.append(arr_is_revenues_merchant,0)
-					arr_is_revenues_contracted = np.append(arr_is_revenues_contracted,0)
-					arr_sizing_debt_interest_operations = np.append(arr_sizing_debt_interest_operations,0) 
-					arr_cumul_years_in_period = np.append(arr_cumul_years_in_period,0)
-					arr_time_days_under_contract_in_period = np.append(arr_time_days_under_contract_in_period,0)
-					arr_time_years_in_period_operations = np.append(arr_time_years_in_period_operations,0)
+
 
 					cumul_years_contract_indexation += create_timeline_array(date_contract_indexation_start,date_operations_end,start_period,end_period)
 					cumul_years_electricity_price_indexation += create_timeline_array(date_price_elec_indexation_start,date_operations_end,start_period,end_period)
@@ -472,37 +439,13 @@ def project_view(request,id):
 
 				for i in range(0, int_operating_periods):
 					
-					"""Compute start and end date of period"""
-					arr_time_start_period = np.append(arr_time_start_period,start_period)
-					end_period = compute_end_period(start_period,inp_periodicity,1,date_operations_end)
-					arr_time_end_period = np.append(arr_time_end_period,end_period)
 
-					arr_time_start_period_financing_plan = np.append(arr_time_start_period_financing_plan,"n.a.")
-					arr_time_end_period_financing_plan = np.append(arr_time_end_period_financing_plan,"n.a.")
-
-					"""Compute number of days in period"""
-					days_in_period = compute_days_in_period(start_period,end_period)
-					arr_time_days_in_period = np.append(arr_time_days_in_period,days_in_period)
-					
-					"""Compute year fraction in period"""
-					years_in_period = compute_years_in_period(start_period,end_period)
-					arr_time_years_in_period = np.append(arr_time_years_in_period,years_in_period)
-					cumul_years_in_period += years_in_period
-					arr_cumul_years_in_period = np.append(arr_cumul_years_in_period,cumul_years_in_period)
-					arr_time_years_in_period_operations = np.append(arr_time_years_in_period_operations,years_in_period)
-
-					arr_time_years_from_COD_EOP = np.append(arr_time_years_from_COD_EOP,cumul_years_in_period)
-					arr_time_years_from_COD_BOP = np.append(arr_time_years_from_COD_BOP,cumul_years_in_period-years_in_period)
-					arr_time_years_from_COD_avg = np.add(arr_time_years_from_COD_BOP,arr_time_years_from_COD_EOP)/2
 			
 					"""Compute seasonality in period"""
 					days_in_month = compute_days_in_month(start_period,end_period)
 					arr_time_seasonality = np.append(arr_time_seasonality,np.sum(days_in_month*seasonality))
 
-					pct_total_operations_in_period = days_in_period/days_in_operation
-					
-					"""Operations flag"""
-					arr_time_operations = np.append(arr_time_operations,1)
+
 
 					"""Contract flag"""
 					days_under_contract_in_period = create_timeline_array(date_contract_start,date_contract_end,start_period,end_period)
