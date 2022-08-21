@@ -1330,19 +1330,9 @@
 				</table>
 
   			<h2>Production</h2>
- 				<p>Production</p>
-
-
 				<table class="table">
 					<tbody id="myTableProd"></tbody>
 				</table>
-
- 				<p>Prices</p>
-
-				<table class="table">
-					<tbody id="myTablePric"></tbody>
-				</table>
-
 
 
   			<h2>Income statement</h2>
@@ -1459,7 +1449,7 @@
 
   				var result_indexation = '';
   				$.each(json, function(key, data) {
-  					if(key.startsWith("arr_index")) {
+  					if(key.startsWith("arr_indexation")) {
 	  					result_indexation += "<tr>";
 	  					result_indexation += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
@@ -1484,19 +1474,6 @@
   					}
   				});
   				$("#myTableProd").html(result_prod);
-
- 				var result_pric = '';
-  				$.each(json, function(key, data) {
-  					if(key.startsWith("arr_pric")) {
-	  					result_pric += "<tr>";
-	  					result_pric += "<td>" + key + "</td>";
-	  					$.each(data, function(index, data) {
-	    					result_pric += "<td>" + data.toFixed(2) + "</td>";
-	    				});
-	  					result_pric += "</tr>";
-  					}
-  				});
-  				$("#myTablePric").html(result_pric);
 
 				var result_IS = '';
   				$.each(json, function(key, data) {
@@ -1645,12 +1622,14 @@
   				});
   				$("#myTableAudit").html(result_Audit);
 
+
   				$("#dateCOD").html(json.data_dump_sidebar[0]);
   				$("#dateRetirement").html(json.data_dump_sidebar[1]);
   				$("#sumSeasonality").html(json.data_dump_sidebar[2]);
   				$("#sumConstructionCosts").html(json.data_dump_sidebar[3]);
+  				$("#debtMaturity").html(json.data_dump_sidebar[4]);
 
-				$("#elecPriceLabel1").html(json.arr_years_electricity_prices[0]);
+  				$("#elecPriceLabel1").html(json.arr_years_electricity_prices[0]);
   				$("#elecPriceLabel2").html(json.arr_years_electricity_prices[1]);
   				$("#elecPriceLabel3").html(json.arr_years_electricity_prices[2]);
   				$("#elecPriceLabel4").html(json.arr_years_electricity_prices[3]);
@@ -1680,8 +1659,8 @@
   				$("#elecPriceLabel28").html(json.arr_years_electricity_prices[27]);
   				$("#elecPriceLabel29").html(json.arr_years_electricity_prices[28]);
   				$("#elecPriceLabel30").html(json.arr_years_electricity_prices[29]);
-  		
-  				myChart.data.labels = json.arr_date_end_period_format;
+
+  				myChart.data.labels = json.arr_date_end_period;
   				myChart.data.datasets[0].data = json.arr_prod;
   				myChart.data.datasets[1].data = json.arr_prod_degrad;
 				myChart.update()
@@ -1689,33 +1668,32 @@
   				myChart2.data.datasets[0].data = json.seasonality;
 				myChart2.update()
 
-  				myChart3.data.labels = json.arr_date_end_period_format;
-  				myChart3.data.datasets[0].data = json.arr_is_rev_contracted;
-  				myChart3.data.datasets[1].data = json.arr_is_rev_merchant;
+  				myChart3.data.labels = json.arr_time_end_period;
+  				myChart3.data.datasets[0].data = json.arr_is_revenues_contracted;
+  				myChart3.data.datasets[1].data = json.arr_is_revenues_merchant;
 				myChart3.update()
 
-  				myChart4.data.labels = json.arr_date_end_period_format;
+  				myChart4.data.labels = json.arr_time_end_period;
   				myChart4.data.datasets[0].data = json.arr_is_operating_costs;
 				myChart4.update()
 
-				myChart5.data.labels = json.arr_date_end_period_format;
+				myChart5.data.labels = json.arr_time_end_period;
   				myChart5.data.datasets[0].data = json.arr_is_EBITDA;
   				myChart5.data.datasets[1].data = json.arr_is_EBITDA_margin;
 				myChart5.update()
 
-				myChart6.data.labels = json.arr_date_end_period_format;
+				myChart6.data.labels = json.arr_time_end_period_financing_plan;
   				myChart6.data.datasets[0].data = json.arr_fp_uses_construction_costs;
-  				myChart6.data.datasets[1].data = json.arr_construction_costs_cumul;
+  				myChart6.data.datasets[1].data = json.arr_assets_cumul_construction_costs;
 				myChart6.update()
 
-				myChart7.data.labels = json.arr_date_end_period_format;
-  				myChart7.data.datasets[0].data = json.arr_sizing_debt_interest_operations;
-  				myChart7.data.datasets[1].data = json.arr_debt_service_repayment;
+				myChart7.data.labels = json.arr_time_end_period;
+  				myChart7.data.datasets[0].data = json.arr_debt_interest;
+  				myChart7.data.datasets[1].data = json.arr_debt_repayment;
    				myChart7.data.datasets[2].data = json.arr_ratios_DSCR;
 				myChart7.update()
 
-
-				myChart8.data.labels = json.arr_date_end_period_format;
+				myChart8.data.labels = json.arr_time_end_period;
   				myChart8.data.datasets[0].data = json.arr_debt_service;
   				myChart8.data.datasets[1].data = json.arr_sizing_CFADS;
 				myChart8.update()

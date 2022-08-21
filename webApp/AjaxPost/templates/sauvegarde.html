@@ -448,8 +448,6 @@ def project_view(request,id):
 
 
 					"""Contract flag"""
-					days_under_contract_in_period = create_timeline_array(date_contract_start,date_contract_end,start_period,end_period)
-					arr_time_days_under_contract_in_period = np.append(arr_time_days_under_contract_in_period,days_under_contract_in_period)
 
 					cumul_years_contract_indexation += create_timeline_array(date_contract_indexation_start,date_operations_end,start_period,end_period)
 					cumul_years_electricity_price_indexation += create_timeline_array(date_price_elec_indexation_start,date_operations_end,start_period,end_period)
@@ -460,9 +458,6 @@ def project_view(request,id):
 					arr_indexation_opex = np.append(arr_indexation_opex,(1+inp_opex_indexation_rate)**cumul_years_opex_indexation)
 
 
-					arr_fp_uses_construction_costs = np.append(arr_fp_uses_construction_costs,0)
-					arr_assets_cumul_construction_costs = np.append(arr_assets_cumul_construction_costs,0)
-					arr_fp_sources_equity_drawn = np.append(arr_fp_sources_equity_drawn,0)
 				
 					arr_is_depreciation = np.append(arr_is_depreciation,cumul_construction_costs*pct_total_operations_in_period)
 					
