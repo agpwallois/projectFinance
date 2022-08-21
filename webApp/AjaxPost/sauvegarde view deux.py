@@ -18,7 +18,6 @@ import math
 import pandas as pd
 import numpy as np
 from django.core import serializers
-import json
 
 
 class ProjectView(ListView):
@@ -415,7 +414,11 @@ def project_view(request,id):
 
 			arr_is_depreciation = total_construction_costs*arr_time_years_in_period_operations/inp_life
 
+
+	
+
 			"""arr_sizing_debt_interest_operations = []
+
 
 			arr_debt_amount_available = np.append(arr_debt_amount_available,0)
 			arr_debt_commitment_fee = np.append(arr_debt_commitment_fee,0)
@@ -473,9 +476,15 @@ def project_view(request,id):
 				""" Debt sculpting """
 				"""npv_CFADS = sum(arr_sizing_CFADS*arr_sizing_debt_period_discount_factor_cumul)
 				DSCR_sculpting = npv_CFADS/cumul_debt_drawn
+
+
+
+				
 				arr_sizing_debt_repayment_target = (arr_sizing_CFADS/DSCR_sculpting-arr_sizing_debt_interest_operations).clip(lower=0)"""
 
+
 				arr_sizing_debt_repayment_target = (arr_sizing_target_DS_sizing-arr_sizing_debt_interest_operations).clip(lower=0)
+
 
 				"""npv_CFADS = arr_sizing_CFADS*arr_sizing_debt_period_discount_factor_cumul
 				DSCR_sculpting = npv_CFADS/cumul_debt_drawn
@@ -487,15 +496,153 @@ def project_view(request,id):
 				arr_debt_service = (arr_sizing_debt_interest_operations-arr_debt_repayment)
 				arr_ratios_DSCR = np.divide(arr_sizing_CFADS,arr_debt_service, out=np.zeros_like(arr_sizing_CFADS), where=arr_debt_service!=0)
 
+
+
 			summary_debt = np.array([debt_amount,debt_amount_DSCR,debt_amount_gearing,debt_amount_target,cumul_debt_drawn])
 			data_dump_sidebar = np.array([date_COD,date_operations_end,sum_seasonality,sum_construction_costs])
 
-			df = pd.DataFrame()
+			d = {
+			'Total rev': arr_is_rev_total, 
+			'Contracted rev': arr_is_rev_contracted, 
+			}
 
-			df['col'] = arr_debt_service_repayment
 
 
-			return JsonResponse({"df":df.to_dict(),},safe=False, status=200)
+			dataf = pd.DataFrame(d)
+			dataf.reset_index(drop=True, inplace=True)
+
+
+
+			return JsonResponse(
+							{
+
+							"dataf":dataf.to_json(),
+
+							"data_dump_sidebar":data_dump_sidebar.tolist(),
+		
+							"arr_date_start_period_format":arr_date_start_period_format.tolist(),
+							"arr_date_end_period_format":arr_date_end_period_format.tolist(),
+							"arr_date_end_period_year":arr_date_end_period_year.tolist(),
+
+
+
+							"arr_debt_interest":arr_debt_interest.tolist(),
+							"arr_sizing_debt_interest_operations":arr_sizing_debt_interest_operations.tolist(),
+
+							"arr_debt_service_repayment":arr_debt_service_repayment.tolist(),
+							"arr_debt_service":arr_debt_service.tolist(),
+							"arr_ratios_DSCR":arr_ratios_DSCR.tolist(),
+
+							"arr_date_start_contract_period_format":arr_date_start_contract_period_format.tolist(),
+							"arr_date_end_contract_period_format":arr_date_end_contract_period_format.tolist(),
+							
+							"arr_date_start_contract_indexation":arr_date_start_contract_indexation.tolist(),
+							"arr_date_end_contract_indexation":arr_date_end_contract_indexation.tolist(),
+
+							"arr_date_start_elec_indexation":arr_date_start_elec_indexation.tolist(),
+							"arr_date_end_elec_indexation":arr_date_end_elec_indexation.tolist(),
+
+							"arr_date_start_opex_indexation":arr_date_start_opex_indexation.tolist(),
+							"arr_date_end_opex_indexation":arr_date_end_opex_indexation.tolist(),
+
+							"arr_flag_debt_amortisation":arr_flag_debt_amortisation.tolist(),
+
+
+							"arr_flag_construction":arr_flag_construction.tolist(),
+							"arr_flag_operations":arr_flag_operations.tolist(),
+							"arr_flag_contract":arr_flag_contract.tolist(),
+							"arr_flag_contract_indexation":arr_flag_contract_indexation.tolist(),
+							"arr_flag_elec_indexation":arr_flag_elec_indexation.tolist(),
+							"arr_flag_opex_indexation":arr_flag_elec_indexation.tolist(),
+
+
+
+							"arr_time_days_in_period":arr_time_days_in_period.tolist(),
+							"arr_time_days_under_contract":arr_time_days_under_contract.tolist(),
+							"arr_time_pct_under_contract":arr_time_pct_under_contract.tolist(),
+
+
+
+							"arr_time_days_contract_indexation":arr_time_days_contract_indexation.tolist(),
+							"arr_time_days_merchant_indexation":arr_time_days_merchant_indexation.tolist(),
+							"arr_time_days_opex_indexation":arr_time_days_merchant_indexation.tolist(),
+
+
+							"arr_index_merchant":arr_index_merchant.tolist(),
+							"arr_index_contracted":arr_index_contracted.tolist(),
+							"arr_index_opex":arr_index_opex.tolist(),
+
+
+							"arr_time_years_contract_indexation":arr_time_years_contract_indexation.tolist(),
+							"arr_time_years_merchant_indexation":arr_time_years_merchant_indexation.tolist(),
+							"arr_time_years_opex_indexation":arr_time_years_merchant_indexation.tolist(),
+
+
+							"arr_price_merchant":arr_price_merchant,
+							"arr_price_merchant_aft_index":arr_price_merchant_aft_index.tolist(),
+
+							"arr_price_contracted":arr_price_contracted.tolist(),
+							"arr_price_contracted_aft_index":arr_price_contracted_aft_index.tolist(),
+
+
+
+							"arr_time_days_in_year":arr_time_days_in_year.tolist(),
+							"arr_time_years_in_period":arr_time_years_in_period.tolist(),
+							"arr_time_years_in_period_operations":arr_time_years_in_period_operations.tolist(),
+							"arr_time_years_from_COD_BOP":arr_time_years_from_COD_BOP.tolist(),
+							"arr_time_years_from_COD_EOP":arr_time_years_from_COD_EOP.tolist(),
+							"arr_time_years_from_COD_avg":arr_time_years_from_COD_avg.tolist(),
+
+							"arr_time_seasonality":arr_time_seasonality.tolist(),
+							"arr_prod_degrad":arr_prod_degrad.tolist(),
+							"arr_prod_capacity_af_degrad":arr_prod_capacity_af_degrad.tolist(),
+							"arr_prod":arr_prod.tolist(),
+
+							"arr_is_rev_contracted":arr_is_rev_contracted.tolist(),
+							"arr_is_rev_merchant":arr_is_rev_merchant.tolist(),
+							"arr_is_rev_total":arr_is_rev_total.tolist(),
+
+							"arr_is_operating_costs":arr_is_operating_costs.tolist(),
+
+							"arr_is_EBITDA":arr_is_EBITDA.tolist(),
+							"arr_is_EBITDA_margin":arr_is_EBITDA_margin.tolist(),
+							"arr_is_depreciation":arr_is_depreciation.tolist(),
+
+							"arr_is_EBIT":arr_is_EBIT.tolist(),
+							"arr_is_EBT":arr_is_EBT.tolist(),
+							"arr_is_corporate_tax":arr_is_corporate_tax.tolist(),
+							"arr_is_net_income":arr_is_net_income.tolist(),
+
+
+							"arr_debt_BoP":arr_debt_BoP.tolist(),
+							"arr_debt_drawn":arr_debt_drawn.tolist(),
+							"arr_debt_repayment":arr_debt_repayment.tolist(),
+
+							"arr_debt_EoP":arr_debt_EoP.tolist(),
+
+
+
+							"arr_sizing_CFADS":arr_sizing_CFADS.tolist(),
+							"arr_sizing_target_DS_sizing":arr_sizing_target_DS_sizing.tolist(),
+							"arr_sizing_debt_avg_interest":arr_sizing_debt_avg_interest.tolist(),
+							"arr_sizing_debt_period_discount_factor":arr_sizing_debt_period_discount_factor.tolist(),
+							"arr_sizing_debt_period_discount_factor_cumul":arr_sizing_debt_period_discount_factor_cumul.tolist(),
+
+
+
+
+							"seasonality":seasonality.tolist(),
+
+							"arr_fp_uses_construction_costs":arr_fp_uses_construction_costs.tolist(),
+							"arr_years_electricity_prices":arr_years_electricity_prices.tolist(),
+
+
+
+							"arr_construction_costs":arr_construction_costs.tolist(),
+							"arr_construction_costs_cumul":arr_construction_costs_cumul.tolist(),
+							"summary_debt":summary_debt.tolist(),
+
+						},safe=False, status=200)
 		else:
 			errors = project_form.errors.as_json()
 			return JsonResponse({"errors": errors}, status=400)

@@ -426,13 +426,9 @@ def project_view(request,id):
 					arr_is_depreciation = np.append(arr_is_depreciation,0)
 
 
-
-					cumul_years_contract_indexation += create_timeline_array(date_contract_indexation_start,date_operations_end,start_period,end_period)
-					cumul_years_electricity_price_indexation += create_timeline_array(date_price_elec_indexation_start,date_operations_end,start_period,end_period)
 					cumul_years_opex_indexation += create_timeline_array(date_opex_indexation_start,date_operations_end,start_period,end_period)
 					
-					arr_indexation_contract = np.append(arr_indexation_contract,(1+inp_contract_indexation_rate)**cumul_years_contract_indexation)
-					arr_indexation_electricity_price = np.append(arr_indexation_electricity_price,(1+inp_price_elec_indexation)**cumul_years_electricity_price_indexation)
+				
 					arr_indexation_opex = np.append(arr_indexation_opex,(1+inp_opex_indexation_rate)**cumul_years_opex_indexation)
 					
 					start_period = end_period + datetime.timedelta(days=1)
