@@ -1418,18 +1418,51 @@
 			success:function(json){
 				console.log(json);
 
-  				var result_date = '';
-  				$.each(json.df, function(key, data) {
-  					if(key.startsWith("col")) {
-	  					result_date += "<tr>";
-	  					result_date += "<td>" + key + "</td>";
+    			var results = []
+
+    			var dic = {
+    			arr_date:"#myTableDate",
+    			arr_flag:"#myTableFlag",
+    			arr_time:"#myTableTimeline",
+    			arr_prod:"#myTableProd",
+    			arr_index:"#myTableIndexation",
+    			arr_is:"#myTableIS",
+    			arr_price:"#myTablePric",
+    			};
+
+  				for (var i = 0; i < Object.keys(dic).length; i++) {
+	  				$.each(json.df, function(key, data) {
+	  						if(key.startsWith(Object.keys(dic)[i])) {
+		  					results[i] += "<tr>";
+		  					results[i] += "<td>" + key + "</td>";
+		  					$.each(data, function(index, data) {
+		    					results[i] += "<td>" + data + "</td>";
+		    				});
+		  					results[i] += "</tr>";
+	  					}
+	  				});
+	  			$(Object.values(dic)[i]).html(results[i]);
+				}
+
+				result_all = ''
+   				$.each(json, function(key, data) {
+	  					result_all += "<tr>";
+	  					result_all += "<td>" + key + "</td>";
 	  					$.each(data, function(index, data) {
-	    					result_date += "<td>" + data + "</td>";
+	    					result_all += "<td>" + data + "</td>";
 	    				});
-	  					result_date += "</tr>";
-  					}
+	  					result_all += "</tr>";
   				});
-  				$("#myTableDate").html(result_date);
+  				$("#myTableAll").html(result_all);
+
+
+  				myChart.data.labels = json.arr_date_end_period;
+  				myChart.data.datasets[0].data = json.arr_prod;
+  				myChart.data.datasets[1].data = json.arr_prod_degrad;
+				myChart.update()
+
+  				myChart2.data.datasets[0].data = json.seasonality;
+				myChart2.update()
 			},
 
 			error: function(){

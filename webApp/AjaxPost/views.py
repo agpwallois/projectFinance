@@ -146,11 +146,11 @@ def project_view(request,id):
 			inp_contract_price = float(request.POST['contract_price'])
 			inp_price_contract_index_rate = float(request.POST['contract_indexation'])/100
 
-			inp_contract_indexation_start_date = request.POST['contract_indexation_start_date']
-			date_contract_indexation_start = datetime.datetime.strptime(inp_contract_indexation_start_date, "%Y-%m-%d").date()
+			inp_contract_index_start_date = request.POST['contract_indexation_start_date']
+			date_contract_index_start = datetime.datetime.strptime(inp_contract_index_start_date, "%Y-%m-%d").date()
 
 			inp_price_merchant_index_rate_start_date = request.POST['price_elec_indexation_start_date']
-			date_price_elec_indexation_start = datetime.datetime.strptime(inp_price_merchant_index_rate_start_date, "%Y-%m-%d").date()
+			date_price_elec_index_start = datetime.datetime.strptime(inp_price_merchant_index_rate_start_date, "%Y-%m-%d").date()
 
 			inp_price_merchant_index_rate = float(request.POST['price_elec_indexation'])/100
 
@@ -259,9 +259,9 @@ def project_view(request,id):
 			""" Operating costs """
 
 			inp_opex = float(request.POST['opex'])
-			inp_opex_indexation_start_date = request.POST['opex_indexation_start_date']
-			date_opex_indexation_start = datetime.datetime.strptime(inp_opex_indexation_start_date, "%Y-%m-%d").date()
-			inp_opex_indexation_rate = float(request.POST['opex_indexation'])/100
+			inp_opex_index_start_date = request.POST['opex_indexation_start_date']
+			date_opex_index_start = datetime.datetime.strptime(inp_opex_index_start_date, "%Y-%m-%d").date()
+			inp_opex_index_rate = float(request.POST['opex_indexation'])/100
 
 			""" Senior debt """
 
@@ -289,6 +289,8 @@ def project_view(request,id):
 
 			""" Arrays instanciation """
 
+			df = pd.DataFrame()
+
 			""" Variables instanciation """
 
 			days_in_operation = (date_operations_end - date_COD).days
@@ -313,66 +315,71 @@ def project_view(request,id):
 			start_period_operations = pd.Series(pd.date_range(first_day_operations_start, last_day_operations_end,freq=freq)).clip(lower=pd.Timestamp(date_COD))
 			end_period_operations = pd.Series(pd.date_range(first_day_operations_start_plus_six, last_day_operations_end_plus_six,freq=freq2)).clip(upper=pd.Timestamp(date_operations_end))
 
-			arr_date_start_period = pd.concat([start_period_construction,start_period_operations])
-			arr_date_end_period = pd.concat([end_period_construction,end_period_operations])
+			arr_date_start_period = pd.concat([start_period_construction,start_period_operations], ignore_index=True)
+			arr_date_end_period = pd.concat([end_period_construction,end_period_operations], ignore_index=True)
+
+			df['arr_date_start_period'] = pd.to_datetime(arr_date_start_period).dt.strftime('%d/%m/%Y')
+			df['arr_date_end_period'] = pd.to_datetime(arr_date_end_period).dt.strftime('%d/%m/%Y')
 
 			arr_date_end_period_year = arr_date_end_period.dt.year
 
 			arr_date_start_contract_period = array_time(arr_date_start_period,inp_contract_start,inp_contract_end)
 			arr_date_end_contract_period = array_time(arr_date_end_period,inp_contract_start,inp_contract_end)
 
-			arr_date_start_contract_indexation = array_time(arr_date_start_period,date_contract_indexation_start,inp_contract_end)
-			arr_date_end_contract_indexation = array_time(arr_date_end_period,date_contract_indexation_start,inp_contract_end)
+			arr_date_start_contract_index = array_time(arr_date_start_period,date_contract_index_start,inp_contract_end)
+			arr_date_end_contract_index = array_time(arr_date_end_period,date_contract_index_start,inp_contract_end)
 
-			arr_date_start_elec_indexation = array_time(arr_date_start_period,date_price_elec_indexation_start,date_operations_end)
-			arr_date_end_elec_indexation = array_time(arr_date_end_period,date_price_elec_indexation_start,date_operations_end)
+			arr_date_start_elec_index = array_time(arr_date_start_period,date_price_elec_index_start,date_operations_end)
+			arr_date_end_elec_index = array_time(arr_date_end_period,date_price_elec_index_start,date_operations_end)
 
-			arr_date_start_opex_indexation = array_time(arr_date_start_period,date_opex_indexation_start,date_operations_end)
-			arr_date_end_opex_indexation = array_time(arr_date_end_period,date_opex_indexation_start,date_operations_end)
+			arr_date_start_opex_index = array_time(arr_date_start_period,date_opex_index_start,date_operations_end)
+			arr_date_end_opex_index = array_time(arr_date_end_period,date_opex_index_start,date_operations_end)
 
 			""" Create flag series """
 
-			arr_flag_operations = (arr_date_end_period>pd.to_datetime(date_COD)).astype(int)
-			arr_flag_construction = 1-arr_flag_operations
-			arr_flag_contract = array_flag(arr_date_end_contract_period,inp_contract_start,arr_date_start_contract_period,inp_contract_end)
-			arr_flag_contract_indexation = array_flag(arr_date_end_contract_indexation,date_contract_indexation_start,arr_date_start_contract_indexation,inp_contract_end)
-			arr_flag_elec_indexation = array_flag(arr_date_end_elec_indexation,date_price_elec_indexation_start,arr_date_start_elec_indexation,date_operations_end)
-			arr_flag_opex_indexation = array_flag(arr_date_end_opex_indexation,date_opex_indexation_start,arr_date_start_opex_indexation,date_operations_end)
-			arr_flag_debt_amortisation = (arr_date_end_period<pd.to_datetime(date_debt_maturity)).astype(int)*arr_flag_operations
+			df['arr_flag_operations'] = (arr_date_end_period>pd.to_datetime(date_COD)).astype(int)
+			df['arr_flag_construction'] = 1-df['arr_flag_operations']
+			df['arr_flag_contract'] = array_flag(arr_date_end_contract_period,inp_contract_start,arr_date_start_contract_period,inp_contract_end)
+			df['arr_flag_contract_index'] = array_flag(arr_date_end_contract_index,date_contract_index_start,arr_date_start_contract_index,inp_contract_end)
+			df['arr_flag_elec_index'] = array_flag(arr_date_end_elec_index,date_price_elec_index_start,arr_date_start_elec_index,date_operations_end)
+			df['arr_flag_opex_index'] = array_flag(arr_date_end_opex_index,date_opex_index_start,arr_date_start_opex_index,date_operations_end)
+			df['arr_flag_debt_amortisation'] = (arr_date_end_period<pd.to_datetime(date_debt_maturity)).astype(int)*df['arr_flag_operations']
 
 			""" Create time series """
 
-			arr_time_days_in_period = array_days(arr_date_end_period,arr_date_start_period,1)
-			arr_time_days_under_contract = array_days(arr_date_end_contract_period,arr_date_start_contract_period,arr_flag_contract)
+			df['arr_time_days_in_period'] = array_days(arr_date_end_period,arr_date_start_period,1)
+			df['arr_time_days_under_contract'] = array_days(arr_date_end_contract_period,arr_date_start_contract_period,df['arr_flag_contract'])
+			df['arr_time_pct_under_contract']=df['arr_time_days_under_contract']/df['arr_time_days_in_period']
 
-			arr_time_pct_under_contract=arr_time_days_under_contract/arr_time_days_in_period
+			df['arr_time_days_contract_index'] = array_days(arr_date_end_contract_index,arr_date_start_contract_index,df['arr_flag_contract_index'])
+			df['arr_time_days_merchant_index'] = array_days(arr_date_end_elec_index,arr_date_start_elec_index,df['arr_flag_elec_index'])
+			df['arr_time_days_opex_index'] = array_days(arr_date_end_opex_index,arr_date_start_opex_index,df['arr_flag_opex_index'])
 
-			arr_time_days_contract_indexation = array_days(arr_date_end_contract_indexation,arr_date_start_contract_indexation,arr_flag_contract_indexation)
-			arr_time_days_merchant_indexation = array_days(arr_date_end_elec_indexation,arr_date_start_elec_indexation,arr_flag_elec_indexation)
-			arr_time_days_opex_indexation = array_days(arr_date_end_opex_indexation,arr_date_start_opex_indexation,arr_flag_opex_indexation)
+			df['arr_time_days_in_year'] = arr_date_end_period.dt.is_leap_year*366 + (1-arr_date_end_period.dt.is_leap_year)*365
+			df['arr_time_years_in_period'] = df['arr_time_days_in_period']/df['arr_time_days_in_year']
+			df['arr_time_years_in_period_operations'] = df['arr_time_years_in_period']*df['arr_flag_operations']
+			df['arr_time_years_from_COD_EOP'] = df['arr_time_years_in_period_operations'].cumsum()
+			df['arr_time_years_from_COD_BOP'] = df['arr_time_years_from_COD_EOP']-df['arr_time_years_in_period_operations']
+			df['arr_time_years_from_COD_avg'] = (df['arr_time_years_from_COD_BOP']+df['arr_time_years_from_COD_EOP'])/2
 
-
-			arr_time_days_in_year = arr_date_end_period.dt.is_leap_year*366 + (1-arr_date_end_period.dt.is_leap_year)*365
-			arr_time_years_in_period = arr_time_days_in_period/arr_time_days_in_year
-			arr_time_years_in_period_operations = arr_time_years_in_period*arr_flag_operations
-			arr_time_years_from_COD_EOP = arr_time_years_in_period_operations.cumsum()
-			arr_time_years_from_COD_BOP = arr_time_years_from_COD_EOP-arr_time_years_in_period_operations
-			arr_time_years_from_COD_avg = (arr_time_years_from_COD_BOP+arr_time_years_from_COD_EOP)/2
-
-			arr_time_years_contract_indexation=(arr_time_days_contract_indexation/arr_time_days_in_year).cumsum()
-			arr_time_years_merchant_indexation=(arr_time_days_merchant_indexation/arr_time_days_in_year).cumsum()
-			arr_time_years_opex_indexation=(arr_time_days_merchant_indexation/arr_time_days_in_year).cumsum()
+			df['arr_time_years_contract_index']=(df['arr_time_days_contract_index']/df['arr_time_days_in_year']).cumsum()
+			df['arr_time_years_merchant_index']=(df['arr_time_days_merchant_index']/df['arr_time_days_in_year']).cumsum()
+			df['arr_time_years_opex_index']=(df['arr_time_days_opex_index']/df['arr_time_days_in_year']).cumsum()
 
 			""" Production """
 
 			arr_time_seasonality = array_seasonality(arr_date_start_period,arr_date_end_period,seasonality)
-			arr_prod_degrad = 1/(1+inp_degradation)**arr_time_years_from_COD_avg
-			arr_prod_capacity_af_degrad = inp_capacity*arr_prod_degrad
-			arr_prod = inp_production/1000*arr_time_seasonality[0]*arr_prod_capacity_af_degrad*arr_flag_operations
+			arr_prod_degrad = 1/(1+inp_degradation)**df['arr_time_years_from_COD_avg']
+			df['arr_prod_capacity_af_degrad'] = inp_capacity*arr_prod_degrad
+			arr_prod = inp_production/1000*arr_time_seasonality[0]*df['arr_prod_capacity_af_degrad']*df['arr_flag_operations']
+
+			df['arr_prod'] = arr_prod
+			df['arr_prod_degrad'] = arr_prod_degrad
+
 
 			""" Construction """
 
-			arr_fp_uses_construction_costs = np.hstack([arr_construction_costs,np.zeros(arr_flag_operations.size-arr_construction_costs.size)])*arr_flag_construction
+			arr_fp_uses_construction_costs = np.hstack([arr_construction_costs,np.zeros(df['arr_flag_operations'].size-arr_construction_costs.size)])*df['arr_flag_construction']
 			arr_construction_costs_cumul = arr_fp_uses_construction_costs.cumsum()
 			total_construction_costs = max(arr_construction_costs_cumul)
 			
@@ -381,39 +388,39 @@ def project_view(request,id):
 			arr_date_start_period_format = arr_date_start_period.dt.date
 			arr_date_end_period_format = arr_date_end_period.dt.date
 
-			arr_date_start_contract_period_format = arr_date_start_contract_period.dt.date.mask(arr_flag_contract==False, False)
-			arr_date_end_contract_period_format = arr_date_end_contract_period.dt.date.mask(arr_flag_contract==False, False)
+			arr_date_start_contract_period_format = arr_date_start_contract_period.dt.date.mask(df['arr_flag_contract']==False, False)
+			arr_date_end_contract_period_format = arr_date_end_contract_period.dt.date.mask(df['arr_flag_contract']==False, False)
 
-			arr_date_start_contract_indexation = arr_date_start_contract_indexation.dt.date.mask(arr_flag_contract_indexation==False, False)
-			arr_date_end_contract_indexation = arr_date_end_contract_indexation.dt.date.mask(arr_flag_contract_indexation==False, False)
+			arr_date_start_contract_index = arr_date_start_contract_index.dt.date.mask(df['arr_flag_contract_index']==False, False)
+			arr_date_end_contract_index = arr_date_end_contract_index.dt.date.mask(df['arr_flag_contract_index']==False, False)
 			
-			arr_date_start_elec_indexation = arr_date_start_elec_indexation.dt.date.mask(arr_flag_elec_indexation==False, False)
-			arr_date_end_elec_indexation = arr_date_end_elec_indexation.dt.date.mask(arr_flag_elec_indexation==False, False)
+			arr_date_start_elec_index = arr_date_start_elec_index.dt.date.mask(df['arr_flag_elec_index']==False, False)
+			arr_date_end_elec_index = arr_date_end_elec_index.dt.date.mask(df['arr_flag_elec_index']==False, False)
 
-			arr_date_start_opex_indexation = arr_date_start_opex_indexation.dt.date.mask(arr_flag_opex_indexation==False, False)
-			arr_date_end_opex_indexation = arr_date_end_opex_indexation.dt.date.mask(arr_flag_opex_indexation==False, False)
+			arr_date_start_opex_index = arr_date_start_opex_index.dt.date.mask(df['arr_flag_opex_index']==False, False)
+			arr_date_end_opex_index = arr_date_end_opex_index.dt.date.mask(df['arr_flag_opex_index']==False, False)
 
 			""" Indexation """
 
-			arr_index_merchant = array_index(inp_price_merchant_index_rate,arr_time_years_merchant_indexation)
-			arr_index_contracted = array_index(inp_price_contract_index_rate,arr_time_years_contract_indexation)
-			arr_index_opex = array_index(inp_opex_indexation_rate,arr_time_years_opex_indexation)
+			df['arr_index_merchant'] = array_index(inp_price_merchant_index_rate,df['arr_time_years_merchant_index'])
+			df['arr_index_contract'] = array_index(inp_price_contract_index_rate,df['arr_time_years_contract_index'])
+			df['arr_index_opex'] = array_index(inp_opex_index_rate,df['arr_time_years_opex_index'])
 
 			""" Price """
 
-			arr_price_merchant = array_elec_prices(arr_date_end_period_year,dic_price_elec)
-			arr_price_merchant_aft_index = arr_price_merchant*arr_index_merchant
+			df['arr_price_merchant'] = array_elec_prices(arr_date_end_period_year,dic_price_elec)
+			df['arr_price_merchant_aft_index'] = df['arr_price_merchant']*df['arr_index_merchant']
 			
-			arr_price_contracted = inp_contract_price*arr_flag_contract
-			arr_price_contracted_aft_index = arr_price_contracted*arr_index_contracted
+			df['arr_price_contract'] = inp_contract_price*df['arr_flag_contract']
+			df['arr_price_contract_aft_index'] = df['arr_price_contract']*df['arr_index_contract']
 
-			arr_is_rev_contracted = arr_price_contracted_aft_index*arr_prod*arr_time_pct_under_contract/1000
-			arr_is_rev_merchant = arr_price_merchant_aft_index*arr_prod*(1-arr_time_pct_under_contract)/1000
-			arr_is_rev_total = arr_is_rev_contracted+arr_is_rev_merchant
+			df['arr_is_rev_contract'] = df['arr_price_contract_aft_index']*df['arr_prod']*df['arr_time_pct_under_contract']/1000
+			df['arr_is_rev_merchant'] = df['arr_price_merchant_aft_index']*df['arr_prod']*(1-df['arr_time_pct_under_contract'])/1000
+			df['arr_is_rev_total'] = df['arr_is_rev_contract']+df['arr_is_rev_merchant']
 
-			arr_is_operating_costs = inp_opex*arr_index_opex*arr_time_years_in_period_operations
+			df['arr_is_operating_costs'] = inp_opex*df['arr_index_opex']*df['arr_time_years_in_period_operations']
 
-			arr_is_depreciation = total_construction_costs*arr_time_years_in_period_operations/inp_life
+			df['arr_is_depreciation'] = total_construction_costs*df['arr_time_years_in_period_operations']/inp_life
 
 			"""arr_sizing_debt_interest_operations = []
 
@@ -428,10 +435,11 @@ def project_view(request,id):
 
 			""" EBITDA """
 
-			arr_is_EBITDA = arr_is_rev_total-arr_is_operating_costs
-			arr_is_EBITDA_margin = np.divide(arr_is_EBITDA,arr_is_rev_total, out=np.zeros_like(arr_is_EBITDA), where=arr_is_rev_total!=0)*100
-			arr_is_EBIT = arr_is_EBITDA-arr_is_depreciation
+			df['arr_is_EBITDA'] = df['arr_is_rev_total']-df['arr_is_operating_costs']
+			arr_is_EBITDA_margin = np.divide(df['arr_is_EBITDA'],df['arr_is_rev_total'], out=np.zeros_like(df['arr_is_EBITDA']), where=df['arr_is_rev_total']!=0)*100
+			df['arr_is_EBIT'] = df['arr_is_EBITDA']-df['arr_is_depreciation']
 
+			df['arr_test'] = df['arr_is_EBITDA']-df['arr_is_depreciation']
 
 			debt_amount = 1000
 			debt_amount_target = 2000
@@ -439,63 +447,70 @@ def project_view(request,id):
 			arr_sizing_debt_repayment_target = np.full(number_columns, -200)
 
 
-			while abs(debt_amount-debt_amount_target)>10:
+			"""while abs(debt_amount-debt_amount_target)>10:
 
-				debt_amount = debt_amount_target
-				arr_debt_repayment = -arr_sizing_debt_repayment_target
+			debt_amount = debt_amount_target
+			arr_debt_repayment = -arr_sizing_debt_repayment_target"""
 
-				""" Debt """
+			""" Debt """
 
-				arr_debt_drawn = (arr_construction_costs_cumul*inp_debt_gearing_max).clip(upper=debt_amount)
-				cumul_debt_drawn  = max(arr_debt_drawn)
-				arr_debt_EoP = (arr_debt_drawn+arr_debt_repayment.cumsum()).clip(lower=0)
-				arr_debt_BoP = np.roll(arr_debt_EoP, 1)
-				arr_debt_interest = arr_debt_BoP*inp_debt_interest_rate*arr_time_days_in_period/360
-				arr_sizing_debt_interest_operations = arr_debt_interest*arr_flag_debt_amortisation
+			"""arr_debt_drawn = (arr_construction_costs_cumul*inp_debt_gearing_max).clip(upper=debt_amount)
+			cumul_debt_drawn  = max(arr_debt_drawn)
+			arr_debt_EoP = (arr_debt_drawn+arr_debt_repayment.cumsum()).clip(lower=0)
+			arr_debt_BoP = np.roll(arr_debt_EoP, 1)
+			arr_debt_interest = arr_debt_BoP*inp_debt_interest_rate*arr_time_days_in_period/360
+			arr_sizing_debt_interest_operations = arr_debt_interest*df['arr_flag_debt_amortisation']
 
-				arr_is_EBT = arr_is_EBIT-arr_debt_interest
-				arr_is_corporate_tax = -inp_corporate_income_tax_rate*arr_is_EBT.clip(lower=0)
-				arr_is_net_income = arr_is_EBT-arr_is_corporate_tax
+			arr_is_EBT = df['arr_is_EBIT']-arr_debt_interest
+			arr_is_corporate_tax = -inp_corporate_income_tax_rate*arr_is_EBT.clip(lower=0)
+			arr_is_net_income = arr_is_EBT-arr_is_corporate_tax"""
 
-				""" Debt sizing """
+			""" Debt sizing """
 
-				arr_sizing_CFADS = (arr_is_EBIT-arr_is_corporate_tax)*arr_flag_debt_amortisation
-				arr_sizing_target_DS_sizing = arr_sizing_CFADS/inp_target_DSCR
+			"""arr_sizing_CFADS = (df['arr_is_EBIT']-arr_is_corporate_tax)*df['arr_flag_debt_amortisation']
+			arr_sizing_target_DS_sizing = arr_sizing_CFADS/inp_target_DSCR
 
-				arr_sizing_debt_avg_interest = np.divide(arr_sizing_debt_interest_operations,arr_debt_BoP,out=np.zeros_like(arr_sizing_debt_interest_operations), where=arr_debt_BoP!=0)/arr_time_days_in_period*360
-				arr_sizing_debt_period_discount_factor = (1/(1+(arr_sizing_debt_avg_interest*arr_time_days_in_period/360)))*arr_flag_debt_amortisation+arr_flag_construction
-				arr_sizing_debt_period_discount_factor_cumul = arr_sizing_debt_period_discount_factor.cumprod()
+			arr_sizing_debt_avg_interest = np.divide(arr_sizing_debt_interest_operations,arr_debt_BoP,out=np.zeros_like(arr_sizing_debt_interest_operations), where=arr_debt_BoP!=0)/arr_time_days_in_period*360
+			arr_sizing_debt_period_discount_factor = (1/(1+(arr_sizing_debt_avg_interest*arr_time_days_in_period/360)))*df['arr_flag_debt_amortisation']+df['arr_flag_construction']
+			arr_sizing_debt_period_discount_factor_cumul = arr_sizing_debt_period_discount_factor.cumprod()
 
-				debt_amount_DSCR = sum(arr_sizing_target_DS_sizing*arr_sizing_debt_period_discount_factor_cumul)
-				debt_amount_gearing = total_construction_costs*inp_debt_gearing_max
-				debt_amount_target = min(debt_amount_DSCR,debt_amount_gearing)
+			debt_amount_DSCR = sum(arr_sizing_target_DS_sizing*arr_sizing_debt_period_discount_factor_cumul)
+			debt_amount_gearing = total_construction_costs*inp_debt_gearing_max
+			debt_amount_target = min(debt_amount_DSCR,debt_amount_gearing)"""
 
-				""" Debt sculpting """
-				"""npv_CFADS = sum(arr_sizing_CFADS*arr_sizing_debt_period_discount_factor_cumul)
-				DSCR_sculpting = npv_CFADS/cumul_debt_drawn
-				arr_sizing_debt_repayment_target = (arr_sizing_CFADS/DSCR_sculpting-arr_sizing_debt_interest_operations).clip(lower=0)"""
+			""" Debt sculpting """
+			"""npv_CFADS = sum(arr_sizing_CFADS*arr_sizing_debt_period_discount_factor_cumul)
+			DSCR_sculpting = npv_CFADS/cumul_debt_drawn
+			arr_sizing_debt_repayment_target = (arr_sizing_CFADS/DSCR_sculpting-arr_sizing_debt_interest_operations).clip(lower=0)"""
 
-				arr_sizing_debt_repayment_target = (arr_sizing_target_DS_sizing-arr_sizing_debt_interest_operations).clip(lower=0)
+			"""arr_sizing_debt_repayment_target = (arr_sizing_target_DS_sizing-arr_sizing_debt_interest_operations).clip(lower=0)"""
 
-				"""npv_CFADS = arr_sizing_CFADS*arr_sizing_debt_period_discount_factor_cumul
-				DSCR_sculpting = npv_CFADS/cumul_debt_drawn
-				arr_sizing_target_DS_sculpting=arr_sizing_CFADS/inp_target_DSCR
-				arr_sizing_debt_repayment_target = (arr_sizing_target_DS_sculpting-arr_sizing_debt_interest_operations)*arr_flag_debt_amortisation
-				arr_sizing_debt_repayment_target = np.clip(arr_sizing_debt_repayment_target,0,a_max=None)"""
+			"""npv_CFADS = arr_sizing_CFADS*arr_sizing_debt_period_discount_factor_cumul
+			DSCR_sculpting = npv_CFADS/cumul_debt_drawn
+			arr_sizing_target_DS_sculpting=arr_sizing_CFADS/inp_target_DSCR
+			arr_sizing_debt_repayment_target = (arr_sizing_target_DS_sculpting-arr_sizing_debt_interest_operations)*df['arr_flag_debt_amortisation']
+			arr_sizing_debt_repayment_target = np.clip(arr_sizing_debt_repayment_target,0,a_max=None)"""
 
-				arr_debt_service_repayment = -arr_debt_repayment
-				arr_debt_service = (arr_sizing_debt_interest_operations-arr_debt_repayment)
-				arr_ratios_DSCR = np.divide(arr_sizing_CFADS,arr_debt_service, out=np.zeros_like(arr_sizing_CFADS), where=arr_debt_service!=0)
+			"""arr_debt_service_repayment = -arr_debt_repayment
+			arr_debt_service = (arr_sizing_debt_interest_operations-arr_debt_repayment)
+			arr_ratios_DSCR = np.divide(arr_sizing_CFADS,arr_debt_service, out=np.zeros_like(arr_sizing_CFADS), where=arr_debt_service!=0)
 
 			summary_debt = np.array([debt_amount,debt_amount_DSCR,debt_amount_gearing,debt_amount_target,cumul_debt_drawn])
-			data_dump_sidebar = np.array([date_COD,date_operations_end,sum_seasonality,sum_construction_costs])
-
-			df = pd.DataFrame()
-
-			df['col'] = arr_debt_service_repayment
+			data_dump_sidebar = np.array([date_COD,date_operations_end,sum_seasonality,sum_construction_costs])"""
 
 
-			return JsonResponse({"df":df.to_dict(),},safe=False, status=200)
+
+			return JsonResponse({
+
+				"df":df.to_dict(),
+				"seasonality":seasonality.tolist(),
+				"arr_prod":arr_prod.tolist(),
+				"arr_prod_degrad":arr_prod_degrad.tolist(),
+				"arr_date_end_period":arr_date_end_period.tolist(),
+
+
+
+				},safe=False, status=200)
 		else:
 			errors = project_form.errors.as_json()
 			return JsonResponse({"errors": errors}, status=400)
@@ -518,7 +533,7 @@ def array_time(timeline,start,end):
 	return timeline_result
 
 def array_flag(timeline_end,start,timeline_start,end):	
-	flag_result = (timeline_end>pd.to_datetime(start))*(timeline_start<pd.to_datetime(end))
+	flag_result = (timeline_end>pd.to_datetime(start))*(timeline_start<pd.to_datetime(end)).astype(int)
 	return flag_result
 
 def array_days(arr_end_date,arr_start_date,flag):
