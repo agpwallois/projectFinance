@@ -1429,6 +1429,7 @@
     			arr_is:"#myTableIS",
     			arr_price:"#myTablePrice",
     			arr_sizing:"#myTableSizing",
+    			arr_debt:"#myTableSeniorDebt",
 
     			};
 
@@ -1461,6 +1462,28 @@
   					$(Object.values(dict_sidebar)[i]).html(json.data_dump_sidebar[i]);
   				}
 
+  				var summary_results = []
+
+	  				$.each(json.df_result, function(key, data) {
+		  					summary_results += "<tr>";
+		  					summary_results += "<td>" + key + "</td>";
+		  					$.each(data, function(index, data) {
+		    					summary_results += "<td>" + data + "</td>";
+		    				});
+		  					summary_results += "</tr>";
+	  					
+	  				});
+	  			$("#summary_debt").html(summary_results);
+				
+
+				var dict_summary = {
+    			number_columns:"#summary_equity",
+    			};
+
+  				for (var i = 0; i < Object.keys(dict_summary).length; i++) {
+  					$(Object.values(dict_summary)[i]).html(json.data_dump_summary[i]);
+  				}
+
   				myChart.data.labels = Object.values(json.df.arr_date_end_period);
   				myChart.data.datasets[0].data = Object.values(json.df.arr_prod);
   				myChart.data.datasets[1].data = Object.values(json.df.arr_prod_degrad);
@@ -1488,7 +1511,17 @@
   				myChart6.data.datasets[1].data = Object.values(json.df.arr_construction_costs_cumul);
 				myChart6.update()
 
+				myChart7.data.labels = Object.values(json.df.arr_date_end_period);
+  				myChart7.data.datasets[0].data = Object.values(json.df.arr_sizing_debt_interest_operations);
+  				myChart7.data.datasets[1].data = Object.values(json.df.arr_debt_service_repayment);
+   				myChart7.data.datasets[2].data = Object.values(json.df.arr_ratios_DSCR);
+				myChart7.update()
 
+
+				myChart8.data.labels = Object.values(json.df.arr_date_end_period);
+  				myChart8.data.datasets[0].data = Object.values(json.df.arr_debt_service);
+  				myChart8.data.datasets[1].data = Object.values(json.df.arr_sizing_CFADS);
+				myChart8.update()
 
 
 

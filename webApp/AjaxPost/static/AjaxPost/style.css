@@ -142,6 +142,10 @@ td:nth-child(1) {
     font-weight: bold;
     min-width: 15em;
     max-width: 15em;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    align-self: flex-start,
 }
 
 
