@@ -133,7 +133,6 @@ def project_view(request,id):
 			months_construction = (r.years * 12) + r.months + 1
 			months_construction = math.ceil(int(months_construction))
 
-			number_columns = months_construction + int_operating_periods
 
 			""" Offtake contract and Electricity price inputs """
 
@@ -368,10 +367,14 @@ def project_view(request,id):
 
 			""" Production """
 
-			arr_time_seasonality = array_seasonality(arr_date_start_period,arr_date_end_period,seasonality)
+			df['arr_time_seasonality'] = array_seasonality(arr_date_start_period,arr_date_end_period,seasonality)
+
+
 			df['arr_prod_degrad'] = 1/(1+inp_degradation)**df['arr_time_years_from_COD_avg']
 			df['arr_prod_capacity_af_degrad'] = inp_capacity*df['arr_prod_degrad']
-			df['arr_prod'] = inp_production/1000*arr_time_seasonality[0]*df['arr_prod_capacity_af_degrad']*df['arr_flag_operations']
+			df['arr_prod'] = inp_production/1000*df['arr_time_seasonality']*df['arr_prod_capacity_af_degrad']*df['arr_flag_operations']
+
+
 		
 			""" Construction """
 
@@ -408,6 +411,7 @@ def project_view(request,id):
 			df['arr_is_EBITDA_margin'] = np.divide(df['arr_is_EBITDA'],df['arr_is_rev_total'], out=np.zeros_like(df['arr_is_EBITDA']), where=df['arr_is_rev_total']!=0)*100
 			df['arr_is_EBIT'] = df['arr_is_EBITDA']-df['arr_is_depreciation']
 
+			number_columns = sum(df['arr_flag_operations'])+sum(df['arr_flag_construction'])-1
 
 			debt_amount = 1000
 			debt_amount_target = 2000
@@ -470,7 +474,6 @@ def project_view(request,id):
 			df['arr_ratios_DSCR'] = np.divide(df['arr_sizing_CFADS'],df['arr_debt_service'], out=np.zeros_like(df['arr_sizing_CFADS']), where=df['arr_debt_service']!=0)
 
 
-
 			df_result = pd.DataFrame({
 				"debt_amount":[debt_amount],
 				"debt_amount_DSCR":[debt_amount_DSCR],
@@ -478,15 +481,20 @@ def project_view(request,id):
 				"debt_amount_target":[debt_amount_target],
 				})
 
-                 
 
-			data_dump_summary = np.array([number_columns,])
+			
+			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
+
+			data_dump_summary = np.array([number_columns])
 			data_dump_sidebar = np.array([date_COD,date_operations_end,sum_seasonality,sum_construction_costs])
 
 
 			return JsonResponse({
 
 				"df":df.to_dict(),
+				"df_sum":df_sum.to_dict(),
+
+
 				"df_result":df_result.to_dict(),
 				"seasonality":seasonality.tolist(),
 				"arr_years_electricity_prices":arr_years_electricity_prices.tolist(),
@@ -570,6 +578,7 @@ def array_seasonality(arr_date_start_period,arr_date_end_period,seasonality):
 
 	df_seasonality_result=df_seasonality_result.mul(seasonality, axis=0)
 	arr_time_seasonality = df_seasonality_result.sum(axis=0)
+	arr_time_seasonality = arr_time_seasonality.values.tolist()
 
 	return arr_time_seasonality
 

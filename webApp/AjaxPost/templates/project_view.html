@@ -1430,7 +1430,6 @@
     			arr_price:"#myTablePrice",
     			arr_sizing:"#myTableSizing",
     			arr_debt:"#myTableSeniorDebt",
-
     			};
 
   				for (var i = 0; i < Object.keys(dict).length; i++) {
@@ -1438,6 +1437,7 @@
 	  						if(key.startsWith(Object.keys(dict)[i])) {
 		  					results[i] += "<tr>";
 		  					results[i] += "<td>" + key + "</td>";
+		  					results[i] += "<td>" + json.df_sum[key] + "</td>";
 		  					$.each(data, function(index, data) {
 		    					results[i] += "<td>" + data + "</td>";
 		    				});
@@ -1477,7 +1477,7 @@
 				
 
 				var dict_summary = {
-    			number_columns:"#summary_equity",
+    			months_construction:"#summary_equity",
     			};
 
   				for (var i = 0; i < Object.keys(dict_summary).length; i++) {
