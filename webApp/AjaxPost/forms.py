@@ -19,6 +19,19 @@ ELECTRICITY_PRICES_CHOICES= [
 	('3', 'High'),
 	]
 
+TECHNOLOGY_CHOICES= [
+	('1', 'Solar'),
+	('2', 'Wind'),
+	]
+
+COUNTRY_CHOICES= [
+	('1', 'Italy'),
+	('2', 'France'),
+	('3', 'Spain'),
+	]
+
+
+
 class ProjectForm(forms.ModelForm):
 	class Meta:
 	 model = Project
@@ -41,7 +54,11 @@ class ProjectForm(forms.ModelForm):
 
 		exclude_from_formatting = [self.fields['periodicity'],
 								   self.fields['production_choice'],
-								   self.fields['price_elec_choice'],]
+								   self.fields['price_elec_choice'],
+					
+						
+								  
+								   ]
 
 		for field in self.fields.values():
 			if field not in exclude_from_formatting:

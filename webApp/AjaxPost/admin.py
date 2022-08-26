@@ -3,7 +3,7 @@ from AjaxPost.models import Project
 
 # Register your models here.
 
-class ContactAdmin(admin.ModelAdmin):
+class ProjectAdmin(admin.ModelAdmin):
 	list_display = ('name',)
 
-admin.site.register(Project, ContactAdmin)
+admin.site.register(Project, ProjectAdmin)

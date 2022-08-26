@@ -63,6 +63,15 @@ def project_view(request,id):
 		if project_form.is_valid():
 			project_form.save()
 
+
+			""" Timing inputs """
+
+			inp_country = request.POST['country']
+			inp_technology = request.POST['technology']
+
+
+
+
 			""" Timing inputs """
 
 			inp_construction_start = request.POST['start_construction']
@@ -480,8 +489,6 @@ def project_view(request,id):
 				"debt_amount_gearing":[debt_amount_gearing],
 				"debt_amount_target":[debt_amount_target],
 				})
-
-
 			
 			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
 

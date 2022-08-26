@@ -1252,6 +1252,9 @@
 				    <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
 				      <div class="accordion-body">
 								        		{{ project_form.name }}
+								        		{{ project_form.country }}
+								        		{{ project_form.technology }}
+
 
 				      </div>
 				    </div>
@@ -1447,6 +1450,17 @@
 	  			$(Object.values(dict)[i]).html(results[i]);
 				}
 
+
+			    $('tr').click(function () {
+			        //Check to see if background color is set or if it's set to white.
+			        if(this.style.background == "" || this.style.background =="white") {
+			            $(this).css('background', '#e7f1ff');
+			        }
+			        else {
+			            $(this).css('background', 'white');
+			        }
+			    });
+
   				for (var i = 0; i < 30; i++) {
 					$("#elecPriceLabel"+i).html(json.arr_years_electricity_prices[i]);
 				}
@@ -1483,6 +1497,10 @@
   				for (var i = 0; i < Object.keys(dict_summary).length; i++) {
   					$(Object.values(dict_summary)[i]).html(json.data_dump_summary[i]);
   				}
+
+		
+
+
 
   				myChart.data.labels = Object.values(json.df.arr_date_end_period);
   				myChart.data.datasets[0].data = Object.values(json.df.arr_prod);

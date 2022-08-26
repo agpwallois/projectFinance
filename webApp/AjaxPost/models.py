@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime
 from django.core.exceptions import ValidationError
 
-
+from django import forms
 
   
 
@@ -11,19 +11,20 @@ class Project(models.Model):
 
 	def __str__(self):
 		return f'{self.name}'
+	
+	COUNTRY_CHOICES = (
+        ('France', 'France'),
+        ('Spain', 'Spain'),
+    )
 
-	class Production(models.TextChoices):
-		P50 = 'P50'
-		P90 = 'P90'
-		P99 = 'P99'
-
-	class ElecPrice(models.TextChoices):
-		Low = 'Low'
-		Medium = 'Medium'
-		High = 'High'
-
+	TECHNOLOGY_CHOICES = (
+        ('Solar', 'Solar'),
+        ('Wind', 'Wind'),
+    )
 
 	name = models.fields.CharField(max_length=100)
+	country = models.fields.CharField(choices=COUNTRY_CHOICES,max_length=100,default="France")
+	technology = models.fields.CharField(choices=TECHNOLOGY_CHOICES,max_length=100,default="Solar")
 
 	start_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	end_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
