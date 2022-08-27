@@ -146,6 +146,7 @@ td:nth-child(1) {
     position: sticky;
     left: 0;
     align-self: flex-start; /* <-- this is the fix */
+    background-color: white;
 }
 
 

@@ -1352,7 +1352,10 @@
 				<table class="table">
 					<tbody id="myTableIS"></tbody>
 				</table>
- 			
+
+				<table class="table">
+					<tbody id="myTableRE"></tbody>
+				</table> 			
 
  			<h2>Operating account</h2>
  				<p>Cash flow from operating activities</p>
@@ -1382,6 +1385,9 @@
 
  			<h2>Distribution account</h2>
 
+ 			<table class="table">
+					<tbody id="DistrAccount"></tbody>
+			</table>
 
  			<h2>Financing plan</h2>
  				<p>Uses</p>
@@ -1475,7 +1481,8 @@
     			arr_cf_fin:"#myTableCFfinancing",
     			arr_fp_uses:"#myTableFPUses",
     			arr_cf_CFADS:"#myTableCFADS",
-
+    			arr_distr:"#DistrAccount",
+    			arr_re:"#myTableRE",
     			};
 
     			var dict_format = {
@@ -1493,7 +1500,9 @@
       			arr_cf_find:currencyFormat,
     			arr_fp_uses:currencyFormat,
     			arr_cf_CFADS:currencyFormat,
-  			
+    			arr_distr:currencyFormat,
+    			arr_re:currencyFormat,
+
     			};
 
   				for (var i = 0; i < Object.keys(dict).length; i++) {
