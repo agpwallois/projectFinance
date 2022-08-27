@@ -28,6 +28,13 @@
 
 </div>
 
+<div class="charts-container">
+
+    <div class="graph"><canvas id="myChart9"></canvas></div>
+    <div class="graph"><canvas id="myChart10"></canvas></div>
+
+</div>
+
 <!-- Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
 
@@ -461,6 +468,56 @@ const myChart8 = new Chart(ctx8, {
 
     }
 });
+
+const ctx9 = document.getElementById('myChart9');
+const myChart9 = new Chart(ctx9, {
+    data: {
+        labels: ["1","2","3","4","5","6"],
+        datasets: [{
+            type: 'bar',
+            label: 'Repayments',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+            ],
+            borderWidth: 1
+        },{
+
+            type: 'line',
+            label: 'Debt outstanding',
+            data: [1,2,3,4,5,6],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+            ],
+            fill: 'origin',
+            borderWidth: 1
+        }
+        ]
+    },
+    options: {
+
+        responsive:true,
+        maintainAspectRatio: false,
+
+      plugins:{
+        legend: {
+            position: 'top',
+        },
+
+         title: {
+            display: true,
+            text: 'Debt outstanding and repayments'
+        }},
+
+    }
+});
+
 
 </script>
 

@@ -125,10 +125,10 @@ header {
     width: 100%;
 }
 
-
 .table{
     font-size: 0.75rem;
 }
+
 
 td {
     line-height: 0px;
@@ -142,9 +142,12 @@ td:nth-child(1) {
     font-weight: bold;
     min-width: 15em;
     max-width: 15em;
-    background-color: red;
-    color: blue;
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    left: 0;
+    align-self: flex-start; /* <-- this is the fix */
 }
+
 
 
 /* ---------------------------------------------------

@@ -1353,6 +1353,36 @@
 					<tbody id="myTableIS"></tbody>
 				</table>
  			
+
+ 			<h2>Operating account</h2>
+ 				<p>Cash flow from operating activities</p>
+
+ 				<table class="table">
+					<tbody id="myTableCFoperating"></tbody>
+				</table>
+
+ 				<p>Cash flow from investing activities</p>
+ 			
+ 				<table class="table">
+					<tbody id="myTableCFinvesting"></tbody>
+				</table>
+
+ 				<p>Cash flow from financing activities</p>
+
+	 			<table class="table">
+					<tbody id="myTableCFfinancing"></tbody>
+				</table>
+ 				
+ 				<p>Cash available for senior debt service</p>
+
+	 			<table class="table">
+					<tbody id="myTableCFADS"></tbody>
+				</table>
+
+
+ 			<h2>Distribution account</h2>
+
+
  			<h2>Financing plan</h2>
  				<p>Uses</p>
 		 			<table class="table">
@@ -1364,10 +1394,6 @@
 					<tbody id="myTableFPSources"></tbody>
 				</table>
 
- 			<h2>Cash flow statement</h2>
-	 			<table class="table">
-					<tbody id="myTableCF"></tbody>
-				</table>
 
  			<h2>Senior debt</h2>
  			<table class="table">
@@ -1413,6 +1439,17 @@
 
 	$(document).on('submit','#post-form', function(e){
 
+
+		const numberFormat = new Intl.NumberFormat();
+		const currencyFormat = new Intl.NumberFormat('fr-FR', {
+													  style: 'currency',
+													  currency: 'EUR',
+													  currencySign: 'accounting',
+													});
+
+
+
+
 		e.preventDefault(),
 		$.ajax({
 			type:'POST',
@@ -1433,6 +1470,30 @@
     			arr_price:"#myTablePrice",
     			arr_sizing:"#myTableSizing",
     			arr_debt:"#myTableSeniorDebt",
+    			arr_cf_op:"#myTableCFoperating",
+    			arr_cf_inv:"#myTableCFinvesting",
+    			arr_cf_fin:"#myTableCFfinancing",
+    			arr_fp_uses:"#myTableFPUses",
+    			arr_cf_CFADS:"#myTableCFADS",
+
+    			};
+
+    			var dict_format = {
+    			arr_date:"",
+    			arr_flag:numberFormat,
+    			arr_time:numberFormat,
+    			arr_prod:numberFormat,
+    			arr_index:numberFormat,
+    			arr_is:currencyFormat,
+    			arr_price:currencyFormat,
+    			arr_sizing:currencyFormat,
+    			arr_debt:currencyFormat,
+    			arr_cf_op:currencyFormat,
+      			arr_cf_inv:currencyFormat,
+      			arr_cf_find:currencyFormat,
+    			arr_fp_uses:currencyFormat,
+    			arr_cf_CFADS:currencyFormat,
+  			
     			};
 
   				for (var i = 0; i < Object.keys(dict).length; i++) {
@@ -1440,9 +1501,13 @@
 	  						if(key.startsWith(Object.keys(dict)[i])) {
 		  					results[i] += "<tr>";
 		  					results[i] += "<td>" + key + "</td>";
-		  					results[i] += "<td>" + json.df_sum[key] + "</td>";
+		  					results[i] += "<td>" + numberFormat.format(json.df_sum[key]) + "</td>";
 		  					$.each(data, function(index, data) {
-		    					results[i] += "<td>" + data + "</td>";
+		  						if (i == 0){
+		    						results[i] += "<td>" + data + "</td>";
+		  						} else {
+		    						results[i] += "<td>" + Object.values(dict_format)[i].format(data) + "</td>";
+		    					}
 		    				});
 		  					results[i] += "</tr>";
 	  					}
@@ -1482,7 +1547,7 @@
 		  					summary_results += "<tr>";
 		  					summary_results += "<td>" + key + "</td>";
 		  					$.each(data, function(index, data) {
-		    					summary_results += "<td>" + data + "</td>";
+		    					summary_results += "<td>" + Intl.NumberFormat().format(data) + "</td>";
 		    				});
 		  					summary_results += "</tr>";
 	  					
@@ -1521,7 +1586,7 @@
 
 				myChart5.data.labels = Object.values(json.df.arr_date_end_period);
   				myChart5.data.datasets[0].data = Object.values(json.df.arr_is_EBITDA);
-  				myChart5.data.datasets[1].data = Object.values(json.df.arr_is_EBITDA_margin);
+  				myChart5.data.datasets[1].data = Object.values(json.df.arr_EBITDA_margin);
 				myChart5.update()
 
 				myChart6.data.labels = Object.values(json.df.arr_date_end_period);
@@ -1541,6 +1606,10 @@
   				myChart8.data.datasets[1].data = Object.values(json.df.arr_sizing_CFADS);
 				myChart8.update()
 
+				myChart9.data.labels = Object.values(json.df.arr_date_end_period);
+  				myChart9.data.datasets[0].data = Object.values(json.df.arr_debt_service_repayment);
+  				myChart9.data.datasets[1].data = Object.values(json.df.arr_debt_EoP);
+				myChart9.update()
 
 
 			},
