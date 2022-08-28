@@ -3,9 +3,9 @@
 {% block sidebar %}
 
 <nav id="sidebar">
-    <div class="sidebar"><h3>{{ project.name }}</h3>
+	<div class="sidebar"><h3>{{ project.name }}</h3>
 
-    	<form method="POST" id="post-form">{% csrf_token %}
+		<form method="POST" id="post-form">{% csrf_token %}
 			<div class="fieldWrapper" id="the_post">
 
 				<div  class="btn-wrapper">
@@ -16,1255 +16,1255 @@
 
 				<div class="accordion" id="accordionSidebar">
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingOne">
-				      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-				        Timing
-				      </button>
-				    </h2>
-				    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        
-				      <div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
+					<h2 class="accordion-header" id="headingOne">
+					  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+						Timing
+					  </button>
+					</h2>
+					<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+						
+					  <div class="row-inline-wrapper">
+										<div class="row-inline-two">
 											<h1>Start of construction</h1>
-					        			</div>
+										</div>
 
-							    		<div class="row-inline-two">
+										<div class="row-inline-two">
 											<h1>End of construction</h1>
-					        			</div>
+										</div>
 
-					        		</div>
+									</div>
 
-					        		<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
-							 		{{ project_form.start_construction }}
-					        			</div>
+									<div class="row-inline-wrapper">
+										<div class="row-inline-two">
+									{{ project_form.start_construction }}
+										</div>
 
-							    		<div class="row-inline-two">
-							 		{{ project_form.end_construction }}
-					        			</div>
+										<div class="row-inline-two">
+									{{ project_form.end_construction }}
+										</div>
 
-					        		</div>
+									</div>
 
-					        		<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
+									<div class="row-inline-wrapper">
+										<div class="row-inline-two">
 											<h1>Commissioning Date</h1>
-					        			</div>
+										</div>
 
-							    		<div class="row-inline-two">
-							    			<div id="dateCOD"></div>
-					        			</div>
+										<div class="row-inline-two">
+											<div id="dateCOD"></div>
+										</div>
 
-					        		</div>
+									</div>
 
-					        		<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
+									<div class="row-inline-wrapper">
+										<div class="row-inline-two">
 											<h1>Operating life (years)</h1>
-					        			</div>
+										</div>
 
-							    		<div class="row-inline-two">
+										<div class="row-inline-two">
 											{{ project_form.operating_life }}
 
-					        			</div>
+										</div>
 
-					        		</div>
+									</div>
 
-					        		<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
+									<div class="row-inline-wrapper">
+										<div class="row-inline-two">
 											<h1>Retirement</h1>
-					        			</div>
+										</div>
 
-							    		<div class="row-inline-two">
-							    			<div id="dateRetirement"></div>
-					        			</div>
+										<div class="row-inline-two">
+											<div id="dateRetirement"></div>
+										</div>
 
-					        		</div>
+									</div>
 
-					        		<div class="row-inline-wrapper">
-							    		<div class="row-inline-two">
-							 				<h1>Periodicity</h1>
-					        			</div>
+									<div class="row-inline-wrapper">
+										<div class="row-inline-two">
+											<h1>Periodicity</h1>
+										</div>
 
-							    		<div class="row-inline-two">
-							 				{{ project_form.periodicity }}
+										<div class="row-inline-two">
+											{{ project_form.periodicity }}
 
-					        			</div>
+										</div>
 
-					        		</div>
+									</div>
 
 
 
-				      </div>
-				    </div>
+					  </div>
+					</div>
 				  </div>
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingTwo">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-				        Capacity and Production
-				      </button>
-				    </h2>
-				    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        <h5>Capacity and production Production</h5>
+					<h2 class="accordion-header" id="headingTwo">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						Capacity and Production
+					  </button>
+					</h2>
+					<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+						<h5>Capacity and production Production</h5>
 
-			    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Installed capacity (kWp)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											<h1>Annual degradation (%)</h1>
-				        			</div>
-					        	</div>
+									</div>
+								</div>
 
-				        		<div class="row-inline-wrapper">
-						    		<div class="row-inline-two">
-						 				{{ project_form.panels_capacity }}
-				        			</div>
-						    		<div class="row-inline-two">
-						 				{{ project_form.annual_degradation }}
-				        			</div>
-				        		</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
+										{{ project_form.panels_capacity }}
+									</div>
+									<div class="row-inline-two">
+										{{ project_form.annual_degradation }}
+									</div>
+								</div>
 
-			    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>P50 (kWp/kWh)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.p50 }}
-				        			</div>
-					        	</div>
+									</div>
+								</div>
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>p90_10y (kWp/kWh)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.p90_10y }}
-				        			</div>
-					        	</div>
+									</div>
+								</div>
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>P99_10y (kWp/kWh)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.P99_10y }}
-				        			</div>
-					        	</div>		
+									</div>
+								</div>		
 
 
-				        		<div class="row-inline-wrapper">
-						    		<div class="row-inline-two">
-						 				<h1>Production selected</h1>
-				        			</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
+										<h1>Production selected</h1>
+									</div>
 
-						    		<div class="row-inline-two">
-						 				{{ project_form.production_choice }}
+									<div class="row-inline-two">
+										{{ project_form.production_choice }}
 
-				        			</div>
+									</div>
 
-					        	</div>
+								</div>
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Availability (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.availability }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<h5>Seasonality</h5>
-       									
-       							<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<h5>Seasonality</h5>
+										
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Sum (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
-							    			<div id="sumSeasonality"></div>
-				        			</div>
-					        	</div>
+									</div>
+									<div class="row-inline-two">
+											<div id="sumSeasonality"></div>
+									</div>
+								</div>
 
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>January (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m1 }}
-				        			</div>
-					        	</div>
+									</div>
+								</div>
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>February (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m2 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>March (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m3 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>April (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m4 }}
-				        			</div>
-					        	</div>
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+									</div>
+								</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>May (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m5 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>June (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m6 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>July (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m7 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>August (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m8 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>September (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m9 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>October (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m10 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>November (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m11 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>December (%)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.seasonality_m12 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-				      </div>
-				    </div>
+					  </div>
+					</div>
 				  </div>
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingThree">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-				        Construction costs
-				      </button>
-				    </h2>
-				    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				       <h5>Monthly construction schedule</h5>
+					<h2 class="accordion-header" id="headingThree">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+						Construction costs
+					  </button>
+					</h2>
+					<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+					   <h5>Monthly construction schedule</h5>
 
-       							<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Sum (kEUR)</h1>
-					        		</div>
-						    		<div class="row-inline-two">
-							    			<div id="sumConstructionCosts"></div>
-				        			</div>
-					        	</div>
+									</div>
+									<div class="row-inline-two">
+											<div id="sumConstructionCosts"></div>
+									</div>
+								</div>
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 1</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m1 }}
 
-				        			</div>
-					        	</div>
+									</div>
+								</div>
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 2</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m2 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 3</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m3 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 4</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m4 }}
-				        			</div>
-					        	</div>
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+									</div>
+								</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 5</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m5 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 6</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m6 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 7</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m7 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 8</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m8 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 9</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m9 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 10</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m10 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 11</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m11 }}
-				        			</div>
-					        	</div>	
+									</div>
+								</div>	
 
-					        	<div class="row-inline-wrapper">
-							    	<div class="row-inline-two">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
 											<h1>Month 12</h1>
-					        		</div>
-						    		<div class="row-inline-two">
+									</div>
+									<div class="row-inline-two">
 											{{ project_form.costs_m12 }}
-				        			</div>
-					        	</div>	
-				      </div>
-				    </div>
+									</div>
+								</div>	
+					  </div>
+					</div>
 				  </div>
 				  
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingFour">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-				        Offtake and Market prices
-				      </button>
-				    </h2>
-				    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				    <h5>Offtake contract</h5>
+					<h2 class="accordion-header" id="headingFour">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+						Offtake and Market prices
+					  </button>
+					</h2>
+					<div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+					<h5>Offtake contract</h5>
 
-				    		<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
 									<h1>Start of contract</h1>
-			        			</div>
+								</div>
 
-					    		<div class="row-inline-two">
+								<div class="row-inline-two">
 									<h1>End of contract</h1>
-			        			</div>
+								</div>
 
-					        </div>
+							</div>
 
-			        		<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
-					 				{{ project_form.start_contract }}
-			        			</div>
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
+									{{ project_form.start_contract }}
+								</div>
 
-					    		<div class="row-inline-two">
-					 				{{ project_form.end_contract }}
-			        			</div>
+								<div class="row-inline-two">
+									{{ project_form.end_contract }}
+								</div>
 
-			        		</div>
+							</div>
 
-				    		<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
 									<h1>Contract start price</h1>
-			        			</div>
+								</div>
 
-					    		<div class="row-inline-two">
+								<div class="row-inline-two">
 									<h1>{{ project_form.contract_price }}</h1>
-			        			</div>
+								</div>
 
-					        </div>
+							</div>
 							
 							<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
+								<div class="row-inline-two">
 									<h1>Contract indexation base date</h1>
-			        			</div>
+								</div>
 
-					    		<div class="row-inline-two">
+								<div class="row-inline-two">
 									<h1>Contract indexation p.a. (%)</h1>
-			        			</div>
+								</div>
 
-					        </div>
+							</div>
 
-			        		<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
-					 				{{ project_form.contract_indexation_start_date }}
-			        			</div>
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
+									{{ project_form.contract_indexation_start_date }}
+								</div>
 
-					    		<div class="row-inline-two">
-					 				{{ project_form.contract_indexation }}
-			        			</div>
+								<div class="row-inline-two">
+									{{ project_form.contract_indexation }}
+								</div>
 
-			        		</div>
+							</div>
 									<h5>Electricity market price</h5>
 
 								
 								<div class="row-inline-wrapper">
-						    		<div class="row-inline-two">
+									<div class="row-inline-two">
 										<h1>Electricity price indexation base date</h1>
-				        			</div>
+									</div>
 
-						    		<div class="row-inline-two">
+									<div class="row-inline-two">
 										<h1>Electricity prices indexation rate (%)</h1>
-				        			</div>
+									</div>
 
-				        		</div>
-
-				        		<div class="row-inline-wrapper">
-						    		<div class="row-inline-two">
-						 		{{ project_form.price_elec_indexation_start_date }}
-				        			</div>
-
-						    		<div class="row-inline-two">
-						 		{{ project_form.price_elec_indexation }}
-				        			</div>
-
-				        		</div>
+								</div>
 
 								<div class="row-inline-wrapper">
-						    		<div class="row-inline-two">
-						 				<h1>Electricity prices selected</h1>
-				        			</div>
+									<div class="row-inline-two">
+								{{ project_form.price_elec_indexation_start_date }}
+									</div>
 
-						    		<div class="row-inline-two">
-						 				{{ project_form.price_elec_choice }}
-				        			</div>
+									<div class="row-inline-two">
+								{{ project_form.price_elec_indexation }}
+									</div>
 
-				        		</div>
+								</div>
 
-			    				<div class="row-inline-wrapper">
+								<div class="row-inline-wrapper">
+									<div class="row-inline-two">
+										<h1>Electricity prices selected</h1>
+									</div>
 
-							    	<div class="row-inline-four">
+									<div class="row-inline-two">
+										{{ project_form.price_elec_choice }}
+									</div>
+
+								</div>
+
+								<div class="row-inline-wrapper">
+
+									<div class="row-inline-four">
 											<h1>Year</h1>
-					        		</div>
-						    		<div class="row-inline-four">
+									</div>
+									<div class="row-inline-four">
 											<h1>Low</h1>
-				        			</div>
+									</div>
 
-				        			<div class="row-inline-four">
+									<div class="row-inline-four">
 											<h1>Medium</h1>
-				        			</div>
+									</div>
 
-				        			<div class="row-inline-four">
+									<div class="row-inline-four">
 											<h1>High</h1>
-				        			</div>
-					        	</div>
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel0"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y1 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y1 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_high_y1 }}
-
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel1"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y2 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y2 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y2 }}
-
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel2"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y3 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y3 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y3 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel3"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y4 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y4 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y4 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel4"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y5 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y5 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y5 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel5"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y6 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y6 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y6 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel6"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y7 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y7 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y7 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel7"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y8 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y8 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y8 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel8"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y9 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y9 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y9 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel9"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y10 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y10 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y10 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel10"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y11 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y11 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y11 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel11"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y12 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y12 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y12 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel12"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y13 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y13 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y13 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel13"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y14 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y14 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y14 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel14"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y15 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y15 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y15 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel15"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y16 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y16 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y16 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel16"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y17 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y17 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y17 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel17"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y18 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y18 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y18 }}
-				        			</div>
-					        	</div>
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel18"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y19 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y19 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y19 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel19"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y20 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y20 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y20 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel20"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y21 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y21 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y21 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel21"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y22 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y22 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y22 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel22"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y23 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y23 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y23 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel23"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y24 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y24 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y24 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel24"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y25 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y25 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y25 }}
-				        			</div>
-					        	</div>
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel25"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y26 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y26 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y26 }}
-				        			</div>
-					        	</div>
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel26"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y27 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y27 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y27 }}
-				        			</div>
-					        	</div>
-
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel27"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y28 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y28 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y28 }}
-				        			</div>
-					        	</div>
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel28"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y29 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y29 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y29 }}
-				        			</div>
-					        	</div>
-
-		    				<div class="row-inline-wrapper">
-							    	<div class="row-inline-four">
-							    			<div id="elecPriceLabel29"></div>
-					        		</div>
-						    		<div class="row-inline-four">
-											{{ project_form.price_elec_low_y30 }}
-				        			</div>
-				        			<div class="row-inline-four">
-											{{ project_form.price_elec_med_y30 }}
-				        			</div>
-				        			<div class="row-inline-four">
-				        					{{ project_form.price_elec_high_y30 }}
-				        			</div>
-					        	</div>
-	
-
-				      </div>
-				    </div>
-				  </div>
-				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingFive">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-				        Operating costs
-				      </button>
-				    </h2>
-				    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				       <div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
-									<h1>Operating costs indexation base date</h1>
-			        			</div>
-
-					    		<div class="row-inline-two">
-									<h1>Operating costs indexation p.a. (%)</h1>
-			        			</div>
-
-					        </div>
-
-			        		<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
-					 				{{ project_form.opex_indexation_start_date }}
-			        			</div>
-
-					    		<div class="row-inline-two">
-					 				{{ project_form.opex_indexation }}
-			        			</div>
-
-			        		</div>
+									</div>
+								</div>
 
 							<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel0"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y1 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y1 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y1 }}
+
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel1"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y2 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y2 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y2 }}
+
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel2"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y3 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y3 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y3 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel3"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y4 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y4 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y4 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel4"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y5 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y5 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y5 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel5"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y6 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y6 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y6 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel6"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y7 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y7 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y7 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel7"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y8 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y8 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y8 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel8"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y9 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y9 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y9 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel9"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y10 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y10 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y10 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel10"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y11 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y11 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y11 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel11"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y12 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y12 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y12 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel12"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y13 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y13 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y13 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel13"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y14 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y14 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y14 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel14"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y15 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y15 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y15 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel15"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y16 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y16 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y16 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel16"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y17 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y17 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y17 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel17"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y18 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y18 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y18 }}
+									</div>
+								</div>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel18"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y19 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y19 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y19 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel19"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y20 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y20 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y20 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel20"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y21 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y21 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y21 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel21"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y22 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y22 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y22 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel22"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y23 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y23 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y23 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel23"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y24 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y24 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y24 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel24"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y25 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y25 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y25 }}
+									</div>
+								</div>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel25"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y26 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y26 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y26 }}
+									</div>
+								</div>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel26"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y27 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y27 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y27 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel27"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y28 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y28 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y28 }}
+									</div>
+								</div>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel28"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y29 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y29 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y29 }}
+									</div>
+								</div>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-four">
+											<div id="elecPriceLabel29"></div>
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_low_y30 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_med_y30 }}
+									</div>
+									<div class="row-inline-four">
+											{{ project_form.price_elec_high_y30 }}
+									</div>
+								</div>
+	
+
+					  </div>
+					</div>
+				  </div>
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingFive">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+						Operating costs
+					  </button>
+					</h2>
+					<div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+					   <div class="row-inline-wrapper">
+								<div class="row-inline-two">
+									<h1>Operating costs indexation base date</h1>
+								</div>
+
+								<div class="row-inline-two">
+									<h1>Operating costs indexation p.a. (%)</h1>
+								</div>
+
+							</div>
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
+									{{ project_form.opex_indexation_start_date }}
+								</div>
+
+								<div class="row-inline-two">
+									{{ project_form.opex_indexation }}
+								</div>
+
+							</div>
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
 									<h1>Operating costs p.a.</h1>
-			        			</div>
+								</div>
 
-					    		<div class="row-inline-two">
+								<div class="row-inline-two">
 									<h1>{{ project_form.opex }}</h1>
-			        			</div>
+								</div>
 
-					        </div>
-				      </div>
-				    </div>
+							</div>
+					  </div>
+					</div>
 				  </div>
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingSix">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-				        HMR
-				      </button>
-				    </h2>
-				    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-				      </div>
-				    </div>
+					<h2 class="accordion-header" id="headingSix">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+						HMR
+					  </button>
+					</h2>
+					<div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+						<strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+					  </div>
+					</div>
 				  </div>
 
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingSeven">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-				        Senior Debt
-				      </button>
-				    </h2>
-				    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        	<h5>Timing</h5>
+					<h2 class="accordion-header" id="headingSeven">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+						Senior Debt
+					  </button>
+					</h2>
+					<div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+							<h5>Timing</h5>
 
-			    		<div class="row-inline-wrapper">
-					    	<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Door to door tenor</h1>
-			        		</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_tenor }}
-		        			</div>
-			        	</div>
-        				<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_tenor }}
+							</div>
+						</div>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 								<h1>Maturity</h1>
-		        			</div>
+							</div>
 
-				    		<div class="row-inline-two">
-				    			<div id="debtMaturity"></div>
-		        			</div>
+							<div class="row-inline-two">
+								<div id="debtMaturity"></div>
+							</div>
 
-		        		</div>
+						</div>
 
-					  		<h5>Pricing</h5>
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+							<h5>Pricing</h5>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Upfront fee</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_upfront_fee }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_upfront_fee }}
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Commitment fee</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_commitment_fee }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_commitment_fee }}
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Credit margin</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_margin }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_margin }}
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Swap rate</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_swap_rate }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_swap_rate }}
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Reference rate buffer</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_reference_rate_buffer }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_reference_rate_buffer }}
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Swap margin</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_swap_margin }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_swap_margin }}
+							</div>
+						</div>
 
-					  		<h5>Sizing</h5>
+							<h5>Sizing</h5>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Minimum DSCR</h1>
-		        			</div>
-				    		<div class="row-inline-two">
+							</div>
+							<div class="row-inline-two">
 									<h1>Maximum gearing</h1>
-		        			</div>
-		        		</div>
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_target_DSCR }}
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_gearing_max }}
-		        			</div>
-		        		</div>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
+								{{ project_form.debt_target_DSCR }}
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_gearing_max }}
+							</div>
+						</div>
 
-		        		<div class="row-inline-wrapper">
-				    		<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Negative tail</h1>
-		        			</div>
-				    		<div class="row-inline-two">
-				 				{{ project_form.debt_negative_tail }}
-		        			</div>
-		        		</div>
+							</div>
+							<div class="row-inline-two">
+								{{ project_form.debt_negative_tail }}
+							</div>
+						</div>
 
-				      </div>
-				    </div>
+					  </div>
+					</div>
 				  </div>
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingEight">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
-				        Tax
-				      </button>
-				    </h2>
-				    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        	<div class="row-inline-wrapper">
-					    		<div class="row-inline-two">
+					<h2 class="accordion-header" id="headingEight">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+						Tax
+					  </button>
+					</h2>
+					<div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
 										<h1>Corporate income tax (%)</h1>
-			        			</div>
-					    		<div class="row-inline-two">
-					 				{{ project_form.corporate_income_tax }}
-			        			</div>
-				      		</div>
-				   	 </div>
-				  	</div>
-				  	</div>
+								</div>
+								<div class="row-inline-two">
+									{{ project_form.corporate_income_tax }}
+								</div>
+							</div>
+					 </div>
+					</div>
+					</div>
 
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingNine">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
-				        Accounting
-				      </button>
-				    </h2>
-				    <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-				      </div>
-				    </div>
+					<h2 class="accordion-header" id="headingNine">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+						Accounting
+					  </button>
+					</h2>
+					<div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+						<strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+					  </div>
+					</div>
 				  </div>
 
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingTen">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
-				        Equity
-				      </button>
-				    </h2>
-				    <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-				        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-				      </div>
-				    </div>
+					<h2 class="accordion-header" id="headingTen">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+						Equity
+					  </button>
+					</h2>
+					<div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+						<strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+					  </div>
+					</div>
 				  </div>				  
 
 
 				  <div class="accordion-item">
-				    <h2 class="accordion-header" id="headingEleven">
-				      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
-				        Macro
-				      </button>
-				    </h2>
-				    <div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
-				      <div class="accordion-body">
-								        		{{ project_form.name }}
-								        		{{ project_form.country }}
-								        		{{ project_form.technology }}
+					<h2 class="accordion-header" id="headingEleven">
+					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+						Macro
+					  </button>
+					</h2>
+					<div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+												{{ project_form.name }}
+												{{ project_form.country }}
+												{{ project_form.technology }}
 
 
-				      </div>
-				    </div>
+					  </div>
+					</div>
 				  </div>	
 				</div>
 
-	  			</div>
-	  		</div>
-  		</form>  
-  	</div>
+				</div>
+			</div>
+		</form>  
+	</div>
 </nav>
 
 {% endblock %}
@@ -1273,47 +1273,55 @@
 
 <div id="content">
 	<nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-        	<button type="button" id="sidebarCollapse" class="btn btn-primary btn-lg"><</button>
-        </div>
-    </nav>
+		<div class="container-fluid">
+			<button type="button" id="sidebarCollapse" class="btn btn-primary btn-lg"><</button>
+		</div>
+	</nav>
 
 	<nav>
 		<ul class="nav nav-tabs">
 		  <li class="nav-item">
-		    <a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Summary</a>
+			<a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Summary</a>
 		  </li>
 		  <li class="nav-item">
-		    <a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Calculation</a>
+			<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Calculation</a>
 		  </li>
 		</ul>
 	</nav>
 
 	<div class="tab-content">
-  		<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
-  			
-  			<h2>Summary</h2>
-  			  <div class="summary-container">
+		<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
+			
+			<h2>Summary</h2>
+			  <div class="summary-container">
 
-  				<div class="summary">
-			  		<table class="table">
+				<div class="summary">
+					<table class="table">
 						<tbody id="summary_debt"></tbody>
 					</table>
-  				</div>
-  				<div class="summary">
-			  		<table class="table">
+				</div>
+				<div class="summary">
+					<table class="table">
 						<tbody id="summary_equity"></tbody>
 					</table>  				
 				</div> 				
-  				</div> 				
+				</div> 	
 
-  			<h2>Graphs</h2>
-	 		{% block jquery %}{% include 'charts.html' %}{% endblock %}
+			<h2>Audit</h2>
+
+				<div class="summary">
+					<table class="table">
+						<tbody id="summary_audit"></tbody>
+					</table>
+				</div>
+
+			<h2>Charts</h2>
+			{% block jquery %}{% include 'charts.html' %}{% endblock %}
 
 		</div>
 
 		<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
-	  		<h2>Timeline</h2>
+			<h2>Timeline</h2>
 
 				<table class="table">
 					<tbody id="myTableDate"></tbody>
@@ -1327,20 +1335,20 @@
 					<tbody id="myTableTime"></tbody>
 				</table>
 
-	  		<h2>Indexation</h2>
+			<h2>Indexation</h2>
 				<table class="table">
 					<tbody id="myTableIndex"></tbody>
 				</table>
 
-  			<h2>Production</h2>
- 				<p>Production</p>
+			<h2>Production</h2>
+				<p>Production</p>
 
 
 				<table class="table">
 					<tbody id="myTableProd"></tbody>
 				</table>
 
- 				<p>Prices</p>
+				<p>Prices</p>
 
 				<table class="table">
 					<tbody id="myTablePrice"></tbody>
@@ -1348,90 +1356,92 @@
 
 
 
-  			<h2>Income statement</h2>
+			<h2>Income statement</h2>
 				<table class="table">
 					<tbody id="myTableIS"></tbody>
 				</table>
+
+
+			<h2>Operating account</h2>
+				<p>Cash flow from operating activities</p>
+
+				<table class="table">
+					<tbody id="myTableCFoperating"></tbody>
+				</table>
+
+				<p>Cash flow from investing activities</p>
+			
+				<table class="table">
+					<tbody id="myTableCFinvesting"></tbody>
+				</table>
+
+				<p>Cash flow from financing activities</p>
+
+				<table class="table">
+					<tbody id="myTableCFfinancing"></tbody>
+				</table>
+				
+				<p>Cash available for senior debt service</p>
+
+				<table class="table">
+					<tbody id="myTableCFADS"></tbody>
+				</table>
+
+
+			<h2>Distribution account</h2>
 
 				<table class="table">
 					<tbody id="myTableRE"></tbody>
 				</table> 			
 
- 			<h2>Operating account</h2>
- 				<p>Cash flow from operating activities</p>
 
- 				<table class="table">
-					<tbody id="myTableCFoperating"></tbody>
-				</table>
-
- 				<p>Cash flow from investing activities</p>
- 			
- 				<table class="table">
-					<tbody id="myTableCFinvesting"></tbody>
-				</table>
-
- 				<p>Cash flow from financing activities</p>
-
-	 			<table class="table">
-					<tbody id="myTableCFfinancing"></tbody>
-				</table>
- 				
- 				<p>Cash available for senior debt service</p>
-
-	 			<table class="table">
-					<tbody id="myTableCFADS"></tbody>
-				</table>
-
-
- 			<h2>Distribution account</h2>
-
- 			<table class="table">
+			<table class="table">
 					<tbody id="DistrAccount"></tbody>
 			</table>
 
- 			<h2>Financing plan</h2>
- 				<p>Uses</p>
-		 			<table class="table">
+			<h2>Financing plan</h2>
+				<p>Uses</p>
+					<table class="table">
 						<tbody id="myTableFPUses"></tbody>
 					</table>
 
- 				<p>Sources</p>
-	 			<table class="table">
+				<p>Sources</p>
+				<table class="table">
 					<tbody id="myTableFPSources"></tbody>
 				</table>
 
 
- 			<h2>Senior debt</h2>
- 			<table class="table">
+			<h2>Senior debt</h2>
+			<table class="table">
 				<tbody id="myTableSeniorDebt"></tbody>
 			</table>
 
 			<h2>Sizing and sculpting</h2>
- 			<table class="table">
+			<table class="table">
 				<tbody id="myTableSizing"></tbody>
 			</table>
 
 			<h2>Balance sheet</h2>
 				<p>Assets</p>
-		 			<table class="table">
-						<tbody id="myTableBalanceSheetAssets"></tbody>
+					<table class="table">
+						<tbody id="myTableBSA"></tbody>
 					</table>
 
 				<p>Liabilities</p>
-		 			<table class="table">
-						<tbody id="myTableBalanceSheetLiabilities"></tbody>
+					<table class="table">
+						<tbody id="myTableBSL"></tbody>
 					</table>
 
 			<h2>Audit</h2>
-	 			<table class="table">
+				<table class="table">
 					<tbody id="myTableAudit"></tbody>
 				</table>
 
-	  		<table class="table">
+			<table class="table">
 					<tbody id="myTableAll"></tbody>
 			</table>
-	 	</div>
-    </div>
+		</div>
+	</div>
 </div>
 
 
@@ -1439,7 +1449,7 @@
 <script type="text/javascript">
 
 	$(document).ready(function(){
-    	$("#post-form").submit();
+		$("#post-form").submit();
 	});
 
 
@@ -1456,6 +1466,16 @@
 
 
 
+		function formatAsPercent(num) {
+			return new Intl.NumberFormat('default', {
+			style: 'percent',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		  }).format(num);
+		}
+
+
+
 		e.preventDefault(),
 		$.ajax({
 			type:'POST',
@@ -1464,162 +1484,193 @@
 			success:function(json){
 				console.log(json);
 
-    			var results = []
+				var results = []
 
-    			var dict = {
-    			arr_date:"#myTableDate",
-    			arr_flag:"#myTableFlag",
-    			arr_time:"#myTableTime",
-    			arr_prod:"#myTableProd",
-    			arr_index:"#myTableIndex",
-    			arr_is:"#myTableIS",
-    			arr_price:"#myTablePrice",
-    			arr_sizing:"#myTableSizing",
-    			arr_debt:"#myTableSeniorDebt",
-    			arr_cf_op:"#myTableCFoperating",
-    			arr_cf_inv:"#myTableCFinvesting",
-    			arr_cf_fin:"#myTableCFfinancing",
-    			arr_fp_uses:"#myTableFPUses",
-    			arr_cf_CFADS:"#myTableCFADS",
-    			arr_distr:"#DistrAccount",
-    			arr_re:"#myTableRE",
-    			};
+				var dict = {
+				arr_date:"#myTableDate",
+				arr_flag:"#myTableFlag",
+				arr_time:"#myTableTime",
+				arr_prod:"#myTableProd",
+				arr_index:"#myTableIndex",
+				arr_is:"#myTableIS",
+				arr_price:"#myTablePrice",
+				arr_sizing:"#myTableSizing",
+				arr_debt:"#myTableSeniorDebt",
+				arr_cf_op:"#myTableCFoperating",
+				arr_cf_inv:"#myTableCFinvesting",
+				arr_cf_fin:"#myTableCFfinancing",
+				arr_fp_uses:"#myTableFPUses",
+				arr_cf_CFADS:"#myTableCFADS",
+				arr_distr:"#DistrAccount",
+				arr_re:"#myTableRE",
+				arr_bs_a:"#myTableBSA",
+				arr_bs_l:"#myTableBSL",
+				arr_audit:"#myTableAudit",
 
-    			var dict_format = {
-    			arr_date:"",
-    			arr_flag:numberFormat,
-    			arr_time:numberFormat,
-    			arr_prod:numberFormat,
-    			arr_index:numberFormat,
-    			arr_is:currencyFormat,
-    			arr_price:currencyFormat,
-    			arr_sizing:currencyFormat,
-    			arr_debt:currencyFormat,
-    			arr_cf_op:currencyFormat,
-      			arr_cf_inv:currencyFormat,
-      			arr_cf_find:currencyFormat,
-    			arr_fp_uses:currencyFormat,
-    			arr_cf_CFADS:currencyFormat,
-    			arr_distr:currencyFormat,
-    			arr_re:currencyFormat,
+				};
 
-    			};
+				var dict_format = {
+				arr_date:"",
+				arr_flag:numberFormat,
+				arr_time:numberFormat,
+				arr_prod:numberFormat,
+				arr_index:numberFormat,
+				arr_is:currencyFormat,
+				arr_price:currencyFormat,
+				arr_sizing:currencyFormat,
+				arr_debt:currencyFormat,
+				arr_cf_op:currencyFormat,
+				arr_cf_inv:currencyFormat,
+				arr_cf_find:currencyFormat,
+				arr_fp_uses:currencyFormat,
+				arr_cf_CFADS:currencyFormat,
+				arr_distr:currencyFormat,
+				arr_re:currencyFormat,
+				arr_bs_a:currencyFormat,
+				arr_bs_l:currencyFormat,
+				arr_audit:currencyFormat,
+				};
 
-  				for (var i = 0; i < Object.keys(dict).length; i++) {
-	  				$.each(json.df, function(key, data) {
-	  						if(key.startsWith(Object.keys(dict)[i])) {
-		  					results[i] += "<tr>";
-		  					results[i] += "<td>" + key + "</td>";
-		  					results[i] += "<td>" + numberFormat.format(json.df_sum[key]) + "</td>";
-		  					$.each(data, function(index, data) {
-		  						if (i == 0){
-		    						results[i] += "<td>" + data + "</td>";
-		  						} else {
-		    						results[i] += "<td>" + Object.values(dict_format)[i].format(data) + "</td>";
-		    					}
-		    				});
-		  					results[i] += "</tr>";
-	  					}
-	  				});
-	  			$(Object.values(dict)[i]).html(results[i]);
+				for (var i = 0; i < Object.keys(dict).length; i++) {
+					$.each(json.df, function(key, data) {
+							if(key.startsWith(Object.keys(dict)[i])) {
+							results[i] += "<tr>";
+							results[i] += "<td>" + key + "</td>";
+							results[i] += "<td>" + numberFormat.format(json.df_sum[key]) + "</td>";
+							$.each(data, function(index, data) {
+								if (i == 0){
+									results[i] += "<td>" + data + "</td>";
+								} else {
+									results[i] += "<td>" + Object.values(dict_format)[i].format(data) + "</td>";
+								}
+							});
+							results[i] += "</tr>";
+						}
+					});
+				$(Object.values(dict)[i]).html(results[i]);
 				}
 
 
-			    $('tr').click(function () {
-			        //Check to see if background color is set or if it's set to white.
-			        if(this.style.background == "" || this.style.background =="white") {
-			            $(this).css('background', '#e7f1ff');
-			        }
-			        else {
-			            $(this).css('background', 'white');
-			        }
-			    });
+				$('tr').click(function () {
+					//Check to see if background color is set or if it's set to white.
+					if(this.style.background == "" || this.style.background =="white") {
+						$(this).css('background', '#e7f1ff');
+					}
+					else {
+						$(this).css('background', 'white');
+					}
+				});
 
-  				for (var i = 0; i < 30; i++) {
+				for (var i = 0; i < 30; i++) {
 					$("#elecPriceLabel"+i).html(json.arr_years_electricity_prices[i]);
 				}
 
 				var dict_sidebar = {
-    			date_COD:"#dateCOD",
-    			date_operations_end:"#dateRetirement",
-    			sum_seasonality:"#sumSeasonality",
-    			sum_construction_costs:"#sumConstructionCosts",
-    			};
+				date_COD:"#dateCOD",
+				date_operations_end:"#dateRetirement",
+				sum_seasonality:"#sumSeasonality",
+				sum_construction_costs:"#sumConstructionCosts",
+				};
 
-  				for (var i = 0; i < Object.keys(dict_sidebar).length; i++) {
-  					$(Object.values(dict_sidebar)[i]).html(json.data_dump_sidebar[i]);
-  				}
+				for (var i = 0; i < Object.keys(dict_sidebar).length; i++) {
+					$(Object.values(dict_sidebar)[i]).html(json.data_dump_sidebar[i]);
+				}
 
-  				var summary_results = []
+				var summary_results = []
 
-	  				$.each(json.df_result, function(key, data) {
-		  					summary_results += "<tr>";
-		  					summary_results += "<td>" + key + "</td>";
-		  					$.each(data, function(index, data) {
-		    					summary_results += "<td>" + Intl.NumberFormat().format(data) + "</td>";
-		    				});
-		  					summary_results += "</tr>";
-	  					
-	  				});
-	  			$("#summary_debt").html(summary_results);
+					$.each(json.df_result, function(key, data) {
+							summary_results += "<tr>";
+							summary_results += "<td>" + key + "</td>";
+							$.each(data, function(index, data) {
+								summary_results += "<td>" + Intl.NumberFormat().format(data) + "</td>";
+							});
+							summary_results += "</tr>";
+						
+					});
+				$("#summary_debt").html(summary_results);
 				
 
-				var dict_summary = {
-    			months_construction:"#summary_equity",
-    			};
+				var summary_results_equity = []
 
-  				for (var i = 0; i < Object.keys(dict_summary).length; i++) {
-  					$(Object.values(dict_summary)[i]).html(json.data_dump_summary[i]);
-  				}
+					$.each(json.df_result_equity, function(key, data) {
+							summary_results_equity += "<tr>";
+							summary_results_equity += "<td>" + key + "</td>";
+							$.each(data, function(index, data) {
+								summary_results_equity += "<td>" + formatAsPercent(data) + "</td>";
+							});
+							summary_results_equity += "</tr>";
+						
+					});
+				$("#summary_equity").html(summary_results_equity);
 
-		
 
 
+				var summary_audit = []
 
-  				myChart.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart.data.datasets[0].data = Object.values(json.df.arr_prod);
-  				myChart.data.datasets[1].data = Object.values(json.df.arr_prod_degrad);
+					$.each(json.df_audit, function(key, data) {
+							summary_audit += "<tr>";
+							summary_audit += "<td>" + key + "</td>";
+							$.each(data, function(index, data) {
+								summary_audit += "<td>" + data + "</td>";
+							});
+							summary_audit += "</tr>";
+						
+					});
+				$("#summary_audit").html(summary_audit);
+
+
+				myChart.data.labels = Object.values(json.df.arr_date_end_period);
+				myChart.data.datasets[0].data = Object.values(json.df.arr_prod);
+				myChart.data.datasets[1].data = Object.values(json.df.arr_prod_degrad);
 				myChart.update()
 
-  				myChart2.data.datasets[0].data = json.seasonality;
+				myChart2.data.datasets[0].data = json.seasonality;
 				myChart2.update()
 
-  				myChart3.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart3.data.datasets[0].data = Object.values(json.df.arr_is_rev_contract);
-  				myChart3.data.datasets[1].data = Object.values(json.df.arr_is_rev_merchant);
+				myChart3.data.labels = Object.values(json.df.arr_date_end_period);
+				myChart3.data.datasets[0].data = Object.values(json.df.arr_is_rev_contract);
+				myChart3.data.datasets[1].data = Object.values(json.df.arr_is_rev_merchant);
 				myChart3.update()
 
-  				myChart4.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart4.data.datasets[0].data = Object.values(json.df.arr_is_opex);
+				myChart4.data.labels = Object.values(json.df.arr_date_end_period);
+				myChart4.data.datasets[0].data = Object.values(json.df.arr_is_opex);
 				myChart4.update()
 
 				myChart5.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart5.data.datasets[0].data = Object.values(json.df.arr_is_EBITDA);
-  				myChart5.data.datasets[1].data = Object.values(json.df.arr_EBITDA_margin);
+				myChart5.data.datasets[0].data = Object.values(json.df.arr_is_EBITDA);
+				myChart5.data.datasets[1].data = Object.values(json.df.arr_EBITDA_margin);
 				myChart5.update()
 
 				myChart6.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart6.data.datasets[0].data = Object.values(json.df.arr_fp_uses_construction_costs);
-  				myChart6.data.datasets[1].data = Object.values(json.df.arr_construction_costs_cumul);
+				myChart6.data.datasets[0].data = Object.values(json.df.arr_fp_uses_construction_costs);
+				myChart6.data.datasets[1].data = Object.values(json.df.arr_construction_costs_cumul);
 				myChart6.update()
 
 				myChart7.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart7.data.datasets[0].data = Object.values(json.df.arr_sizing_debt_interest_operations);
-  				myChart7.data.datasets[1].data = Object.values(json.df.arr_debt_service_repayment);
-   				myChart7.data.datasets[2].data = Object.values(json.df.arr_ratios_DSCR);
+				myChart7.data.datasets[0].data = Object.values(json.df.arr_sizing_debt_interest_operations);
+				myChart7.data.datasets[1].data = Object.values(json.df.arr_debt_service_repayment);
+				myChart7.data.datasets[2].data = Object.values(json.df.arr_ratios_DSCR);
 				myChart7.update()
 
 
 				myChart8.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart8.data.datasets[0].data = Object.values(json.df.arr_debt_service);
-  				myChart8.data.datasets[1].data = Object.values(json.df.arr_sizing_CFADS);
+				myChart8.data.datasets[0].data = Object.values(json.df.arr_debt_service);
+				myChart8.data.datasets[1].data = Object.values(json.df.arr_sizing_CFADS);
 				myChart8.update()
 
 				myChart9.data.labels = Object.values(json.df.arr_date_end_period);
-  				myChart9.data.datasets[0].data = Object.values(json.df.arr_debt_service_repayment);
-  				myChart9.data.datasets[1].data = Object.values(json.df.arr_debt_EoP);
+				myChart9.data.datasets[0].data = Object.values(json.df.arr_debt_service_repayment);
+				myChart9.data.datasets[1].data = Object.values(json.df.arr_debt_EoP);
 				myChart9.update()
 
+				myChart10.data.labels = Object.values(json.df.arr_date_end_period);
+				myChart10.data.datasets[0].data = Object.values(json.df.arr_sponsors_cash_flows);
+				myChart10.update()
+
+				myChart11.data.labels = Object.values(json.df.arr_date_end_period);
+				myChart11.data.datasets[0].data = Object.values(json.df.arr_re_BoP);
+				myChart11.data.datasets[1].data = Object.values(json.df.arr_distr_EoP);
+				myChart11.update()
 
 			},
 
@@ -1627,31 +1678,31 @@
 				alert('error Ajax')
 			}
 		});
-	    return false;
+		return false;
 	});
 
 </script>
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
-        $("#sidebar").mCustomScrollbar({
-            theme: "minimal-dark"
-        });
+	$(document).ready(function () {
+		$("#sidebar").mCustomScrollbar({
+			theme: "minimal-dark"
+		});
 
-        $('#sidebarCollapse').on('click', function () {
-            $('#sidebar, #content').toggleClass('active');
-            $('.collapse.in').toggleClass('in');
-            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-            if ($(this).text() == '<') {
-                $(this).text('>');
-            } else {
-                $(this).text('<');
-            }
-        });
+		$('#sidebarCollapse').on('click', function () {
+			$('#sidebar, #content').toggleClass('active');
+			$('.collapse.in').toggleClass('in');
+			$('a[aria-expanded=true]').attr('aria-expanded', 'false');
+			if ($(this).text() == '<') {
+				$(this).text('>');
+			} else {
+				$(this).text('<');
+			}
+		});
 
-    });
-    
+	});
+	
 </script>
 
 

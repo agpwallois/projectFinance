@@ -140,16 +140,14 @@ td {
 td:nth-child(1) {  
     text-align: left;
     font-weight: bold;
-    min-width: 15em;
-    max-width: 15em;
+    min-width: 20em;
+    max-width: 20em;
     position: -webkit-sticky; /* for Safari */
     position: sticky;
-    left: 0;
+    left: 0px;
     align-self: flex-start; /* <-- this is the fix */
     background-color: white;
 }
-
-
 
 /* ---------------------------------------------------
     MEDIAQUERIES

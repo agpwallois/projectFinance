@@ -12,6 +12,7 @@ import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import dateutil.parser
+from datetime import date
 
 import math
 
@@ -19,7 +20,9 @@ import pandas as pd
 import numpy as np
 from django.core import serializers
 import json
+import scipy.optimize
 
+from pyxirr import xirr
 
 class ProjectView(ListView):
 	model = Project
@@ -410,13 +413,7 @@ def project_view(request,id):
 
 			df['arr_is_opex'] = -inp_opex*df['arr_index_opex']*df['arr_time_years_in_period_operations']
 
-			df['arr_is_depreciation'] = -total_construction_costs*df['arr_time_years_in_period_operations']/inp_life
 
-			""" EBITDA """
-
-			df['arr_is_EBITDA'] = df['arr_is_rev_total']+df['arr_is_opex']
-			df['arr_EBITDA_margin'] = np.divide(df['arr_is_EBITDA'],df['arr_is_rev_total'], out=np.zeros_like(df['arr_is_EBITDA']), where=df['arr_is_rev_total']!=0)*100
-			df['arr_is_EBIT'] = df['arr_is_EBITDA']+df['arr_is_depreciation']
 
 			number_columns = sum(df['arr_flag_operations'])+sum(df['arr_flag_construction'])-1
 
@@ -424,13 +421,17 @@ def project_view(request,id):
 			debt_amount_target = 2000
 			df['arr_debt_repayment'] = np.full(number_columns+1, -100)
 			df['arr_sizing_debt_repayment_target'] = np.full(number_columns+1, -200)
-			df['arr_re_BoP'] = np.full(number_columns+1, 0) 
-			df['arr_distr_BoP'] = np.full(number_columns+1, 0) 
+			df['arr_re_distributable_profits'] = np.full(number_columns+1, 0) 
+			df['arr_distr_cash_distributable'] = np.full(number_columns+1, 0) 
+
 
 			df['arr_sculpting_test'] = df['arr_sizing_debt_repayment_target']+df['arr_debt_repayment']
 			df['arr_fp_uses_total'] = df['arr_fp_uses_construction_costs']
 
 			while abs(debt_amount-debt_amount_target)!=0 or sum(df['arr_sculpting_test'])!=0:
+
+
+
 
 				debt_amount = debt_amount_target
 				df['arr_debt_repayment'] = -df['arr_sizing_debt_repayment_target']
@@ -448,7 +449,20 @@ def project_view(request,id):
 				df['arr_debt_BoP'] = np.roll(df['arr_debt_EoP'], 1)
 				df['arr_debt_interest'] = df['arr_debt_BoP']*inp_debt_interest_rate*df['arr_time_days_in_period']/360
 				df['arr_sizing_debt_interest_operations'] = df['arr_debt_interest']*df['arr_flag_debt_amortisation']
-				
+				df['arr_sizing_debt_interest_construction'] = df['arr_debt_interest']*df['arr_flag_construction']
+
+				df['arr_capitalised_costs_cumul'] = df['arr_sizing_debt_interest_construction'].cumsum()
+				debt_capitalised_interest = max(df['arr_capitalised_costs_cumul'])
+
+				df['arr_is_depreciation'] = -(total_construction_costs+debt_capitalised_interest)*df['arr_time_years_in_period_operations']/inp_life
+
+				""" EBITDA """
+
+				df['arr_is_EBITDA'] = df['arr_is_rev_total']+df['arr_is_opex']
+				df['arr_EBITDA_margin'] = np.divide(df['arr_is_EBITDA'],df['arr_is_rev_total'], out=np.zeros_like(df['arr_is_EBITDA']), where=df['arr_is_rev_total']!=0)*100
+				df['arr_is_EBIT'] = df['arr_is_EBITDA']+df['arr_is_depreciation']
+
+
 				df['arr_fp_uses_idc'] = df['arr_debt_interest']*df['arr_flag_construction']
 				df['arr_fp_uses_total'] = df['arr_fp_uses_construction_costs']+df['arr_fp_uses_idc']
 
@@ -456,7 +470,7 @@ def project_view(request,id):
 
 				df['arr_is_EBT'] = df['arr_is_EBIT']+df['arr_is_interest']
 				df['arr_is_corporate_tax'] = -inp_corporate_income_tax_rate*df['arr_is_EBT'].clip(lower=0)
-				df['arr_is_net_income'] = df['arr_is_EBT']-df['arr_is_corporate_tax']
+				df['arr_is_net_income'] = df['arr_is_EBT']+df['arr_is_corporate_tax']
 
 				""" Cash flow statement """
 
@@ -499,11 +513,13 @@ def project_view(request,id):
 
 				""" Dividends """
 
+				df['arr_distr_dividend'] = df['arr_distr_cash_distributable'].where(df['arr_distr_cash_distributable'] < df['arr_re_distributable_profits'], df['arr_re_distributable_profits'].clip(lower=0))
+
 				df['arr_distr_transfer'] = df['arr_cf_CFADS']+df['arr_cf_CFADS_debt_interest']+df['arr_cf_CFADS_debt_repayemnt']
-				df['arr_distr_dividend'] = (df['arr_re_distributable_profits']-df['arr_distr_cash_avail_div']).clip(lower=0)
 				df['arr_distr_EoP'] = df['arr_distr_transfer'].cumsum()-df['arr_distr_dividend'].cumsum()
 				df['arr_distr_BoP'] = df['arr_distr_EoP']+df['arr_distr_dividend']-df['arr_distr_transfer']
-				df['arr_distr_cash_avail_div'] = df['arr_distr_BoP'] + df['arr_distr_transfer'] 
+				df['arr_distr_cash_distributable'] = df['arr_distr_BoP'] + df['arr_distr_transfer']
+								
 
 				df['arr_re_EoP'] = df['arr_is_net_income'].cumsum()-df['arr_distr_dividend'].cumsum()
 				df['arr_re_net_income'] = df['arr_is_net_income']
@@ -511,9 +527,40 @@ def project_view(request,id):
 				df['arr_re_BoP'] = df['arr_re_EoP']+df['arr_re_div_declared']-df['arr_re_net_income']
 				df['arr_re_distributable_profits'] = df['arr_re_BoP']+df['arr_re_net_income']
 
+				""" Balance sheet """
+
+				df['arr_bs_a_assets'] = df['arr_construction_costs_cumul']+df['arr_capitalised_costs_cumul']+df['arr_is_depreciation'].cumsum()
+				df['arr_bs_a_dist_account'] = df['arr_distr_EoP']
+
+				df['arr_bs_a_total'] = df['arr_bs_a_assets']+df['arr_bs_a_dist_account']
+
+
+				df['arr_bs_l_retained_earnings'] = df['arr_re_EoP']
+				df['arr_bs_l_debt'] = df['arr_debt_EoP']
+				df['arr_bs_l_equity'] = df['arr_equity_drawn'].cumsum()
+
+				df['arr_bs_l_total'] = df['arr_bs_l_equity'] + df['arr_bs_l_debt'] + df['arr_bs_l_retained_earnings']
+
+
 			df['arr_debt_service_repayment'] = -df['arr_debt_repayment']
 			df['arr_debt_service'] = (df['arr_sizing_debt_interest_operations']-df['arr_debt_repayment'])
 			df['arr_ratios_DSCR'] = np.divide(df['arr_sizing_CFADS'],df['arr_debt_service'], out=np.zeros_like(df['arr_sizing_CFADS']), where=df['arr_debt_service']!=0)
+
+			df['arr_sponsors_cash_flows'] = -df['arr_equity_drawn']+df['arr_distr_dividend']
+
+
+			df['arr_audit_balance_sheet_balanced'] = df['arr_bs_a_total']-df['arr_bs_l_total']
+			check_balance_sheet_balanced = abs(sum(df['arr_audit_balance_sheet_balanced']))<0.001
+	
+			df['test'] = pd.to_datetime(arr_date_end_period).dt.date
+
+
+			dates = df['test']
+			values = df['arr_sponsors_cash_flows']
+
+
+			irr = xirr(dates,values)
+
 
 			df_result = pd.DataFrame({
 				"debt_amount":[debt_amount],
@@ -521,10 +568,22 @@ def project_view(request,id):
 				"debt_amount_gearing":[debt_amount_gearing],
 				"debt_amount_target":[debt_amount_target],
 				})
+
+			df_audit = pd.DataFrame({
+				"Balance sheet balanced":[check_balance_sheet_balanced],
+				})
+
+
+
 			
 			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
 
-			data_dump_summary = np.array([number_columns])
+			data_dump_summary = np.array([])
+
+			df_result_equity = pd.DataFrame({
+				"IRR":[irr],
+				})
+
 			data_dump_sidebar = np.array([date_COD,date_operations_end,sum_seasonality,sum_construction_costs])
 
 
@@ -535,6 +594,11 @@ def project_view(request,id):
 
 
 				"df_result":df_result.to_dict(),
+				"df_result_equity":df_result_equity.to_dict(),
+
+				"df_audit":df_audit.to_dict(),
+
+
 				"seasonality":seasonality.tolist(),
 				"arr_years_electricity_prices":arr_years_electricity_prices.tolist(),
 				"data_dump_sidebar":data_dump_sidebar.tolist(),
@@ -632,6 +696,34 @@ def array_electricity_prices(start_date):
 		arr_years_electricity_prices = np.append(arr_years_electricity_prices,year+i)
 	return arr_years_electricity_prices
 
+
+"""def xnpv(rate, values, dates):
+	'''Equivalent of Excel's XNPV function.
+
+	>>> from datetime import date
+	>>> dates = [date(2010, 12, 29), date(2012, 1, 25), date(2012, 3, 8)]
+	>>> values = [-10000, 20, 10100]
+	>>> xnpv(0.1, values, dates)
+	-966.4345...
+	'''
+	if rate <= -1.0:
+		return float('inf')
+	d0 = dates[0]    # or min(dates)
+	return sum([ vi / (1.0 + rate)**((di - d0).days / 365.0) for vi, di in zip(values, dates)])
+
+def xirr(values, dates):
+	'''Equivalent of Excel's XIRR function.
+
+	>>> from datetime import date
+	>>> dates = [date(2010, 12, 29), date(2012, 1, 25), date(2012, 3, 8)]
+	>>> values = [-10000, 20, 10100]
+	>>> xirr(values, dates)
+	0.0100612...
+	'''
+	try:
+		return scipy.optimize.newton(lambda r: xnpv(r, values, dates), 0.0)
+	except RuntimeError:    # Failed to converge?
+		return scipy.optimize.brentq(lambda r: xnpv(r, values, dates), -1.0, 1e10)"""
 
 """UNUSED"""
 
