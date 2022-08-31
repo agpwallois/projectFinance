@@ -80,17 +80,7 @@
 
 									</div>
 
-									<div class="row-inline-wrapper">
-										<div class="row-inline-two">
-											<h1>Periodicity</h1>
-										</div>
 
-										<div class="row-inline-two">
-											{{ project_form.periodicity }}
-
-										</div>
-
-									</div>
 
 
 
@@ -1092,6 +1082,18 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
+								<h1>Periodicity</h1>
+							</div>
+
+							<div class="row-inline-two">
+								{{ project_form.periodicity }}
+
+							</div>
+
+						</div>
+
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
 									<h1>Door to door tenor</h1>
 							</div>
 							<div class="row-inline-two">
@@ -1674,8 +1676,10 @@
 
 			},
 
-			error: function(){
-				alert('error Ajax')
+			error: function(json){
+				alert(json.responseJSON.error)
+    			console.log(json)
+
 			}
 		});
 		return false;

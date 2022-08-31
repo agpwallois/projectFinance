@@ -54,7 +54,6 @@ def test(request):
 		}
 	return render(request, "testrr.html", context)
 
-
 def project_view(request,id):
 
 	project_form = ProjectForm()
@@ -66,14 +65,10 @@ def project_view(request,id):
 		if project_form.is_valid():
 			project_form.save()
 
-
 			""" Timing inputs """
 
 			inp_country = request.POST['country']
 			inp_technology = request.POST['technology']
-
-
-
 
 			""" Timing inputs """
 
@@ -144,7 +139,6 @@ def project_view(request,id):
 			r = relativedelta(end_construction,start_period)
 			months_construction = (r.years * 12) + r.months + 1
 			months_construction = math.ceil(int(months_construction))
-
 
 			""" Offtake contract and Electricity price inputs """
 
@@ -381,7 +375,6 @@ def project_view(request,id):
 
 			df['arr_time_seasonality'] = array_seasonality(arr_date_start_period,arr_date_end_period,seasonality)
 
-
 			df['arr_prod_degrad'] = 1/(1+inp_degradation)**df['arr_time_years_from_COD_avg']
 			df['arr_prod_capacity_af_degrad'] = inp_capacity*df['arr_prod_degrad']
 			df['arr_prod'] = inp_production/1000*df['arr_time_seasonality']*df['arr_prod_capacity_af_degrad']*df['arr_flag_operations']
@@ -413,8 +406,6 @@ def project_view(request,id):
 
 			df['arr_is_opex'] = -inp_opex*df['arr_index_opex']*df['arr_time_years_in_period_operations']
 
-
-
 			number_columns = sum(df['arr_flag_operations'])+sum(df['arr_flag_construction'])-1
 
 			debt_amount = 1000
@@ -429,9 +420,6 @@ def project_view(request,id):
 			df['arr_fp_uses_total'] = df['arr_fp_uses_construction_costs']
 
 			while abs(debt_amount-debt_amount_target)!=0 or sum(df['arr_sculpting_test'])!=0:
-
-
-
 
 				debt_amount = debt_amount_target
 				df['arr_debt_repayment'] = -df['arr_sizing_debt_repayment_target']
@@ -511,21 +499,21 @@ def project_view(request,id):
 				"""df['arr_sizing_debt_repayment_target'] = (df['arr_sizing_target_DS_sizing']-df['arr_sizing_debt_interest_operations']).clip(lower=0)"""
 				df['arr_sculpting_test'] = df['arr_sizing_debt_repayment_target']+df['arr_debt_repayment']
 
+
 				""" Dividends """
+				for i in range(20):
+					df['arr_distr_dividend'] = df['arr_distr_cash_distributable'].where(df['arr_distr_cash_distributable'] < df['arr_re_distributable_profits'], df['arr_re_distributable_profits'].clip(lower=0))
 
-				df['arr_distr_dividend'] = df['arr_distr_cash_distributable'].where(df['arr_distr_cash_distributable'] < df['arr_re_distributable_profits'], df['arr_re_distributable_profits'].clip(lower=0))
-
-				df['arr_distr_transfer'] = df['arr_cf_CFADS']+df['arr_cf_CFADS_debt_interest']+df['arr_cf_CFADS_debt_repayemnt']
-				df['arr_distr_EoP'] = df['arr_distr_transfer'].cumsum()-df['arr_distr_dividend'].cumsum()
-				df['arr_distr_BoP'] = df['arr_distr_EoP']+df['arr_distr_dividend']-df['arr_distr_transfer']
-				df['arr_distr_cash_distributable'] = df['arr_distr_BoP'] + df['arr_distr_transfer']
-								
-
-				df['arr_re_EoP'] = df['arr_is_net_income'].cumsum()-df['arr_distr_dividend'].cumsum()
-				df['arr_re_net_income'] = df['arr_is_net_income']
-				df['arr_re_div_declared'] = df['arr_distr_dividend']
-				df['arr_re_BoP'] = df['arr_re_EoP']+df['arr_re_div_declared']-df['arr_re_net_income']
-				df['arr_re_distributable_profits'] = df['arr_re_BoP']+df['arr_re_net_income']
+					df['arr_distr_transfer'] = df['arr_cf_CFADS']+df['arr_cf_CFADS_debt_interest']+df['arr_cf_CFADS_debt_repayemnt']
+					df['arr_distr_EoP'] = df['arr_distr_transfer'].cumsum()-df['arr_distr_dividend'].cumsum()
+					df['arr_distr_BoP'] = df['arr_distr_EoP']+df['arr_distr_dividend']-df['arr_distr_transfer']
+					df['arr_distr_cash_distributable'] = df['arr_distr_BoP'] + df['arr_distr_transfer']
+									
+					df['arr_re_EoP'] = df['arr_is_net_income'].cumsum()-df['arr_distr_dividend'].cumsum()
+					df['arr_re_net_income'] = df['arr_is_net_income']
+					df['arr_re_div_declared'] = df['arr_distr_dividend']
+					df['arr_re_BoP'] = df['arr_re_EoP']+df['arr_re_div_declared']-df['arr_re_net_income']
+					df['arr_re_distributable_profits'] = df['arr_re_BoP']+df['arr_re_net_income']
 
 				""" Balance sheet """
 
@@ -541,7 +529,6 @@ def project_view(request,id):
 
 				df['arr_bs_l_total'] = df['arr_bs_l_equity'] + df['arr_bs_l_debt'] + df['arr_bs_l_retained_earnings']
 
-
 			df['arr_debt_service_repayment'] = -df['arr_debt_repayment']
 			df['arr_debt_service'] = (df['arr_sizing_debt_interest_operations']-df['arr_debt_repayment'])
 			df['arr_ratios_DSCR'] = np.divide(df['arr_sizing_CFADS'],df['arr_debt_service'], out=np.zeros_like(df['arr_sizing_CFADS']), where=df['arr_debt_service']!=0)
@@ -554,13 +541,10 @@ def project_view(request,id):
 	
 			df['test'] = pd.to_datetime(arr_date_end_period).dt.date
 
-
 			dates = df['test']
 			values = df['arr_sponsors_cash_flows']
 
-
 			irr = xirr(dates,values)
-
 
 			df_result = pd.DataFrame({
 				"debt_amount":[debt_amount],
@@ -572,9 +556,6 @@ def project_view(request,id):
 			df_audit = pd.DataFrame({
 				"Balance sheet balanced":[check_balance_sheet_balanced],
 				})
-
-
-
 			
 			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
 
@@ -607,8 +588,10 @@ def project_view(request,id):
 
 				},safe=False, status=200)
 		else:
-			errors = project_form.errors.as_json()
-			return JsonResponse({"errors": errors}, status=400)
+			
+			data = {'error':project_form.errors.as_json()}
+			
+			return JsonResponse(data, status=400)
 
 	else:
 		project_form = ProjectForm(instance=project)
