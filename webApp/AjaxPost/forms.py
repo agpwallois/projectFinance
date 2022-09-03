@@ -1,5 +1,6 @@
 from django import forms
 from .models import Project
+from dateutil.relativedelta import relativedelta
 
 PERIODICITY_CHOICES= [
 	('3', 'Quarterly'),
@@ -160,6 +161,14 @@ class ProjectForm(forms.ModelForm):
 
 		if costs_m12>0 and 12>months_construction:
 			self.add_error('costs_m12','Construction costs out of construction period')
+
+		length_construction = relativedelta(end_construction, start_construction).years
+		operating_life = cleaned_data.get('operating_life')
+		debt_tenor = cleaned_data.get('debt_tenor')
+		debt_max_tenor = length_construction+operating_life
+
+		if debt_tenor>debt_max_tenor:
+			self.add_error('debt_tenor','Debt tenor cannot exceed project life')
 
 		return cleaned_data
 

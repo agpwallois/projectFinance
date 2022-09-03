@@ -1309,6 +1309,22 @@
 				</div> 				
 				</div> 	
 
+			<h2>Financing plan</h2>
+				<div class="summary-container">
+
+					<div class="summary">
+						<table class="table">
+							<tbody id="summary_financing_plan_uses"></tbody>
+						</table>
+					</div>
+
+					<div class="summary">
+						<table class="table">
+							<tbody id="summary_financing_plan_sources"></tbody>
+						</table>
+					</div>
+				</div>
+			
 			<h2>Audit</h2>
 
 				<div class="summary">
@@ -1465,8 +1481,7 @@
 													  currencySign: 'accounting',
 													});
 
-
-
+		var stringFromat = new String();
 
 		function formatAsPercent(num) {
 			return new Intl.NumberFormat('default', {
@@ -1476,6 +1491,26 @@
 		  }).format(num);
 		}
 
+		var option = {
+		   style: 'percent',
+		   minimumFractionDigits: 2,
+		   maximumFractionDigits: 2
+		};
+
+		var percFormat = new Intl.NumberFormat("en-US",option);
+
+		function build_table(json_input,div_output) {
+			var table_result = []
+					$.each(json_input, function(key, data) {
+						table_result += "<tr>";
+						table_result += "<td>" + key + "</td>";
+					$.each(data, function(index, data) {
+						table_result += "<td>" + data + "</td>";
+					});
+						table_result += "</tr>";
+			});
+		$(div_output).html(table_result);
+		}
 
 
 		e.preventDefault(),
@@ -1502,6 +1537,7 @@
 				arr_cf_inv:"#myTableCFinvesting",
 				arr_cf_fin:"#myTableCFfinancing",
 				arr_fp_uses:"#myTableFPUses",
+				arr_fp_sources:"#myTableFPSources",
 				arr_cf_CFADS:"#myTableCFADS",
 				arr_distr:"#DistrAccount",
 				arr_re:"#myTableRE",
@@ -1525,6 +1561,7 @@
 				arr_cf_inv:currencyFormat,
 				arr_cf_find:currencyFormat,
 				arr_fp_uses:currencyFormat,
+				arr_fp_sources:currencyFormat,
 				arr_cf_CFADS:currencyFormat,
 				arr_distr:currencyFormat,
 				arr_re:currencyFormat,
@@ -1553,15 +1590,18 @@
 				}
 
 
-				$('tr').click(function () {
-					//Check to see if background color is set or if it's set to white.
-					if(this.style.background == "" || this.style.background =="white") {
-						$(this).css('background', '#e7f1ff');
-					}
-					else {
-						$(this).css('background', 'white');
-					}
-				});
+
+
+				build_table(json.df_result,"#summary_debt")
+				build_table(json.df_result_equity,"#summary_equity")
+				build_table(json.df_audit,"#summary_audit")
+				build_table(json.df_result_fp_uses,"#summary_financing_plan_uses")
+				build_table(json.df_result_fp_sources,"#summary_financing_plan_sources")
+
+
+
+
+				$("#myTableAll").html(json);
 
 				for (var i = 0; i < 30; i++) {
 					$("#elecPriceLabel"+i).html(json.arr_years_electricity_prices[i]);
@@ -1578,48 +1618,15 @@
 					$(Object.values(dict_sidebar)[i]).html(json.data_dump_sidebar[i]);
 				}
 
-				var summary_results = []
-
-					$.each(json.df_result, function(key, data) {
-							summary_results += "<tr>";
-							summary_results += "<td>" + key + "</td>";
-							$.each(data, function(index, data) {
-								summary_results += "<td>" + Intl.NumberFormat().format(data) + "</td>";
-							});
-							summary_results += "</tr>";
-						
-					});
-				$("#summary_debt").html(summary_results);
-				
-
-				var summary_results_equity = []
-
-					$.each(json.df_result_equity, function(key, data) {
-							summary_results_equity += "<tr>";
-							summary_results_equity += "<td>" + key + "</td>";
-							$.each(data, function(index, data) {
-								summary_results_equity += "<td>" + formatAsPercent(data) + "</td>";
-							});
-							summary_results_equity += "</tr>";
-						
-					});
-				$("#summary_equity").html(summary_results_equity);
-
-
-
-				var summary_audit = []
-
-					$.each(json.df_audit, function(key, data) {
-							summary_audit += "<tr>";
-							summary_audit += "<td>" + key + "</td>";
-							$.each(data, function(index, data) {
-								summary_audit += "<td>" + data + "</td>";
-							});
-							summary_audit += "</tr>";
-						
-					});
-				$("#summary_audit").html(summary_audit);
-
+				$('tr').click(function () {
+					//Check to see if background color is set or if it's set to white.
+					if(this.style.background == "" || this.style.background =="white") {
+						$(this).css('background', '#e7f1ff');
+					}
+					else {
+						$(this).css('background', 'white');
+					}
+				});
 
 				myChart.data.labels = Object.values(json.df.arr_date_end_period);
 				myChart.data.datasets[0].data = Object.values(json.df.arr_prod);
