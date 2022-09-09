@@ -119,6 +119,10 @@ def project_view(request,id):
 
 			""" Construction costs inputs """
 
+
+			inp_dev_fee = int(request.POST['devfee_choice'])
+
+
 			arr_construction_costs = np.array([
 			float(request.POST['costs_m1']),
 			float(request.POST['costs_m2']),
@@ -305,6 +309,7 @@ def project_view(request,id):
 			first_day_construction_start = first_day_month(start_period)
 			last_day_construction_end = end_date_period(end_construction)
 
+
 			first_day_operations_start = first_day_month(date_COD)
 			first_day_operations_start_plus_six = first_day_next_month(date_COD,inp_periodicity)
 
@@ -344,6 +349,7 @@ def project_view(request,id):
 
 			df['arr_flag_operations'] = (arr_date_end_period>pd.to_datetime(date_COD)).astype(int)
 			df['arr_flag_construction'] = 1-df['arr_flag_operations']
+			df['arr_flag_construction_last_month'] = (arr_date_end_period==pd.to_datetime(end_construction)).astype(int)
 			df['arr_flag_contract'] = array_flag(arr_date_end_contract_period,inp_contract_start,arr_date_start_contract_period,inp_contract_end)
 			df['arr_flag_contract_index'] = array_flag(arr_date_end_contract_index,date_contract_index_start,arr_date_start_contract_index,inp_contract_end)
 			df['arr_flag_elec_index'] = array_flag(arr_date_end_elec_index,date_price_elec_index_start,arr_date_start_elec_index,date_operations_end)
@@ -384,7 +390,7 @@ def project_view(request,id):
 
 			df['arr_fp_uses_construction_costs'] = np.hstack([arr_construction_costs,np.zeros(df['arr_flag_operations'].size-arr_construction_costs.size)])*df['arr_flag_construction']
 			df['arr_construction_costs_cumul'] = df['arr_fp_uses_construction_costs'].cumsum()
-			total_construction_costs = max(df['arr_construction_costs_cumul'])
+			construction_costs = max(df['arr_construction_costs_cumul'])
 
 			""" Indexation """
 
@@ -411,11 +417,12 @@ def project_view(request,id):
 
 			debt_amount = 1000
 			debt_amount_target = 2000
+			optimised_devfee = 0
 			df['arr_debt_repayment'] = np.full(number_columns+1, -100)
 			df['arr_sizing_debt_repayment_target'] = np.full(number_columns+1, -200)
 			df['arr_re_distributable_profits'] = np.full(number_columns+1, 0) 
 			df['arr_distr_cash_distributable'] = np.full(number_columns+1, 0) 
-
+			df['arr_fp_uses_devfee']= np.full(number_columns+1, 0) 
 
 			df['arr_sculpting_test'] = df['arr_sizing_debt_repayment_target']+df['arr_debt_repayment']
 			df['arr_fp_uses_total'] = df['arr_fp_uses_construction_costs']
@@ -443,7 +450,7 @@ def project_view(request,id):
 				df['arr_capitalised_costs_cumul'] = df['arr_sizing_debt_interest_construction'].cumsum()
 				debt_capitalised_interest = max(df['arr_capitalised_costs_cumul'])
 
-				df['arr_is_depreciation'] = -(total_construction_costs+debt_capitalised_interest)*df['arr_time_years_in_period_operations']/inp_life
+				df['arr_is_depreciation'] = -(construction_costs+debt_capitalised_interest+optimised_devfee)*df['arr_time_years_in_period_operations']/inp_life
 
 				""" EBITDA """
 
@@ -453,7 +460,7 @@ def project_view(request,id):
 
 
 				df['arr_fp_uses_idc'] = df['arr_debt_interest']*df['arr_flag_construction']
-				df['arr_fp_uses_total'] = df['arr_fp_uses_construction_costs']+df['arr_fp_uses_idc']
+				df['arr_fp_uses_total'] = df['arr_fp_uses_construction_costs']+df['arr_fp_uses_idc']+df['arr_fp_uses_devfee']
 
 				df['arr_is_interest'] = -df['arr_sizing_debt_interest_operations']
 
@@ -468,8 +475,9 @@ def project_view(request,id):
 				df['arr_cf_op_cf'] = df['arr_cf_op_EBITDA']+df['arr_cf_op_corporate_tax']
 
 				df['arr_cf_inv_construction_costs'] = -df['arr_fp_uses_construction_costs']
+				df['arr_cf_inv_development_fee'] = -df['arr_fp_uses_devfee']
 				df['arr_cf_inv_idc'] = -df['arr_fp_uses_idc'] 
-				df['arr_cf_inv_cf'] = df['arr_cf_inv_construction_costs']+df['arr_cf_inv_idc']
+				df['arr_cf_inv_cf'] = df['arr_cf_inv_construction_costs']+df['arr_cf_inv_idc']+df['arr_cf_inv_development_fee']
 
 				df['arr_cf_fin_debt_drawn'] = df['arr_debt_drawn']
 				df['arr_cf_fin_equity_drawn'] = df['arr_equity_drawn']
@@ -488,9 +496,27 @@ def project_view(request,id):
 				df['arr_sizing_debt_period_discount_factor'] = (1/(1+(df['arr_sizing_debt_avg_interest']*df['arr_time_days_in_period']/360)))*df['arr_flag_debt_amortisation']+df['arr_flag_construction']
 				df['arr_sizing_debt_period_discount_factor_cumul'] = df['arr_sizing_debt_period_discount_factor'].cumprod()
 
+				idc = sum(df['arr_fp_uses_idc'])
+
+
 				debt_amount_DSCR = npv(df['arr_sizing_target_DS_sizing'],df['arr_sizing_debt_period_discount_factor_cumul'])
+				
+				total_construction_costs_wo_devfee = construction_costs+idc
+
+				if inp_dev_fee == 1:
+					optimised_devfee = max(debt_amount_DSCR/inp_debt_gearing_max-total_construction_costs_wo_devfee,0)
+				else:
+					optimised_devfee = 0
+
+				total_construction_costs = construction_costs+idc+optimised_devfee
+
 				debt_amount_gearing = total_construction_costs*inp_debt_gearing_max
 				debt_amount_target = min(debt_amount_DSCR,debt_amount_gearing)
+
+
+				df['arr_fp_uses_devfee'] = optimised_devfee * df['arr_flag_construction_last_month']
+				df['arr_development_fee_cumul'] = df['arr_fp_uses_devfee'].cumsum()
+
 
 				""" Debt sculpting """
 
@@ -502,25 +528,27 @@ def project_view(request,id):
 
 
 				""" Dividends """
-				for i in range(10):
-					df['arr_distr_dividend'] = df['arr_distr_cash_distributable'].where(df['arr_distr_cash_distributable'] < df['arr_re_distributable_profits'], df['arr_re_distributable_profits'])
+			
+			for i in range(200):
 
-					df['arr_distr_transfer'] = df['arr_cf_CFADS']+df['arr_cf_CFADS_debt_interest']+df['arr_cf_CFADS_debt_repayemnt']
-					df['arr_distr_EoP'] = df['arr_distr_transfer'].cumsum()-df['arr_distr_dividend'].cumsum()
-					df['arr_distr_BoP'] = df['arr_distr_EoP']+df['arr_distr_dividend']-df['arr_distr_transfer']
-					df['arr_distr_cash_distributable'] = df['arr_distr_BoP'] + df['arr_distr_transfer']
-					
-									
-					df['arr_re_EoP'] = df['arr_is_net_income'].cumsum()-df['arr_distr_dividend'].cumsum()
-					df['arr_re_BoP'] = df['arr_re_EoP']+df['arr_distr_dividend']-df['arr_is_net_income']
-					df['arr_re_distributable_profits'] = (df['arr_re_BoP']+df['arr_is_net_income']).clip(lower=0)
+				df['arr_distr_dividend'] = df['arr_distr_cash_distributable'].where(df['arr_distr_cash_distributable'] < df['arr_re_distributable_profits'], df['arr_re_distributable_profits'])
+
+				df['arr_distr_transfer'] = df['arr_cf_CFADS']+df['arr_cf_CFADS_debt_interest']+df['arr_cf_CFADS_debt_repayemnt']
+				df['arr_distr_EoP'] = df['arr_distr_transfer'].cumsum()-df['arr_distr_dividend'].cumsum()
+				df['arr_distr_BoP'] = df['arr_distr_EoP']+df['arr_distr_dividend']-df['arr_distr_transfer']
+				df['arr_distr_cash_distributable'] = df['arr_distr_BoP'] + df['arr_distr_transfer']
+				
+								
+				df['arr_re_EoP'] = df['arr_is_net_income'].cumsum()-df['arr_distr_dividend'].cumsum()
+				df['arr_re_BoP'] = df['arr_re_EoP']+df['arr_distr_dividend']-df['arr_is_net_income']
+				df['arr_re_distributable_profits'] = (df['arr_re_BoP']+df['arr_is_net_income']).clip(lower=0)
 
 			""" Balance sheet """
 
 			df['arr_re_net_income'] = df['arr_is_net_income']
 			df['arr_re_div_declared'] = df['arr_distr_dividend']
 
-			df['arr_bs_a_assets'] = df['arr_construction_costs_cumul']+df['arr_capitalised_costs_cumul']+df['arr_is_depreciation'].cumsum()
+			df['arr_bs_a_assets'] = df['arr_construction_costs_cumul']+df['arr_capitalised_costs_cumul']+df['arr_development_fee_cumul']+df['arr_is_depreciation'].cumsum()
 			df['arr_bs_a_dist_account'] = df['arr_distr_EoP']
 
 			df['arr_bs_a_total'] = df['arr_bs_a_assets']+df['arr_bs_a_dist_account']
@@ -547,6 +575,7 @@ def project_view(request,id):
 			check_financing_plan_balanced = abs(sum(df['arr_audit_fp_balanced']))<0.001
 	
 			""" Financing plan """
+			equity_drawn = sum(df['arr_fp_sources_equity'])
 
 
 			if debt_amount_DSCR>debt_amount_gearing:
@@ -558,15 +587,15 @@ def project_view(request,id):
 			DSCR_avg = df['arr_ratios_DSCR'].where(df['arr_flag_debt_amortisation']==1).mean()
 
 
-			equity_drawn = sum(df['arr_fp_sources_equity'])
-			idc = sum(df['arr_fp_uses_idc'])
 
-			fp_uses = total_construction_costs+idc
+
+			fp_uses = total_construction_costs
 			fp_sources = equity_drawn+debt_amount
 
 			df_result_fp_uses = pd.DataFrame({
-				"Construction costs":["{:.1f}".format(total_construction_costs)],
-				"Interest during construction":["{:.1f}".format(idc)],
+				"Construction costs":["{:.1f}".format(construction_costs)],
+				"Development fee":["{:.1f}".format(optimised_devfee)],
+				"Interests during construction":["{:.1f}".format(idc)],
 				"Total":["{:.1f}".format(fp_uses)],
 				})
 
@@ -590,8 +619,8 @@ def project_view(request,id):
 				})
 
 			df_audit = pd.DataFrame({
-				"Balance sheet balanced":[check_balance_sheet_balanced],
-				"Financing plan balanced":[check_financing_plan_balanced],
+				"Balance sheet check":[check_balance_sheet_balanced],
+				"Financing plan check":[check_financing_plan_balanced],
 
 				})
 			
@@ -610,6 +639,9 @@ def project_view(request,id):
 
 				"df":df.to_dict(),
 				"df_sum":df_sum.to_dict(),
+
+				"df1":df.to_json(),
+
 
 				"df_result":df_result.to_dict(),
 				"df_result_equity":df_result_equity.to_dict(),
@@ -650,7 +682,7 @@ def array_time(timeline,start,end):
 	return timeline_result
 
 def array_flag(timeline_end,start,timeline_start,end):	
-	flag_result = (timeline_end>pd.to_datetime(start))*(timeline_start<pd.to_datetime(end)).astype(int)
+	flag_result = (timeline_end>=pd.to_datetime(start))*(timeline_start<=pd.to_datetime(end)).astype(int)
 	return flag_result
 
 def array_days(arr_end_date,arr_start_date,flag):

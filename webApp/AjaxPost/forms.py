@@ -30,6 +30,13 @@ COUNTRY_CHOICES= [
 	('3', 'Spain'),
 	]
 
+
+DEV_FEE_CHOICES= [
+	('1', 'Yes'),
+	('2', 'No'),
+	]
+
+
 class ProjectForm(forms.ModelForm):
 
 	class Meta:
@@ -46,6 +53,8 @@ class ProjectForm(forms.ModelForm):
 		'opex_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 		'production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
 		'price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
+		'devfee_choice': forms.RadioSelect(choices=DEV_FEE_CHOICES),
+
 	}
 	 
 	def __init__(self, *args, **kwargs):
@@ -54,6 +63,7 @@ class ProjectForm(forms.ModelForm):
 		exclude_from_formatting = [self.fields['periodicity'],
 								   self.fields['production_choice'],
 								   self.fields['price_elec_choice'],
+								   self.fields['devfee_choice'],
 					
 						
 								  
@@ -127,8 +137,8 @@ class ProjectForm(forms.ModelForm):
 		costs_m11 = cleaned_data.get('costs_m11')
 		costs_m12 = cleaned_data.get('costs_m12')
 
-		months_construction = end_construction.month - start_construction.month + 1
-
+		months_construction = relativedelta(end_construction, start_construction).months
+		
 		if costs_m2>0 and 2>months_construction:
 			self.add_error('costs_m2','Construction costs out of construction period')
 

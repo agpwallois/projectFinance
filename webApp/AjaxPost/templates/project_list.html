@@ -21,13 +21,19 @@
             </nav>
 
         <table class="table table-sm table-hover">
-            <thead class="table-light">
+            <thead>
                 <th>Project</th>
+                <th>Sector</th>
+                <th>Country</th>
+
             </thead>
 
          {% for project in projects %}
             <tr>
             <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
+            <td><a href="{% url 'project_view' project.id %}">{{ project.technology }}</a></td>
+            <td><a href="{% url 'project_view' project.id %}">{{ project.country }}</a></td>
+
              {% endfor %} 
             </tr>
         </table> 

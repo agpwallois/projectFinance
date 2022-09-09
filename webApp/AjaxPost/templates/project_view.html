@@ -294,6 +294,44 @@
 					</h2>
 					<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
+
+					   <h5>Development Fee</h5>
+
+						<div class="row-inline-wrapper">
+							<div class="row-inline-two">
+								<h1>Optimise development fees to achieve target gearing</h1>
+							</div>
+
+							<div class="row-inline-two">
+								{{ project_form.devfee_choice }}
+
+							</div>
+
+						</div>
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
+									<h1>Percentage paid at FC</h1>
+								</div>
+
+								<div class="row-inline-two">
+									<h1>Percentage paid at COD</h1>
+								</div>
+
+							</div>
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-two">
+									{{ project_form.devfee_paid_FC }}
+								</div>
+
+								<div class="row-inline-two">
+									{{ project_form.devfee_paid_COD }}
+								</div>
+
+							</div>
+
 					   <h5>Monthly construction schedule</h5>
 
 								<div class="row-inline-wrapper">
@@ -1600,8 +1638,7 @@
 
 
 
-
-				$("#myTableAll").html(json);
+				$("#myTableAll").html();
 
 				for (var i = 0; i < 30; i++) {
 					$("#elecPriceLabel"+i).html(json.arr_years_electricity_prices[i]);
@@ -1684,8 +1721,11 @@
 			},
 
 			error: function(json){
+
+				obj = JSON.parse(json.responseJSON.error);
+
 				alert(json.responseJSON.error)
-    			console.log(json)
+    			console.log(obj)
 
 			}
 		});

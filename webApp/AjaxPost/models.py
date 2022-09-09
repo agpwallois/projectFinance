@@ -53,8 +53,8 @@ class Project(models.Model):
 	seasonality_m12 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.02)
 
 	costs_m1 = models.fields.IntegerField(default="1000")
-	costs_m2 = models.fields.IntegerField(default="1000")
-	costs_m3 = models.fields.IntegerField(default="1000")
+	costs_m2 = models.fields.IntegerField(default="0")
+	costs_m3 = models.fields.IntegerField(default="0")
 	costs_m4 = models.fields.IntegerField(default="0")
 	costs_m5 = models.fields.IntegerField(default="0")
 	costs_m6 = models.fields.IntegerField(default="0")
@@ -169,7 +169,7 @@ class Project(models.Model):
 	price_elec_high_y29 = models.fields.IntegerField(default="150")
 	price_elec_high_y30 = models.fields.IntegerField(default="150")
 
-	opex = models.fields.IntegerField()
+	opex = models.fields.IntegerField(default="100")
 	opex_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
 
@@ -189,3 +189,6 @@ class Project(models.Model):
 
 	corporate_income_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=30) 
 
+	devfee_choice = models.fields.IntegerField(default="1")
+	devfee_paid_FC = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	devfee_paid_COD = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)

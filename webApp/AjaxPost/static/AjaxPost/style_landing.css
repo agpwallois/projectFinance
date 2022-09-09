@@ -5,7 +5,7 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 body {
     font-family: 'Poppins', sans-serif;
-    background: #fff;
+    background: rgb(245, 247, 249);
 }
 
 p {
@@ -57,10 +57,30 @@ header {
 
 .table{
     font-size: 0.75rem;
+    text-align: center;
+    border-spacing: 1; 
+    border-collapse: collapse; 
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    width:100%;
+    font-size:14px;
+}
+
+thead {
+    background: #e7f1ff;
+    color: #0c63e4;
+    border-bottom:1px solid #e7f1ff;
+
 }
 
 td {
-    line-height: 8px;
+    line-height:15px;
+}
+
+th:nth-child(1) {  
+    text-align: left;
+
 }
 
 td:nth-child(1) {  
