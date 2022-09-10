@@ -23,8 +23,10 @@
         <table class="table table-sm table-hover">
             <thead>
                 <th>Project</th>
-                <th>Sector</th>
+                <th>Technology</th>
                 <th>Country</th>
+                <th>Created date</th>
+                <th>Updated date</th>
 
             </thead>
 
@@ -33,6 +35,8 @@
             <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
             <td><a href="{% url 'project_view' project.id %}">{{ project.technology }}</a></td>
             <td><a href="{% url 'project_view' project.id %}">{{ project.country }}</a></td>
+            <td><a href="{% url 'project_view' project.id %}">{{ project.created_date }}</a></td>
+            <td><a href="{% url 'project_view' project.id %}">{{ project.updated_date }}</a></td>
 
              {% endfor %} 
             </tr>

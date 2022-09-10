@@ -58,24 +58,25 @@ header {
 .table{
     font-size: 0.75rem;
     text-align: center;
-    border-spacing: 1; 
-    border-collapse: collapse; 
     background:white;
     border-radius:10px;
     overflow:hidden;
     width:100%;
-    font-size:14px;
+    font-size:12px;
+    color: rgb(92, 105, 117);
+    border-collapse: separate;
+    border: 1px solid rgb(211, 220, 228);
+    border-spacing: 0;
 }
 
 thead {
-    background: #e7f1ff;
-    color: #0c63e4;
-    border-bottom:1px solid #e7f1ff;
+    background: #00A896;
+    color: white;
 
 }
 
 td {
-    line-height:15px;
+    line-height:12px;
 }
 
 th:nth-child(1) {  
@@ -86,4 +87,5 @@ th:nth-child(1) {
 td:nth-child(1) {  
     text-align: left;
     font-weight: normal;
+    background-color: transparent;
 }

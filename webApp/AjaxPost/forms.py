@@ -1,6 +1,8 @@
 from django import forms
 from .models import Project
 from dateutil.relativedelta import relativedelta
+import math
+import datetime
 
 PERIODICITY_CHOICES= [
 	('3', 'Quarterly'),
@@ -137,7 +139,8 @@ class ProjectForm(forms.ModelForm):
 		costs_m11 = cleaned_data.get('costs_m11')
 		costs_m12 = cleaned_data.get('costs_m12')
 
-		months_construction = relativedelta(end_construction, start_construction).months
+		months_construction = (end_construction.year - start_construction.year) * 12 + (end_construction.month - start_construction.month) + 1
+
 		
 		if costs_m2>0 and 2>months_construction:
 			self.add_error('costs_m2','Construction costs out of construction period')

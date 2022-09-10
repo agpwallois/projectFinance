@@ -22,6 +22,10 @@ class Project(models.Model):
 		('Wind', 'Wind'),
 	)
 
+
+	created_date = models.DateTimeField(auto_now_add=True)
+	updated_date = models.DateTimeField(auto_now=True)
+	
 	name = models.fields.CharField(max_length=100)
 	country = models.fields.CharField(choices=COUNTRY_CHOICES,max_length=100,default="France")
 	technology = models.fields.CharField(choices=TECHNOLOGY_CHOICES,max_length=100,default="Solar")

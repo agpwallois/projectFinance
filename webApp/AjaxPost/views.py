@@ -526,7 +526,6 @@ def project_view(request,id):
 				"""df['arr_sizing_debt_repayment_target'] = (df['arr_sizing_target_DS_sizing']-df['arr_sizing_debt_interest_operations']).clip(lower=0)"""
 				df['arr_sculpting_test'] = df['arr_sizing_debt_repayment_target']+df['arr_debt_repayment']
 
-
 				""" Dividends """
 			
 			for i in range(200):
@@ -538,7 +537,6 @@ def project_view(request,id):
 				df['arr_distr_BoP'] = df['arr_distr_EoP']+df['arr_distr_dividend']-df['arr_distr_transfer']
 				df['arr_distr_cash_distributable'] = df['arr_distr_BoP'] + df['arr_distr_transfer']
 				
-								
 				df['arr_re_EoP'] = df['arr_is_net_income'].cumsum()-df['arr_distr_dividend'].cumsum()
 				df['arr_re_BoP'] = df['arr_re_EoP']+df['arr_distr_dividend']-df['arr_is_net_income']
 				df['arr_re_distributable_profits'] = (df['arr_re_BoP']+df['arr_is_net_income']).clip(lower=0)
@@ -586,9 +584,6 @@ def project_view(request,id):
 			gearing_eff = (debt_amount/total_construction_costs)
 			DSCR_avg = df['arr_ratios_DSCR'].where(df['arr_flag_debt_amortisation']==1).mean()
 
-
-
-
 			fp_uses = total_construction_costs
 			fp_sources = equity_drawn+debt_amount
 
@@ -605,11 +600,7 @@ def project_view(request,id):
 				"Total":["{:.1f}".format(fp_sources)],
 				})
 
-			df['test'] = pd.to_datetime(arr_date_end_period).dt.date
-			dates = df['test']
-			values = df['arr_sponsors_cash_flows']
-
-			irr = xirr(dates,values)
+			irr = xirr(pd.to_datetime(arr_date_end_period).dt.date,df['arr_sponsors_cash_flows'])
 
 			df_result = pd.DataFrame({
 				"Debt amount":["{:.1f}".format(debt_amount)],
