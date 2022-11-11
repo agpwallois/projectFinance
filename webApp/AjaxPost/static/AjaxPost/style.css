@@ -5,15 +5,15 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 body {
     font-family: 'Poppins', sans-serif;
-    background: #fff;
+    color: rgb(51, 51, 51);
+    font-size: 0.75rem;
+}
+
+header{
+    font-size: 1rem;
 }
 
 p {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.1em;
-    font-weight: 300;
-    line-height: 1.7em;
-    color: rgb(59, 69, 78);
 }
 
 a,
@@ -24,23 +24,29 @@ a:focus {
     transition: all 0.3s;
 }
 
+
+
+
+h1 {
+    font-size: 1.5rem;
+}
+
+h2 {
+    font-size: 0.9rem;
+    color: #0d6efd;
+}
+
+h3 {
+    font-size: 0.9rem;
+}
+
 .navbar {
     padding: 15px 0px;
 }
 
-.navbar-btn {
-
-}
 
 
-h1 {
-    font-size: 0.75rem;
-}
 
-h2 {
-    font-size: 1rem;
-    color: #0d6efd;
-}
 
 
 /* ---------------------------------------------------
@@ -48,7 +54,7 @@ h2 {
 ----------------------------------------------------- */
 
 header { 
-    border-bottom: 1px solid rgb(211, 220, 228);
+    border-bottom: 1px solid rgb(221, 221, 221);
     width: 100%;
     background-color: white; 
     padding: 10px;
@@ -71,20 +77,18 @@ header {
 
 #sidebar {
     width: 400px;
-    border-right: 1px solid rgb(211, 220, 228);
+    border-right: 1px solid rgb(221, 221, 221);
     position: fixed;
     left: 0;
     top: 40px;
     height: 100vh;
     z-index: 1;
-    background: rgb(245, 247, 249);
-    color: rgb(92, 105, 117);
+    background: rgb(242, 242, 242);
     transition: all 0.3s;
-    font-size: 0.75rem;
     padding-bottom: 40px;
-    padding-left: 10px;
+    padding-left: 15px;
     padding-top: 10px;
-    padding-right: 10px;
+    padding-right: 15px;
 }
 
 #sidebar.active {
@@ -92,19 +96,16 @@ header {
 }
 
 #accordionSidebar {
-    padding: 5px;
+    margin-top: 10px;
 }
 
 .accordion-button {
   padding: 5px;
-  background: rgb(245, 247, 249);
+  background: rgb(242, 242, 242);
   color: rgb(92, 105, 117);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
-#btn-wrapper{
-  background-color: red;
-}
 
 /* ---------------------------------------------------
     CONTENT STYLE
@@ -116,10 +117,47 @@ header {
     min-height: 100vh;
     transition: all 0.3s;
     position: absolute;
-    top: 0;
     right: 0;
     color: rgb(59, 69, 78);
+    background: rgb(242, 242, 242);
 }
+
+#content-nav{
+    margin-top: 5px;
+    margin-bottom: 10px;
+    background: rgb(242, 242, 242);
+
+    }
+
+.box{
+    background: white;
+    padding: 10px;
+    box-shadow: 0 0 10px #ccc;
+    margin-top: 10px;
+
+}
+
+
+.button {
+  align-items: center;
+  background-color: #0d6efd;
+  border: 0;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.75rem;
+  justify-content: center;
+  min-height: 30px;
+  overflow: hidden;
+  padding: 0px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+
+
 
 #content.active {
     width: 100%;
@@ -131,23 +169,13 @@ header {
 
 
 td {
-    line-height: 0px;
+    line-height: 0px;F
     text-align: center;
     min-width: 10em;
     max-width: 10em;
 }
 
-td:nth-child(1) {  
-    text-align: left;
-    font-weight: bold;
-    min-width: 20em;
-    max-width: 20em;
-    position: -webkit-sticky; /* for Safari */
-    position: sticky;
-    left: 0px;
-    align-self: flex-start; /* <-- this is the fix */
-    background-color: white;
-}
+
 
 /* ---------------------------------------------------
     MEDIAQUERIES
@@ -201,6 +229,7 @@ td:nth-child(1) {
 
 .row-inline-wrapper{
     display: flex;
+
     }
 
 .row-inline-two{
@@ -222,13 +251,26 @@ td:nth-child(1) {
     background-clip: padding-box;
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     }
 
-.form:focus {
+.form:focus,.form:active {
     color: #495057;
     background-color: #fff;
     border-color: #80bdff;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
 }
+
+
+.nav-tabs .nav-item .nav-link {
+    background: rgb(242, 242, 242);
+    color: rgb(51, 51, 51);
+    font-size: 0.9rem;
+
+}
+
+.nav-tabs .nav-item .nav-link.active {
+    color: #0d6efd;
+    border-bottom: 3px solid;
+
+}
+
+

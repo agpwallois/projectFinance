@@ -1,36 +1,36 @@
 {% extends "base.html" %}
 
+
+
 {% block sidebar %}
 
 <nav id="sidebar">
-	<div class="sidebar"><h3>{{ project.name }}</h3>
+	<div class="sidebar"><h1>{{ project.name }}</h1>
 
 		<form method="POST" id="post-form">{% csrf_token %}
 			<div class="fieldWrapper" id="the_post">
 
 				<div  class="btn-wrapper">
-				<div class="d-flex justify-content-end">
-				<input type="submit" value="Submit" class="btn btn-primary btn-lg" id="btn-form">
-				</div>
+				<input type="submit" value="Run" class="button" id="btn-form">
 				</div>
 
 				<div class="accordion" id="accordionSidebar">
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingOne">
-					  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
 						Timing
 					  </button>
 					</h2>
-					<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+					<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 						
 					  <div class="row-inline-wrapper">
 										<div class="row-inline-two">
-											<h1>Start of construction</h1>
+											<p>Construction start</p>
 										</div>
 
 										<div class="row-inline-two">
-											<h1>End of construction</h1>
+											<p>Construction end</p>
 										</div>
 
 									</div>
@@ -48,7 +48,7 @@
 
 									<div class="row-inline-wrapper">
 										<div class="row-inline-two">
-											<h1>Commissioning Date</h1>
+											<p>Commissioning Date</p>
 										</div>
 
 										<div class="row-inline-two">
@@ -59,7 +59,7 @@
 
 									<div class="row-inline-wrapper">
 										<div class="row-inline-two">
-											<h1>Operating life (years)</h1>
+											<p>Operating life (years)</p>
 										</div>
 
 										<div class="row-inline-two">
@@ -71,7 +71,7 @@
 
 									<div class="row-inline-wrapper">
 										<div class="row-inline-two">
-											<h1>Retirement</h1>
+											<p>Retirement</p>
 										</div>
 
 										<div class="row-inline-two">
@@ -89,20 +89,20 @@
 				  </div>
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingTwo">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
 						Capacity and Production
 					  </button>
 					</h2>
 					<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-						<h5>Capacity and production Production</h5>
+						<h3>Capacity and production Production</h3>
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Installed capacity (kWp)</h1>
+											<p>Installed capacity (kWp)</p>
 									</div>
 									<div class="row-inline-two">
-											<h1>Annual degradation (%)</h1>
+											<p>Annual degradation (%)</p>
 									</div>
 								</div>
 
@@ -117,7 +117,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>P50 (kWp/kWh)</h1>
+											<p>P50 (kWp/kWh)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.p50 }}
@@ -126,7 +126,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>p90_10y (kWp/kWh)</h1>
+											<p>p90_10y (kWp/kWh)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.p90_10y }}
@@ -135,7 +135,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>P99_10y (kWp/kWh)</h1>
+											<p>P99_10y (kWp/kWh)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.P99_10y }}
@@ -145,7 +145,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-										<h1>Production selected</h1>
+										<p>Production selected</p>
 									</div>
 
 									<div class="row-inline-two">
@@ -157,18 +157,18 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Availability (%)</h1>
+											<p>Availability (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.availability }}
 									</div>
 								</div>	
 
-								<h5>Seasonality</h5>
+								<h3>Seasonality</h3>
 										
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Sum (%)</h1>
+											<p>Sum (%)</p>
 									</div>
 									<div class="row-inline-two">
 											<div id="sumSeasonality"></div>
@@ -178,7 +178,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>January (%)</h1>
+											<p>January (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m1 }}
@@ -187,7 +187,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>February (%)</h1>
+											<p>February (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m2 }}
@@ -196,7 +196,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>March (%)</h1>
+											<p>March (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m3 }}
@@ -205,7 +205,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>April (%)</h1>
+											<p>April (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m4 }}
@@ -213,7 +213,7 @@
 								</div>
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>May (%)</h1>
+											<p>May (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m5 }}
@@ -222,7 +222,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>June (%)</h1>
+											<p>June (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m6 }}
@@ -231,7 +231,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>July (%)</h1>
+											<p>July (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m7 }}
@@ -240,7 +240,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>August (%)</h1>
+											<p>August (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m8 }}
@@ -249,7 +249,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>September (%)</h1>
+											<p>September (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m9 }}
@@ -258,7 +258,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>October (%)</h1>
+											<p>October (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m10 }}
@@ -267,7 +267,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>November (%)</h1>
+											<p>November (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m11 }}
@@ -276,7 +276,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>December (%)</h1>
+											<p>December (%)</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.seasonality_m12 }}
@@ -288,18 +288,18 @@
 				  </div>
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingThree">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
 						Construction costs
 					  </button>
 					</h2>
 					<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
-					   <h5>Development Fee</h5>
+					   <h3>Development Fee</h3>
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-								<h1>Optimise development fees to achieve target gearing</h1>
+								<p>Optimise development fees to achieve target gearing</p>
 							</div>
 
 							<div class="row-inline-two">
@@ -312,11 +312,11 @@
 
 							<div class="row-inline-wrapper">
 								<div class="row-inline-two">
-									<h1>Percentage paid at FC</h1>
+									<p>Percentage paid at FC</p>
 								</div>
 
 								<div class="row-inline-two">
-									<h1>Percentage paid at COD</h1>
+									<p>Percentage paid at COD</p>
 								</div>
 
 							</div>
@@ -332,11 +332,11 @@
 
 							</div>
 
-					   <h5>Monthly construction schedule</h5>
+					   <h3>Monthly construction schedule</h3>
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Sum (kEUR)</h1>
+											<p>Sum (kEUR)</p>
 									</div>
 									<div class="row-inline-two">
 											<div id="sumConstructionCosts"></div>
@@ -345,7 +345,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 1</h1>
+											<p>Month 1</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m1 }}
@@ -355,7 +355,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 2</h1>
+											<p>Month 2</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m2 }}
@@ -364,7 +364,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 3</h1>
+											<p>Month 3</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m3 }}
@@ -373,7 +373,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 4</h1>
+											<p>Month 4</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m4 }}
@@ -381,7 +381,7 @@
 								</div>
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 5</h1>
+											<p>Month 5</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m5 }}
@@ -390,7 +390,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 6</h1>
+											<p>Month 6</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m6 }}
@@ -399,7 +399,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 7</h1>
+											<p>Month 7</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m7 }}
@@ -408,7 +408,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 8</h1>
+											<p>Month 8</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m8 }}
@@ -417,7 +417,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 9</h1>
+											<p>Month 9</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m9 }}
@@ -426,7 +426,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 10</h1>
+											<p>Month 10</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m10 }}
@@ -435,7 +435,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 11</h1>
+											<p>Month 11</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m11 }}
@@ -444,7 +444,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-											<h1>Month 12</h1>
+											<p>Month 12</p>
 									</div>
 									<div class="row-inline-two">
 											{{ project_form.costs_m12 }}
@@ -456,21 +456,21 @@
 				  
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingFour">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
 						Offtake and Market prices
 					  </button>
 					</h2>
 					<div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-					<h5>Offtake contract</h5>
+					<h3>Offtake contract</h3>
 
 							<div class="row-inline-wrapper">
 								<div class="row-inline-two">
-									<h1>Start of contract</h1>
+									<p>Start of contract</p>
 								</div>
 
 								<div class="row-inline-two">
-									<h1>End of contract</h1>
+									<p>End of contract</p>
 								</div>
 
 							</div>
@@ -488,22 +488,22 @@
 
 							<div class="row-inline-wrapper">
 								<div class="row-inline-two">
-									<h1>Contract start price</h1>
+									<p>Contract start price</p>
 								</div>
 
 								<div class="row-inline-two">
-									<h1>{{ project_form.contract_price }}</h1>
+									<p>{{ project_form.contract_price }}</p>
 								</div>
 
 							</div>
 							
 							<div class="row-inline-wrapper">
 								<div class="row-inline-two">
-									<h1>Contract indexation base date</h1>
+									<p>Contract indexation base date</p>
 								</div>
 
 								<div class="row-inline-two">
-									<h1>Contract indexation p.a. (%)</h1>
+									<p>Contract indexation p.a. (%)</p>
 								</div>
 
 							</div>
@@ -518,16 +518,16 @@
 								</div>
 
 							</div>
-									<h5>Electricity market price</h5>
+									<h3>Electricity market price</h3>
 
 								
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-										<h1>Electricity price indexation base date</h1>
+										<p>Electricity price indexation base date</p>
 									</div>
 
 									<div class="row-inline-two">
-										<h1>Electricity prices indexation rate (%)</h1>
+										<p>Electricity prices indexation rate (%)</p>
 									</div>
 
 								</div>
@@ -545,7 +545,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-two">
-										<h1>Electricity prices selected</h1>
+										<p>Electricity prices selected</p>
 									</div>
 
 									<div class="row-inline-two">
@@ -557,18 +557,18 @@
 								<div class="row-inline-wrapper">
 
 									<div class="row-inline-four">
-											<h1>Year</h1>
+											<p>Year</p>
 									</div>
 									<div class="row-inline-four">
-											<h1>Low</h1>
-									</div>
-
-									<div class="row-inline-four">
-											<h1>Medium</h1>
+											<p>Low</p>
 									</div>
 
 									<div class="row-inline-four">
-											<h1>High</h1>
+											<p>Medium</p>
+									</div>
+
+									<div class="row-inline-four">
+											<p>High</p>
 									</div>
 								</div>
 
@@ -1054,7 +1054,7 @@
 				  </div>
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingFive">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
 						Operating costs
 					  </button>
 					</h2>
@@ -1062,11 +1062,11 @@
 					  <div class="accordion-body">
 					   <div class="row-inline-wrapper">
 								<div class="row-inline-two">
-									<h1>Operating costs indexation base date</h1>
+									<p>Operating costs indexation base date</p>
 								</div>
 
 								<div class="row-inline-two">
-									<h1>Operating costs indexation p.a. (%)</h1>
+									<p>Operating costs indexation p.a. (%)</p>
 								</div>
 
 							</div>
@@ -1084,11 +1084,11 @@
 
 							<div class="row-inline-wrapper">
 								<div class="row-inline-two">
-									<h1>Operating costs p.a.</h1>
+									<p>Operating costs p.a.</p>
 								</div>
 
 								<div class="row-inline-two">
-									<h1>{{ project_form.opex }}</h1>
+									<p>{{ project_form.opex }}</p>
 								</div>
 
 							</div>
@@ -1097,7 +1097,7 @@
 				  </div>
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingSix">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
 						HMR
 					  </button>
 					</h2>
@@ -1110,17 +1110,17 @@
 
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingSeven">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
 						Senior Debt
 					  </button>
 					</h2>
 					<div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-							<h5>Timing</h5>
+							<h3>Timing</h3>
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-								<h1>Periodicity</h1>
+								<p>Periodicity</p>
 							</div>
 
 							<div class="row-inline-two">
@@ -1132,7 +1132,7 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Door to door tenor</h1>
+									<p>Door to door tenor</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_tenor }}
@@ -1140,7 +1140,7 @@
 						</div>
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-								<h1>Maturity</h1>
+								<p>Maturity</p>
 							</div>
 
 							<div class="row-inline-two">
@@ -1149,10 +1149,10 @@
 
 						</div>
 
-							<h5>Pricing</h5>
+							<h3>Pricing</h3>
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Upfront fee</h1>
+									<p>Upfront fee</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_upfront_fee }}
@@ -1161,7 +1161,7 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Commitment fee</h1>
+									<p>Commitment fee</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_commitment_fee }}
@@ -1170,7 +1170,7 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Credit margin</h1>
+									<p>Credit margin</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_margin }}
@@ -1179,7 +1179,7 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Swap rate</h1>
+									<p>Swap rate</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_swap_rate }}
@@ -1188,7 +1188,7 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Reference rate buffer</h1>
+									<p>Reference rate buffer</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_reference_rate_buffer }}
@@ -1197,21 +1197,21 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Swap margin</h1>
+									<p>Swap margin</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_swap_margin }}
 							</div>
 						</div>
 
-							<h5>Sizing</h5>
+							<h3>Sizing</h3>
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Minimum DSCR</h1>
+									<p>Minimum DSCR</p>
 							</div>
 							<div class="row-inline-two">
-									<h1>Maximum gearing</h1>
+									<p>Maximum gearing</p>
 							</div>
 						</div>
 
@@ -1226,7 +1226,7 @@
 
 						<div class="row-inline-wrapper">
 							<div class="row-inline-two">
-									<h1>Negative tail</h1>
+									<p>Negative tail</p>
 							</div>
 							<div class="row-inline-two">
 								{{ project_form.debt_negative_tail }}
@@ -1238,7 +1238,7 @@
 				  </div>
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingEight">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
 						Tax
 					  </button>
 					</h2>
@@ -1246,7 +1246,7 @@
 					  <div class="accordion-body">
 							<div class="row-inline-wrapper">
 								<div class="row-inline-two">
-										<h1>Corporate income tax (%)</h1>
+										<p>Corporate income tax (%)</p>
 								</div>
 								<div class="row-inline-two">
 									{{ project_form.corporate_income_tax }}
@@ -1258,7 +1258,7 @@
 
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingNine">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
 						Accounting
 					  </button>
 					</h2>
@@ -1271,7 +1271,7 @@
 
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingTen">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
 						Equity
 					  </button>
 					</h2>
@@ -1285,7 +1285,7 @@
 
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingEleven">
-					  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
 						Macro
 					  </button>
 					</h2>
@@ -1312,190 +1312,205 @@
 {% block content %}
 
 <div id="content">
-	<nav class="navbar navbar-expand-lg">
-		<div class="container-fluid">
-			<button type="button" id="sidebarCollapse" class="btn btn-primary btn-lg"><</button>
-		</div>
-	</nav>
+	<div id="content-nav">
 
-	<nav>
-		<ul class="nav nav-tabs">
-		  <li class="nav-item">
-			<a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Summary</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Calculation</a>
-		  </li>
-		</ul>
-	</nav>
+		<nav>
+			<div class="container-nav">
+				<button type="button" id="sidebarCollapse" class="button"><</button>
+			</div>
+		</nav>
 
-	<div class="tab-content">
-		<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
+	</div>
+
+	<div id="content-box">
+		<nav>
+			<ul class="nav nav-tabs">
+			  <li class="nav-item">
+				<a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Summary</a>
+			  </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Calculation</a>
+			  </li>
+			</ul>
+		</nav>
+
+		<div class="tab-content">
+			<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
 			
-			<h2>Summary</h2>
-			  <div class="summary-container">
+				<div class="box" id="nav-summary-summary">
+				<h2>Summary</h2>
+				  <div class="summary-container">
 
-				<div class="summary">
-					<table class="table">
-						<tbody id="summary_debt"></tbody>
-					</table>
+						<div class="summary">
+							<table class="table">
+								<tbody id="summary_debt"></tbody>
+							</table>
+						</div>
+						<div class="summary">
+							<table class="table">
+								<tbody id="summary_equity"></tbody>
+							</table>  				
+						</div> 				
+						</div> 	
+
+					<h2>Financing plan</h2>
+						<div class="summary-container">
+
+							<div class="summary">
+								<table class="table">
+									<tbody id="summary_financing_plan_uses"></tbody>
+								</table>
+							</div>
+
+							<div class="summary">
+								<table class="table">
+									<tbody id="summary_financing_plan_sources"></tbody>
+								</table>
+							</div>
+						</div>
+					
+					<h2>Audit</h2>
+
+						<div class="summary">
+							<table class="table">
+								<tbody id="summary_audit"></tbody>
+							</table>
+						</div>
 				</div>
-				<div class="summary">
-					<table class="table">
-						<tbody id="summary_equity"></tbody>
-					</table>  				
-				</div> 				
-				</div> 	
 
-			<h2>Financing plan</h2>
-				<div class="summary-container">
-
-					<div class="summary">
-						<table class="table">
-							<tbody id="summary_financing_plan_uses"></tbody>
-						</table>
-					</div>
-
-					<div class="summary">
-						<table class="table">
-							<tbody id="summary_financing_plan_sources"></tbody>
-						</table>
-					</div>
-				</div>
-			
-			<h2>Audit</h2>
-
-				<div class="summary">
-					<table class="table">
-						<tbody id="summary_audit"></tbody>
-					</table>
+				<div class="box" id="nav-summary-charts">
+					<h2>Charts</h2>
+					{% block jquery %}{% include 'charts.html' %}{% endblock %}
 				</div>
 
-			<h2>Charts</h2>
-			{% block jquery %}{% include 'charts.html' %}{% endblock %}
+			</div>
 
-		</div>
-
-		<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
-			<h2>Timeline</h2>
-
-				<table class="table">
-					<tbody id="myTableDate"></tbody>
-				</table>
-
-				<table class="table">
-					<tbody id="myTableFlag"></tbody>
-				</table>
-
-				<table class="table">
-					<tbody id="myTableTime"></tbody>
-				</table>
-
-			<h2>Indexation</h2>
-				<table class="table">
-					<tbody id="myTableIndex"></tbody>
-				</table>
-
-			<h2>Production</h2>
-				<p>Production</p>
-
-
-				<table class="table">
-					<tbody id="myTableProd"></tbody>
-				</table>
-
-				<p>Prices</p>
-
-				<table class="table">
-					<tbody id="myTablePrice"></tbody>
-				</table>
-
-
-
-			<h2>Income statement</h2>
-				<table class="table">
-					<tbody id="myTableIS"></tbody>
-				</table>
-
-
-			<h2>Operating account</h2>
-				<p>Cash flow from operating activities</p>
-
-				<table class="table">
-					<tbody id="myTableCFoperating"></tbody>
-				</table>
-
-				<p>Cash flow from investing activities</p>
-			
-				<table class="table">
-					<tbody id="myTableCFinvesting"></tbody>
-				</table>
-
-				<p>Cash flow from financing activities</p>
-
-				<table class="table">
-					<tbody id="myTableCFfinancing"></tbody>
-				</table>
+			<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
 				
-				<p>Cash available for senior debt service</p>
+				<div class="box">
 
-				<table class="table">
-					<tbody id="myTableCFADS"></tbody>
-				</table>
+				<h2>Timeline</h2>
 
-
-			<h2>Distribution account</h2>
-
-				<table class="table">
-					<tbody id="myTableRE"></tbody>
-				</table> 			
-
-
-			<table class="table">
-					<tbody id="DistrAccount"></tbody>
-			</table>
-
-			<h2>Financing plan</h2>
-				<p>Uses</p>
 					<table class="table">
-						<tbody id="myTableFPUses"></tbody>
+						<tbody id="myTableDate"></tbody>
 					</table>
 
-				<p>Sources</p>
-				<table class="table">
-					<tbody id="myTableFPSources"></tbody>
-				</table>
-
-
-			<h2>Senior debt</h2>
-			<table class="table">
-				<tbody id="myTableSeniorDebt"></tbody>
-			</table>
-
-			<h2>Sizing and sculpting</h2>
-			<table class="table">
-				<tbody id="myTableSizing"></tbody>
-			</table>
-
-			<h2>Balance sheet</h2>
-				<p>Assets</p>
 					<table class="table">
-						<tbody id="myTableBSA"></tbody>
+						<tbody id="myTableFlag"></tbody>
 					</table>
 
-				<p>Liabilities</p>
 					<table class="table">
-						<tbody id="myTableBSL"></tbody>
+						<tbody id="myTableTime"></tbody>
 					</table>
 
-			<h2>Audit</h2>
+				<h2>Indexation</h2>
+					<table class="table">
+						<tbody id="myTableIndex"></tbody>
+					</table>
+
+				<h2>Production</h2>
+					<p>Production</p>
+
+
+					<table class="table">
+						<tbody id="myTableProd"></tbody>
+					</table>
+
+					<p>Prices</p>
+
+					<table class="table">
+						<tbody id="myTablePrice"></tbody>
+					</table>
+
+
+
+				<h2>Income statement</h2>
+					<table class="table">
+						<tbody id="myTableIS"></tbody>
+					</table>
+
+
+				<h2>Operating account</h2>
+					<p>Cash flow from operating activities</p>
+
+					<table class="table">
+						<tbody id="myTableCFoperating"></tbody>
+					</table>
+
+					<p>Cash flow from investing activities</p>
+				
+					<table class="table">
+						<tbody id="myTableCFinvesting"></tbody>
+					</table>
+
+					<p>Cash flow from financing activities</p>
+
+					<table class="table">
+						<tbody id="myTableCFfinancing"></tbody>
+					</table>
+					
+					<p>Cash available for senior debt service</p>
+
+					<table class="table">
+						<tbody id="myTableCFADS"></tbody>
+					</table>
+
+
+				<h2>Distribution account</h2>
+
+					<table class="table">
+						<tbody id="myTableRE"></tbody>
+					</table> 			
+
+
 				<table class="table">
-					<tbody id="myTableAudit"></tbody>
+						<tbody id="DistrAccount"></tbody>
 				</table>
 
-			<table class="table">
-					<tbody id="myTableAll"></tbody>
-			</table>
+				<h2>Financing plan</h2>
+					<p>Uses</p>
+						<table class="table">
+							<tbody id="myTableFPUses"></tbody>
+						</table>
+
+					<p>Sources</p>
+					<table class="table">
+						<tbody id="myTableFPSources"></tbody>
+					</table>
+
+
+				<h2>Senior debt</h2>
+				<table class="table">
+					<tbody id="myTableSeniorDebt"></tbody>
+				</table>
+
+				<h2>Sizing and sculpting</h2>
+				<table class="table">
+					<tbody id="myTableSizing"></tbody>
+				</table>
+
+				<h2>Balance sheet</h2>
+					<p>Assets</p>
+						<table class="table">
+							<tbody id="myTableBSA"></tbody>
+						</table>
+
+					<p>Liabilities</p>
+						<table class="table">
+							<tbody id="myTableBSL"></tbody>
+						</table>
+
+				<h2>Audit</h2>
+					<table class="table">
+						<tbody id="myTableAudit"></tbody>
+					</table>
+
+				<table class="table">
+						<tbody id="myTableAll"></tbody>
+				</table>
+
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

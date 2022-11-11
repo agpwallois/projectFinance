@@ -1,0 +1,10 @@
+td:nth-child(1) {  
+    text-align: left;
+    min-width: 20em;
+    max-width: 20em;
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    left: 0px;
+    align-self: flex-start; /* <-- this is the fix */
+    background-color: white;
+}

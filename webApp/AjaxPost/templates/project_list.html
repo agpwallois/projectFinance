@@ -10,37 +10,41 @@
         <!-- Page Content  -->
     <div id="content_landing">
 
-            <nav class="navbar navbar-expand-lg">
-                <div class="container-fluid">
 
-              <button type="button" class="btn btn-primary btn-lg">
-        <a href="{% url 'admin:index' %}">Manage projects</a>
-    </button>
 
-                </div>
-            </nav>
+        <div id="content-nav">
 
-        <table class="table table-sm table-hover">
-            <thead>
-                <th>Project</th>
-                <th>Technology</th>
-                <th>Country</th>
-                <th>Created date</th>
-                <th>Updated date</th>
+        <nav>
+            <div class="container-nav">
+              <button type="button" class="button">
+                <a href="{% url 'admin:index' %}">Manage projects</a>
+                </button>            </div>
+        </nav>
 
-            </thead>
+        </div>
 
-         {% for project in projects %}
-            <tr>
-            <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
-            <td><a href="{% url 'project_view' project.id %}">{{ project.technology }}</a></td>
-            <td><a href="{% url 'project_view' project.id %}">{{ project.country }}</a></td>
-            <td><a href="{% url 'project_view' project.id %}">{{ project.created_date }}</a></td>
-            <td><a href="{% url 'project_view' project.id %}">{{ project.updated_date }}</a></td>
 
-             {% endfor %} 
-            </tr>
-        </table> 
+            <table class="table table-sm table-hover">
+                <thead>
+                    <th>Project</th>
+                    <th>Technology</th>
+                    <th>Country</th>
+                    <th>Created date</th>
+                    <th>Updated date</th>
+
+                </thead>
+
+             {% for project in projects %}
+                <tr>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.technology }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.country }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.created_date }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.updated_date }}</a></td>
+
+                 {% endfor %} 
+                </tr>
+            </table> 
     </div>
 
     {% endblock %}
