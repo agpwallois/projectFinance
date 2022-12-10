@@ -20,8 +20,8 @@ import authentication.views
 
 urlpatterns = [
 	path('admin/', admin.site.urls, name='project-admin'),
-	path('', authentication.views.LoginPageView.as_view(), name='login'),
-	path('testrr/', AjaxPost.test, name='test'),
-	path('projects/', AjaxPost.ProjectView.as_view(), name='project-list'),
-	path('project_view/<int:id>/', AjaxPost.project_view, name='project_view'),
+	path('auth/', authentication.views.LoginPageView.as_view(), name='login'),
+	path('test/', AjaxPost.test, name='test'),
+	path('', AjaxPost.ProjectView.as_view(), name='project-list'),
+	path('projects/<int:id>/', AjaxPost.project_view, name='project_view'),
 	]
