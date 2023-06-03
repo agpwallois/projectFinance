@@ -25,3 +25,4 @@ urlpatterns = [
 	path('', AjaxPost.ProjectView.as_view(), name='project-list'),
 	path('projects/<int:id>/', AjaxPost.project_view, name='project_view'),
 	]
+

@@ -67,23 +67,26 @@ class ProjectForm(forms.ModelForm):
 								   self.fields['price_elec_choice'],
 								   self.fields['devfee_choice'],
 					
-						
-								  
+			
 								   ]
 
 		for field in self.fields.values():
 			if field not in exclude_from_formatting:
 				field.widget.attrs['class'] = 'form'
 
+	
+
 	def clean(self):
 		cleaned_data = self.cleaned_data
 
+		# Timeline
 		start_construction = cleaned_data.get('start_construction')
 		end_construction = cleaned_data.get('end_construction')
 
 		if end_construction<start_construction:
 			self.add_error('end_construction','Construction end date should not occur before construction start date.')
 
+		# Offtake contract
 		start_contract = cleaned_data.get('start_contract')
 		end_contract = cleaned_data.get('end_contract')
 
@@ -93,39 +96,18 @@ class ProjectForm(forms.ModelForm):
 		if start_contract<end_construction:
 			self.add_error('start_contract','Contract start date should not occur before construction end date.')
 
-		seasonality_m1 = cleaned_data.get('seasonality_m1')
-		seasonality_m2 = cleaned_data.get('seasonality_m2')
-		seasonality_m3 = cleaned_data.get('seasonality_m3')
-		seasonality_m4 = cleaned_data.get('seasonality_m4')
-		seasonality_m5 = cleaned_data.get('seasonality_m5')
-		seasonality_m6 = cleaned_data.get('seasonality_m6')
-		seasonality_m7 = cleaned_data.get('seasonality_m7')
-		seasonality_m8 = cleaned_data.get('seasonality_m8')
-		seasonality_m9 = cleaned_data.get('seasonality_m9')
-		seasonality_m10 = cleaned_data.get('seasonality_m10')
-		seasonality_m11 = cleaned_data.get('seasonality_m11')
-		seasonality_m12 = cleaned_data.get('seasonality_m12')
-
-		seasonality = [
-		seasonality_m1,
-		seasonality_m2,
-		seasonality_m3,
-		seasonality_m4,
-		seasonality_m5,
-		seasonality_m6,
-		seasonality_m7,
-		seasonality_m8,
-		seasonality_m9, 
-		seasonality_m10,
-		seasonality_m11,
-		seasonality_m12,
-		]
+		# Seasonality
+		seasonality = []
+		for i in range(1, 13):
+		    seasonality_value = cleaned_data.get(f'seasonality_m{i}')
+		    seasonality.append(seasonality_value)
 
 		sum_seasonality = sum(seasonality)
 
 		if sum_seasonality!=1:
-			self.add_error('seasonality_m1','Sum of seasonality factors must be 1.')
+			self.add_error('seasonality_m1','Sum of seasonality factors must be 100%.')
 
+		# Construction costs
 		costs_m1 = cleaned_data.get('costs_m1')
 		costs_m2 = cleaned_data.get('costs_m2')
 		costs_m3 = cleaned_data.get('costs_m3')
@@ -141,39 +123,11 @@ class ProjectForm(forms.ModelForm):
 
 		months_construction = (end_construction.year - start_construction.year) * 12 + (end_construction.month - start_construction.month) + 1
 
-		
-		if costs_m2>0 and 2>months_construction:
-			self.add_error('costs_m2','Construction costs out of construction period')
-
-		if costs_m3>0 and 3>months_construction:
-			self.add_error('costs_m3','Construction costs out of construction period')
-		
-		if costs_m4>0 and 4>months_construction:
-			self.add_error('costs_m4','Construction costs out of construction period')
-
-		if costs_m5>0 and 5>months_construction:
-			self.add_error('costs_m5','Construction costs out of construction period')
-
-		if costs_m6>0 and 6>months_construction:
-			self.add_error('costs_m6','Construction costs out of construction period')
-
-		if costs_m7>0 and 7>months_construction:
-			self.add_error('costs_m7','Construction costs out of construction period')
-
-		if costs_m8>0 and 8>months_construction:
-			self.add_error('costs_m8','Construction costs out of construction period')
-
-		if costs_m9>0 and 9>months_construction:
-			self.add_error('costs_m9','Construction costs out of construction period')
-
-		if costs_m10>0 and 10>months_construction:
-			self.add_error('costs_m10','Construction costs out of construction period')
-
-		if costs_m11>0 and 11>months_construction:
-			self.add_error('costs_m11','Construction costs out of construction period')
-
-		if costs_m12>0 and 12>months_construction:
-			self.add_error('costs_m12','Construction costs out of construction period')
+		for i in range(2, 13):
+			cost_variable = f"costs_m{i}"
+			if locals().get(cost_variable, 0) > 0 and i > months_construction:
+				error_message = f"Construction costs out of construction period"
+				self.add_error(cost_variable, error_message)
 
 		length_construction = relativedelta(end_construction, start_construction).years
 		operating_life = cleaned_data.get('operating_life')
@@ -182,6 +136,13 @@ class ProjectForm(forms.ModelForm):
 
 		if debt_tenor>debt_max_tenor:
 			self.add_error('debt_tenor','Debt tenor cannot exceed project life')
+
+
+		# Liquidation
+		liquidation = cleaned_data.get('liquidation')
+
+		if liquidation<0:
+			self.add_error('liquidation','Liquidation delay must be greater or equal to 0.')
 
 		return cleaned_data
 

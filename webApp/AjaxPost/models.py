@@ -30,9 +30,16 @@ class Project(models.Model):
 	country = models.fields.CharField(choices=COUNTRY_CHOICES,max_length=100,default="France")
 	technology = models.fields.CharField(choices=TECHNOLOGY_CHOICES,max_length=100,default="Solar")
 
+	#Timing
 	start_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	end_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
 	operating_life = models.fields.IntegerField(default="20")
+	liquidation = models.fields.IntegerField(default="6")
+
+
+
+
+
 	periodicity = models.fields.IntegerField(default="6")
 
 	panels_capacity = models.fields.IntegerField(default="2000")
@@ -43,6 +50,7 @@ class Project(models.Model):
 	production_choice = models.fields.IntegerField(default="2")
 
 	availability = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.99)
+	
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m2 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.05)
 	seasonality_m3 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.09)

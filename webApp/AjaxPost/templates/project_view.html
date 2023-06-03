@@ -18,72 +18,101 @@
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingOne">
 					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-						Timing
+						Timeline
 					  </button>
 					</h2>
 					<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-						
-					  <div class="row-inline-wrapper">
-										<div class="row-inline-two">
-											<p>Construction start</p>
-										</div>
 
-										<div class="row-inline-two">
-											<p>Construction end</p>
-										</div>
-
-									</div>
-
-									<div class="row-inline-wrapper">
-										<div class="row-inline-two">
+					<h3>Construction schedule</h3>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>Notice to proceed</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
 									{{ project_form.start_construction }}
-										</div>
+							</div>
+						</div>
 
-										<div class="row-inline-two">
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>End of construction</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
 									{{ project_form.end_construction }}
-										</div>
+							</div>
+						</div>
 
+						<h3>Operating period</h3>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>COD</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
+									<div id="dateCOD"></div>
+							</div>
+						</div>		
+
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>Operating life</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>years</p>
+							</div>
+							<div class="row-inline-three">
+									{{ project_form.operating_life }}
+							</div>
+						</div>			
+
+					<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>End of operations</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
+									<div id="dateRetirement"></div>
+							</div>
+						</div>		
+						
+						<h3>Liquidation</h3>
+						<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+											<p>Delay to liquidation</p>
 									</div>
-
-									<div class="row-inline-wrapper">
-										<div class="row-inline-two">
-											<p>Commissioning Date</p>
-										</div>
-
-										<div class="row-inline-two">
-											<div id="dateCOD"></div>
-										</div>
-
+									<div class="row-inline-three-second">
+											<p>months</p>
 									</div>
-
-									<div class="row-inline-wrapper">
-										<div class="row-inline-two">
-											<p>Operating life (years)</p>
-										</div>
-
-										<div class="row-inline-two">
-											{{ project_form.operating_life }}
-
-										</div>
-
+									<div class="row-inline-three">
+											{{ project_form.liquidation }}
 									</div>
+								</div>	
 
-									<div class="row-inline-wrapper">
-										<div class="row-inline-two">
-											<p>Retirement</p>
-										</div>
-
-										<div class="row-inline-two">
-											<div id="dateRetirement"></div>
-										</div>
-
+									
+						<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+											<p>Liquidation date</p>
 									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="dateLiquidation"></div>
+									</div>
+								</div>	
 
-
-
-
-
+								
 					  </div>
 					</div>
 				  </div>
@@ -95,193 +124,258 @@
 					</h2>
 					<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-						<h3>Capacity and production Production</h3>
+						<h3>Capacity and production</h3>
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>Installed capacity (kWp)</p>
+									<div class="row-inline-three-first">
+											<p>Installed capacity</p>
 									</div>
-									<div class="row-inline-two">
-											<p>Annual degradation (%)</p>
+									<div class="row-inline-three-second">
+											<p>kWp</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.panels_capacity }}
 									</div>
 								</div>
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-										{{ project_form.panels_capacity }}
+									<div class="row-inline-three-first">
+											<p>Annual degradation</p>
 									</div>
-									<div class="row-inline-two">
-										{{ project_form.annual_degradation }}
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
 									</div>
-								</div>
-
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>P50 (kWp/kWh)</p>
-									</div>
-									<div class="row-inline-two">
-											{{ project_form.p50 }}
+									<div class="row-inline-three">
+											{{ project_form.annual_degradation }}
 									</div>
 								</div>
 
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>p90_10y (kWp/kWh)</p>
-									</div>
-									<div class="row-inline-two">
-											{{ project_form.p90_10y }}
-									</div>
-								</div>
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>P99_10y (kWp/kWh)</p>
+									<div class="row-inline-three-first">
+										<p>Production scenario</p>
 									</div>
-									<div class="row-inline-two">
-											{{ project_form.P99_10y }}
-									</div>
-								</div>		
-
-
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-										<p>Production selected</p>
-									</div>
-
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>P</p>
+									</div>	
+									<div class="row-inline-three">
 										{{ project_form.production_choice }}
 
 									</div>
 
 								</div>
 
+
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>Availability (%)</p>
+									<div class="row-inline-three-first">
+											<p>P50</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.p50 }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>P90 10y</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.p90_10y }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>P99 10y</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+
+									<div class="row-inline-three">
+											{{ project_form.P99_10y }}
+									</div>
+								</div>		
+
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Availability</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>									
+									<div class="row-inline-three">
 											{{ project_form.availability }}
 									</div>
 								</div>	
 
 								<h3>Seasonality</h3>
 										
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>Sum (%)</p>
-									</div>
-									<div class="row-inline-two">
-											<div id="sumSeasonality"></div>
-									</div>
-								</div>
 
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>January (%)</p>
+									<div class="row-inline-three-first">
+											<p>January</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m1 }}
 									</div>
 								</div>
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>February (%)</p>
+									<div class="row-inline-three-first">
+											<p>February</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m2 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>March (%)</p>
+									<div class="row-inline-three-first">
+											<p>March</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m3 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>April (%)</p>
+									<div class="row-inline-three-first">
+											<p>April</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m4 }}
 									</div>
 								</div>
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>May (%)</p>
+									<div class="row-inline-three-first">
+											<p>May</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m5 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>June (%)</p>
+									<div class="row-inline-three-first">
+											<p>June</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m6 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>July (%)</p>
+									<div class="row-inline-three-first">
+											<p>July</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m7 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>August (%)</p>
+									<div class="row-inline-three-first">
+											<p>August</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m8 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>September (%)</p>
+									<div class="row-inline-three-first">
+											<p>September</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m9 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>October (%)</p>
+									<div class="row-inline-three-first">
+											<p>October</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m10 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>November (%)</p>
+									<div class="row-inline-three-first">
+											<p>November</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m11 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>December (%)</p>
+									<div class="row-inline-three-first">
+											<p>December</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.seasonality_m12 }}
 									</div>
 								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first-underlined">
+											<p>Total</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="sumSeasonality"></div>
+									</div>
+								</div>
+
 
 					  </div>
 					</div>
@@ -295,161 +389,213 @@
 					<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
-					   <h3>Development Fee</h3>
+					   <h3>Development fee</h3>
 
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-								<p>Optimise development fees to achieve target gearing</p>
-							</div>
+		
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Optimisation</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.devfee_choice }}
+									</div>
+								</div>	
 
-							<div class="row-inline-two">
-								{{ project_form.devfee_choice }}
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Portion paid at FC</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.devfee_paid_FC }}
+									</div>
+								</div>	
 
-							</div>
 
-						</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Portion paid at COD</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.devfee_paid_COD }}
+									</div>
+								</div>	
 
 
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									<p>Percentage paid at FC</p>
-								</div>
-
-								<div class="row-inline-two">
-									<p>Percentage paid at COD</p>
-								</div>
-
-							</div>
-
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									{{ project_form.devfee_paid_FC }}
-								</div>
-
-								<div class="row-inline-two">
-									{{ project_form.devfee_paid_COD }}
-								</div>
-
-							</div>
+					
 
 					   <h3>Monthly construction schedule</h3>
 
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-											<p>Sum (kEUR)</p>
-									</div>
-									<div class="row-inline-two">
-											<div id="sumConstructionCosts"></div>
-									</div>
-								</div>
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 1</p>
 									</div>
-									<div class="row-inline-two">
-											{{ project_form.costs_m1 }}
-
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
 									</div>
-								</div>
+									<div class="row-inline-three">
+											{{ project_form.costs_m1 }}
+									</div>
+								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 2</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m2 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 3</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m3 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 4</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m4 }}
 									</div>
-								</div>
+								</div>	
+
+
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 5</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m5 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 6</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m6 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 7</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m7 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 8</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m8 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 9</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m9 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 10</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m10 }}
 									</div>
 								</div>	
 
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 11</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m11 }}
 									</div>
 								</div>	
 
+
 								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
+									<div class="row-inline-three-first">
 											<p>Month 12</p>
 									</div>
-									<div class="row-inline-two">
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
 											{{ project_form.costs_m12 }}
 									</div>
 								</div>	
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first-underlined">
+											<p>Total</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="sumConstructionCosts"></div>
+									</div>
+								</div>	
+
+								
+
 					  </div>
 					</div>
 				  </div>
@@ -464,96 +610,111 @@
 					  <div class="accordion-body">
 					<h3>Offtake contract</h3>
 
+					
+
 							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									<p>Start of contract</p>
+								<div class="row-inline-three-first">
+										<p>Start of contract</p>
 								</div>
-
-								<div class="row-inline-two">
-									<p>End of contract</p>
+								<div class="row-inline-three-second">
+										<p>date</p>
 								</div>
+								<div class="row-inline-three">
+										{{ project_form.start_contract }}
+								</div>
+							</div>	
 
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>End of contract</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>date</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.end_contract }}
+								</div>
+							</div>	
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Reference price</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>EUR</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.contract_price }}
+								</div>
+							</div>
+
+														
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation base date</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>date</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.contract_indexation_start_date }}
+								</div>
 							</div>
 
 							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									{{ project_form.start_contract }}
+								<div class="row-inline-three-first">
+										<p>Indexation rate</p>
 								</div>
-
-								<div class="row-inline-two">
-									{{ project_form.end_contract }}
+								<div class="row-inline-three-second">
+										<p>% p.a.</p>
 								</div>
-
+								<div class="row-inline-three">
+										{{ project_form.contract_indexation }}
+								</div>
 							</div>
 
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									<p>Contract start price</p>
-								</div>
 
-								<div class="row-inline-two">
-									<p>{{ project_form.contract_price }}</p>
-								</div>
-
-							</div>
-							
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									<p>Contract indexation base date</p>
-								</div>
-
-								<div class="row-inline-two">
-									<p>Contract indexation p.a. (%)</p>
-								</div>
-
-							</div>
-
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									{{ project_form.contract_indexation_start_date }}
-								</div>
-
-								<div class="row-inline-two">
-									{{ project_form.contract_indexation }}
-								</div>
-
-							</div>
-									<h3>Electricity market price</h3>
+									<h3>Market prices</h3>
 
 								
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-										<p>Electricity price indexation base date</p>
-									</div>
-
-									<div class="row-inline-two">
-										<p>Electricity prices indexation rate (%)</p>
-									</div>
-
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation base date</p>
 								</div>
-
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-								{{ project_form.price_elec_indexation_start_date }}
-									</div>
-
-									<div class="row-inline-two">
-								{{ project_form.price_elec_indexation }}
-									</div>
-
+								<div class="row-inline-three-second">
+										<p>date</p>
 								</div>
+								<div class="row-inline-three">
+										{{ project_form.price_elec_indexation_start_date }}
+								</div>
+							</div>
 
-								<div class="row-inline-wrapper">
-									<div class="row-inline-two">
-										<p>Electricity prices selected</p>
-									</div>
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation rate</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>% p.a.</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.price_elec_indexation }}
+								</div>
+							</div>
 
-									<div class="row-inline-two">
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Market price scenario</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
 										{{ project_form.price_elec_choice }}
-									</div>
-
 								</div>
+							</div>
 
+			
 								<div class="row-inline-wrapper">
 
 									<div class="row-inline-four">
@@ -1060,50 +1221,45 @@
 					</h2>
 					<div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-					   <div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									<p>Operating costs indexation base date</p>
-								</div>
 
-								<div class="row-inline-two">
-									<p>Operating costs indexation p.a. (%)</p>
-								</div>
 
-							</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Operating costs</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.opex }}
+									</div>
+								</div>	
 
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									{{ project_form.opex_indexation_start_date }}
-								</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation base date</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.opex_indexation_start_date }}
+									</div>
+								</div>	
 
-								<div class="row-inline-two">
-									{{ project_form.opex_indexation }}
-								</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.opex_indexation }}
+									</div>
+								</div>	
 
-							</div>
-
-							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-									<p>Operating costs p.a.</p>
-								</div>
-
-								<div class="row-inline-two">
-									<p>{{ project_form.opex }}</p>
-								</div>
-
-							</div>
-					  </div>
-					</div>
-				  </div>
-				  <div class="accordion-item">
-					<h2 class="accordion-header" id="headingSix">
-					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-						HMR
-					  </button>
-					</h2>
-					<div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionSidebar">
-					  <div class="accordion-body">
-						<strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+			
 					  </div>
 					</div>
 				  </div>
@@ -1111,128 +1267,172 @@
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingSeven">
 					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-						Senior Debt
+						Senior Debt facilities
 					  </button>
 					</h2>
 					<div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-							<h3>Timing</h3>
+							<h3>Term loan timeline</h3>
+
+						
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Door-to-door tenor</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>years</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_tenor }}
+									</div>
+								</div>	
+
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Maturity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="debtMaturity"></div>
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Periodicity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.periodicity }}
+									</div>
+								</div>	
+
+							<h3>Sizing constraints</h3>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Maximum gearing</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_gearing_max }}
+									</div>
+								</div>		
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Minimum ADSCR</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>x</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_target_DSCR }}
+									</div>
+								</div>		
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Negative tail</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>years</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_negative_tail }}
+									</div>
+								</div>				
+
+							<h3>Fees and margins</h3>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Upfront fee</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_upfront_fee }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commitment fee</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_commitment_fee }}
+									</div>
+								</div>	
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Credit margin</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_margin }}
+									</div>
+								</div>						
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Swap rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_swap_rate }}
+									</div>
+								</div>		
 
 						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-								<p>Periodicity</p>
-							</div>
+									<div class="row-inline-three-first">
+											<p>Reference rate buffer</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_reference_rate_buffer }}
+									</div>
+								</div>		
+					
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Swap margin</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_swap_margin }}
+									</div>
+								</div>		
+					
+					
 
-							<div class="row-inline-two">
-								{{ project_form.periodicity }}
 
-							</div>
 
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Door to door tenor</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_tenor }}
-							</div>
-						</div>
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-								<p>Maturity</p>
-							</div>
-
-							<div class="row-inline-two">
-								<div id="debtMaturity"></div>
-							</div>
-
-						</div>
-
-							<h3>Pricing</h3>
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Upfront fee</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_upfront_fee }}
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Commitment fee</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_commitment_fee }}
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Credit margin</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_margin }}
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Swap rate</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_swap_rate }}
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Reference rate buffer</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_reference_rate_buffer }}
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Swap margin</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_swap_margin }}
-							</div>
-						</div>
-
-							<h3>Sizing</h3>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Minimum DSCR</p>
-							</div>
-							<div class="row-inline-two">
-									<p>Maximum gearing</p>
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-								{{ project_form.debt_target_DSCR }}
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_gearing_max }}
-							</div>
-						</div>
-
-						<div class="row-inline-wrapper">
-							<div class="row-inline-two">
-									<p>Negative tail</p>
-							</div>
-							<div class="row-inline-two">
-								{{ project_form.debt_negative_tail }}
-							</div>
-						</div>
-
+				
 					  </div>
 					</div>
 				  </div>
@@ -1244,14 +1444,21 @@
 					</h2>
 					<div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
+
+
 							<div class="row-inline-wrapper">
-								<div class="row-inline-two">
-										<p>Corporate income tax (%)</p>
-								</div>
-								<div class="row-inline-two">
-									{{ project_form.corporate_income_tax }}
-								</div>
-							</div>
+									<div class="row-inline-three-first">
+											<p>Income tax rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.corporate_income_tax }}
+									</div>
+								</div>	
+
+						
 					 </div>
 					</div>
 					</div>
@@ -1286,14 +1493,48 @@
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingEleven">
 					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
-						Macro
+						Project details
 					  </button>
 					</h2>
 					<div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-												{{ project_form.name }}
-												{{ project_form.country }}
-												{{ project_form.technology }}
+
+					 			<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Project name</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>text</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.name }}
+									</div>
+								</div>	
+
+		 			<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Project type</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.technology }}
+									</div>
+								</div>	
+
+		 			<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Country</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.country }}
+									</div>
+								</div>	
+											
 
 
 					  </div>
@@ -1336,50 +1577,80 @@
 
 		<div class="tab-content">
 			<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
-			
-				<div class="box" id="nav-summary-summary">
-				<h2>Summary</h2>
-				  <div class="summary-container">
+				
+				<div class="nav-summary">
+					<div class="summary-container-left">
+						<div class="box" id="summary-fp">
+							<h2>Financing plan</h2>
 
-						<div class="summary">
-							<table class="table">
-								<tbody id="summary_debt"></tbody>
-							</table>
-						</div>
-						<div class="summary">
-							<table class="table">
-								<tbody id="summary_equity"></tbody>
-							</table>  				
-						</div> 				
-						</div> 	
-
-					<h2>Financing plan</h2>
-						<div class="summary-container">
-
-							<div class="summary">
-								<table class="table">
-									<tbody id="summary_financing_plan_uses"></tbody>
-								</table>
+							<div class="summary-container-titles">
+								<div class="summary-titles">
+									<h4>Uses</h4>
+								</div>
+								<div class="summary-titles">
+									<h4>Sources</h4>
+								</div>								
 							</div>
 
-							<div class="summary">
-								<table class="table">
-									<tbody id="summary_financing_plan_sources"></tbody>
-								</table>
+							<div class="summary-container">
+								<div class="summary">
+									<table class="table">
+										<tbody id="summary_financing_plan_uses"></tbody>
+									</table>
+								</div>
+
+								<div class="summary">
+									<table class="table">
+										<tbody id="summary_financing_plan_sources"></tbody>
+									</table>
+								</div>
 							</div>
 						</div>
+
+						<div class="box" id="summary-financing">
+							<h2>Financing terms</h2>
+	
+						</div>
+
+
+					</div>
+
+					<div class="summary-container-right">
+
+						<div class="box" id="summary-IRR">
+							<h2>Project IRR and Equity IRR</h2>
+									<h4>Project IRR</h4>
+
+
+									<h4>Equity IRR</h4>
+										<table class="table">
+											<tbody id="summary_equity"></tbody>
+										</table>  
+											
 					
-					<h2>Audit</h2>
-
-						<div class="summary">
-							<table class="table">
-								<tbody id="summary_audit"></tbody>
-							</table>
 						</div>
+
+						<div class="box" id="summary-debt">
+							<h2>Debt summary</h2>
+										<table class="table">
+											<tbody id="summary_debt"></tbody>
+										</table>
+						</div>
+
+
+				
+						<div class="box" id="summary-audit">
+							<h2>Audit</h2>
+									<table class="table">
+										<tbody id="summary_audit"></tbody>
+									</table>
+						</div>
+					</div>
 				</div>
 
+
+
 				<div class="box" id="nav-summary-charts">
-					<h2>Charts</h2>
 					{% block jquery %}{% include 'charts.html' %}{% endblock %}
 				</div>
 
@@ -1389,19 +1660,48 @@
 				
 				<div class="box">
 
-				<h2>Timeline</h2>
+				<h2>Timeline, Counters and Flags</h2>
+				
 
 					<table class="table">
 						<tbody id="myTableDate"></tbody>
 					</table>
 
+				<h3>Project timeline</h3>
+
+				<h4>Model timeline</h4>
+					
 					<table class="table">
-						<tbody id="myTableFlag"></tbody>
+						<tbody id="myTableFlagMod"></tbody>
+					</table>
+
+
+				<h4>Construction</h4>
+
+					<table class="table">
+						<tbody id="myTableFlagCons"></tbody>
+					</table>
+
+				<h4>Operating period</h4>
+
+
+					<table class="table">
+						<tbody id="myTableFlagOp"></tbody>
+					</table>
+
+
+				<h4>Offtake contract</h4>
+					
+					<table class="table">
+						<tbody id="myTableOftk"></tbody>
 					</table>
 
 					<table class="table">
 						<tbody id="myTableTime"></tbody>
 					</table>
+
+
+				<h3>Financing</h3>
 
 				<h2>Indexation</h2>
 					<table class="table">
@@ -1434,19 +1734,19 @@
 					<p>Cash flow from operating activities</p>
 
 					<table class="table">
-						<tbody id="myTableCFoperating"></tbody>
+						<tbody id="myTableCF_operating"></tbody>
 					</table>
 
 					<p>Cash flow from investing activities</p>
 				
 					<table class="table">
-						<tbody id="myTableCFinvesting"></tbody>
+						<tbody id="myTableCF_inesting"></tbody>
 					</table>
 
 					<p>Cash flow from financing activities</p>
 
 					<table class="table">
-						<tbody id="myTableCFfinancing"></tbody>
+						<tbody id="myTableCF_fiancing"></tbody>
 					</table>
 					
 					<p>Cash available for senior debt service</p>
@@ -1576,171 +1876,133 @@
 
 				var results = []
 
-				var dict = {
-				arr_date:"#myTableDate",
-				arr_flag:"#myTableFlag",
-				arr_time:"#myTableTime",
-				arr_prod:"#myTableProd",
-				arr_index:"#myTableIndex",
-				arr_is:"#myTableIS",
-				arr_price:"#myTablePrice",
-				arr_sizing:"#myTableSizing",
-				arr_debt:"#myTableSeniorDebt",
-				arr_cf_op:"#myTableCFoperating",
-				arr_cf_inv:"#myTableCFinvesting",
-				arr_cf_fin:"#myTableCFfinancing",
-				arr_fp_uses:"#myTableFPUses",
-				arr_fp_sources:"#myTableFPSources",
-				arr_cf_CFADS:"#myTableCFADS",
-				arr_distr:"#DistrAccount",
-				arr_re:"#myTableRE",
-				arr_bs_a:"#myTableBSA",
-				arr_bs_l:"#myTableBSL",
-				arr_audit:"#myTableAudit",
-
+				const dict = {
+				  Date: { selector: "#myTableDate", format: "" },
+				  FlagMod: { selector: "#myTableFlagMod", format: numberFormat },
+				  FlagCons: { selector: "#myTableFlagCons", format: numberFormat },
+				  FlagOp: { selector: "#myTableFlagOp", format: numberFormat },
+				  FlagOftk: { selector: "#myTableOftk", format: numberFormat },
+				  arr_time: { selector: "#myTableTime", format: numberFormat },
+				  Prod: { selector: "#myTableProd", format: numberFormat },
+				  arr_index: { selector: "#myTableIndex", format: numberFormat },
+				  IS: { selector: "#myTableIS", format: currencyFormat },
+				  Price: { selector: "#myTablePrice", format: currencyFormat },
+				  arr_sizing: { selector: "#myTableSizing", format: currencyFormat },
+				  Debt: { selector: "#myTableSeniorDebt", format: currencyFormat },
+				  CF_op: { selector: "#myTableCF_operating", format: currencyFormat },
+				  CF_in: { selector: "#myTableCF_inesting", format: currencyFormat },
+				  CF_fi: { selector: "#myTableCF_fiancing", format: currencyFormat },
+				  FP_u: { selector: "#myTableFPUses", format: currencyFormat },
+				  FP_s: { selector: "#myTableFPSources", format: currencyFormat },
+				  CFADS: { selector: "#myTableCFADS", format: currencyFormat },
+				  Distr: { selector: "#DistrAccount", format: currencyFormat },
+				  RE: { selector: "#myTableRE", format: currencyFormat },
+				  BS_a: { selector: "#myTableBSA", format: currencyFormat },
+				  BS_l: { selector: "#myTableBSL", format: currencyFormat },
+				  Audit: { selector: "#myTableAudit", format: currencyFormat }
 				};
 
-				var dict_format = {
-				arr_date:"",
-				arr_flag:numberFormat,
-				arr_time:numberFormat,
-				arr_prod:numberFormat,
-				arr_index:numberFormat,
-				arr_is:currencyFormat,
-				arr_price:currencyFormat,
-				arr_sizing:currencyFormat,
-				arr_debt:currencyFormat,
-				arr_cf_op:currencyFormat,
-				arr_cf_inv:currencyFormat,
-				arr_cf_find:currencyFormat,
-				arr_fp_uses:currencyFormat,
-				arr_fp_sources:currencyFormat,
-				arr_cf_CFADS:currencyFormat,
-				arr_distr:currencyFormat,
-				arr_re:currencyFormat,
-				arr_bs_a:currencyFormat,
-				arr_bs_l:currencyFormat,
-				arr_audit:currencyFormat,
-				};
+				for (const key in dict) {
+				  const entry = dict[key];
+				  const { selector, format } = entry;
+				  const dictKey = key;
+				  let tableContent = "";
 
-				for (var i = 0; i < Object.keys(dict).length; i++) {
-					$.each(json.df, function(key, data) {
-							if(key.startsWith(Object.keys(dict)[i])) {
-							results[i] += "<tr>";
-							results[i] += "<td>" + key + "</td>";
-							results[i] += "<td>" + numberFormat.format(json.df_sum[key]) + "</td>";
-							$.each(data, function(index, data) {
-								if (i == 0){
-									results[i] += "<td>" + data + "</td>";
-								} else {
-									results[i] += "<td>" + Object.values(dict_format)[i].format(data) + "</td>";
-								}
-							});
-							results[i] += "</tr>";
-						}
-					});
-				$(Object.values(dict)[i]).html(results[i]);
+				  $.each(json.df, function (dataKey, data) {
+				    if (dataKey.startsWith(dictKey)) {
+				      tableContent += "<tr>";
+				      tableContent += "<td>" + dataKey.substring(dictKey.length) + "</td>";
+				      tableContent += "<td>" + numberFormat.format(json.df_sum[dataKey]) + "</td>";
+
+				      $.each(data, function (index, dataValue) {
+				        tableContent += "<td>";
+				        if (key === "Date") {
+				          tableContent += dataValue;
+				        } else {
+				          tableContent += format.format(dataValue);
+				        }
+				        tableContent += "</td>";
+				      });
+
+				      tableContent += "</tr>";
+				    }
+				  });
+
+				  $(selector).html(tableContent);
 				}
 
 
+				const tables = [
+				  { data: json.df_result, selector: "#summary_debt" },
+				  { data: json.df_result_equity, selector: "#summary_equity" },
+				  { data: json.df_audit, selector: "#summary_audit" },
+				  { data: json.df_result_fp_uses, selector: "#summary_financing_plan_uses" },
+				  { data: json.df_result_fp_sources, selector: "#summary_financing_plan_sources" }
+				];
 
-
-				build_table(json.df_result,"#summary_debt")
-				build_table(json.df_result_equity,"#summary_equity")
-				build_table(json.df_audit,"#summary_audit")
-				build_table(json.df_result_fp_uses,"#summary_financing_plan_uses")
-				build_table(json.df_result_fp_sources,"#summary_financing_plan_sources")
-
+				tables.forEach(table => build_table(table.data, table.selector));
 
 
 				$("#myTableAll").html();
 
 				for (var i = 0; i < 30; i++) {
-					$("#elecPriceLabel"+i).html(json.arr_years_electricity_prices[i]);
+					$("#elecPriceLabel"+i).html(json.dic_price_elec_keys[i]);
 				}
 
 				var dict_sidebar = {
-				date_COD:"#dateCOD",
-				date_operations_end:"#dateRetirement",
+				formatted_date_COD:"#dateCOD",
+				formatted_date_operations_end:"#dateRetirement",
 				sum_seasonality:"#sumSeasonality",
 				sum_construction_costs:"#sumConstructionCosts",
+				formatted_date_liquidation:"#dateLiquidation",
+				date_debt_maturity:"#debtMaturity",
+
 				};
 
 				for (var i = 0; i < Object.keys(dict_sidebar).length; i++) {
 					$(Object.values(dict_sidebar)[i]).html(json.data_dump_sidebar[i]);
 				}
 
-				$('tr').click(function () {
-					//Check to see if background color is set or if it's set to white.
-					if(this.style.background == "" || this.style.background =="white") {
-						$(this).css('background', '#e7f1ff');
-					}
-					else {
-						$(this).css('background', 'white');
-					}
+
+				function updateChart(chart, datasets) {
+					chart.data.labels = Object.values(json.df['Date Period end']);
+					datasets.forEach((data, index) => {
+						chart.data.datasets[index].data = data;
+					});
+					chart.update();
+				}
+
+				const datasets = [
+				  [Object.values(json.df['Prod Production']), Object.values(json.df['Prod Capacity degradation'])],
+				  [Object.values(json.df['IS Contracted revenues']), Object.values(json.df['IS Uncontracted electricity revenues'])],
+				  [Object.values(json.df['IS Operating expenses']).map(value => value * -1)],
+				  [Object.values(json.df['IS EBITDA']), Object.values(json.df.arr_EBITDA_margin)],
+				  [Object.values(json.df['FP_u Construction costs']), Object.values(json.df['FP_u Cumulative total uses'])],
+				  [Object.values(json.df.arr_sizing_debt_interest_operations), Object.values(json.df.arr_debt_service_repayment), Object.values(json.df.arr_ratios_DSCR)],
+				  [Object.values(json.df['Debt Debt service']), Object.values(json.df.arr_sizing_CFADS)],
+				  [Object.values(json.df.arr_debt_service_repayment), Object.values(json.df['Debt Senior debt balance (EoP)'])],
+				  [Object.values(json.df['Equity injections and reimbursement']), Object.values(json.df['Distr Dividends paid']),Object.values(json.df['IRR curve'])],
+				  [Object.values(json.df['RE Retained earnings (BoP)']), Object.values(json.df['Distr Distribution account balance (EoP)'])]
+				];
+
+				const charts = [myChart, myChart2, myChart3, myChart4, myChart5, myChart6, myChart7, myChart8, myChart9, myChart10];
+
+				charts.forEach((chart, index) => {
+				  updateChart(chart, datasets[index]);
 				});
 
-				myChart.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart.data.datasets[0].data = Object.values(json.df.arr_prod);
-				myChart.data.datasets[1].data = Object.values(json.df.arr_prod_degrad);
-				myChart.update()
-
-				myChart2.data.datasets[0].data = json.seasonality;
-				myChart2.update()
-
-				myChart3.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart3.data.datasets[0].data = Object.values(json.df.arr_is_rev_contract);
-				myChart3.data.datasets[1].data = Object.values(json.df.arr_is_rev_merchant);
-				myChart3.update()
-
-				myChart4.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart4.data.datasets[0].data = Object.values(json.df.arr_is_opex);
-				myChart4.update()
-
-				myChart5.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart5.data.datasets[0].data = Object.values(json.df.arr_is_EBITDA);
-				myChart5.data.datasets[1].data = Object.values(json.df.arr_EBITDA_margin);
-				myChart5.update()
-
-				myChart6.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart6.data.datasets[0].data = Object.values(json.df.arr_fp_uses_construction_costs);
-				myChart6.data.datasets[1].data = Object.values(json.df.arr_construction_costs_cumul);
-				myChart6.update()
-
-				myChart7.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart7.data.datasets[0].data = Object.values(json.df.arr_sizing_debt_interest_operations);
-				myChart7.data.datasets[1].data = Object.values(json.df.arr_debt_service_repayment);
-				myChart7.data.datasets[2].data = Object.values(json.df.arr_ratios_DSCR);
-				myChart7.update()
-
-
-				myChart8.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart8.data.datasets[0].data = Object.values(json.df.arr_debt_service);
-				myChart8.data.datasets[1].data = Object.values(json.df.arr_sizing_CFADS);
-				myChart8.update()
-
-				myChart9.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart9.data.datasets[0].data = Object.values(json.df.arr_debt_service_repayment);
-				myChart9.data.datasets[1].data = Object.values(json.df.arr_debt_EoP);
-				myChart9.update()
-
-				myChart10.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart10.data.datasets[0].data = Object.values(json.df.arr_sponsors_cash_flows);
-				myChart10.update()
-
-				myChart11.data.labels = Object.values(json.df.arr_date_end_period);
-				myChart11.data.datasets[0].data = Object.values(json.df.arr_re_BoP);
-				myChart11.data.datasets[1].data = Object.values(json.df.arr_distr_EoP);
-				myChart11.update()
-
+		
 			},
 
 			error: function(json){
 
 				obj = JSON.parse(json.responseJSON.error);
 
-				alert(json.responseJSON.error)
-    			console.log(obj)
+				const array = Object.values(obj)[0];
+				const firstElement = array[0];
+
+				alert(firstElement.message)
+				console.log(firstElement.message)
 
 			}
 		});
