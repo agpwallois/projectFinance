@@ -38,6 +38,10 @@ DEV_FEE_CHOICES= [
 	('2', 'No'),
 	]
 
+EQUITY_CHOICES= [
+	('1', 'Equity first'),
+	('2', 'Prorata'),
+	]
 
 class ProjectForm(forms.ModelForm):
 
@@ -56,6 +60,7 @@ class ProjectForm(forms.ModelForm):
 		'production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
 		'price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
 		'devfee_choice': forms.RadioSelect(choices=DEV_FEE_CHOICES),
+		'injection_choice': forms.RadioSelect(choices=EQUITY_CHOICES),
 
 	}
 	 
@@ -66,6 +71,7 @@ class ProjectForm(forms.ModelForm):
 								   self.fields['production_choice'],
 								   self.fields['price_elec_choice'],
 								   self.fields['devfee_choice'],
+								   self.fields['injection_choice'],
 					
 			
 								   ]

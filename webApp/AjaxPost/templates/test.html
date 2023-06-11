@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block landingcss %}
+    <link rel="stylesheet" href="{% static 'AjaxPost/style_landing.css' %}" />
+
+    {% block content %}
+
+        <!-- Page Content  -->
+    <div id="content_landing">
+
+
+
+        <div id="content-nav">
+
+        <nav>
+            <div class="container-nav">
+              <button type="button" class="button">
+                <a href="{% url 'admin:index' %}">Manage projects</a>
+                </button>            </div>
+        </nav>
+
+        </div>
+
+
+            <table class="table table-sm table-hover">
+                <thead>
+                    <th>Project</th>
+                    <th>Technology</th>
+                    <th>Country</th>
+                    <th>Created on</th>
+                    <th>Updated on</th>
+
+                </thead>
+
+             {% for project in projects %}
+                <tr>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.technology }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.country }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.created_date }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.updated_date }}</a></td>
+
+                 {% endfor %} 
+                </tr>
+            </table> 
+
+
+
+            <div class="row-inline-three">
+                        {{ Debt }}
+                </div>
+    </div>
+
+    {% endblock %}
+
+{% endblock %}
+

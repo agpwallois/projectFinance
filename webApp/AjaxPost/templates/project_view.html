@@ -205,17 +205,6 @@
 
 
 
-								<div class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Availability</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>%</p>
-									</div>									
-									<div class="row-inline-three">
-											{{ project_form.availability }}
-									</div>
-								</div>	
 
 								<h3>Seasonality</h3>
 										
@@ -1358,7 +1347,7 @@
 
 							<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
-											<p>Upfront fee</p>
+											<p>Arrangement fee</p>
 									</div>
 									<div class="row-inline-three-second">
 											<p>%</p>
@@ -1484,7 +1473,20 @@
 					</h2>
 					<div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-						<strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+							
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Equity injections</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.injection_choice }}
+									</div>
+								</div>	
+
+
 					  </div>
 					</div>
 				  </div>				  
@@ -1499,7 +1501,7 @@
 					<div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
-					 			<div class="row-inline-wrapper">
+								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
 											<p>Project name</p>
 									</div>
@@ -1511,7 +1513,7 @@
 									</div>
 								</div>	
 
-		 			<div class="row-inline-wrapper">
+					<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
 											<p>Project type</p>
 									</div>
@@ -1523,7 +1525,7 @@
 									</div>
 								</div>	
 
-		 			<div class="row-inline-wrapper">
+					<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
 											<p>Country</p>
 									</div>
@@ -1609,6 +1611,12 @@
 
 						<div class="box" id="summary-financing">
 							<h2>Financing terms</h2>
+
+								<div class="summary">
+									<table class="table">
+										<tbody id="summary_financing_terms"></tbody>
+									</table>
+								</div>
 	
 						</div>
 
@@ -1618,9 +1626,12 @@
 					<div class="summary-container-right">
 
 						<div class="box" id="summary-IRR">
-							<h2>Project IRR and Equity IRR</h2>
+							<h2>Project and shareholder return</h2>
 									<h4>Project IRR</h4>
-
+										
+										<table class="table">
+											<tbody id="summary_project"></tbody>
+										</table>  
 
 									<h4>Equity IRR</h4>
 										<table class="table">
@@ -1631,7 +1642,7 @@
 						</div>
 
 						<div class="box" id="summary-debt">
-							<h2>Debt summary</h2>
+							<h2>Senior debt</h2>
 										<table class="table">
 											<tbody id="summary_debt"></tbody>
 										</table>
@@ -1640,7 +1651,7 @@
 
 				
 						<div class="box" id="summary-audit">
-							<h2>Audit</h2>
+							<h2>Audit and control</h2>
 									<table class="table">
 										<tbody id="summary_audit"></tbody>
 									</table>
@@ -1669,20 +1680,20 @@
 
 				<h3>Project timeline</h3>
 
-				<h4>Model timeline</h4>
+				<p>Model timeline</p>
 					
 					<table class="table">
 						<tbody id="myTableFlagMod"></tbody>
 					</table>
 
 
-				<h4>Construction</h4>
+				<p>Construction</p>
 
 					<table class="table">
 						<tbody id="myTableFlagCons"></tbody>
 					</table>
 
-				<h4>Operating period</h4>
+				<p>Operating period</p>
 
 
 					<table class="table">
@@ -1690,23 +1701,44 @@
 					</table>
 
 
-				<h4>Offtake contract</h4>
+				<p>Offtake contract</p>
 					
 					<table class="table">
 						<tbody id="myTableOftk"></tbody>
 					</table>
 
-					<table class="table">
-						<tbody id="myTableTime"></tbody>
+
+
+				<h3>Financing timeline</h3>
+				<p>Debt</p>
+
+				<table class="table">
+						<tbody id="myTableFin"></tbody>
 					</table>
 
-
-				<h3>Financing</h3>
 
 				<h2>Indexation</h2>
+
+				<p>Offtake contract</p>
+
 					<table class="table">
-						<tbody id="myTableIndex"></tbody>
+						<tbody id="myTableOftkIndex"></tbody>
 					</table>
+
+				<p>Electricity market price</p>
+
+					<table class="table">
+						<tbody id="myTableMkt"></tbody>
+					</table>
+
+				<p>Operating expenses</p>
+
+					<table class="table">
+						<tbody id="myTableOpex"></tbody>
+					</table>
+
+
+
 
 				<h2>Production</h2>
 					<p>Production</p>
@@ -1722,6 +1754,16 @@
 						<tbody id="myTablePrice"></tbody>
 					</table>
 
+				<h2>Financing plan</h2>
+					<p>Uses</p>
+						<table class="table">
+							<tbody id="myTableFPUses"></tbody>
+						</table>
+
+					<p>Sources</p>
+					<table class="table">
+						<tbody id="myTableFPSources"></tbody>
+					</table>
 
 
 				<h2>Income statement</h2>
@@ -1758,6 +1800,10 @@
 
 				<h2>Distribution account</h2>
 
+				<table class="table">
+						<tbody id="myTableREcash"></tbody>
+					</table> 	
+
 					<table class="table">
 						<tbody id="myTableRE"></tbody>
 					</table> 			
@@ -1767,27 +1813,34 @@
 						<tbody id="DistrAccount"></tbody>
 				</table>
 
-				<h2>Financing plan</h2>
-					<p>Uses</p>
-						<table class="table">
-							<tbody id="myTableFPUses"></tbody>
-						</table>
 
-					<p>Sources</p>
-					<table class="table">
-						<tbody id="myTableFPSources"></tbody>
-					</table>
+
+				<h2>Share capital</h2>
+				<table class="table">
+					<tbody id="myTableEquity"></tbody>
+				</table>
 
 
 				<h2>Senior debt</h2>
+
+				<table class="table">
+					<tbody id="myTableDebtAvailable"></tbody>
+				</table>
+
+				<table class="table">
+					<tbody id="myTableDebtBalance"></tbody>
+				</table>
+
 				<table class="table">
 					<tbody id="myTableSeniorDebt"></tbody>
 				</table>
 
-				<h2>Sizing and sculpting</h2>
+				<p>Sizing and sculpting</p>
 				<table class="table">
 					<tbody id="myTableSizing"></tbody>
 				</table>
+
+
 
 				<h2>Balance sheet</h2>
 					<p>Assets</p>
@@ -1852,11 +1905,54 @@
 
 		var percFormat = new Intl.NumberFormat("en-US",option);
 
+		const columnLabel_summary = {
+
+			"Project IRR (pre-tax)": "%",
+			"Project IRR (post-tax)": "%",
+
+
+			"Equity IRR": "%",
+			"Payback date": "date",
+			"Payback time (from Financial Close)": "years",
+
+
+			"Debt constraint": "text",
+			"Effective gearing": "%",
+			"Average DSCR": "x",
+			"Balance sheet": "true/false",
+			"Financing plan": "true/false",
+
+			"":"",
+			"Date of final repayment":"date",
+			"Tenor (door-to-door)":"years",
+			"Average life (from Financial Close)":"years",
+			"Maximum gearing":"%",
+			"Minimum DSCR":"x",
+			"Equity injection":"text",
+
+
+
+			};
+
+
+
+
 		function build_table(json_input,div_output) {
 			var table_result = []
 					$.each(json_input, function(key, data) {
 						table_result += "<tr>";
 						table_result += "<td>" + key + "</td>";
+
+
+						if (columnLabel_summary.hasOwnProperty(key)) {
+
+						  table_result += "<td>" + columnLabel_summary[key] + "</td>";
+
+						} else {
+						  
+						  table_result += "<td>" + "kEUR" + "</td>";
+	  					}
+
 					$.each(data, function(index, data) {
 						table_result += "<td>" + data + "</td>";
 					});
@@ -1877,67 +1973,311 @@
 				var results = []
 
 				const dict = {
-				  Date: { selector: "#myTableDate", format: "" },
-				  FlagMod: { selector: "#myTableFlagMod", format: numberFormat },
-				  FlagCons: { selector: "#myTableFlagCons", format: numberFormat },
-				  FlagOp: { selector: "#myTableFlagOp", format: numberFormat },
-				  FlagOftk: { selector: "#myTableOftk", format: numberFormat },
-				  arr_time: { selector: "#myTableTime", format: numberFormat },
-				  Prod: { selector: "#myTableProd", format: numberFormat },
-				  arr_index: { selector: "#myTableIndex", format: numberFormat },
-				  IS: { selector: "#myTableIS", format: currencyFormat },
-				  Price: { selector: "#myTablePrice", format: currencyFormat },
-				  arr_sizing: { selector: "#myTableSizing", format: currencyFormat },
-				  Debt: { selector: "#myTableSeniorDebt", format: currencyFormat },
-				  CF_op: { selector: "#myTableCF_operating", format: currencyFormat },
-				  CF_in: { selector: "#myTableCF_inesting", format: currencyFormat },
-				  CF_fi: { selector: "#myTableCF_fiancing", format: currencyFormat },
-				  FP_u: { selector: "#myTableFPUses", format: currencyFormat },
-				  FP_s: { selector: "#myTableFPSources", format: currencyFormat },
-				  CFADS: { selector: "#myTableCFADS", format: currencyFormat },
-				  Distr: { selector: "#DistrAccount", format: currencyFormat },
-				  RE: { selector: "#myTableRE", format: currencyFormat },
-				  BS_a: { selector: "#myTableBSA", format: currencyFormat },
-				  BS_l: { selector: "#myTableBSL", format: currencyFormat },
-				  Audit: { selector: "#myTableAudit", format: currencyFormat }
+				  Date: { selector: "#myTableDate" },
+				  FlagMod: { selector: "#myTableFlagMod" },
+				  FlagCons: { selector: "#myTableFlagCons" },
+				  FlagOp: { selector: "#myTableFlagOp" },
+				  FlagOftk_t: { selector: "#myTableOftk" },
+				  FlagOftk_i: { selector: "#myTableOftkIndex" },
+
+				  FlagFin: { selector: "#myTableFin" },
+
+
+				  Mkt_i: { selector: "#myTableMkt" },
+				  Opex: { selector: "#myTableOpex" },
+				  Prod: { selector: "#myTableProd" },
+				  IS: { selector: "#myTableIS" },
+				  Price: { selector: "#myTablePrice" },
+				  Sizing: { selector: "#myTableSizing" },
+				  Eqt: { selector: "#myTableEquity" },
+		  
+				  Debt_a: { selector: "#myTableDebtAvailable" },
+				  Debt_b: { selector: "#myTableDebtBalance" },
+				  Debt_i: { selector: "#myTableSeniorDebt" },
+				  CF_op: { selector: "#myTableCF_operating" },
+				  CF_in: { selector: "#myTableCF_inesting" },
+				  CF_fi: { selector: "#myTableCF_fiancing" },
+				  FP_u: { selector: "#myTableFPUses" },
+				  FP_s: { selector: "#myTableFPSources" },
+				  CFADS: { selector: "#myTableCFADS" },
+				  Distr: { selector: "#DistrAccount" },
+				  RE_c: { selector: "#myTableREcash" },
+				  RE_b: { selector: "#myTableRE" },
+				  BS_a: { selector: "#myTableBSA" },
+				  BS_l: { selector: "#myTableBSL" },
+				  Audit: { selector: "#myTableAudit" }
 				};
+
+
+
+				const columnFormatting = {
+				" Target DSCR": formatDSCR,
+				" Average interest rate": formatAsPercent,
+				" Seasonality": formatAsPercent,
+				" Year": formatAsInt,
+				" Days in period": formatAsInt,
+				" Days in year": formatAsInt,
+				" Years in period": formatAsPercent,
+				" Construction": formatAsInt,
+				" Percentage in contract period": formatAsPercent,
+				" Indexation": formatAsPercent,
+				" Discount factor": formatAsPercent,
+				" Cumulative discount factor": formatAsPercent,
+				" Capacity degradation factor": formatAsPercent,
+				" Years from indexation start date": formatAsFloat,
+				" Cash available for dividends": formatOther,
+				" Dividends declared": formatOther,
+				" Dividends paid": formatOther,
+
+
+
+				  // Add more column names and corresponding formatting functions here
+				};
+
+
+
+
+				const columnLabel = {
+				" Period start": "date",
+				" Period end": "date",
+				" Year": "year",
+				" Days in period": "days",
+				" Days in year": "days",
+				" Years in period": "years",
+				" Construction start": "#",
+				" Construction": "#",
+				" Construction end": "#",
+				" Operations": "true/false",
+				" Years during operations": "year",
+				" Years from COD (BoP)": "years",
+				" Years from COD (EoP)": "years",
+				" Years from COD (avg.)": "years",
+				" Seasonality": "%",
+				" Liquidation": "true/false",
+				" Liquidation end": "true/false",
+				" Contract period": "true/false",
+				" Contract start date": "date",
+				" Contract end date": "date",
+				" Days in contract period": "days",
+				" Percentage in contract period": "%",
+				" Indexation period": "true/false",
+				" Indexation start date": "date",
+				" Indexation end date": "date",
+				" Indexation (days)": "days",
+				" Years from indexation start date": "years",
+				" Indexation": "%",
+				" Capacity before degradation": "MW",
+				" Capacity degradation factor": "%",
+
+				" Capacity after degradation": "MW",
+				" Production": "MWh",
+				" Electricity market price before indexation": "EUR",
+				" Electricity market price after indexation": "EUR",
+				" Contract price before indexation": "EUR",
+				" Contract price after indexation": "EUR",
+
+
+				" Amortisation period": "true/false",
+
+
+				" Target DSCR": "x",
+				" Average interest rate": "%",
+				" Discount factor": "%",
+				" Cumulative discount factor": "%",
+
+				" Financing plan balanced": "test",
+				" Balance sheet balanced": "test",
+
+
+				  // Add more column names and corresponding formatting functions here
+				};
+
+
+
+
+				const excludedColumns = [
+				  " Period start",
+				  " Period end",
+				  " Contract start date",
+				  " Contract end date",
+				  " Electricity price indexation start date",
+				  " Electricity price indexation end date",
+				  " Opex indexation start date",
+				  " Opex indexation end date",
+				  " Year",
+				  " Years from COD (BoP)",
+				  " Years from COD (EoP)",
+				  " Years from COD (avg.)",
+				  " Seasonality",
+				  " Capacity before degradation",
+				  " Capacity degradation",
+				  " Capacity after degradation",
+				  " Electricity market price before indexation",
+				  " Electricity market price after indexation",
+				  " Contract price before indexation",
+				  " Days in period",
+				  " Days in year",
+				  " Years in period",
+				  " Contract price after indexation",
+				  " Days in contract period",
+				  " Percentage in contract period",
+				  " Distributable profit",
+				  " Cash available for dividends",
+				  " Retained earnings (BoP)",
+				  " Retained earnings (EoP)",
+				  " Distribution account balance (BoP)",
+				  " Distribution account balance (EoP)",
+				  " Debt available (BoP)",
+				  " Debt available (EoP)",
+				  " Senior debt balance (BoP)",
+				  " Senior debt balance (EoP)",
+				  " Target DSCR",
+				  " Average interest rate",
+				  " Discount factor",
+				  " Cumulative discount factor",
+				  " Assets",
+				  " Distribution account balance",
+				  " Total assets",
+				  " Retained earnings",
+				  " Senior debt",
+				  " Equity",
+				  " Total liabilities",
+				  " Financing plan balanced",
+				  " Balance sheet balanced",
+				  " Indexation period",
+				  " Indexation start date",
+				  " Indexation end date",
+				  " Indexation (days)",
+				  " Years from indexation start date",
+				  " Indexation",
+				  " Share capital (BoP)",
+				  " Share capital (EoP)",
+
+
+
+
+				];
+
+
+				
 
 				for (const key in dict) {
 				  const entry = dict[key];
-				  const { selector, format } = entry;
+				  const { selector } = entry;
 				  const dictKey = key;
 				  let tableContent = "";
 
 				  $.each(json.df, function (dataKey, data) {
-				    if (dataKey.startsWith(dictKey)) {
-				      tableContent += "<tr>";
-				      tableContent += "<td>" + dataKey.substring(dictKey.length) + "</td>";
-				      tableContent += "<td>" + numberFormat.format(json.df_sum[dataKey]) + "</td>";
+					if (dataKey.startsWith(dictKey)) {
+						const pd_column_name = dataKey.substring(dictKey.length)
 
-				      $.each(data, function (index, dataValue) {
-				        tableContent += "<td>";
-				        if (key === "Date") {
-				          tableContent += dataValue;
-				        } else {
-				          tableContent += format.format(dataValue);
-				        }
-				        tableContent += "</td>";
-				      });
+					  tableContent += "<tr>";
+					  tableContent += "<td>" + pd_column_name + "</td>";
 
-				      tableContent += "</tr>";
-				    }
+
+					if (columnLabel.hasOwnProperty(pd_column_name)) {
+
+					  tableContent += "<td>" + columnLabel[pd_column_name] + "</td>";
+
+					} else {
+					  
+					  tableContent += "<td>" + "kEUR" + "</td>";
+  					}
+
+
+					if (excludedColumns.includes(pd_column_name)) {
+
+					  tableContent += "<td>" + "" + "</td>";
+
+					} else {
+					  
+					  tableContent += "<td>" + formatOther(json.df_sum[dataKey]) + "</td>";
+  					}
+
+					  $.each(data, function (index, dataValue) {
+						
+						if (columnFormatting.hasOwnProperty(pd_column_name)) {
+        				const formattedValue = columnFormatting[pd_column_name](dataValue);
+						
+						tableContent += "<td>";
+						tableContent += formattedValue;
+						tableContent += "</td>";					
+
+					} else if (!containsExcludedWords(pd_column_name)) {
+						
+        				const formattedValue = formatOther(dataValue);
+
+						tableContent += "<td>";
+						tableContent += formattedValue;
+						tableContent += "</td>";
+					  
+
+					} else {
+
+						tableContent += "<td>";
+						tableContent += dataValue;
+						tableContent += "</td>";
+
+					}
+					});
+
+					}
 				  });
 
 				  $(selector).html(tableContent);
 				}
 
+				function formatDSCR(dataValue) {
+					
+					const formattedValue = dataValue.toFixed(2) + "x";
+
+				return formattedValue;
+				}
+
+				function formatOther(dataValue) {
+					
+				  const roundedValue = Math.round(Math.abs(dataValue) * 10) / 10;
+				  const formattedValue = roundedValue.toLocaleString("fr-FR", {
+				    minimumFractionDigits: 1,
+				    maximumFractionDigits: 1
+				  });
+				  return dataValue < 0 ? `(${formattedValue})` : formattedValue;
+				}
+
+				function formatAsInt(dataValue) {
+  				return Math.floor(dataValue).toString();					
+		
+				}
+
+				function formatAsFloat(dataValue) {
+				  const formattedValue = dataValue.toLocaleString("fr-FR", {
+				    minimumFractionDigits: 1,
+				    maximumFractionDigits: 1
+				  });
+				  return formattedValue;
+}
+
+				function containsExcludedWords(pd_column_name) {
+				  const excludedWords = ["date", "end", "start"];
+				  for (const word of excludedWords) {
+				    if (pd_column_name.toLowerCase().includes(word)) {
+				      return true;
+				    }
+				  }
+				  return false;
+}
 
 				const tables = [
-				  { data: json.df_result, selector: "#summary_debt" },
-				  { data: json.df_result_equity, selector: "#summary_equity" },
-				  { data: json.df_audit, selector: "#summary_audit" },
-				  { data: json.df_result_fp_uses, selector: "#summary_financing_plan_uses" },
-				  { data: json.df_result_fp_sources, selector: "#summary_financing_plan_sources" }
+				  { data: json.table_debt, selector: "#summary_debt" },
+				  { data: json.table_projectIRR, selector: "#summary_project" },
+				  { data: json.table_equity, selector: "#summary_equity" },
+				  { data: json.table_audit, selector: "#summary_audit" },
+				  { data: json.table_uses, selector: "#summary_financing_plan_uses" },
+				  { data: json.table_sources, selector: "#summary_financing_plan_sources" },
+				  { data: json.table_financing_terms, selector: "#summary_financing_terms" },
+
+
+
 				];
 
 				tables.forEach(table => build_table(table.data, table.selector));
@@ -1951,10 +2291,10 @@
 
 				var dict_sidebar = {
 				formatted_date_COD:"#dateCOD",
-				formatted_date_operations_end:"#dateRetirement",
+				end_of_operations_formatted:"#dateRetirement",
 				sum_seasonality:"#sumSeasonality",
 				sum_construction_costs:"#sumConstructionCosts",
-				formatted_date_liquidation:"#dateLiquidation",
+				liquidation_formatted:"#dateLiquidation",
 				date_debt_maturity:"#debtMaturity",
 
 				};
@@ -1973,19 +2313,23 @@
 				}
 
 				const datasets = [
-				  [Object.values(json.df['Prod Production']), Object.values(json.df['Prod Capacity degradation'])],
+				  [Object.values(json.df['Prod Production']), Object.values(json.df['Prod Capacity degradation factor'])],
 				  [Object.values(json.df['IS Contracted revenues']), Object.values(json.df['IS Uncontracted electricity revenues'])],
 				  [Object.values(json.df['IS Operating expenses']).map(value => value * -1)],
 				  [Object.values(json.df['IS EBITDA']), Object.values(json.df.arr_EBITDA_margin)],
-				  [Object.values(json.df['FP_u Construction costs']), Object.values(json.df['FP_u Cumulative total uses'])],
-				  [Object.values(json.df.arr_sizing_debt_interest_operations), Object.values(json.df.arr_debt_service_repayment), Object.values(json.df.arr_ratios_DSCR)],
-				  [Object.values(json.df['Debt Debt service']), Object.values(json.df.arr_sizing_CFADS)],
-				  [Object.values(json.df.arr_debt_service_repayment), Object.values(json.df['Debt Senior debt balance (EoP)'])],
+				  [Object.values(json.df['FP_u Construction costs']), Object.values(json.df['Cumulative total uses'])],
+				  [Object.values(json.df['FP_s Equity injections']), Object.values(json.df['FP_s Senior debt']), Object.values(json.df['FP_u Total uses']),Object.values(json.df['Gearing during financing plan'])],
+				  [Object.values(json.df['Sizing Interests during operations']), Object.values(json.df.arr_debt_service_repayment), Object.values(json.df.arr_ratios_DSCR)],
+				  [Object.values(json.df['Sizing Target debt service']), Object.values(json.df['Sizing CFADS'])],
+				  [Object.values(json.df.arr_debt_service_repayment), Object.values(json.df['Debt_b Senior debt balance (EoP)'])],
 				  [Object.values(json.df['Equity injections and reimbursement']), Object.values(json.df['Distr Dividends paid']),Object.values(json.df['IRR curve'])],
-				  [Object.values(json.df['RE Retained earnings (BoP)']), Object.values(json.df['Distr Distribution account balance (EoP)'])]
+				  [Object.values(json.df['RE_b Retained earnings (BoP)']), Object.values(json.df['Distr Distribution account balance (BoP)']), Object.values(json.df['Equity dividends and reimbursement'])],
+
+
+
 				];
 
-				const charts = [myChart, myChart2, myChart3, myChart4, myChart5, myChart6, myChart7, myChart8, myChart9, myChart10];
+				const charts = [myChart, myChart2, myChart3, myChart4, myChart5, myChart6, myChart7, myChart8, myChart9, myChart10, myChart11];
 
 				charts.forEach((chart, index) => {
 				  updateChart(chart, datasets[index]);
@@ -2003,6 +2347,7 @@
 
 				alert(firstElement.message)
 				console.log(firstElement.message)
+				
 
 			}
 		});

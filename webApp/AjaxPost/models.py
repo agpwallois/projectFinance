@@ -49,8 +49,7 @@ class Project(models.Model):
 	P99_10y = models.fields.IntegerField(default="2000")
 	production_choice = models.fields.IntegerField(default="2")
 
-	availability = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.99)
-	
+
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m2 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.05)
 	seasonality_m3 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.09)
@@ -204,3 +203,6 @@ class Project(models.Model):
 	devfee_choice = models.fields.IntegerField(default="1")
 	devfee_paid_FC = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	devfee_paid_COD = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)
+
+
+	injection_choice = models.fields.IntegerField(default="1")

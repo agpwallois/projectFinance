@@ -198,6 +198,10 @@ td:first-child {
     max-width: 25em;
 }  
 
+td:nth-child(2) {
+  font-style: italic;
+}  
+
 
 
 /* ---------------------------------------------------

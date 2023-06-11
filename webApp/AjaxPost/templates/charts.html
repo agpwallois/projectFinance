@@ -54,7 +54,7 @@ const myChart = new Chart(ctx, {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
-			label: 'Production (kWh)',
+			label: 'Production',
 			yAxisID: 'A',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
@@ -67,7 +67,7 @@ const myChart = new Chart(ctx, {
 		},{
 
 			type: 'line',
-			label: 'Degradation',
+			label: 'Degradation factor',
 			yAxisID: 'B',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
@@ -92,7 +92,7 @@ const myChart = new Chart(ctx, {
 
 		 title: {
 			display: true,
-			text: 'Production and degradation'
+			text: 'Production (kWh) and degradation factor (%)'
 		}},
 
 		scales: {
@@ -103,7 +103,14 @@ const myChart = new Chart(ctx, {
 			B: {
 				position: 'right',
 				beginAtZero: true,
+			 ticks: {
+			    callback: function (value) {
+			      var multipliedValue = value * 100;
+			      return multipliedValue.toString() + '%';
+			    }
+			  }		
 			},
+
 		}
 	}
 });
@@ -114,7 +121,7 @@ const myChart2 = new Chart(ctx2, {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
-			label: 'Contracted revenues (kEUR)',
+			label: 'Contracted revenues',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(75, 192, 192, 0.2)',
@@ -126,7 +133,7 @@ const myChart2 = new Chart(ctx2, {
 		},{
 
 			type: 'bar',
-			label: 'Merchant revenues (kEUR)',
+			label: 'Merchant revenues',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(255, 206, 86, 0.2)',
@@ -150,7 +157,7 @@ const myChart2 = new Chart(ctx2, {
 
 		 title: {
 			display: true,
-			text: 'Revenues'
+			text: 'Revenues (kEUR)'
 		}},
 
 		scales: {
@@ -170,7 +177,7 @@ const myChart3 = new Chart(ctx3, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
-			label: 'kEUR',
+			label: 'Operating costs',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(54, 162, 235, 0.2)',
@@ -193,7 +200,7 @@ const myChart3 = new Chart(ctx3, {
 
 			title: {
 				display: true,
-				text: 'Operating costs'
+				text: 'Operating costs (kEUR)'
 			}},
 	}
 });
@@ -204,7 +211,7 @@ const myChart4 = new Chart(ctx4, {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
-			label: 'EBITDA (kEUR)',
+			label: 'EBITDA',
 			yAxisID: 'A',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
@@ -217,7 +224,7 @@ const myChart4 = new Chart(ctx4, {
 		},{
 
 			type: 'line',
-			label: 'EBITDA margin (%)',
+			label: 'EBITDA margin',
 			yAxisID: 'B',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
@@ -242,7 +249,7 @@ const myChart4 = new Chart(ctx4, {
 
 		 title: {
 			display: true,
-			text: 'EBITDA and EBITDA margin'
+			text: 'EBITDA (kEUR) and EBITDA margin (%)'
 		}},
 
 		scales: {
@@ -253,6 +260,11 @@ const myChart4 = new Chart(ctx4, {
 			B: {
 				position: 'right',
 				beginAtZero: true,
+				ticks: {
+			    callback: function (value) {
+			      return value.toString() + '%';
+			    }
+			  }		
 			},
 		}
 	}
@@ -302,7 +314,7 @@ const myChart5 = new Chart(ctx5, {
 
 		 title: {
 			display: true,
-			text: 'Construction costs'
+			text: 'Construction costs (kEUR)'
 		}},
 
 	}
@@ -310,6 +322,100 @@ const myChart5 = new Chart(ctx5, {
 
 const ctx6 = document.getElementById('myChart6');
 const myChart6 = new Chart(ctx6, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Equity injections',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+			],
+			borderWidth: 1
+		},{
+
+			type: 'bar',
+			label: 'Debt drawdowns',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 206, 86, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 206, 86, 1)',
+			],
+			borderWidth: 1
+		}
+		,{
+
+			type: 'bar',
+			label: 'Construction costs',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(54, 162, 235, 0.2)',
+			],
+			borderColor: [
+				'rgba(54, 162, 235, 1)',
+			],
+			borderWidth: 1
+		},{
+			type: 'line',
+			yAxisID: 'z',
+			label: 'Gearing during construction',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(75, 192, 192, 0.2)',
+			],
+			borderColor: [
+				'rgba(75, 192, 192, 1)',
+			],
+			borderWidth: 1
+		}
+		]
+	},
+	options: {
+
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Financing plan (kEUR)'
+		}},
+
+		scales: {
+			x: {
+				stacked: true,
+			},
+			y: {
+				stacked: true,
+			},
+				z: {
+				position: 'right',
+				min:0,
+				max:1,
+				ticks: {
+                callback: function (value) {
+                    return (value*100).toString() + '%';
+                }
+            },
+	
+			},
+		}
+	}
+});
+
+
+
+const ctx7 = document.getElementById('myChart7');
+const myChart7 = new Chart(ctx7, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -363,7 +469,7 @@ const myChart6 = new Chart(ctx6, {
 
 		 title: {
 			display: true,
-			text: 'Debt service and DSCR'
+			text: 'Debt service (kEUR) and DSCR (x)'
 		}},
 
 		scales: {
@@ -389,8 +495,8 @@ const myChart6 = new Chart(ctx6, {
 	}
 });
 
-const ctx7 = document.getElementById('myChart7');
-const myChart7 = new Chart(ctx7, {
+const ctx8 = document.getElementById('myChart8');
+const myChart8 = new Chart(ctx8, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -432,14 +538,14 @@ const myChart7 = new Chart(ctx7, {
 
 		 title: {
 			display: true,
-			text: 'Debt service and CFADS'
+			text: 'Debt service and CFADS (kEUR)'
 		}},
 
 	}
 });
 
-const ctx8 = document.getElementById('myChart8');
-const myChart8 = new Chart(ctx8, {
+const ctx9 = document.getElementById('myChart9');
+const myChart9 = new Chart(ctx9, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -481,20 +587,20 @@ const myChart8 = new Chart(ctx8, {
 
 		 title: {
 			display: true,
-			text: 'Debt outstanding and repayments'
+			text: 'Debt outstanding and repayments (kEUR)'
 		}},
 
 	}
 });
 
 
-const ctx9 = document.getElementById('myChart9');
-const myChart9 = new Chart(ctx9, {
+const ctx10 = document.getElementById('myChart10');
+const myChart10 = new Chart(ctx10, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
-			label: 'Share capital injections and reimbursement (kEUR)',
+			label: 'Share capital injections and reimbursement',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(75, 192, 192, 0.2)',
@@ -506,19 +612,19 @@ const myChart9 = new Chart(ctx9, {
 		},{
 
 			type: 'bar',
-			label: 'Dividends (kEUR)',
+			label: 'Dividends',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
-				'rgba(255, 206, 86, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
 			],
 			borderColor: [
-				'rgba(255, 206, 86, 1)',
+				'rgba(54, 162, 235, 1)',
 			],
 			borderWidth: 1
 		},{
 			type: 'line',
 			yAxisID: 'z',
-			label: 'Equity IRR',
+			label: 'Equity IRR (%)',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(255, 99, 132, 0.2)',
@@ -543,7 +649,7 @@ const myChart9 = new Chart(ctx9, {
 
 		 title: {
 			display: true,
-			text: 'Shareholders cash flows and IRR'
+			text: 'Shareholders cash flows (kEUR) and Equity IRR (%)'
 		}},
 
 		scales: {
@@ -563,20 +669,20 @@ const myChart9 = new Chart(ctx9, {
                     callback: function (value) {
                         return value.toString() + '%';
                     }
-                }			
+                },
 			},
 		}
 	}
 });
 
 
-const ctx10 = document.getElementById('myChart10');
-const myChart10 = new Chart(ctx10, {
+const ctx11 = document.getElementById('myChart11');
+const myChart11 = new Chart(ctx11, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'line',
-			label: 'Retained earnings',
+			label: 'Retained earnings (BoP)',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(54, 162, 235, 0.2)',
@@ -588,13 +694,26 @@ const myChart10 = new Chart(ctx10, {
 		},{
 
 			type: 'line',
-			label: 'Distribution account balance',
+			label: 'Distribution account balance (BoP)',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(255, 99, 132, 0.2)',
 			],
 			borderColor: [
 				'rgba(255, 99, 132, 1)',
+			],
+			fill: 'origin',
+			borderWidth: 1
+		},{
+
+			type: 'bar',
+			label: 'Dividends paid',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(75, 192, 192, 0.2)',
+			],
+			borderColor: [
+				'rgba(75, 192, 192, 1)',
 			],
 			fill: 'origin',
 			borderWidth: 1
@@ -613,11 +732,14 @@ const myChart10 = new Chart(ctx10, {
 
 		 title: {
 			display: true,
-			text: 'Cash trap'
+			text: 'Cash trap (kEUR)'
 		}},
 
 	}
 });
+
+
+
 
 </script>
 
