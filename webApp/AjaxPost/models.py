@@ -206,3 +206,12 @@ class Project(models.Model):
 
 
 	injection_choice = models.fields.IntegerField(default="1")
+	subgearing = models.fields.DecimalField(max_digits=4, decimal_places=2, default=90)
+	SHL_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
+
+
+	calculation_detail = models.fields.IntegerField(default="1")
+	payment_delay_revenues = models.fields.IntegerField(default="30")
+	payment_delay_costs = models.fields.IntegerField(default="30")
+
+	DSRA_choice = models.fields.IntegerField(default="1")

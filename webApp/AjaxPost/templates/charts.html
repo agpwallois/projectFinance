@@ -326,13 +326,25 @@ const myChart6 = new Chart(ctx6, {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
-			label: 'Equity injections',
+			label: 'Share capital injections',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(255, 99, 132, 0.2)',
 			],
 			borderColor: [
 				'rgba(255, 99, 132, 1)',
+			],
+			borderWidth: 1
+		},{
+
+			type: 'bar',
+			label: 'Shareholderl loan injections',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(75, 192, 192, 0.2)',
+			],
+			borderColor: [
+				'rgba(75, 192, 192, 1)',
 			],
 			borderWidth: 1
 		},{
@@ -550,6 +562,17 @@ const myChart9 = new Chart(ctx9, {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
+			label: 'Drawdowns',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 206, 86, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 206, 86, 1)',
+			],
+			borderWidth: 1
+		},{
+			type: 'bar',
 			label: 'Repayments',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
@@ -593,14 +616,74 @@ const myChart9 = new Chart(ctx9, {
 	}
 });
 
-
 const ctx10 = document.getElementById('myChart10');
 const myChart10 = new Chart(ctx10, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
+			label: 'Debt service',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(54, 162, 235, 0.2)',
+			],
+			borderColor: [
+				'rgba(54, 162, 235, 1)',
+			],
+			borderWidth: 1
+		},{
+
+			type: 'line',
+			label: 'DSRA balance (BoP)',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+			],
+			fill: 'origin',
+			borderWidth: 1
+		}
+		]
+	},
+	options: {
+
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Debt service reserve account (kEUR)'
+		}},
+
+	}
+});
+
+
+const ctx11 = document.getElementById('myChart11');
+const myChart11 = new Chart(ctx11, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
 			label: 'Share capital injections and reimbursement',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+			],
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Shareholder loan injections and reimbursement',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(75, 192, 192, 0.2)',
@@ -676,8 +759,8 @@ const myChart10 = new Chart(ctx10, {
 });
 
 
-const ctx11 = document.getElementById('myChart11');
-const myChart11 = new Chart(ctx11, {
+const ctx12 = document.getElementById('myChart12');
+const myChart12 = new Chart(ctx12, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -718,6 +801,20 @@ const myChart11 = new Chart(ctx11, {
 			fill: 'origin',
 			borderWidth: 1
 		}
+		,{
+
+			type: 'bar',
+			label: 'Share capital repayment',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 206, 86, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 206, 86, 1)',
+			],
+			fill: 'origin',
+			borderWidth: 1
+		}
 		]
 	},
 	options: {
@@ -737,7 +834,6 @@ const myChart11 = new Chart(ctx11, {
 
 	}
 });
-
 
 
 

@@ -15,6 +15,8 @@ import dateutil.parser
 from datetime import date
 from dateutil import parser
 import math
+from dateutil.parser import ParserError
+import time
 
 import pandas as pd
 import numpy as np
@@ -64,6 +66,7 @@ def project_view(request,id):
 	project = Project.objects.get(id=id)
 
 	if request.method == "POST":
+
 		project_form = ProjectForm(request.POST, instance=project)
 
 		if project_form.is_valid():
@@ -82,7 +85,7 @@ def project_view(request,id):
 
 			""" Capacity and Production inputs """
 		
-			seasonality = import_seasonality(request)
+			inp_seasonality = import_seasonality(request)
 
 			""" Construction costs inputs """
 
@@ -104,7 +107,49 @@ def project_view(request,id):
 
 			""" Senior debt """
 
+
+			start_contract = request.POST['start_contract']
+			end_contract = request.POST['end_contract']
+
+			contract_index_start_date = request.POST['contract_indexation_start_date']
+			date_contract_index_start = datetime.datetime.strptime(contract_index_start_date, "%Y-%m-%d").date()
+		
+
+
+			# INPUT IMPORT #
+
+			inp_income_tax_rate = float(request.POST['corporate_income_tax'])/100
 			inp_debt_gearing_max = float(request.POST['debt_gearing_max'])/100
+			inp_upfront_fee = float(request.POST['debt_upfront_fee'])/100
+			inp_commitment_fee = float(request.POST['debt_commitment_fee'])/100
+			inp_injection = int(request.POST['injection_choice'])
+			inp_subgearing=float(request.POST['subgearing'])/100
+			inp_target_DSCR = float(request.POST['debt_target_DSCR'])
+			inp_all_in_interest = np.array([
+				float(request.POST['debt_margin']),
+				float(request.POST['debt_swap_rate']),
+				float(request.POST['debt_swap_margin']),
+				float(request.POST['debt_reference_rate_buffer']),
+				])
+			inp_debt_interest_rate = np.sum(inp_all_in_interest)/100			
+			inp_length_operations = int(request.POST['operating_life'])
+			inp_SHL_margin_rate = float(request.POST['SHL_margin'])/100
+			inp_devfee_paid_FC = float(request.POST['devfee_paid_FC'])
+			inp_devfee_paid_COD = float(request.POST['devfee_paid_COD'])
+			inp_price_contract = float(request.POST['contract_price'])
+			inp_index_rate_merchant = float(request.POST['price_elec_indexation'])/100
+			inp_index_rate_contract = float(request.POST['contract_indexation'])/100
+			inp_index_rate_opex = float(request.POST['opex_indexation'])/100
+			inp_payment_delay_rev=int(request.POST['payment_delay_revenues'])
+			inp_payment_delay_costs=int(request.POST['payment_delay_costs'])
+			inp_opex = float(request.POST['opex'])
+			
+			periodicity = int(request.POST['periodicity'])
+
+			inp_dsra = 6 if int(request.POST['DSRA_choice']) == 1 else 12
+
+
+
 
 			""" Arrays instanciation """
 
@@ -112,149 +157,336 @@ def project_view(request,id):
 
 			""" Create date series """
 
-			arr_start_period,arr_end_period = create_period_series(request)
+			start_time = time.time()
+			period_start,period_end = create_period_series(request,periodicity)
+			end_time = time.time()
+			elapsed_time  = end_time-start_time
 
-			df = create_timeline(df,arr_start_period,arr_end_period)
-			df = create_flags_operations(df,COD,arr_start_period,arr_end_period,construction_start,construction_end,end_of_operations,liquidation)
-			df = create_timeline_contract(df,request,arr_start_period,arr_end_period)
-
-			arr_end_period_year = arr_end_period.dt.year
-			df['FlagMod Year'] = arr_end_period_year
-
-
-			arr_date_start_elec_index = array_time(arr_start_period,date_price_elec_index_start,end_of_operations)
-
-
-			arr_date_end_elec_index = array_time(arr_end_period,date_price_elec_index_start,end_of_operations)
-
-			arr_date_start_opex_index = array_time(arr_start_period,date_opex_index_start,end_of_operations)
-			
-			arr_date_end_opex_index = array_time(arr_end_period,date_opex_index_start,end_of_operations)
+			arr_date_start_contract_period, arr_date_end_contract_period = create_contract_period_series(period_start,period_end,start_contract,end_contract)
+			arr_date_start_contract_index_period, arr_date_end_contract_index_period = create_contract_index_series(request,period_start,period_end,start_contract,end_contract,date_contract_index_start)			
+			arr_date_start_elec_index = array_time(period_start,date_price_elec_index_start,end_of_operations)
+			arr_date_end_elec_index = array_time(period_end,date_price_elec_index_start,end_of_operations)
+			arr_date_start_opex_index = array_time(period_start,date_opex_index_start,end_of_operations)	
+			arr_date_end_opex_index = array_time(period_end,date_opex_index_start,end_of_operations)
 
 			""" Create flag series """
 
-			df['Mkt_i Indexation period'] = array_flag(arr_date_end_elec_index,date_price_elec_index_start,arr_date_start_elec_index,end_of_operations)
-			df['Opex Indexation period'] = array_flag(arr_date_end_opex_index,date_opex_index_start,arr_date_start_opex_index,end_of_operations)
-			df['FlagFin Amortisation period'] = (arr_end_period<=pd.to_datetime(debt_maturity)).astype(int)*df['FlagOp Operations']
+			flag_operations = create_flag_operations(COD,period_start,period_end,end_of_operations)
+			flag_construction = create_flag_construction(period_start,construction_end)
+			flag_construction_end = create_flag_construction_end(period_end,construction_end)
+			flag_construction_start = create_flag_construction_start(COD,period_start,construction_start)
+			flag_liquidation = create_flag_liquidation(period_end,end_of_operations)
+			flag_liquidation_end = create_flag_liquidation_end(period_end,liquidation)
+			
+			flag_contract = array_flag(arr_date_end_contract_period,start_contract,arr_date_start_contract_period,end_contract)
+			flag_contract_indexation_period = array_flag(arr_date_end_contract_index_period,date_contract_index_start,arr_date_start_contract_index_period,end_contract)
+			
+			flag_elec_indexation_period = array_flag(arr_date_end_elec_index,date_price_elec_index_start,arr_date_start_elec_index,end_of_operations)
+			flag_opex_indexation_period= array_flag(arr_date_end_opex_index,date_opex_index_start,arr_date_start_opex_index,end_of_operations)
 
-
-			df['Mkt_i Indexation start date'] = pd.to_datetime(arr_date_start_elec_index).dt.strftime('%d/%m/%Y')
-			df['Mkt_i Indexation start date'] = df['Mkt_i Indexation start date']*df['Mkt_i Indexation period']
-
-			df['Mkt_i Indexation end date'] = pd.to_datetime(arr_date_end_elec_index).dt.strftime('%d/%m/%Y')
-			df['Mkt_i Indexation end date'] = df['Mkt_i Indexation end date']*df['Mkt_i Indexation period']
-
-
-			df['Opex Indexation start date'] = pd.to_datetime(arr_date_start_opex_index).dt.strftime('%d/%m/%Y')
-			df['Opex Indexation end date'] = pd.to_datetime(arr_date_end_opex_index).dt.strftime('%d/%m/%Y')
-			df['Opex Indexation start date'] = df['Opex Indexation start date']*df['Opex Indexation period']
-			df['Opex Indexation end date'] = df['Opex Indexation end date']*df['Opex Indexation period']
-
+			flag_debt_amo = (period_end<=pd.to_datetime(debt_maturity)).astype(int)*flag_operations
 
 			""" Create time series """
 
-			df['FlagMod Days in period'] = array_days(arr_end_period,arr_start_period,1)
-			df['FlagOftk_t Percentage in contract period']=df['FlagOftk_t Days in contract period']/df['FlagMod Days in period']
+			days_in_period = array_days(period_end,period_start,1)
+			days_in_year = period_end.dt.is_leap_year*366+(1-period_end.dt.is_leap_year)*365
+			years_in_period = days_in_period/days_in_year
+			years_during_operations = years_in_period*flag_operations
+			years_from_COD_eop = years_during_operations.cumsum()
+			years_from_COD_bop = years_from_COD_eop-years_during_operations
+			years_from_COD_avg = (years_from_COD_eop+years_from_COD_bop)/2
+			period_end_year = period_end.dt.year
 
-			df['Mkt_i Indexation (days)'] = array_days(arr_date_end_elec_index,arr_date_start_elec_index,df['Mkt_i Indexation period'])
-			df['Opex Indexation (days)'] = array_days(arr_date_end_opex_index,arr_date_start_opex_index,df['Opex Indexation period'])
+			days_in_contract = array_days(arr_date_end_contract_period,arr_date_start_contract_period,flag_contract)
+			days_contract_indexation = array_days(arr_date_end_contract_index_period,arr_date_start_contract_index_period,flag_contract_indexation_period)
+			pct_in_contract_period=days_in_contract/days_in_period
 
-			df['FlagMod Days in year'] = arr_end_period.dt.is_leap_year*366 + (1-arr_end_period.dt.is_leap_year)*365
-			df['FlagMod Years in period'] = df['FlagMod Days in period']/df['FlagMod Days in year']
+			days_elec_indexation = array_days(arr_date_end_elec_index,arr_date_start_elec_index,flag_elec_indexation_period)
+			days_opex_indexation = array_days(arr_date_end_opex_index,arr_date_start_opex_index,flag_opex_indexation_period)
 
-			df['FlagOp Years during operations'] = df['FlagMod Years in period']*df['FlagOp Operations']
-			df['FlagOp Years from COD (EoP)'] = df['FlagOp Years during operations'].cumsum()
-			df['FlagOp Years from COD (BoP)'] = df['FlagOp Years from COD (EoP)']-df['FlagOp Years during operations']
-			df['FlagOp Years from COD (avg.)'] = (df['FlagOp Years from COD (BoP)']+df['FlagOp Years from COD (EoP)'])/2
+			years_from_base_date_contract = calculate_years_from_base_date(days_contract_indexation,days_in_year)
+			years_from_base_date_elec = calculate_years_from_base_date(days_elec_indexation,days_in_year)
+			years_from_base_date_opex = calculate_years_from_base_date(days_opex_indexation,days_in_year)
 
-			df['FlagOftk_i Years from indexation start date']=(df['FlagOftk_i Indexation (days)']/df['FlagMod Days in year']).cumsum()
-			df['Mkt_i Years from indexation start date']=(df['Mkt_i Indexation (days)']/df['FlagMod Days in year']).cumsum()
-			df['Opex Years from indexation start date']=(df['Opex Indexation (days)']/df['FlagMod Days in year']).cumsum()
 
-			df = calculate_production(df,request,arr_start_period,arr_end_period,seasonality)
-			df = calculate_indexation(df,request)
-			df = calculate_prices(df,request,arr_end_period_year,dic_price_elec)
-			df = calculate_revenues(df)
-			df = calculate_opex(df,request)
-			df = calculate_EBITDA(df)
+			seasonality = array_seasonality(period_start,period_end,inp_seasonality)
+			capacity_before_degradation = calculate_capacity(request,flag_operations)
+			degradation_factor = calculate_degradation_factor(request,years_from_COD_avg)
+			capacity_after_degradation = capacity_before_degradation*degradation_factor
+			production = calculate_production(request,seasonality,capacity_after_degradation)
 
-			df['FP_u Construction costs'] = np.hstack([arr_construction_costs,np.zeros(df['FlagOp Operations'].size-arr_construction_costs.size)])*df['FlagCons Construction']
-			df['arr_construction_costs_cumul'] = df['FP_u Construction costs'].cumsum()
-			construction_costs = max(df['arr_construction_costs_cumul'])
 
-			df,target_debt_amount,optimised_devfee,debt_amount_not_converged,total_costs = instantiate_variables(df)
+
+			elec_index_indice =array_index(inp_index_rate_merchant,years_from_base_date_elec)
+			contract_index_indice =array_index(inp_index_rate_contract,years_from_base_date_contract)
+			opex_index_indice =array_index(inp_index_rate_opex,years_from_base_date_opex)
+
+
+			electricity_prices_real = array_elec_prices(period_end_year,dic_price_elec)
+			electricity_prices_indexed = electricity_prices_real*elec_index_indice
+
+			contract_prices_real=inp_price_contract*flag_contract
+			contract_prices_indexed=contract_prices_real*contract_index_indice
+
+
+			contracted_revenues = production*contract_prices_indexed*pct_in_contract_period/1000
+			market_revenues = production*electricity_prices_indexed*(1-pct_in_contract_period)/1000
+			total_revenues = contracted_revenues+market_revenues
+
 			
+			opex = inp_opex*opex_index_indice*years_during_operations
 
-			while debt_amount_not_converged or debt_sculpting_not_converged:
-				
+			EBITDA = total_revenues-opex
+			EBITDA_margin = (EBITDA/total_revenues).fillna(0) * 100
+
+
+
+			revenues_in_period_paid = (1-inp_payment_delay_rev/days_in_period)*total_revenues
+			accounts_receivables_eop= total_revenues-revenues_in_period_paid
+			accounts_receivables_bop = np.roll(accounts_receivables_eop, 1)
+
+			costs_in_period_paid = (1-inp_payment_delay_costs/days_in_period)*opex
+			accounts_payables_eop = opex-costs_in_period_paid
+			accounts_payables_bop = np.roll(accounts_payables_eop, 1)
+
+			cashflows_from_creditors = np.ediff1d(accounts_receivables_eop, to_begin=accounts_receivables_eop[0])
+			cashflows_from_debtors =np.ediff1d(accounts_payables_eop, to_begin=accounts_payables_eop[0])
+			working_cap_movement = cashflows_from_debtors-cashflows_from_creditors
+
+			construction_costs = np.hstack([arr_construction_costs,np.zeros(flag_operations.size-arr_construction_costs.size)])*flag_construction
+			construction_costs_cumul = construction_costs.cumsum()
+			construction_costs_max = max(construction_costs_cumul)
+
+			# INSTANTIATION #
+
+			target_debt_amount = construction_costs_max*inp_debt_gearing_max
+			total_costs=construction_costs_max
+			optimised_devfee = 0
+
+			senior_debt_repayments_target = np.full(period_end.size, 0)
+
+			debt_amount_not_converged = True
+			debt_sculpting_not_converged = True
+			distributable_profit = np.full(period_end.size, 1)
+
+			total_uses=construction_costs
+
+			SHL_balance_bop = np.full(period_end.size, 1)
+			SHL_interests_construction= np.full(period_end.size, 0)
+			SHL_interests_operations= np.full(period_end.size, 0)
+			dsra_bop= np.full(period_end.size, 0)
+			dsra_initial_funding= np.full(period_end.size, 0)
+			dsra_initial_funding_max=0
+			size = period_end.size
+
+			# DEBT LOOP #
+
+			"""while debt_amount_not_converged or debt_sculpting_not_converged:"""
+			for i in range(30):
 				debt_amount = target_debt_amount
 				equity_amount= total_costs-debt_amount
-				df['Debt_b Principal repayment'] = -df['Sizing Debt repayment target']
+				senior_debt_repayments = senior_debt_repayments_target
 
-				df = calculate_debt(df,request,debt_amount,total_costs,equity_amount)
+				gearing_eff = (debt_amount/total_costs)
 
-				df = calculate_depreciation(df,request,construction_costs,optimised_devfee)
-				df = calculate_financing_plan(df)
-				df = calculate_income_statement(df,request)
-				df = calculate_cash_flow_statement(df)
+				total_uses_cumul = total_uses.cumsum()
+
+				if inp_injection == 1:
+					equity_injections_cumul = np.clip(total_uses_cumul, None, equity_amount) 
+					equity_injections = np.ediff1d(equity_injections_cumul, to_begin=equity_injections_cumul[0])
+					share_capital_injections = equity_injections*(1-inp_subgearing)
+					SHL_injections = equity_injections*inp_subgearing		
+					senior_debt_drawdowns = total_uses - equity_injections
+					senior_debt_drawdowns_cumul = senior_debt_drawdowns.cumsum()
+				elif inp_injection == 2:
+					senior_debt_drawdowns_cumul = np.clip(total_uses_cumul * gearing_eff, None, debt_amount)
+					senior_debt_drawdowns = np.ediff1d(senior_debt_drawdowns_cumul, to_begin=senior_debt_drawdowns_cumul[0])
+					equity_injections = total_uses - senior_debt_drawdowns
+					share_capital_injections = equity_injections*(1-inp_subgearing)
+					SHL_injections = equity_injections*inp_subgearing
+
+				# Calculate senior debt balance
+				senior_debt_balance_eop=(senior_debt_drawdowns-senior_debt_repayments).cumsum()
+				senior_debt_balance_bop=senior_debt_balance_eop+senior_debt_repayments-senior_debt_drawdowns
+
+				# Calculate senior debt interests
+				senior_debt_interests=senior_debt_balance_bop*inp_debt_interest_rate*days_in_period/360
+				senior_debt_interests_operations=senior_debt_interests*flag_debt_amo
+				senior_debt_interests_construction=senior_debt_interests*flag_construction
+
+				# Calculate upfront fee 
+				upfront_fee=flag_construction_start*debt_amount*inp_upfront_fee
+
+				# Calculate debt available
+				senior_debt_available_eop=(debt_amount-senior_debt_balance_bop)*flag_construction
+				senior_debt_available_bop=senior_debt_available_eop+senior_debt_drawdowns
+
+				# Calculate capitalised fees 
+				commitment_fees=senior_debt_available_bop*inp_commitment_fee*days_in_period/360
+				capitalised_fees_idc_cumul = (senior_debt_interests_construction+upfront_fee+commitment_fees+SHL_interests_construction).cumsum()
+				capitalised_fees_idc_max = max(capitalised_fees_idc_cumul)
 				
+				# Calculate depreciation
+				depreciation = (construction_costs_max+capitalised_fees_idc_max+optimised_devfee)*years_during_operations/inp_length_operations
 
-				df = calculate_debt_sizing(df,request)
+				# Calculate total uses	
+				total_uses=construction_costs+senior_debt_interests_construction+optimised_devfee+upfront_fee+commitment_fees+dsra_initial_funding
 
-				debt_amount_DSCR = npv(df['Sizing Target debt service'],df['Sizing Cumulative discount factor'])
+				# Calculate EBIT, EBT, and net income
+				EBIT=EBITDA-depreciation
+				EBT=EBIT-senior_debt_interests_operations-SHL_interests_operations
+				corporate_income_tax=np.clip(inp_income_tax_rate*EBT, 0, None)
+				net_income=EBT-corporate_income_tax
 
-				interests_during_construction = sum(df['FP_u Interests during construction'])
-				upfront_fee = sum(df['Debt_i Arrangement fee (upfront)'])
-				commitment_fee= sum(df['Debt_i Commitment fees'])
+				# Calculate cash flows
+				cash_flows_operating=EBITDA+working_cap_movement-corporate_income_tax
+				cash_flows_investing=-(construction_costs+senior_debt_interests_construction+optimised_devfee)
+				cash_flows_financing=upfront_fee+commitment_fees+senior_debt_drawdowns+equity_injections
 
+				CFADS=cash_flows_operating
 
-				optimised_devfee = optimise_devfee(request,debt_amount_DSCR,construction_costs,interests_during_construction)
-				total_costs = construction_costs+interests_during_construction+optimised_devfee+upfront_fee+commitment_fee
+				CFADS_amo = CFADS*flag_debt_amo
+				target_DSCR=inp_target_DSCR*flag_debt_amo
+				target_DS=CFADS_amo/inp_target_DSCR
+
+				avg_interest_rate=np.divide(senior_debt_interests_operations,senior_debt_balance_bop,out=np.zeros_like(senior_debt_interests_operations), where=senior_debt_balance_bop!=0)/days_in_period*360
+				discount_factor=(1/(1+(avg_interest_rate*days_in_period/360)))*flag_debt_amo+flag_construction
+				discount_factor_cumul=discount_factor.cumprod()
+
+				debt_amount_DSCR = npv(target_DS,discount_factor_cumul)
+
+				"""clarifier"""
+
+				interests_during_construction = sum(senior_debt_interests_construction)
+				upfront_fee = sum(upfront_fee)
+				commitment_fee= sum(commitment_fees)
+
+				optimised_devfee = optimise_devfee(request,debt_amount_DSCR,construction_costs_max,interests_during_construction)
+				total_costs = construction_costs_max+interests_during_construction+optimised_devfee+upfront_fee+commitment_fee+dsra_initial_funding_max
 
 				debt_amount_gearing = total_costs*inp_debt_gearing_max
 				target_debt_amount = min(debt_amount_DSCR,debt_amount_gearing)
 
-				devfee_paid_FC = float(request.POST['devfee_paid_FC'])
-				devfee_paid_COD = float(request.POST['devfee_paid_COD'])
+				development_fee = inp_devfee_paid_FC * optimised_devfee * flag_construction_start + inp_devfee_paid_COD * optimised_devfee * flag_construction_end
+				development_fee_cumul = development_fee.cumsum()
 
-				df['FP_u Development fee'] = devfee_paid_FC * optimised_devfee * df['FlagCons Construction start'] + devfee_paid_COD * optimised_devfee * df['FlagCons Construction end']
-				df['arr_development_fee_cumul'] = df['FP_u Development fee'].cumsum()
+				cumul_debt_drawn  = max(senior_debt_drawdowns_cumul)
+				npv_CFADS = npv(CFADS_amo,discount_factor_cumul)
+			
+				DSCR_sculpting = npv_CFADS / cumul_debt_drawn if cumul_debt_drawn > 0 else 1
+				
+				senior_debt_repayments_target = np.minimum(senior_debt_balance_bop,CFADS_amo/DSCR_sculpting - senior_debt_interests_operations)
 
-				df = calculate_debt_sculpting(df)
+				DS_effective=senior_debt_repayments+senior_debt_interests_operations
+				DSCR_effective = np.divide(CFADS_amo,DS_effective,out=np.zeros_like(CFADS_amo), where=DS_effective!=0)
+
+				# Calculate DSRA
+				cash_available_for_dsra = np.maximum(CFADS - DS_effective,0)
+				dsra_target = calculate_dsra_target(inp_dsra,periodicity,DS_effective)*flag_debt_amo
+				dsra_initial_funding = calculate_dsra_funding(dsra_target)*flag_construction_end
+				dsra_additions_available = np.minimum(cash_available_for_dsra,dsra_target)
+				dsra_target = dsra_target+dsra_initial_funding
+				dsra_eop=np.clip((dsra_initial_funding+dsra_additions_available).cumsum(),0,dsra_target)
+				dsra_eop_mov=np.ediff1d(dsra_eop, to_begin=dsra_eop[0])
+				dsra_additions=np.maximum(dsra_eop_mov,0)
+				dsra_release = np.minimum(dsra_eop_mov,0)
+				dsra_bop=np.roll(dsra_eop, 1)
+				dsra_mov = (dsra_eop-dsra_bop)*flag_debt_amo
+				dsra_initial_funding_max = max(dsra_initial_funding)
+
+				
+
+				cash_available_for_distribution = (CFADS - senior_debt_interests_operations - senior_debt_repayments - dsra_mov)
+				transfers_distribution_account = cash_available_for_distribution
+
+				start_time = time.time()
+
+
+				SHL_balance_bop=np.array(SHL_balance_bop)
+				days_in_period=np.array(days_in_period)
+				flag_operations=np.array(flag_operations)
+				flag_construction=np.array(flag_construction)
+				transfers_distribution_account=np.array(transfers_distribution_account)
+				distributable_profit=np.array(distributable_profit)
+				SHL_injections=np.array(SHL_injections)
+				net_income=np.array(net_income)
+
+
+	
+				distribution_account = calculate_distribution_account(SHL_balance_bop, inp_SHL_margin_rate, days_in_period, flag_operations, flag_construction,
+						  transfers_distribution_account, distributable_profit, SHL_injections, net_income)
+
+
+				SHL_interests_operations = distribution_account['SHL_interests_operations']
+				SHL_interests_construction = distribution_account['SHL_interests_construction']
+				cash_available_for_SHL_interests = distribution_account['cash_available_for_SHL_interests']
+				SHL_interests_paid = distribution_account['SHL_interests_paid']
+				cash_available_for_dividends = distribution_account['cash_available_for_dividends']
+				cash_available_for_SHL_repayments = distribution_account['cash_available_for_SHL_repayments']
+				dividends_paid = distribution_account['dividends_paid']
+				SHL_repayments = distribution_account['SHL_repayments']
+				distribution_account_eop = distribution_account['distribution_account_eop']
+				distribution_account_bop = distribution_account['distribution_account_bop']
+				SHL_balance_eop = distribution_account['SHL_balance_eop']
+				SHL_balance_bop = distribution_account['SHL_balance_bop']
+				retained_earnings_eop = distribution_account['retained_earnings_eop']
+				retained_earnings_bop = distribution_account['retained_earnings_bop']
+				distributable_profit = distribution_account['distributable_profit']
+
+				
+				end_time = time.time()
+				execution_time_distribution_account = end_time - start_time
 
 				""" Convergence tests """
 
-				debt_amount_not_converged = abs(debt_amount-target_debt_amount)>0
-				debt_sculpting_not_converged = sum(df['arr_sculpting_test'])!=0
+				debt_amount_not_converged = abs(debt_amount-target_debt_amount)>0.1
+				difference = senior_debt_repayments_target-senior_debt_repayments
+				debt_sculpting_not_converged = np.where(difference == 0, True, False)
+				debt_sculpting_not_converged = np.any(np.logical_not(debt_sculpting_not_converged))
 
-			""" Distribution account """
+			share_capital_repayment=distribution_account_bop*flag_liquidation_end
+			distribution_account_eop=distribution_account_eop-share_capital_repayment
 
-			df = calculate_distribution_account(df)
-			
+			share_capital_eop = (share_capital_injections - share_capital_repayment).cumsum()
+			share_capital_bop = share_capital_eop - (share_capital_injections-share_capital_repayment)
+
+
+			equity_cash_flows = -equity_injections+dividends_paid+share_capital_repayment+SHL_interests_operations+SHL_repayments
+			equity_cash_flows_cumul = equity_cash_flows.cumsum()
+
+
 			""" Balance sheet """		
 
-			df['Distr Share capital reimbursement'] = df['Distr Distribution account balance (BoP)']*df['FlagOp Liquidation end']
-			df['Distr Distribution account balance (EoP)'] = df['Distr Distribution account balance (EoP)']-df['Distr Share capital reimbursement']
-			
-			df = calculate_equity(df)
-			df = calculate_balance_sheet(df)
+			PPE = construction_costs_cumul+capitalised_fees_idc_cumul+development_fee_cumul-depreciation.cumsum()
+			total_assets = PPE+accounts_receivables_eop+distribution_account_eop+dsra_eop
 
-			df = create_IRR_curve(df,arr_end_period)
+			total_liabilities = share_capital_eop+SHL_balance_eop+senior_debt_balance_eop+retained_earnings_eop+accounts_payables_eop
 
+			total_sources = senior_debt_drawdowns+equity_injections
+
+			audit_financing_plan = total_uses-total_sources
+			audit_balance_sheet = total_assets-total_liabilities
+
+			share_capital_injections_repayments = -share_capital_injections+share_capital_repayment
+			SHL_injections_repayments=-SHL_injections+SHL_repayments
+			dividends_and_share_capital_repayment = dividends_paid+share_capital_repayment
+
+			irr_values = create_IRR_curve(equity_cash_flows,period_end)
 			""" Outputs """
 		
+			test_numpy = is_numpy_array(period_start)
+			test_panda= is_pandas_array(period_start)
+
 			debt_constraint = determine_debt_constraint(debt_amount_DSCR,debt_amount_gearing)
-			table_uses = create_table_uses(construction_costs,optimised_devfee,interests_during_construction,upfront_fee,commitment_fee,total_costs)
-			table_sources = create_table_sources(df,debt_amount)
-			table_debt = create_table_debt(df,debt_amount,debt_constraint,total_costs)
-			table_projectIRR = create_table_projectIRR(df,arr_end_period)
-			table_equity = create_table_equity(df,construction_start,arr_end_period)
-			table_financing_terms = create_table_financing_terms(request,df,construction_start,debt_amount)
-			table_audit = create_table_audit(df)
+			table_uses = create_table_uses(construction_costs_max,optimised_devfee,interests_during_construction,upfront_fee,commitment_fee,total_costs,dsra_initial_funding_max)
+			table_sources = create_table_sources(share_capital_injections,SHL_injections,debt_amount)
+			table_debt = create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo)
+			table_projectIRR = create_table_projectIRR(total_uses,EBITDA,corporate_income_tax,period_end)
+			table_equity = create_table_equity(construction_start,period_end,equity_cash_flows,equity_cash_flows_cumul)
+			table_financing_terms = create_table_financing_terms(request,construction_start,debt_amount,period_end,senior_debt_balance_eop,share_capital_eop,SHL_balance_eop,years_in_period,senior_debt_balance_bop,SHL_balance_bop,SHL_injections)
+			table_audit = create_table_audit(audit_financing_plan,audit_balance_sheet)
 
-			df = calculate_gearing_financing_plan(df)
-
-			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
+			gearing_during_finplan = senior_debt_drawdowns.cumsum()/(equity_injections.cumsum()+senior_debt_drawdowns.cumsum())
 
 			COD_formatted,end_of_operations_formatted,liquidation_formatted,debt_maturity_formatted = format_dates(COD,end_of_operations,liquidation,debt_maturity)
 
@@ -263,6 +495,243 @@ def project_view(request,id):
 			sum_construction_costs = np.sum(arr_construction_costs)
 
 
+			data_detailed = {
+				
+				'Date Period start': pd.to_datetime(period_start).dt.strftime('%d/%m/%Y'),
+				'Date Period end': pd.to_datetime(period_end).dt.strftime('%d/%m/%Y'),
+
+				'FlagCons Construction': flag_construction,
+				'FlagCons Construction start': flag_construction_start,
+				'FlagCons Construction end': flag_construction_end,
+				
+				'FlagMod Year': period_end_year,
+				'FlagMod Days in period': days_in_period,
+				'FlagMod Days in year': days_in_year,
+				'FlagMod Years in period': years_in_period,
+
+				'FlagOftk_t Contract period': flag_contract,
+				'FlagOftk_t Contract start date': pd.to_datetime(arr_date_start_contract_period).dt.strftime('%d/%m/%Y'),
+				'FlagOftk_t Contract end date': pd.to_datetime(arr_date_end_contract_period).dt.strftime('%d/%m/%Y'),
+				'FlagOftk_t Days in contract period': days_in_contract,
+				'FlagOftk_t Percentage in contract period': pct_in_contract_period,
+
+				'FlagOftk_i Indexation period': flag_contract_indexation_period,
+				'FlagOftk_i Indexation start date': pd.to_datetime(arr_date_start_contract_index_period).dt.strftime('%d/%m/%Y'),
+				'FlagOftk_i Indexation end date': pd.to_datetime(arr_date_end_contract_index_period).dt.strftime('%d/%m/%Y'),
+				'FlagOftk_i Indexation (days)': days_contract_indexation,
+				'FlagOftk_i Indexation': contract_index_indice,
+
+				'FlagOp Operations': flag_operations,
+				'FlagOp Years from COD (BoP)': years_from_COD_bop,
+				'FlagOp Years from COD (EoP)': years_from_COD_eop,
+				'FlagOp Years from COD (avg.)': years_from_COD_avg,
+				'FlagOp Years during operations': years_during_operations,
+				'FlagOp Liquidation': flag_liquidation,
+				'FlagOp Liquidation end': flag_liquidation_end,
+				'FlagOp Seasonality':seasonality,
+
+				'FlagFin Amortisation period': flag_debt_amo,
+
+				
+				'IS Contracted revenues': contracted_revenues,
+				'IS Uncontracted electricity revenues': market_revenues,
+				'IS Total revenues': total_revenues,
+				'IS Operating expenses': -opex,
+				'IS EBITDA':EBITDA,
+				'IS Depreciation':-depreciation,
+				'IS EBIT':EBIT,
+				'IS Senior debt interests':-senior_debt_interests_operations,
+				'IS Shareholder loan interests':-SHL_interests_operations,
+				'IS EBT':EBT, 
+				'IS Corporate income tax':-corporate_income_tax,
+				'IS Net income':net_income,
+
+			
+				'Mkt_i Indexation': elec_index_indice,
+				'Mkt_i Indexation (days)': days_elec_indexation,
+				'Mkt_i Indexation end date': pd.to_datetime(arr_date_end_elec_index).dt.strftime('%d/%m/%Y'),
+				'Mkt_i Indexation period': flag_elec_indexation_period,
+				'Mkt_i Indexation start date': pd.to_datetime(arr_date_start_elec_index).dt.strftime('%d/%m/%Y'),
+				
+				'Opex Indexation': opex_index_indice,
+				'Opex Indexation (days)': days_opex_indexation,
+				'Opex Indexation end date': pd.to_datetime(arr_date_end_opex_index).dt.strftime('%d/%m/%Y'),
+				'Opex Indexation period': flag_opex_indexation_period,
+				'Opex Indexation start date': pd.to_datetime(arr_date_start_opex_index).dt.strftime('%d/%m/%Y'),
+				'Opex Years from indexation start date': years_from_base_date_opex,
+				
+				'Price Contract price (unindexed)': contract_prices_real,
+				'Price Contract price (indexed)': contract_prices_indexed,
+				'Price Electricity market price (unindexed)': electricity_prices_real,
+				'Price Electricity market price (indexed)': electricity_prices_indexed,
+				
+				'Prod Capacity after degradation': capacity_after_degradation,
+				'Prod Capacity before degradation': capacity_before_degradation,
+				'Prod Capacity degradation factor': degradation_factor,
+				'Prod Production': production,
+				
+				'EBITDA margin': EBITDA_margin,
+				'arr_construction_costs_cumul': construction_costs_cumul,							
+
+
+
+				'WCRec Accounts receivables (BoP)':accounts_receivables_bop,
+				'WCRec Revenue accrued in period':total_revenues,
+				'WCRec Payment received in period':-revenues_in_period_paid-accounts_receivables_bop,
+				'WCRec Accounts receivables (EoP)':accounts_receivables_eop,
+
+				'WCPay Accounts payables (BoP)':accounts_payables_bop,
+				'WCPay Costs accrued in period':opex,
+				'WCPay Payment made in period':-costs_in_period_paid-accounts_payables_bop,
+				'WCPay Accounts payables (EoP)':accounts_payables_eop,
+
+				'WCMov Cash flow from (to) creditors':-cashflows_from_creditors,
+				'WCMov Cash flow from (to) debtors':cashflows_from_debtors,
+				'WCMov Net movement in working capital':working_cap_movement,
+				
+				'CF_op EBITDA':EBITDA,
+				'CF_op Net movement in working capital':working_cap_movement,
+				'CF_op Corporate income tax':-corporate_income_tax,
+				'CF_op Cash flows from operating activities':cash_flows_operating,
+				
+				'CF_in Construction costs':-construction_costs,
+				'CF_in Development fee':-optimised_devfee,
+				'CF_in Capitalised IDC':-senior_debt_interests_construction,
+				'CF_in Cash flows from investing activities':cash_flows_investing,
+			
+				'CF_fi Arrangement fee (upfront)':-upfront_fee,
+				'CF_fi Commitment fees':-commitment_fees,				
+				'CF_fi Senior debt drawdowns':senior_debt_drawdowns,
+				'CF_fi Equity injections':equity_injections,
+				'CF_fi Cash flows from financing activities':cash_flows_financing,
+				
+				'CFADS CFADS':CFADS,
+				'CFADS Senior debt interests':-senior_debt_interests_operations,
+				'CFADS Senior debt principal':-senior_debt_repayments,
+
+				'CFDSRA Additions to DSRA':-dsra_additions,
+				'CFDSRA Release of excess funds':-dsra_release,
+
+				'CFDistr Cash available for distribution':cash_available_for_distribution,
+				'CFDistr Transfers to distribution account':-transfers_distribution_account,
+
+
+				'FP_u Construction costs': construction_costs,
+				'FP_u Development fee': development_fee,	
+				'FP_u Interests during construction':senior_debt_interests_construction,
+				'FP_u Arrangement fee (upfront)':upfront_fee,
+				'FP_u Commitment fees':commitment_fees,
+				'FP_u Initial DSRA funding':dsra_initial_funding,
+
+				'FP_u Total uses':total_uses,
+
+				'FP_s Senior debt drawdowns': senior_debt_drawdowns,
+				'FP_s Share capital injections': share_capital_injections,
+				'FP_s Shareholder loan injections': SHL_injections,
+				'FP_s Total sources': total_sources,
+
+				'Debt_a Debt available (BoP)':senior_debt_available_bop,
+				'Debt_a Debt drawdowns':-senior_debt_drawdowns,
+				'Debt_a Debt available (EoP)':senior_debt_available_eop,
+			
+				'Debt_b Senior debt balance (BoP)':senior_debt_balance_bop,
+				'Debt_b Debt drawdowns':senior_debt_drawdowns,
+				'Debt_b Debt repayments':-senior_debt_repayments,
+				'Debt_b Senior debt balance (EoP)':senior_debt_balance_eop,
+			
+				'Debt_i Arrangement fee (upfront)':upfront_fee,
+				'Debt_i Commitment fees':commitment_fees,
+				'Debt_i Debt interests':senior_debt_interests,
+				
+				'Sizing CFADS':CFADS_amo,
+				'Sizing Target DSCR':target_DSCR,
+				'Sizing Target DS':target_DS,
+				'Sizing Average interest rate':avg_interest_rate,
+				'Sizing Discount factor':discount_factor,
+				'Sizing Cumulative discount factor':discount_factor_cumul,
+				'Sizing Interests during operations':senior_debt_interests_operations,
+				'Sizing Debt repayment target':senior_debt_repayments_target,
+
+				'DSRA Cash available for DSRA':cash_available_for_dsra,
+				'DSRA DSRA target liquidity':dsra_target,
+				'DSRA DSRA (BoP)':dsra_bop,
+				'DSRA Additions to DSRA':dsra_additions,
+				'DSRA Release of excess funds':dsra_release,
+				'DSRA DSRA (EoP)':dsra_eop,
+
+				
+				
+				'Distr Distribution account balance (BoP)':distribution_account_bop,
+				'Distr Transfers to distribution account':transfers_distribution_account,
+				'Distr Shareholder loan interests paid':-SHL_interests_paid,
+				'Distr Dividends paid':-dividends_paid,
+				'Distr Shareholder loan reimbursement':-SHL_repayments,
+				'Distr Share capital reimbursement':-share_capital_repayment,
+				'Distr Distribution account balance (EoP)':distribution_account_eop,
+				
+				'SHL Shareholder loan (BoP)':SHL_balance_bop,
+				'SHL Shareholder loan injections':SHL_injections,
+				'SHL Shareholder loan capitalised interests':SHL_interests_construction,
+				'SHL Shareholder loan reimbursement':-SHL_repayments,
+				'SHL Shareholder loan (EoP)':SHL_balance_eop,
+				
+				'iSHL Shareholder loan interests (construction)':SHL_interests_construction,
+				'iSHL Shareholder loan interests (operations)':SHL_interests_operations,
+
+				'RE_b Distributable profit':distributable_profit,			
+				'RE_b Retained earnings (BoP)':retained_earnings_bop,
+				'RE_b Net income': net_income,		
+				'RE_b Dividends declared': -dividends_paid,
+				'RE_b Retained earnings (EoP)':retained_earnings_eop,
+
+				'RE_c Cash available for SHL interests':cash_available_for_SHL_interests,
+				'RE_c Cash available for dividends':cash_available_for_dividends,
+				'RE_c Cash available for SHL repayment':cash_available_for_SHL_repayments,
+
+				'Eqt Share capital (BoP)':share_capital_bop,			
+				'Eqt Share capital injections':share_capital_injections,
+				'Eqt Share capital reimbursement':-share_capital_repayment,
+				'Eqt Share capital (EoP)':share_capital_eop,
+
+				'BS_a Property, Plant, and Equipment': PPE,
+				'BS_a Accounts receivables (EoP)': accounts_receivables_eop,
+				'BS_a Distribution account balance': distribution_account_eop,
+				'BS_a Debt service reserve account': dsra_eop,
+
+				'BS_a Total assets': total_assets,
+			
+				'BS_l Share capital (EoP)': share_capital_eop,
+				'BS_l Retained earnings': retained_earnings_eop,
+				'BS_l Shareholder loan (EoP)': SHL_balance_eop,
+				'BS_l Senior debt (EoP)': senior_debt_balance_eop,
+				'BS_l Accounts payables (EoP)': accounts_payables_eop,
+				'BS_l Total liabilities': total_liabilities,
+
+				'Cumulative total uses':total_uses_cumul,
+				'Senior debt drawdowns neg': -1 * senior_debt_drawdowns,
+				'Share capital injections neg': -1 * share_capital_injections,
+				'Shareholder loan injections neg': -1 * SHL_injections,
+				'Dividends paid pos':dividends_paid,
+				'Operating expenses pos':opex,
+				'Senior debt repayments':senior_debt_repayments,
+				'DSCR effective':DSCR_effective,
+				'Share capital injections and repayment':share_capital_injections_repayments,
+				'Shareholder loan injections and repayment':SHL_injections_repayments,
+				'Share capital repayment pos':share_capital_repayment,
+				'Debt service':DS_effective,
+
+				'IRR curve':irr_values,
+
+				'Gearing during financing plan':gearing_during_finplan,
+				'Audit Balance sheet balanced': audit_balance_sheet,
+				'Audit Financing plan balanced': audit_financing_plan,
+			}
+
+			df = pd.DataFrame(data_detailed)
+			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
+
+			final_repayment_date_debt=find_last_payment_date(period_end, senior_debt_balance_eop)
+
 			data_dump_sidebar = np.array([
 				COD_formatted,
 				end_of_operations_formatted,
@@ -270,27 +739,32 @@ def project_view(request,id):
 				sum_construction_costs,
 				liquidation_formatted,
 				debt_maturity_formatted,
+				debt_amount_DSCR,
+				debt_amount_gearing,
+				target_debt_amount,
+				debt_amount,
+				optimised_devfee,
+				DSCR_sculpting,
+				final_repayment_date_debt,
+				execution_time_distribution_account,
+				test_numpy,
+				test_panda,
 				])
 
-			df = reorder_columns(df)
 
 			return JsonResponse({
-
 				"df":df.to_dict(),
 				"df_sum":df_sum.to_dict(),
-				"table_projectIRR":table_projectIRR.to_dict(),
-
-				"table_debt":table_debt.to_dict(),
-				"table_equity":table_equity.to_dict(),
 				"table_uses":table_uses.to_dict(),
 				"table_sources":table_sources.to_dict(),
-				"table_audit":table_audit.to_dict(),
-				"table_financing_terms":table_financing_terms.to_dict(),
+				"table_projectIRR":table_projectIRR.to_dict(),
+				"table_equity":table_equity.to_dict(),
+				"table_debt":table_debt.to_dict(),
 
+				"table_financing_terms":table_financing_terms.to_dict(),
+				"table_audit":table_audit.to_dict(),
 				"dic_price_elec_keys":dic_price_elec_keys.tolist(),
 				"data_dump_sidebar":data_dump_sidebar.tolist(),
-
-
 				},safe=False, status=200)
 		else:
 			
@@ -311,9 +785,9 @@ def project_view(request,id):
 
 """USED"""
 
-def create_period_series(request):
+def create_period_series(request,periodicity):
 
-	periodicity = int(request.POST['periodicity'])
+	
 	liquidation = int(request.POST['liquidation'])
 	start_construction = request.POST['start_construction']
 	construction_end = request.POST['end_construction']
@@ -343,7 +817,7 @@ def create_period_series(request):
 	start_period_operations = pd.Series(pd.date_range(first_day_start_operations, last_day_end_operations,freq=freq_start_period)).clip(lower=pd.Timestamp(COD))
 	start_period_liquidation = pd.Series(pd.date_range(first_day_start_liquidation, end_liquidation,freq=freq_start_period)).clip(lower=pd.Timestamp(start_liquidation))
 	
-	arr_start_period = pd.concat([start_period_construction,start_period_operations,start_period_liquidation], ignore_index=True)
+	period_start = pd.concat([start_period_construction,start_period_operations,start_period_liquidation], ignore_index=True)
 
 	first_day_start_operations_plus_freq = first_day_next_month(COD,periodicity)
 	last_day_end_operations_plus_freq = first_day_next_month(end_of_operations,periodicity)
@@ -355,9 +829,56 @@ def create_period_series(request):
 	end_period_operations = pd.Series(pd.date_range(first_day_start_operations_plus_freq, last_day_end_operations_plus_freq,freq=freq_end_period)).clip(upper=pd.Timestamp(end_of_operations))
 	end_period_liquidation= pd.Series(pd.date_range(first_day_start_liquidation_plus_freq, last_day_end_liquidation_plus_freq,freq=freq_end_period)).clip(upper=pd.Timestamp(end_liquidation))
 	
-	arr_end_period = pd.concat([end_period_construction,end_period_operations,end_period_liquidation], ignore_index=True)
+	period_end = pd.concat([end_period_construction,end_period_operations,end_period_liquidation], ignore_index=True)
 	
-	return arr_start_period, arr_end_period
+	return period_start, period_end
+
+
+def calculate_distribution_account(SHL_balance_bop, inp_SHL_margin_rate, days_in_period, flag_operations, flag_construction,
+					 transfers_distribution_account, distributable_profit, SHL_injections, net_income):
+	
+	for i in range(100):
+	
+		SHL_interests_operations = SHL_balance_bop * inp_SHL_margin_rate * days_in_period / 360 * flag_operations
+		SHL_interests_construction = SHL_balance_bop * inp_SHL_margin_rate * days_in_period / 360 * flag_construction
+
+		SHL_interests_paid = np.minimum(transfers_distribution_account, SHL_interests_operations)
+		cash_available_for_dividends = transfers_distribution_account - SHL_interests_paid
+		dividends_paid = np.minimum(cash_available_for_dividends, distributable_profit)
+		cash_available_for_SHL_repayments = cash_available_for_dividends - dividends_paid
+		SHL_repayments = np.minimum(SHL_balance_bop, cash_available_for_SHL_repayments)
+		
+		distribution_account_eop = (transfers_distribution_account - SHL_interests_paid - dividends_paid - SHL_repayments).cumsum()
+		distribution_account_bop = distribution_account_eop - (transfers_distribution_account - SHL_interests_paid - dividends_paid - SHL_repayments)
+
+		SHL_balance_eop = (SHL_injections + SHL_interests_construction - SHL_repayments).cumsum()
+		SHL_balance_bop = SHL_balance_eop - (SHL_injections + SHL_interests_construction - SHL_repayments)
+
+		retained_earnings_eop = (net_income - dividends_paid).cumsum()
+		retained_earnings_bop = retained_earnings_eop - (net_income - dividends_paid)
+		
+		distributable_profit = np.clip(retained_earnings_bop + net_income, 0, None)
+
+	result = {
+			'SHL_interests_operations': SHL_interests_operations,
+			'SHL_interests_construction': SHL_interests_construction,
+			'cash_available_for_SHL_interests': transfers_distribution_account,
+			'SHL_interests_paid': SHL_interests_paid,
+			'cash_available_for_dividends': cash_available_for_dividends,	
+			'dividends_paid': dividends_paid,
+			'cash_available_for_SHL_repayments': cash_available_for_SHL_repayments,
+			'SHL_repayments': SHL_repayments,
+			'distribution_account_eop': distribution_account_eop,
+			'distribution_account_bop': distribution_account_bop,
+			'SHL_balance_eop': SHL_balance_eop,
+			'SHL_balance_bop': SHL_balance_bop,
+			'retained_earnings_eop': retained_earnings_eop,
+			'retained_earnings_bop': retained_earnings_bop,
+			'distributable_profit': distributable_profit,
+		}
+
+	return result
+
 
 def create_price_elec_dict(request):
 	
@@ -388,42 +909,40 @@ def create_price_elec_dict(request):
 	return dic_price_elec
 
 
-def reorder_columns(df):
+def calculate_dsra_target(inp_dsra,periodicity,DS_effective):
 
-	df_copy = df.copy()
-	# Define a dictionary with set names as keys and ordered columns as values
-	ordered_columns_dict = {
-		'set1': ['Debt_a Debt available (BoP)', 'Debt_a Debt drawdowns', 'Debt_a Debt available (EoP)'],
-		'set2': ['Debt_b Senior debt balance (BoP)', 'Debt_b Debt drawdowns', 'Debt_b Principal repayment', 'Debt_b Senior debt balance (EoP)'],
-		'set3': ['Debt_i Arrangement fee (upfront)', 'Debt_i Commitment fees', 'Debt_i Debt interests'],
-		'set4': ['Distr Distribution account balance (BoP)', 'Distr Transfers to the distribution account', 'Distr Dividends paid', 'Distr Share capital reimbursement', 'Distr Distribution account balance (EoP)'],
-		'set5': ['RE_b Retained earnings (BoP)', 'RE_b Net income', 'RE_b Dividends declared', 'RE_b Retained earnings (EoP)'],
-		'set6': ['FP_u Construction costs', 'FP_u Development fee', 'FP_u Arrangement fee (upfront)', 'FP_u Commitment fees', 'FP_u Interests during construction', 'FP_u Total uses'],
-		'set7': ['Sizing CFADS','Sizing Target DSCR', 'Sizing Target debt service', 'Sizing Average interest rate', 'Sizing Discount factor', 'Sizing Cumulative discount factor', 'Sizing Interests during operations', 'Sizing Debt repayment target'],
-		'set8': ['FlagCons Construction start','FlagCons Construction', 'FlagCons Construction end'],
-		'set9': ['FlagOp Operations','FlagOp Years during operations', 'FlagOp Years from COD (BoP)','FlagOp Years from COD (EoP)','FlagOp Years from COD (avg.)','FlagOp Seasonality','FlagOp Liquidation','FlagOp Liquidation end'],
-		'set10': ['FlagOftk_i Indexation period'],
-		'set11': ['Mkt_i Indexation period','Mkt_i Indexation start date'],
-		'set12': ['FlagOftk_t Contract period'],
-		'set13': ['Eqt Share Capital (BoP)','Eqt Share Capital injections','Eqt Share capital reimbursement','Eqt Share Capital (EoP)'],
+	look_forward=int(inp_dsra/periodicity)	
+
+	looking_forward_debt_service = []
+	for i in range(len(DS_effective)):
+		forward_debt_service = sum(DS_effective[i+1:min(i+1+look_forward, len(DS_effective))])
+		looking_forward_debt_service.append(forward_debt_service)
+
+	return looking_forward_debt_service
+
+def calculate_dsra_funding(dsra_target):
+	
+	positive_sum = 0
+	count = 0
+
+	for num in dsra_target:
+		if num > 0:
+			positive_sum += num
+			count += 1
+
+		if count == 1:
+			break
+
+	return positive_sum
 
 
+def calculate_interests(balance_bop,rate,days,flag):
+	interests=balance_bop*rate*days/360*flag
+	return interests
 
-
-	}
-
-	remaining_columns = [col for col in df_copy.columns if col not in ordered_columns_dict.values()]
-	new_columns = []
-
-	# Append ordered columns from each set to the new_columns list
-	for ordered_columns in ordered_columns_dict.values():
-		new_columns += ordered_columns
-
-	new_columns += remaining_columns
-
-	df_copy = df_copy[new_columns]
-
-	return df_copy
+def calculate_years_from_base_date(days_of_indexation, days_in_year):
+	years_from_base_date = (days_of_indexation/days_in_year).cumsum()
+	return years_from_base_date		
 
 
 def import_construction_start(request):
@@ -444,7 +963,6 @@ def calculate_COD(construction_end):
 	COD = construction_end + datetime.timedelta(days=1) 
 
 	return COD
-
 
 def calculate_end_of_operations(request,construction_end):
 
@@ -478,14 +996,12 @@ def format_dates(COD,end_of_operations,liquidation,debt_maturity):
 
 	return COD_formatted,end_of_operations_formatted,liquidation_formatted,debt_maturity_formatted
 
-
-
 def import_seasonality(request):
-	seasonality = np.zeros(12)
+	inp_seasonality = np.zeros(12)
 	for i in range(1, 13):
 		key = 'seasonality_m{}'.format(i)
-		seasonality[i - 1] = float(request.POST[key])
-	return seasonality
+		inp_seasonality[i - 1] = float(request.POST[key])
+	return inp_seasonality
 
 def import_construction_costs(request):
 	construction_costs = np.zeros(12)
@@ -494,126 +1010,78 @@ def import_construction_costs(request):
 		construction_costs[i - 1] = float(request.POST[key])
 	return construction_costs
 
+def create_flag_operations(COD,period_start,period_end,end_of_operations):
+	flag_operations = ((period_end>pd.to_datetime(COD))*(period_start<pd.to_datetime(end_of_operations))).astype(int)
+	return flag_operations 
 
-def instantiate_variables(df):
+def create_flag_construction(period_start,construction_end):
+	flag_construction = (period_start<pd.to_datetime(construction_end)).astype(int)
+	return flag_construction
 
-	target_debt_amount = 100
-	total_costs=100
-	optimised_devfee = 0
-	df['Sizing Debt repayment target'] = -100
-	df['RE_c Distributable profit'] = 0
-	df['RE_c Cash available for dividends'] = 0
-	df['FP_u Development fee']= 0
+def create_flag_construction_end(period_end,construction_end):
+	flag_construction_end = (period_end==pd.to_datetime(construction_end)).astype(int)
+	return flag_construction_end 
 
-	df['FP_u Total uses'] = df['FP_u Construction costs']
+def create_flag_construction_start(COD,period_start,construction_start):
+	flag_construction_start = (period_start==pd.to_datetime(construction_start)).astype(int)
+	return flag_construction_start 
 
-	debt_amount_not_converged = True
+def create_flag_liquidation(period_end,end_of_operations):
+	flag_liquidation = (period_end>pd.to_datetime(end_of_operations + datetime.timedelta(days=1))).astype(int)
+	return flag_liquidation 
 
-	return df,target_debt_amount,optimised_devfee,debt_amount_not_converged,total_costs
+def create_flag_liquidation_end(period_end,liquidation):
+	flag_liquidation_end = (period_end==pd.to_datetime(liquidation)).astype(int)
+	return flag_liquidation_end 
 
-def create_timeline(df,arr_start_period,arr_end_period):
-	df_copy = df.copy()
-	df_copy['Date Period start'] = pd.to_datetime(arr_start_period).dt.strftime('%d/%m/%Y')
-	df_copy['Date Period end'] = pd.to_datetime(arr_end_period).dt.strftime('%d/%m/%Y')
-
-
-	return df_copy 
-
-
-
-
-
-def calculate_gearing_financing_plan(df):
-	df_copy = df.copy()
-
-	df_copy['Gearing during financing plan']=df_copy['FP_s Senior debt'].cumsum()/(df_copy['FP_s Equity injections'].cumsum()+df_copy['FP_s Senior debt'].cumsum())
+def create_contract_period_series(period_start,period_end,start_contract,end_contract):
 	
-	return df_copy 
-
-
-def create_flags_operations(df,COD,arr_start_period,arr_end_period,construction_start,construction_end,end_of_operations,liquidation):
-	df_copy = df.copy()
-	df_copy['FlagOp Operations'] = ((arr_end_period>pd.to_datetime(COD))*(arr_start_period<pd.to_datetime(end_of_operations))).astype(int)
-	df_copy['FlagOp Liquidation'] = (arr_end_period>pd.to_datetime(end_of_operations + datetime.timedelta(days=1))).astype(int)
-	df_copy['FlagOp Liquidation end'] = (arr_end_period==pd.to_datetime(liquidation)).astype(int)
-
-	df_copy['FlagCons Construction'] = (arr_start_period<pd.to_datetime(construction_end)).astype(int)
-	df_copy['FlagCons Construction end'] = (arr_end_period==pd.to_datetime(construction_end)).astype(int)
-	df_copy['FlagCons Construction start'] = (arr_start_period==pd.to_datetime(construction_start)).astype(int)
-
-	return df_copy 
-
-def create_timeline_contract(df,request,arr_start_period,arr_end_period):
-	df_copy = df.copy()
-
-	start_contract = request.POST['start_contract']
-	end_contract = request.POST['end_contract']
-
-	contract_index_start_date = request.POST['contract_indexation_start_date']
-	date_contract_index_start = datetime.datetime.strptime(contract_index_start_date, "%Y-%m-%d").date()
-
-	arr_date_start_contract_period = array_time(arr_start_period,start_contract,end_contract)
-	arr_date_end_contract_period = array_time(arr_end_period,start_contract,end_contract)
-
-	df_copy['FlagOftk_t Contract start date'] = pd.to_datetime(arr_date_start_contract_period).dt.strftime('%d/%m/%Y')
-	df_copy['FlagOftk_t Contract end date'] = pd.to_datetime(arr_date_end_contract_period).dt.strftime('%d/%m/%Y')
-
-
-
-	arr_date_start_contract_index_period = array_time(arr_start_period,date_contract_index_start,end_contract)
-	arr_date_end_contract_index_period = array_time(arr_end_period,date_contract_index_start,end_contract)
-
-
-
-	df_copy['FlagOftk_t Contract period'] = array_flag(arr_date_end_contract_period,start_contract,arr_date_start_contract_period,end_contract)
-	df_copy['FlagOftk_t Days in contract period'] = array_days(arr_date_end_contract_period,arr_date_start_contract_period,df_copy['FlagOftk_t Contract period'])
-
-	df_copy['FlagOftk_i Indexation start date'] = pd.to_datetime(arr_date_start_contract_index_period).dt.strftime('%d/%m/%Y')
-	df_copy['FlagOftk_i Indexation end date'] = pd.to_datetime(arr_date_end_contract_index_period).dt.strftime('%d/%m/%Y')
-
-	df_copy['FlagOftk_i Indexation period'] = array_flag(arr_date_end_contract_index_period,date_contract_index_start,arr_date_start_contract_index_period,end_contract)
-	df_copy['FlagOftk_i Indexation (days)'] = array_days(arr_date_end_contract_index_period,arr_date_start_contract_index_period,df_copy['FlagOftk_i Indexation period'])
-
-	df_copy['FlagOftk_t Contract start date']=df_copy['FlagOftk_t Contract start date']*df_copy['FlagOftk_t Contract period']
-	df_copy['FlagOftk_t Contract end date']=df_copy['FlagOftk_t Contract end date']*df_copy['FlagOftk_t Contract period']
-
-	df_copy['FlagOftk_i Indexation start date']=df_copy['FlagOftk_i Indexation start date']*df_copy['FlagOftk_i Indexation period']
-	df_copy['FlagOftk_i Indexation end date']=df_copy['FlagOftk_i Indexation end date']*df_copy['FlagOftk_i Indexation period']
-
-
-
+	arr_date_start_contract_period = array_time(period_start,start_contract,end_contract)
+	arr_date_end_contract_period = array_time(period_end,start_contract,end_contract)
 	
-	return df_copy 
+	return arr_date_start_contract_period, arr_date_end_contract_period
 
-def calculate_production(df,request,arr_start_period,arr_end_period,seasonality):
-	df_copy = df.copy()
+def create_contract_index_series(request,period_start,period_end,start_contract,end_contract,date_contract_index_start):
+	
+
+	arr_date_start_contract_index_period = array_time(period_start,date_contract_index_start,end_contract)
+	arr_date_end_contract_index_period = array_time(period_end,date_contract_index_start,end_contract)
+	
+	return arr_date_start_contract_index_period, arr_date_end_contract_index_period
+
+
+def calculate_capacity(request,flag_operations):
 
 	capacity_installed = int(request.POST['panels_capacity'])
-	degradation_factor = float(request.POST['annual_degradation'])/100		
+
+	capacity_before_degradation = capacity_installed*flag_operations
+
+	return capacity_before_degradation 
+
+def calculate_degradation_factor(request,years_from_COD_avg):
+	
+	degradation = float(request.POST['annual_degradation'])/100		
+	degradation_factor = 1/(1+degradation)**years_from_COD_avg
+	
+	return degradation_factor
+
+
+def calculate_production(request,seasonality,capacity_after_degradation):
 
 	if int(request.POST['production_choice']) == 1:
-		production = int(request.POST['p50'])
+		inp_production = float(request.POST['p50'])
 	elif int(request.POST['production_choice']) == 2:
-		production = int(request.POST['p90_10y'])
+		inp_production = float(request.POST['p90_10y'])
 	else: 
-		production = int(request.POST['P99_10y'])
+		inp_production = float(request.POST['P99_10y'])
 
-	df_copy['FlagOp Seasonality'] = array_seasonality(arr_start_period,arr_end_period,seasonality)
-	df_copy['Prod Capacity before degradation'] = capacity_installed*df_copy['FlagOp Operations']
-	df_copy['Prod Capacity degradation factor'] = 1/(1+degradation_factor)**df_copy['FlagOp Years from COD (avg.)']
-	df_copy['Prod Capacity after degradation'] = df_copy['Prod Capacity before degradation']*df_copy['Prod Capacity degradation factor']
-	df_copy['Prod Production'] = production/1000*df_copy['FlagOp Seasonality']*df_copy['Prod Capacity after degradation']
+	seasonality=np.array(seasonality,dtype=float)
 
-	return df_copy 
+	production = inp_production/1000*seasonality*capacity_after_degradation
 
-def create_audit_checks(df):
-	
-	df_copy=df.copy()
 
-	check_balance_sheet_balanced = abs(sum(df_copy['Audit Balance sheet balanced']))<0.001
-	check_financing_plan_balanced = abs(sum(df_copy['Audit Financing plan balanced']))<0.001
+	return production
 
-	return check_balance_sheet_balanced, check_financing_plan_balanced
 
 
 def determine_debt_constraint(debt_amount_DSCR,debt_amount_gearing):
@@ -626,36 +1094,41 @@ def determine_debt_constraint(debt_amount_DSCR,debt_amount_gearing):
 	return constraint
 
 
-def create_table_uses(construction_costs,optimised_devfee,interests_during_construction,upfront_fee,commitment_fee,total_costs):
+def create_table_uses(construction_costs_max,optimised_devfee,interests_during_construction,upfront_fee,commitment_fee,total_costs,dsra_initial_funding_max):
 
 	table_table_uses = pd.DataFrame({
-				"Construction costs":["{:.1f}".format(construction_costs)],
+				"Construction costs":["{:.1f}".format(construction_costs_max)],
 				"Development fee":["{:.1f}".format(optimised_devfee)],
 				"Arrangement fee (upfront)":["{:.1f}".format(upfront_fee)],
 				"Commitment fees":["{:.1f}".format(commitment_fee)],				
 				"Interests during construction":["{:.1f}".format(interests_during_construction)],
+				"Initial DSRA funding":["{:.1f}".format(dsra_initial_funding_max)],
 				"Total":["{:.1f}".format(total_costs)],
 				})
 	return table_table_uses
 
 
-def create_table_sources(df,debt_amount):
+def create_table_sources(share_capital_injections,SHL_injections,debt_amount):
 
-	equity_drawn = sum(df['arr_equity_drawn'])
+	share_capital_drawn = sum(share_capital_injections)
+	shl_drawn = sum(SHL_injections)
+	equity_drawn=share_capital_drawn+shl_drawn
 
 	fp_sources = equity_drawn+debt_amount
 
 	table_sources = pd.DataFrame({
-				"Equity":["{:.1f}".format(equity_drawn)],
-				"Debt":["{:.1f}".format(debt_amount)],
+				"Share capital":["{:.1f}".format(share_capital_drawn)],
+				"Shareholder loan":["{:.1f}".format(shl_drawn)],
+				"Equity injections":["{:.1f}".format(equity_drawn)],
+				"Senior debt":["{:.1f}".format(debt_amount)],
 				"Total":["{:.1f}".format(fp_sources)],
 				})
 	return table_sources
 
 
-def create_table_debt(df,debt_amount,debt_constraint,total_costs):
+def create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo):
 	
-	DSCR_avg = df['arr_ratios_DSCR'].where(df['FlagFin Amortisation period']==1).mean()
+	DSCR_avg = DSCR_effective[flag_debt_amo == 1].mean()
 	gearing_eff = (debt_amount/total_costs)
 
 
@@ -668,27 +1141,20 @@ def create_table_debt(df,debt_amount,debt_constraint,total_costs):
 	return table_debt
 
 
-def create_table_equity(df,construction_start,arr_end_period):
+def create_table_equity(construction_start,period_end,equity_cash_flows,equity_cash_flows_cumul):
 
-	irr = xirr(pd.to_datetime(arr_end_period).dt.date,df['arr_sponsors_cash_flows'])
+	irr = xirr(pd.to_datetime(period_end).dt.date,equity_cash_flows)
+	
+	payback_date = find_payback_date(period_end,equity_cash_flows_cumul)
 
-	payback_date = find_payback_date(df)
-
-
-
-	if isinstance(payback_date, str):
-		try:
-			payback_date = parser.parse(payback_date).date()
-			time_difference = payback_date-construction_start
-			payback_time = round(time_difference.days / 365.25, 1)
-			payback_date=payback_date.strftime("%d/%m/%Y")
-		except ParserError:
-			payback_date = "error"
-			payback_time = "error"
-	else: 
-			payback_date = "error"
-			payback_time = "error"		
-
+	try:
+		payback_date = parser.parse(str(payback_date)).date()
+		time_difference = payback_date-construction_start
+		payback_time = round(time_difference.days / 365.25, 1)
+		payback_date=payback_date.strftime("%d/%m/%Y")
+	except ParserError:
+		payback_date="error"
+		payback_time="error"
 
 
 	table_equity = pd.DataFrame({
@@ -700,14 +1166,32 @@ def create_table_equity(df,construction_start,arr_end_period):
 
 	return table_equity
 
-def create_table_projectIRR(df,arr_end_period):
+
+def find_payback_date(period_end,equity_cash_flows_cumul):
+
+	# Find the indices where cumulative_equity is greater than or equal to zero
+	valid_indices = np.where(equity_cash_flows_cumul >= 0)[0]
+
+	if len(valid_indices) > 0:
+		# Find the minimum date_period_end value at the valid indices
+		payback_date_index = valid_indices[np.argmin(period_end[valid_indices])]
+		payback_date = period_end[payback_date_index]
+	else:
+		payback_date = None
+	"""payback_date = df.loc[df['Cumulative Equity for payback'] >= 0, 'Date Period end'].min()"""
+	return payback_date
 
 
-	df['Project IRR cashflows pre-tax'] = -df['FP_u Total uses']+df['IS EBITDA']
-	df['Project IRR cashflows post-tax'] = df['Project IRR cashflows pre-tax']+df['IS Corporate income tax']
 
-	project_irr_pre_tax = xirr(pd.to_datetime(arr_end_period).dt.date,df['Project IRR cashflows pre-tax'])
-	project_irr_post_tax = xirr(pd.to_datetime(arr_end_period).dt.date,df['Project IRR cashflows post-tax'])
+def create_table_projectIRR(total_uses,EBITDA,corporate_income_tax,period_end):
+
+
+	project_cash_flows_pre_tax = -total_uses+EBITDA
+	project_cash_flows_post_tax = project_cash_flows_pre_tax+corporate_income_tax
+
+	project_irr_pre_tax = xirr(pd.to_datetime(period_end).dt.date,project_cash_flows_pre_tax)
+	project_irr_post_tax = xirr(pd.to_datetime(period_end).dt.date,project_cash_flows_post_tax)
+
 
 
 	table_projectIRR = pd.DataFrame({
@@ -719,226 +1203,103 @@ def create_table_projectIRR(df,arr_end_period):
 
 
 
+def find_last_payment_date(period_end,boolean_array):
+	boolean_array = boolean_array > 0
+	new_array = [date if boolean else 0 for boolean, date in zip(boolean_array, period_end)]
+	non_zero_dates = [date for date in new_array if date != 0]
+	max_date = max(non_zero_dates)
+	return max_date
 
 
-def find_payback_date(df):
-	payback_date = df.loc[df['Cumulative Equity for payback'] >= 0, 'Date Period end'].min()
-	return payback_date
 
-def find_last_debt_payment_date(df):
-	last_payment_date = df.loc[df['Debt_b Senior debt balance (EoP)'] < 0.01, 'Date Period start'].min()
-	return last_payment_date
-
-def find_last_equity_payment_date(df):
-	last_payment_date = df.loc[df['Eqt Share Capital (EoP)'] < 0.01, 'Date Period end'].min()
-	return last_payment_date
+def calculate_tenor(final_repayment_date, construction_start):
+	time_difference = final_repayment_date-construction_start
+	tenor = round(time_difference.days / 365.25, 1)
+	return tenor
 
 
-def create_table_financing_terms(request,df,construction_start,debt_amount):
+
+
+def create_table_financing_terms(request,construction_start,debt_amount,period_end,senior_debt_balance_eop,share_capital_eop,SHL_balance_eop,years_in_period,senior_debt_balance_bop,SHL_balance_bop,SHL_injections):
 
 	inp_debt_gearing_max = request.POST['debt_gearing_max']+"%"
-	target_DSCR = request.POST['debt_target_DSCR']+"x"
-
+	inp_target_DSCR = request.POST['debt_target_DSCR']+"x"
+	inp_subgearing=float(request.POST['subgearing'])
+	subgearing_capital=str(100-inp_subgearing)+"%"
+	subgearing_SHL=str(inp_subgearing)+"%"
 	inp_injection = request.POST['injection_choice']
 
-	final_repayment_date_debt=find_last_debt_payment_date(df)
-	if final_repayment_date_debt == "":		
-		final_repayment_date_debt="Error"
-		tenor_debt="Error"
-	else:		
-		final_repayment_date_debt=parser.parse(final_repayment_date_debt).date()- timedelta(days=1)
-		time_difference_debt = final_repayment_date_debt-construction_start
-		tenor_debt = round(time_difference_debt.days / 365.25, 1)
-		final_repayment_date_debt=final_repayment_date_debt.strftime("%d/%m/%Y")
-		
-	final_repayment_date_equity=find_last_equity_payment_date(df)	
+	final_repayment_date_debt=find_last_payment_date(period_end, senior_debt_balance_eop)
+	final_repayment_date_equity=find_last_payment_date(period_end,share_capital_eop)	
+	final_repayment_date_SHL=find_last_payment_date(period_end,SHL_balance_eop)
+
+	final_repayment_date_debt = final_repayment_date_debt.strftime("%Y-%m-%d %H:%M:%S")
+	final_repayment_date_debt = parser.parse(final_repayment_date_debt).date()
+
+	
+	final_repayment_date_equity = final_repayment_date_equity.strftime("%Y-%m-%d %H:%M:%S")
+	final_repayment_date_equity = parser.parse(final_repayment_date_equity).date()
 
 
-	if isinstance(final_repayment_date_equity, str):
-		try:
-			final_repayment_date_equity = parser.parse(final_repayment_date_equity).date()
-			time_difference_equity = final_repayment_date_equity-construction_start
-			tenor_equity = round(time_difference_equity.days / 365.25, 1)
-			final_repayment_date_equity=final_repayment_date_equity.strftime("%d/%m/%Y")
-		except ParserError:
-			final_repayment_date_equity = "error"
-			tenor_equity = "error"
-	else:
-		final_repayment_date_equity = "error"
-		tenor_equity = "error"
-	
-	
+	final_repayment_date_SHL = final_repayment_date_SHL.strftime("%Y-%m-%d %H:%M:%S")
+	final_repayment_date_SHL = parser.parse(final_repayment_date_SHL).date()
+
+	tenor_debt = calculate_tenor(final_repayment_date_debt,construction_start)
+	tenor_equity = calculate_tenor(final_repayment_date_equity,construction_start)
+	tenor_SHL = calculate_tenor(final_repayment_date_SHL,construction_start)
+
 	equity_injection_choice = {"1":"Equity first", "2":"Prorata"}
 
+	if debt_amount>0:
+		average_debt_life = sum(x * y for x, y in zip(years_in_period, senior_debt_balance_bop))/debt_amount
+		average_debt_life = round(average_debt_life,1)
+	else:
+		average_debt_life=""	
 
-	average_debt_life = sum(x * y for x, y in zip(df['FlagMod Years in period'], df['Debt_b Senior debt balance (BoP)']))/debt_amount
-	average_debt_life = round(average_debt_life,1)
+	SHL_amount = sum(SHL_injections)
+
+	if SHL_amount>0:
+		average_SHL_life = sum(x * y for x, y in zip(years_in_period, SHL_balance_bop))/SHL_amount
+		average_SHL_life = round(average_SHL_life,1)
+	else:
+		average_SHL_life=""
 
 	table_financing_terms = pd.DataFrame({
-				"":["Share capital","Senior Debt"],
-				"Equity injection":[equity_injection_choice[inp_injection],"n/a"],
-				"Date of final repayment":[final_repayment_date_equity,final_repayment_date_debt],
-				"Tenor (door-to-door)":[tenor_equity,tenor_debt],
-				"Average life (from Financial Close)":["n/a",average_debt_life],
-				"Maximum gearing":["n/a",inp_debt_gearing_max],
-				"Minimum DSCR":["n/a",target_DSCR],
+				"":["Share capital","Shareholder loan","Senior Debt"],
+				"Equity injection":[equity_injection_choice[inp_injection],equity_injection_choice[inp_injection],equity_injection_choice[inp_injection]],
+				"Average life (from Financial Close)":["",average_SHL_life,average_debt_life],
+				"Date of final repayment":[final_repayment_date_equity,final_repayment_date_SHL,final_repayment_date_debt],
+				"Tenor (door-to-door)":[tenor_equity,tenor_SHL,tenor_debt],
+				"Subgearing":[subgearing_capital,subgearing_SHL,""],
+				"Maximum gearing":["","",inp_debt_gearing_max],
+				"Minimum DSCR":["","",inp_target_DSCR],
 				})
 
 	return table_financing_terms
 
 
 
-def create_table_audit(df):
+def create_table_audit(audit_financing_plan,audit_balance_sheet):
 
-	check_balance_sheet_balanced,check_financing_plan_balanced = create_audit_checks(df)
+	check_financing_plan_balanced = abs(sum(audit_financing_plan))<0.01
+	check_balance_sheet_balanced = abs(sum(audit_balance_sheet))<0.01
 
 	table_audit = pd.DataFrame({
-		"Balance sheet":[check_balance_sheet_balanced],
 		"Financing plan":[check_financing_plan_balanced],
+		"Balance sheet":[check_balance_sheet_balanced],
+
 		})
 
 	return table_audit
 
-def calculate_indexation(df,request):
-	df_copy = df.copy()
-	
-	index_rate_merchant = float(request.POST['price_elec_indexation'])/100
-	index_rate_contract = float(request.POST['contract_indexation'])/100
-	index_rate_opex = float(request.POST['opex_indexation'])/100
-
-	df_copy['Mkt_i Indexation'] = array_index(index_rate_merchant,df_copy['Mkt_i Years from indexation start date'])
-	df_copy['FlagOftk_i Indexation'] = array_index(index_rate_contract,df_copy['FlagOftk_i Years from indexation start date'])
-	df_copy['Opex Indexation'] = array_index(index_rate_opex,df_copy['Opex Years from indexation start date'])
-	return df_copy 
-
-def calculate_prices(df,request,arr_end_period_year,dic_price_elec):
-	df_copy = df.copy()
-
-	price_contract = float(request.POST['contract_price'])
-
-	df_copy['Price Electricity market price before indexation'] = array_elec_prices(arr_end_period_year,dic_price_elec)
-
-	df_copy['Price Electricity market price after indexation'] = df_copy['Price Electricity market price before indexation']*df_copy['Mkt_i Indexation']
-	df_copy['Price Contract price before indexation'] = price_contract*df['FlagOftk_t Contract period']
-	df_copy['Price Contract price after indexation'] = df_copy['Price Contract price before indexation']*df_copy['FlagOftk_i Indexation']
-	return df_copy 
-
-def calculate_revenues(df):
-	df_copy = df.copy()
-	df_copy['IS Contracted revenues'] = df_copy['Price Contract price after indexation']*df_copy['Prod Production']*df_copy['FlagOftk_t Percentage in contract period']/1000
-	df_copy['IS Uncontracted electricity revenues'] = df_copy['Price Electricity market price after indexation']*df_copy['Prod Production']*(1-df_copy['FlagOftk_t Percentage in contract period'])/1000
-	df_copy['IS Total revenues'] = df_copy['IS Contracted revenues']+df_copy['IS Uncontracted electricity revenues']
-	return df_copy 
-
-def calculate_opex(df,request):
-	df_copy = df.copy()
-	
-	opex = float(request.POST['opex'])
-
-	df_copy['IS Operating expenses'] = -opex*df_copy['Opex Indexation']*df_copy['FlagOp Years during operations']
-	return df_copy 
-
-def calculate_EBITDA(df):
-	df_copy = df.copy()
-	df_copy['IS EBITDA'] = df_copy['IS Total revenues']+df_copy['IS Operating expenses']
-	df_copy['arr_EBITDA_margin'] = np.divide(df_copy['IS EBITDA'],df_copy['IS Total revenues'], out=np.zeros_like(df_copy['IS EBITDA']), where=df_copy['IS Total revenues']!=0)*100
-	return df_copy 
-
-def calculate_debt(df,request,debt_amount,total_costs,equity_amount):
-	df_copy = df.copy()
-
-	inp_debt_gearing_max = float(request.POST['debt_gearing_max'])/100
-	inp_upfront_fee = float(request.POST['debt_upfront_fee'])/100
-	inp_commitment_fee = float(request.POST['debt_commitment_fee'])/100
-
-	inp_injection = int(request.POST['injection_choice'])
-
-
-	inp_all_in_interest = np.array([
-		float(request.POST['debt_margin']),
-		float(request.POST['debt_swap_rate']),
-		float(request.POST['debt_swap_margin']),
-		float(request.POST['debt_reference_rate_buffer']),
-		])
-
-	inp_debt_interest_rate = np.sum(inp_all_in_interest)/100
-
-	gearing_eff = (debt_amount/total_costs)
-
-
-	if inp_injection == 2:
-		df_copy['Cumulative total uses'] = df_copy['FP_u Total uses'].cumsum()
-		df_copy['Cumulative senior debt drawdowns'] = (df_copy['Cumulative total uses'] * gearing_eff).clip(upper=debt_amount)
-		df_copy['Debt_b Debt drawdowns'] = np.ediff1d(df_copy['Cumulative senior debt drawdowns'], to_begin=df_copy['Cumulative senior debt drawdowns'][0])
-		df_copy['arr_equity_drawn'] = df_copy['FP_u Total uses'] - df_copy['Debt_b Debt drawdowns']
-	elif inp_injection == 1:
-		df_copy['Cumulative total uses'] = df_copy['FP_u Total uses'].cumsum()
-		df_copy['Cumulative equity drawdowns'] = df_copy['Cumulative total uses'].clip(upper=equity_amount)
-		df_copy['arr_equity_drawn'] = np.ediff1d(df_copy['Cumulative equity drawdowns'], to_begin=df_copy['Cumulative equity drawdowns'][0])
-		df_copy['Debt_b Debt drawdowns'] = df_copy['FP_u Total uses'] - df_copy['arr_equity_drawn']
-		df_copy['Cumulative senior debt drawdowns'] = df_copy['Debt_b Debt drawdowns'].cumsum() 
-
-
-
-	df_copy['Debt_b Senior debt balance (EoP)'] = (df_copy['Cumulative senior debt drawdowns']+df_copy['Debt_b Principal repayment'].cumsum()).clip(lower=0)
-	df_copy['Debt_b Senior debt balance (BoP)'] = np.roll(df_copy['Debt_b Senior debt balance (EoP)'], 1)
-
-	df_copy['Debt_i Debt interests'] = df_copy['Debt_b Senior debt balance (BoP)']*inp_debt_interest_rate*df_copy['FlagMod Days in period']/360
-	df_copy['Sizing Interests during operations'] = df_copy['Debt_i Debt interests']*df_copy['FlagFin Amortisation period']
-	df_copy['Interests during construction'] = df_copy['Debt_i Debt interests']*df_copy['FlagCons Construction']
-	df_copy['Debt_i Arrangement fee (upfront)'] = df_copy['FlagCons Construction start']*debt_amount*inp_upfront_fee
-	df_copy['Debt_a Debt available (BoP)'] = (debt_amount-df_copy['Debt_b Senior debt balance (BoP)'])*df_copy['FlagCons Construction']
-	df_copy['Debt_a Debt drawdowns'] = df_copy['Debt_b Debt drawdowns']
-	df_copy['Debt_a Debt available (EoP)'] = df_copy['Debt_a Debt available (BoP)'] - df_copy['Debt_a Debt drawdowns']
-
-
-	df_copy['Debt_i Commitment fees'] = df_copy['Debt_a Debt available (BoP)']*inp_commitment_fee*df_copy['FlagMod Days in period']/360
-
-	df_copy['arr_capitalised_costs_cumul'] = df_copy['Interests during construction'].cumsum()+df_copy['Debt_i Arrangement fee (upfront)'].cumsum()+df_copy['Debt_i Commitment fees'].cumsum()
-
-	return df_copy 
-
-def calculate_equity(df):
-
-	df_copy = df.copy()
-
-	df_copy['Eqt Share Capital injections'] = df_copy['CF_fi Equity injections']
-	df_copy['Eqt Share capital reimbursement'] = -df['Distr Share capital reimbursement']
-	df_copy['Eqt Share Capital (EoP)'] = df_copy['Eqt Share Capital injections'].cumsum() + df_copy['Eqt Share capital reimbursement'].cumsum()
-	df_copy['Eqt Share Capital (BoP)'] = np.roll(df_copy['Eqt Share Capital (EoP)'], 1)
-
-	return df_copy 
-
-def calculate_depreciation(df,request,construction_costs,optimised_devfee):
-	df_copy = df.copy()
-
-	length_operations = int(request.POST['operating_life'])
-	
-	debt_capitalised_interest = max(df_copy['arr_capitalised_costs_cumul'])
-	df_copy['IS Depreciation'] = -(construction_costs+debt_capitalised_interest+optimised_devfee)*df_copy['FlagOp Years during operations']/length_operations
-
-	return df_copy 
-
-def calculate_financing_plan(df):
-	df_copy = df.copy()
-
-
-	df_copy['FP_u Interests during construction'] = df_copy['Debt_i Debt interests']*df_copy['FlagCons Construction']
-	df_copy['FP_u Total uses'] = df_copy['FP_u Construction costs']+df_copy['FP_u Interests during construction']+df_copy['FP_u Development fee']+df_copy['Debt_i Arrangement fee (upfront)']+df_copy['Debt_i Commitment fees']
-	df_copy['FP_u Arrangement fee (upfront)'] = df_copy['Debt_i Arrangement fee (upfront)']
-	df_copy['FP_u Commitment fees'] = df_copy['Debt_i Commitment fees']
-	return df_copy 
-
-
-def create_IRR_curve(df,arr_end_period):
-	df_copy= df.copy()
+def create_IRR_curve(equity_cash_flows,period_end):
 
 	irr_values = []
 
 	# Iterate through each period and calculate the IRR up to that period
-	for i in range(1, len(df_copy['arr_sponsors_cash_flows'])+1):
-		subset_cash_flows = df_copy['arr_sponsors_cash_flows'].iloc[:i]
-		subset_dates = pd.to_datetime(arr_end_period.iloc[:i]).dt.date
+	for i in range(1, len(equity_cash_flows)+1):
+		subset_cash_flows = equity_cash_flows.iloc[:i]
+		subset_dates = pd.to_datetime(period_end.iloc[:i]).dt.date
 
 		try:
 			irr = xirr(subset_dates, subset_cash_flows)*100
@@ -947,133 +1308,14 @@ def create_IRR_curve(df,arr_end_period):
 
 		irr_values.append(max(irr,0,0))
 
-	df_copy['IRR curve'] = irr_values
-	return df_copy 
+	return irr_values 
 
-
-def calculate_income_statement(df,request):
-	df_copy = df.copy()
-
-	income_tax_rate = float(request.POST['corporate_income_tax'])/100
-
-	df_copy['IS EBIT'] = df_copy['IS EBITDA']+df_copy['IS Depreciation']
-	df_copy['IS Interests'] = -df_copy['Sizing Interests during operations']
-	df_copy['IS EBT'] = df_copy['IS EBIT']+df_copy['IS Interests']
-	df_copy['IS Corporate income tax'] = -income_tax_rate*df_copy['IS EBT'].clip(lower=0)
-	df_copy['IS Net income'] = df_copy['IS EBT']+df_copy['IS Corporate income tax']
-	return df_copy 
-
-
-def calculate_cash_flow_statement(df):
-	df_copy = df.copy()
-	df_copy['CF_op EBITDA'] = df_copy['IS EBITDA']
-	df_copy['CF_op Corporate income tax'] = df_copy['IS Corporate income tax']
-	df_copy['CF_op Cash flows from operating activities'] = df_copy['CF_op EBITDA']+df_copy['CF_op Corporate income tax']
-	df_copy['CF_in Construction costs'] = -df_copy['FP_u Construction costs']
-	df_copy['CF_in Development fee'] = -df_copy['FP_u Development fee']
-	df_copy['CF_in Interests during construction'] = -df_copy['FP_u Interests during construction'] 
-	df_copy['CF_in Cash flows from investing activities'] = df_copy['CF_in Construction costs']+df_copy['CF_in Interests during construction']+df_copy['CF_in Development fee']
-	df_copy['CF_fi Senior debt drawdowns'] = df_copy['Debt_b Debt drawdowns']
-	df_copy['CF_fi Equity injections'] = df_copy['arr_equity_drawn']
-	df_copy['CF_fi Arrangement fee (upfront)'] = -df_copy['Debt_i Arrangement fee (upfront)']
-	df_copy['CF_fi Commitment fees'] = -df_copy['Debt_i Commitment fees']	
-	df_copy['CF_fi Cash flows from financing activities'] = df_copy['CF_fi Arrangement fee (upfront)']+df_copy['CF_fi Commitment fees']+df_copy['CF_fi Senior debt drawdowns']+df_copy['CF_fi Equity injections']
-	df_copy['CFADS CFADS'] = df_copy['CF_op Cash flows from operating activities']+df_copy['CF_in Cash flows from investing activities']+df_copy['CF_fi Cash flows from financing activities']
-	df_copy['CFADS Senior debt interests'] = -df_copy['Sizing Interests during operations'] 
-	df_copy['CFADS Senior debt principal'] = df_copy['Debt_b Principal repayment']
-	return df_copy 
-
-
-def calculate_debt_sizing(df,request):
-	df_copy = df.copy()
-
-	target_DSCR = float(request.POST['debt_target_DSCR'])
-
-	df_copy['Sizing CFADS'] = df_copy['CFADS CFADS']*df_copy['FlagFin Amortisation period']
-	df_copy['Sizing Target DSCR'] = (target_DSCR*df_copy['FlagFin Amortisation period']).astype(float)
-	df_copy['Sizing Target debt service'] = df_copy['Sizing CFADS']/target_DSCR
-
-	df_copy['Sizing Average interest rate'] = np.divide(df_copy['Sizing Interests during operations'],df_copy['Debt_b Senior debt balance (BoP)'],out=np.zeros_like(df_copy['Sizing Interests during operations']), where=df_copy['Debt_b Senior debt balance (BoP)']!=0)/df_copy['FlagMod Days in period']*360
-	df_copy['Sizing Discount factor'] = (1/(1+(df_copy['Sizing Average interest rate']*df_copy['FlagMod Days in period']/360)))*df_copy['FlagFin Amortisation period']+df_copy['FlagCons Construction']
-	df_copy['Sizing Cumulative discount factor'] = df_copy['Sizing Discount factor'].cumprod()
-
-
-
-	return df_copy 
-
-
-def calculate_debt_sculpting(df):
-	df_copy = df.copy()
-
-	cumul_debt_drawn  = max(df_copy['Cumulative senior debt drawdowns'])
-	npv_CFADS = npv(df_copy['Sizing CFADS'],df_copy['Sizing Cumulative discount factor'])
-	DSCR_sculpting = npv_CFADS/cumul_debt_drawn
-	df_copy['Sizing Debt repayment target'] = (df_copy['Sizing CFADS']/DSCR_sculpting-df_copy['Sizing Interests during operations']).clip(lower=0)
-	df_copy['arr_sculpting_test'] = df_copy['Sizing Debt repayment target']+df_copy['Debt_b Principal repayment']
-	return df_copy 
-
-
-def calculate_distribution_account(df):
-	df_copy = df.copy()
-
-	for i in range(100):
-				
-		df_copy['Distr Dividends paid'] = df_copy['RE_c Cash available for dividends'].where(df_copy['RE_c Cash available for dividends'] < df_copy['RE_c Distributable profit'], df_copy['RE_c Distributable profit'])
-
-		df_copy['Distr Transfers to the distribution account'] = df_copy['CFADS CFADS']+df_copy['CFADS Senior debt interests']+df_copy['CFADS Senior debt principal']
-		df_copy['Distr Distribution account balance (EoP)'] = df_copy['Distr Transfers to the distribution account'].cumsum()-df_copy['Distr Dividends paid'].cumsum()
-		df_copy['Distr Distribution account balance (BoP)'] = df_copy['Distr Distribution account balance (EoP)']+df_copy['Distr Dividends paid']-df_copy['Distr Transfers to the distribution account']
-		df_copy['RE_c Cash available for dividends'] = df_copy['Distr Distribution account balance (BoP)'] + df_copy['Distr Transfers to the distribution account']
-		
-		df_copy['RE_b Retained earnings (EoP)'] = df_copy['IS Net income'].cumsum()-df_copy['Distr Dividends paid'].cumsum()
-		df_copy['RE_b Retained earnings (BoP)'] = df_copy['RE_b Retained earnings (EoP)']+df_copy['Distr Dividends paid']-df_copy['IS Net income']
-		df_copy['RE_c Distributable profit'] = (df_copy['RE_b Retained earnings (BoP)']+df_copy['IS Net income']).clip(lower=0)
-
-	return df_copy 
-
-
-def calculate_balance_sheet(df):
-	df_copy = df.copy()
-
-	df_copy['RE_b Net income'] = df_copy['IS Net income']
-	df_copy['RE_b Dividends declared'] = df_copy['Distr Dividends paid']
-
-	df_copy['BS_a Assets'] = df_copy['arr_construction_costs_cumul']+df_copy['arr_capitalised_costs_cumul']+df_copy['arr_development_fee_cumul']+df_copy['IS Depreciation'].cumsum()
-	df_copy['BS_a Distribution account balance'] = df_copy['Distr Distribution account balance (EoP)']
-
-	df_copy['BS_a Total assets'] = df_copy['BS_a Assets']+df_copy['BS_a Distribution account balance']
-
-	df_copy['BS_l Retained earnings'] = df_copy['RE_b Retained earnings (EoP)']
-	df_copy['BS_l Senior debt'] = df_copy['Debt_b Senior debt balance (EoP)']
-	df_copy['BS_l Equity'] = df_copy['arr_equity_drawn'].cumsum()-df_copy['Distr Share capital reimbursement']
-
-	df_copy['BS_l Total liabilities'] = df_copy['BS_l Equity'] + df_copy['BS_l Senior debt'] + df_copy['BS_l Retained earnings']
-
-	df_copy['arr_debt_service_repayment'] = -df_copy['Debt_b Principal repayment']
-	df_copy['Sizing Target debt service'] = (df_copy['Sizing Interests during operations']-df_copy['Debt_b Principal repayment'])
-	df_copy['arr_ratios_DSCR'] = np.divide(df_copy['Sizing CFADS'],df_copy['Sizing Target debt service'], out=np.zeros_like(df_copy['Sizing CFADS']), where=df_copy['Sizing Target debt service']!=0)
-
-	df_copy['arr_sponsors_cash_flows'] = -df_copy['arr_equity_drawn']+df_copy['Distr Dividends paid']+df_copy['Distr Share capital reimbursement']
-	df_copy['Equity injections and reimbursement'] = -df_copy['arr_equity_drawn']+df_copy['Distr Share capital reimbursement']
-	df_copy['Equity dividends and reimbursement'] = df_copy['Distr Dividends paid']+df_copy['Distr Share capital reimbursement']
-
-	df_copy['Cumulative Equity for payback']=df_copy['Equity injections and reimbursement'].cumsum()+df_copy['Distr Dividends paid'].cumsum()
-
-	df_copy['FP_s Senior debt'] = -df_copy['Debt_b Debt drawdowns']
-	df_copy['FP_s Equity injections'] = -df_copy['arr_equity_drawn']
-	df_copy['FP_s Total sources'] = -df_copy['FP_s Senior debt']-df_copy['FP_s Equity injections']
-
-	df_copy['Audit Financing plan balanced'] = df_copy['FP_u Total uses']-df_copy['FP_s Total sources']
-	df_copy['Audit Balance sheet balanced'] = df_copy['BS_a Total assets']-df_copy['BS_l Total liabilities']
-
-	return df_copy 
-
-def optimise_devfee(request,debt_amount_DSCR,construction_costs,interests_during_construction):
+def optimise_devfee(request,debt_amount_DSCR,construction_costs_max,interests_during_construction):
 
 	dev_fee_switch = int(request.POST['devfee_choice'])
 	gearing_max = float(request.POST['debt_gearing_max'])/100
 
-	total_costs_wo_devfee = construction_costs+interests_during_construction
+	total_costs_wo_devfee = construction_costs_max+interests_during_construction
 
 
 	if dev_fee_switch == 1:
@@ -1103,22 +1345,22 @@ def npv(arr_cash_flow,arr_discount_factor):
 	npv = sum(arr_cash_flow*arr_discount_factor)
 	return npv
 
-def array_elec_prices(arr_end_period_year,dic_price_elec):
+def array_elec_prices(period_end_year,dic_price_elec):
 	electricity_prices = []
 	
-	for row in arr_end_period_year:
+	for row in period_end_year:
 		if str(row) in dic_price_elec.keys():
 			electricity_prices.append(dic_price_elec[str(row)])
 	
 	return electricity_prices
 
-def array_seasonality(arr_start_period,arr_end_period,seasonality):
-	data = {'start':arr_start_period,
-			'end':arr_end_period}
+def array_seasonality(period_start,period_end,inp_seasonality):
+	data = {'start':period_start,
+			'end':period_end}
 
 	df = pd.DataFrame(data)
 
-	df_seasonality_result = pd.DataFrame(columns=arr_end_period)
+	df_seasonality_result = pd.DataFrame(columns=period_end)
 
 	for index, row in df.iterrows():
 		start_date = row['start']
@@ -1142,7 +1384,7 @@ def array_seasonality(arr_start_period,arr_end_period,seasonality):
 
 				df_seasonality_result.loc[i,end_date] = 0
 
-	df_seasonality_result=df_seasonality_result.mul(seasonality, axis=0)
+	df_seasonality_result=df_seasonality_result.mul(inp_seasonality, axis=0)
 	arr_time_seasonality = df_seasonality_result.sum(axis=0)
 	arr_time_seasonality = arr_time_seasonality.values.tolist()
 
@@ -1162,5 +1404,8 @@ def first_day_next_month(date,periodicity):
 
 
 
+def is_numpy_array(arr):
+	return isinstance(arr, np.ndarray)
 
-
+def is_pandas_array(arr):
+	return isinstance(arr, (pd.DataFrame, pd.Series))

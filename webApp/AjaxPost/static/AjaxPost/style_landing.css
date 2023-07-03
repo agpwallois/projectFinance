@@ -54,38 +54,48 @@ header {
     right: 0;
 }
 
-.table{
+.table-list{
     font-size: 0.75rem;
     text-align: center;
     background:white;
-    overflow:hidden;
     width:100%;
-    font-size:12px;
-    border: 1px solid rgb(221, 221, 221);
-    border-collapse: collapse;
+    font-size:14px;
+    table-layout: auto;
 }
 
 thead {
     line-height:25px;
-
-    border-bottom: 2px solid #0d6efd;
+    border-bottom: 3px solid #0d6efd;
 }
 
 td {
-    line-height:12px;
+    line-height:20px;
 }
 
 th:nth-child(1) {  
     text-align: left;
+    white-space: nowrap; /* Prevent wrapping of text in the first column */
+    width: 1%; /* Set an initial width for the first column */
 
 }
 
 td:nth-child(1) {  
     text-align: left;
     font-weight: normal;
+
 }
 
 tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
+
+.box-wrapper {
+    background: white;
+    padding: 10px;
+    box-shadow: 0 0 10px #ccc;
+    margin-top: 10px;
+    width: 75%;
+    overflow-x: auto;
+
+}

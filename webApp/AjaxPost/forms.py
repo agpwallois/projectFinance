@@ -43,6 +43,18 @@ EQUITY_CHOICES= [
 	('2', 'Prorata'),
 	]
 
+
+CALCULATION_DETAILS_CHOICES= [
+	('1', 'Simplified'),
+	('2', 'Detailed'),
+	]
+
+
+DSRA_CHOICES= [
+	('1', '6 months'),
+	('2', '12 months'),
+	]
+
 class ProjectForm(forms.ModelForm):
 
 	class Meta:
@@ -61,6 +73,8 @@ class ProjectForm(forms.ModelForm):
 		'price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
 		'devfee_choice': forms.RadioSelect(choices=DEV_FEE_CHOICES),
 		'injection_choice': forms.RadioSelect(choices=EQUITY_CHOICES),
+		'calculation_detail': forms.RadioSelect(choices=CALCULATION_DETAILS_CHOICES),
+		'DSRA_choice': forms.RadioSelect(choices=DSRA_CHOICES),
 
 	}
 	 
@@ -72,6 +86,8 @@ class ProjectForm(forms.ModelForm):
 								   self.fields['price_elec_choice'],
 								   self.fields['devfee_choice'],
 								   self.fields['injection_choice'],
+								   self.fields['calculation_detail'],
+								   self.fields['DSRA_choice'],
 					
 			
 								   ]
