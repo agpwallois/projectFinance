@@ -450,8 +450,9 @@ def project_view(request,id):
 			share_capital_eop = (share_capital_injections - share_capital_repayment).cumsum()
 			share_capital_bop = share_capital_eop - (share_capital_injections-share_capital_repayment)
 
-
-			equity_cash_flows = -equity_injections+dividends_paid+share_capital_repayment+SHL_interests_operations+SHL_repayments
+			share_capital_cash_flows=-equity_injections+dividends_paid+share_capital_repayment
+			SHL_cash_flows= -SHL_injections+SHL_interests_operations+SHL_repayments
+			equity_cash_flows = share_capital_cash_flows+SHL_cash_flows
 			equity_cash_flows_cumul = equity_cash_flows.cumsum()
 
 
@@ -472,8 +473,19 @@ def project_view(request,id):
 			dividends_and_share_capital_repayment = dividends_paid+share_capital_repayment
 
 			irr_values = create_IRR_curve(equity_cash_flows,period_end)
+
+			""" Debt ratios """
+
+			avg_i = avg_interest_rate[avg_interest_rate>0].mean()
+
+			LLCR_discounted_CFADS=compute_npv(CFADS_amo,avg_i,period_end)
+			PLCR_discounted_CFADS=compute_npv(CFADS,avg_i,period_end)
+
+			LLCR = np.divide(LLCR_discounted_CFADS,senior_debt_balance_eop,out=np.zeros_like(LLCR_discounted_CFADS), where=senior_debt_balance_eop>0.01)
+			PLCR = np.divide(PLCR_discounted_CFADS,senior_debt_balance_eop,out=np.zeros_like(PLCR_discounted_CFADS), where=senior_debt_balance_eop>0.01)
+			
 			""" Outputs """
-		
+
 			test_numpy = is_numpy_array(period_start)
 			test_panda= is_pandas_array(period_start)
 
@@ -482,7 +494,7 @@ def project_view(request,id):
 			table_sources = create_table_sources(share_capital_injections,SHL_injections,debt_amount)
 			table_debt = create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo)
 			table_projectIRR = create_table_projectIRR(total_uses,EBITDA,corporate_income_tax,period_end)
-			table_equity = create_table_equity(construction_start,period_end,equity_cash_flows,equity_cash_flows_cumul)
+			table_equity = create_table_equity(construction_start,period_end,share_capital_cash_flows,SHL_cash_flows,equity_cash_flows,equity_cash_flows_cumul)
 			table_financing_terms = create_table_financing_terms(request,construction_start,debt_amount,period_end,senior_debt_balance_eop,share_capital_eop,SHL_balance_eop,years_in_period,senior_debt_balance_bop,SHL_balance_bop,SHL_injections)
 			table_audit = create_table_audit(audit_financing_plan,audit_balance_sheet)
 
@@ -496,7 +508,11 @@ def project_view(request,id):
 
 
 			data_detailed = {
+				'AAA Ttest': LLCR_discounted_CFADS,
 				
+
+
+
 				'Date Period start': pd.to_datetime(period_start).dt.strftime('%d/%m/%Y'),
 				'Date Period end': pd.to_datetime(period_end).dt.strftime('%d/%m/%Y'),
 
@@ -714,7 +730,10 @@ def project_view(request,id):
 				'Dividends paid pos':dividends_paid,
 				'Operating expenses pos':opex,
 				'Senior debt repayments':senior_debt_repayments,
-				'DSCR effective':DSCR_effective,
+				'Ratio DSCR':DSCR_effective,
+				'Ratio LLCR':LLCR,
+				'Ratio PLCR':PLCR,
+
 				'Share capital injections and repayment':share_capital_injections_repayments,
 				'Shareholder loan injections and repayment':SHL_injections_repayments,
 				'Share capital repayment pos':share_capital_repayment,
@@ -1117,10 +1136,10 @@ def create_table_sources(share_capital_injections,SHL_injections,debt_amount):
 	fp_sources = equity_drawn+debt_amount
 
 	table_sources = pd.DataFrame({
-				"Share capital":["{:.1f}".format(share_capital_drawn)],
-				"Shareholder loan":["{:.1f}".format(shl_drawn)],
+				"Share capital injections":["{:.1f}".format(share_capital_drawn)],
+				"Shareholder loan injections":["{:.1f}".format(shl_drawn)],
 				"Equity injections":["{:.1f}".format(equity_drawn)],
-				"Senior debt":["{:.1f}".format(debt_amount)],
+				"Senior debt drawdowns":["{:.1f}".format(debt_amount)],
 				"Total":["{:.1f}".format(fp_sources)],
 				})
 	return table_sources
@@ -1141,9 +1160,13 @@ def create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,fla
 	return table_debt
 
 
-def create_table_equity(construction_start,period_end,equity_cash_flows,equity_cash_flows_cumul):
+def create_table_equity(construction_start,period_end,share_capital_cash_flows,SHL_cash_flows,equity_cash_flows,equity_cash_flows_cumul):
 
-	irr = xirr(pd.to_datetime(period_end).dt.date,equity_cash_flows)
+	share_capital_irr = xirr(pd.to_datetime(period_end).dt.date,share_capital_cash_flows)
+	SHL_irr = xirr(pd.to_datetime(period_end).dt.date,SHL_cash_flows)
+	equity_irr = xirr(pd.to_datetime(period_end).dt.date,equity_cash_flows)
+
+
 	
 	payback_date = find_payback_date(period_end,equity_cash_flows_cumul)
 
@@ -1158,7 +1181,9 @@ def create_table_equity(construction_start,period_end,equity_cash_flows,equity_c
 
 
 	table_equity = pd.DataFrame({
-				"Equity IRR":["{:.2%}".format(irr)],
+				"Share capital":["{:.2%}".format(share_capital_irr)],
+				"Shareholder loan":["{:.2%}".format(SHL_irr)],
+				"Equity":["{:.2%}".format(equity_irr)],
 				"Payback date":[(payback_date)],
 				"Payback time (from Financial Close)":[(payback_time)],
 
@@ -1200,6 +1225,28 @@ def create_table_projectIRR(total_uses,EBITDA,corporate_income_tax,period_end):
 				})
 
 	return table_projectIRR
+
+
+def compute_npv(cfads, discount_rate,period_end):
+	npvs = []
+
+	period_end=pd.to_datetime(period_end).dt.date
+	
+
+	for i in range(len(cfads)):
+		npv = 0
+		if cfads[i] > 1:
+			for j in range(i, len(cfads)):
+				end_date = period_end[j]
+				start_date = period_end[i-1]
+				time_delta = (end_date - start_date).days/365.25
+				npv += cfads[j] / ((1+discount_rate) ** (time_delta))
+
+			npvs.append(npv)
+		else: 
+			npvs.append(0)
+
+	return npvs
 
 
 

@@ -43,7 +43,6 @@ title-wrapper {
   flex-direction: column;
   width: 100%;
   position: sticky;
-  top: 0;
   left: 0;
 }
 
@@ -53,8 +52,9 @@ h1-calc {
   font-size: 0.9rem;
   color: #0d6efd;
   position: sticky;
-  top: 0;
   left: 0;
+  background-color: white;
+
 }
 
 h2-calc {
@@ -63,7 +63,6 @@ h2-calc {
   text-decoration: underline;
   margin-bottom: 0;
   position: sticky;
-  top: 0;
   left: 0;
 }
 
@@ -71,7 +70,6 @@ h3-calc {
   margin-top: auto;
   margin-bottom: auto;
   position: sticky;
-  top: 0;
   left: 0;
 }
 
@@ -219,7 +217,6 @@ header {
 
 .table {
   font-size: 0.75rem;
-  border-collapse: collapse;
 
 }
 
@@ -247,11 +244,16 @@ header {
 
 
 
+.box-calc {
+    padding-left: 0px;
+    overflow: auto; /* Add this line */
+    height:680px;
+}
+
 .box {
     padding-left: 0px;
     overflow: auto; /* Add this line */
 }
-
 
 .table td {
     line-height: 0em;
@@ -260,8 +262,8 @@ header {
 }
 
 .table td:first-child {
-    min-width: 30em;
-    max-width: 30em;
+    min-width: 25em;
+    max-width: 25em;
 }  
 
 .table td:nth-child(2) {
@@ -277,9 +279,24 @@ header {
 
 .table-sum td:first-child {
 
-    background-color: red;
 }  
 
+
+.dates-wrapper {
+width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+
+#myTableDate{
+    background-color: rgb(242, 242, 242);
+}
+
+#myTableDate td:first-child{
+    background-color: rgb(242, 242, 242);
+}
 
 .table-sum td{
     font-size: 0.75rem;

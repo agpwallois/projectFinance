@@ -1755,15 +1755,15 @@
 			<div class="box-wrapper">	
 
 
-				<div class="box">
+				<div class="box-calc">
 
 				<h1-calc>Timeline, Counters and Flags</h1-calc>
 				
-
+				<div class="dates-wrapper">
 					<table class="table">
 						<tbody id="myTableDate"></tbody>
 					</table>
-
+				</div>
 
 				<title-wrapper>	
 				<h2-calc>Project timeline</h2-calc>
@@ -2072,8 +2072,10 @@
 			"Project IRR (pre-tax)": "%",
 			"Project IRR (post-tax)": "%",
 
+			"Share capital": "IRR",
+			"Shareholder loan": "IRR",
 
-			"Equity IRR": "%",
+			"Equity": "IRR",
 			"Payback date": "date",
 			"Payback time (from Financial Close)": "years",
 
@@ -2286,7 +2288,6 @@
 				  
 				  "balance",
 
-				  "rate",
 				  "price",
 				  "capacity",
 				  "date",
@@ -2463,9 +2464,12 @@
 				  [Object.values(json.df['IS EBITDA']), Object.values(json.df['EBITDA margin'])],
 				  [Object.values(json.df['FP_u Construction costs']), Object.values(json.df['Cumulative total uses'])],
 				  [Object.values(json.df['Share capital injections neg']),Object.values(json.df['Shareholder loan injections neg']),Object.values(json.df['Senior debt drawdowns neg']), Object.values(json.df['FP_u Total uses']),Object.values(json.df['Gearing during financing plan'])],
-				  [Object.values(json.df['Sizing Interests during operations']), Object.values(json.df['Senior debt repayments']), Object.values(json.df['DSCR effective'])],
+				  [Object.values(json.df['Sizing Interests during operations']), Object.values(json.df['Senior debt repayments']), Object.values(json.df['Ratio DSCR'])],
 				  [Object.values(json.df['Sizing Target DS']), Object.values(json.df['Sizing CFADS'])],
 				  [Object.values(json.df['FP_s Senior debt drawdowns']),Object.values(json.df['Senior debt repayments']), Object.values(json.df['Debt_b Senior debt balance (EoP)'])],
+
+
+				  [Object.values(json.df['Ratio DSCR']), Object.values(json.df['Ratio LLCR']), Object.values(json.df['Ratio PLCR'])],
 
 				  [Object.values(json.df['Debt service']), Object.values(json.df['DSRA DSRA (BoP)'])],
 
@@ -2475,7 +2479,7 @@
 
 				];
 
-				const charts = [myChart, myChart2, myChart3, myChart4, myChart5, myChart6, myChart7, myChart8, myChart9, myChart10, myChart11, myChart12];
+				const charts = [myChart, myChart2, myChart3, myChart4, myChart5, myChart6, myChart7, myChart8, myChart9, myChart10, myChart11, myChart12, myChart13];
 
 				charts.forEach((chart, index) => {
 				  updateChart(chart, datasets[index]);

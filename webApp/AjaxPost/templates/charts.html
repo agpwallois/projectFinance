@@ -42,6 +42,12 @@
 
 </div>
 
+<div class="charts-container">
+
+	<div class="graph"><canvas id="myChart13"></canvas></div>
+	<div class="graph"><canvas id="myChart14"></canvas></div>
+
+</div>
 
 <!-- Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
@@ -432,7 +438,7 @@ const myChart7 = new Chart(ctx7, {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
 			type: 'bar',
-			label: 'Interests (kEUR)',
+			label: 'Interests',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(75, 192, 192, 0.2)',
@@ -444,7 +450,7 @@ const myChart7 = new Chart(ctx7, {
 		},{
 
 			type: 'bar',
-			label: 'Repayments (kEUR)',
+			label: 'Repayments',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(255, 206, 86, 0.2)',
@@ -616,8 +622,86 @@ const myChart9 = new Chart(ctx9, {
 	}
 });
 
-const ctx10 = document.getElementById('myChart10');
+
+const ctx10= document.getElementById('myChart10');
 const myChart10 = new Chart(ctx10, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'line',
+			label: 'DSCR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(54, 162, 235, 0.2)',
+			],
+			borderColor: [
+				'rgba(54, 162, 235, 1)',
+			],
+			borderWidth: 1
+		},{
+
+			type: 'line',
+			label: 'LLCR',
+			data: [1,2,3,4,5,6],
+					backgroundColor: [
+				'rgba(255, 206, 86, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 206, 86, 1)',
+			],
+			borderWidth: 1
+		},{
+
+			type: 'line',
+			label: 'PLCR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+			],
+			borderColor: [
+				'rgba(255, 99, 132, 1)',
+			],
+			borderWidth: 1
+		}
+		]
+	},
+	options: {
+
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Debt ratios (x)'
+		}},
+
+		scales: {
+			y: {
+				ticks: {
+                    callback: function (value) {
+                        return value.toString() + 'x';
+                    }
+                }
+			},
+	
+		
+		}
+	}
+});
+
+
+
+
+
+
+
+const ctx11 = document.getElementById('myChart11');
+const myChart11 = new Chart(ctx11, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -666,8 +750,8 @@ const myChart10 = new Chart(ctx10, {
 });
 
 
-const ctx11 = document.getElementById('myChart11');
-const myChart11 = new Chart(ctx11, {
+const ctx12 = document.getElementById('myChart12');
+const myChart12 = new Chart(ctx12, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -707,7 +791,7 @@ const myChart11 = new Chart(ctx11, {
 		},{
 			type: 'line',
 			yAxisID: 'z',
-			label: 'Equity IRR (%)',
+			label: 'Equity IRR',
 			data: [1,2,3,4,5,6],
 			backgroundColor: [
 				'rgba(255, 99, 132, 0.2)',
@@ -759,8 +843,8 @@ const myChart11 = new Chart(ctx11, {
 });
 
 
-const ctx12 = document.getElementById('myChart12');
-const myChart12 = new Chart(ctx12, {
+const ctx13 = document.getElementById('myChart13');
+const myChart13 = new Chart(ctx13, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
