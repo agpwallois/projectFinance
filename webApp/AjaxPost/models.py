@@ -210,8 +210,10 @@ class Project(models.Model):
 	SHL_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
 
 
-	calculation_detail = models.fields.IntegerField(default="1")
+	calculation_detail = models.fields.IntegerField(default="2")
 	payment_delay_revenues = models.fields.IntegerField(default="30")
 	payment_delay_costs = models.fields.IntegerField(default="30")
 
 	DSRA_choice = models.fields.IntegerField(default="1")
+	initial_wc = models.fields.IntegerField(default="1")
+	cash_min = models.fields.IntegerField(default="1")

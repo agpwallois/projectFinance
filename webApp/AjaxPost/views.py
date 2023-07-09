@@ -89,7 +89,7 @@ def project_view(request,id):
 
 			""" Construction costs inputs """
 
-			arr_construction_costs = import_construction_costs(request)
+			arr_construction_costs = import_construction_costs(request,construction_start,construction_end)
 
 			""" Offtake contract and Electricity price inputs """
 
@@ -97,7 +97,7 @@ def project_view(request,id):
 			date_price_elec_index_start = datetime.datetime.strptime(inp_price_merchant_index_rate_start_date, "%Y-%m-%d").date()
 		
 			""" Electricity price inputs """
-			dic_price_elec = create_price_elec_dict(request)
+			dic_price_elec = create_price_elec_dict(request, construction_end,liquidation)
 			dic_price_elec_keys = np.array(list(dic_price_elec.keys()))
 
 			""" Operating costs """
@@ -147,9 +147,12 @@ def project_view(request,id):
 			periodicity = int(request.POST['periodicity'])
 
 			inp_dsra = 6 if int(request.POST['DSRA_choice']) == 1 else 12
+			inp_cash_min = int(request.POST['cash_min'])
 
+			start_construction = request.POST['start_construction']
+			construction_end = request.POST['end_construction']
 
-
+			calculation_detail = int(request.POST['calculation_detail'])
 
 			""" Arrays instanciation """
 
@@ -158,7 +161,7 @@ def project_view(request,id):
 			""" Create date series """
 
 			start_time = time.time()
-			period_start,period_end = create_period_series(request,periodicity)
+			period_start,period_end = create_period_series(request,start_construction,construction_end,periodicity)
 			end_time = time.time()
 			elapsed_time  = end_time-start_time
 
@@ -237,8 +240,7 @@ def project_view(request,id):
 			opex = inp_opex*opex_index_indice*years_during_operations
 
 			EBITDA = total_revenues-opex
-			EBITDA_margin = (EBITDA/total_revenues).fillna(0) * 100
-
+			EBITDA_margin =np.divide(EBITDA,total_revenues,out=np.zeros_like(EBITDA), where=total_revenues>0)
 
 
 			revenues_in_period_paid = (1-inp_payment_delay_rev/days_in_period)*total_revenues
@@ -358,11 +360,11 @@ def project_view(request,id):
 				"""clarifier"""
 
 				interests_during_construction = sum(senior_debt_interests_construction)
-				upfront_fee = sum(upfront_fee)
+				upfront_fee_max = np.max(upfront_fee)
 				commitment_fee= sum(commitment_fees)
 
 				optimised_devfee = optimise_devfee(request,debt_amount_DSCR,construction_costs_max,interests_during_construction)
-				total_costs = construction_costs_max+interests_during_construction+optimised_devfee+upfront_fee+commitment_fee+dsra_initial_funding_max
+				total_costs = construction_costs_max+interests_during_construction+optimised_devfee+upfront_fee_max+commitment_fee+dsra_initial_funding_max
 
 				debt_amount_gearing = total_costs*inp_debt_gearing_max
 				target_debt_amount = min(debt_amount_DSCR,debt_amount_gearing)
@@ -396,8 +398,11 @@ def project_view(request,id):
 
 				
 
-				cash_available_for_distribution = (CFADS - senior_debt_interests_operations - senior_debt_repayments - dsra_mov)
+				cash_available_for_distribution = (CFADS - senior_debt_interests_operations - senior_debt_repayments - dsra_mov - inp_cash_min*flag_operations)
 				transfers_distribution_account = cash_available_for_distribution
+
+				operating_account_eop=CFADS - senior_debt_interests_operations - senior_debt_repayments - dsra_mov-transfers_distribution_account
+				operating_account_bop=np.roll(operating_account_eop, 1)
 
 				start_time = time.time()
 
@@ -425,6 +430,8 @@ def project_view(request,id):
 				cash_available_for_SHL_repayments = distribution_account['cash_available_for_SHL_repayments']
 				dividends_paid = distribution_account['dividends_paid']
 				SHL_repayments = distribution_account['SHL_repayments']
+				cash_available_for_redemption = distribution_account['cash_available_for_redemption']
+
 				distribution_account_eop = distribution_account['distribution_account_eop']
 				distribution_account_bop = distribution_account['distribution_account_bop']
 				SHL_balance_eop = distribution_account['SHL_balance_eop']
@@ -454,12 +461,14 @@ def project_view(request,id):
 			SHL_cash_flows= -SHL_injections+SHL_interests_operations+SHL_repayments
 			equity_cash_flows = share_capital_cash_flows+SHL_cash_flows
 			equity_cash_flows_cumul = equity_cash_flows.cumsum()
+			debt_cash_flows = -senior_debt_drawdowns+senior_debt_repayments+senior_debt_interests+upfront_fee+commitment_fees
 
+			total_cash = operating_account_eop+dsra_eop+distribution_account_eop
 
 			""" Balance sheet """		
 
 			PPE = construction_costs_cumul+capitalised_fees_idc_cumul+development_fee_cumul-depreciation.cumsum()
-			total_assets = PPE+accounts_receivables_eop+distribution_account_eop+dsra_eop
+			total_assets = PPE+accounts_receivables_eop+operating_account_eop+distribution_account_eop+dsra_eop
 
 			total_liabilities = share_capital_eop+SHL_balance_eop+senior_debt_balance_eop+retained_earnings_eop+accounts_payables_eop
 
@@ -490,9 +499,9 @@ def project_view(request,id):
 			test_panda= is_pandas_array(period_start)
 
 			debt_constraint = determine_debt_constraint(debt_amount_DSCR,debt_amount_gearing)
-			table_uses = create_table_uses(construction_costs_max,optimised_devfee,interests_during_construction,upfront_fee,commitment_fee,total_costs,dsra_initial_funding_max)
+			table_uses = create_table_uses(construction_costs_max,optimised_devfee,interests_during_construction,upfront_fee_max,commitment_fee,total_costs,dsra_initial_funding_max)
 			table_sources = create_table_sources(share_capital_injections,SHL_injections,debt_amount)
-			table_debt = create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo)
+			table_debt = create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo,period_end,debt_cash_flows)
 			table_projectIRR = create_table_projectIRR(total_uses,EBITDA,corporate_income_tax,period_end)
 			table_equity = create_table_equity(construction_start,period_end,share_capital_cash_flows,SHL_cash_flows,equity_cash_flows,equity_cash_flows_cumul)
 			table_financing_terms = create_table_financing_terms(request,construction_start,debt_amount,period_end,senior_debt_balance_eop,share_capital_eop,SHL_balance_eop,years_in_period,senior_debt_balance_bop,SHL_balance_bop,SHL_injections)
@@ -510,8 +519,6 @@ def project_view(request,id):
 			data_detailed = {
 				'AAA Ttest': LLCR_discounted_CFADS,
 				
-
-
 
 				'Date Period start': pd.to_datetime(period_start).dt.strftime('%d/%m/%Y'),
 				'Date Period end': pd.to_datetime(period_end).dt.strftime('%d/%m/%Y'),
@@ -631,6 +638,11 @@ def project_view(request,id):
 				'CFDistr Cash available for distribution':cash_available_for_distribution,
 				'CFDistr Transfers to distribution account':-transfers_distribution_account,
 
+				'OpAccB Operating account balance (BoP)':operating_account_bop,
+
+				'OpAccE Operating account balance (EoP)':operating_account_eop,
+
+
 
 				'FP_u Construction costs': construction_costs,
 				'FP_u Development fee': development_fee,	
@@ -646,14 +658,14 @@ def project_view(request,id):
 				'FP_s Shareholder loan injections': SHL_injections,
 				'FP_s Total sources': total_sources,
 
-				'Debt_a Debt available (BoP)':senior_debt_available_bop,
-				'Debt_a Debt drawdowns':-senior_debt_drawdowns,
-				'Debt_a Debt available (EoP)':senior_debt_available_eop,
+				'Debt_a Amount available (BoP)':senior_debt_available_bop,
+				'Debt_a Drawdowns':-senior_debt_drawdowns,
+				'Debt_a Amount available (EoP)':senior_debt_available_eop,
 			
-				'Debt_b Senior debt balance (BoP)':senior_debt_balance_bop,
-				'Debt_b Debt drawdowns':senior_debt_drawdowns,
-				'Debt_b Debt repayments':-senior_debt_repayments,
-				'Debt_b Senior debt balance (EoP)':senior_debt_balance_eop,
+				'Debt_b Opening balance':senior_debt_balance_bop,
+				'Debt_b Drawdowns':senior_debt_drawdowns,
+				'Debt_b Scheduled repayments':-senior_debt_repayments,
+				'Debt_b Closing balance':senior_debt_balance_eop,
 			
 				'Debt_i Arrangement fee (upfront)':upfront_fee,
 				'Debt_i Commitment fees':commitment_fees,
@@ -675,44 +687,53 @@ def project_view(request,id):
 				'DSRA Release of excess funds':dsra_release,
 				'DSRA DSRA (EoP)':dsra_eop,
 
+
+							
+				'DistrBOP Balance brought forward':distribution_account_bop,
+				'DistrBOP Transfers to distribution account':transfers_distribution_account,
+
+				'DistrSHLi Cash available for interests':cash_available_for_SHL_interests,
+				'DistrSHLi Shareholder loan interests paid':-SHL_interests_paid,
+
+				'DistrDiv Cash available for dividends':cash_available_for_dividends,
+				'DistrDiv Dividends paid':-dividends_paid,
+
+				'DistrSHLp Cash available for repayment':cash_available_for_SHL_repayments,
+				'DistrSHLp Shareholder loan repayment':-SHL_repayments,
+
+				'DistrSC Cash available for reductions':cash_available_for_redemption,
+				'DistrSC Share capital reductions':-share_capital_repayment,
+
+				'DistrEOP Distribution account balance':distribution_account_eop,
 				
+				'SHL Opening balance':SHL_balance_bop,
+				'SHL Drawdowns':SHL_injections,
+				'SHL Capitalised interest':SHL_interests_construction,
+				'SHL Repayment':-SHL_repayments,
+				'SHL Closing balance':SHL_balance_eop,
 				
-				'Distr Distribution account balance (BoP)':distribution_account_bop,
-				'Distr Transfers to distribution account':transfers_distribution_account,
-				'Distr Shareholder loan interests paid':-SHL_interests_paid,
-				'Distr Dividends paid':-dividends_paid,
-				'Distr Shareholder loan reimbursement':-SHL_repayments,
-				'Distr Share capital reimbursement':-share_capital_repayment,
-				'Distr Distribution account balance (EoP)':distribution_account_eop,
-				
-				'SHL Shareholder loan (BoP)':SHL_balance_bop,
-				'SHL Shareholder loan injections':SHL_injections,
-				'SHL Shareholder loan capitalised interests':SHL_interests_construction,
-				'SHL Shareholder loan reimbursement':-SHL_repayments,
-				'SHL Shareholder loan (EoP)':SHL_balance_eop,
-				
-				'iSHL Shareholder loan interests (construction)':SHL_interests_construction,
-				'iSHL Shareholder loan interests (operations)':SHL_interests_operations,
+				'iSHL Interests (construction)':SHL_interests_construction,
+				'iSHL Interests (operations)':SHL_interests_operations,
 
 				'RE_b Distributable profit':distributable_profit,			
-				'RE_b Retained earnings (BoP)':retained_earnings_bop,
+				'RE_b Balance brought forward':retained_earnings_bop,
 				'RE_b Net income': net_income,		
 				'RE_b Dividends declared': -dividends_paid,
-				'RE_b Retained earnings (EoP)':retained_earnings_eop,
+				'RE_b Retained earnings':retained_earnings_eop,
 
-				'RE_c Cash available for SHL interests':cash_available_for_SHL_interests,
-				'RE_c Cash available for dividends':cash_available_for_dividends,
-				'RE_c Cash available for SHL repayment':cash_available_for_SHL_repayments,
 
-				'Eqt Share capital (BoP)':share_capital_bop,			
-				'Eqt Share capital injections':share_capital_injections,
-				'Eqt Share capital reimbursement':-share_capital_repayment,
-				'Eqt Share capital (EoP)':share_capital_eop,
+				'Eqt Opening balance':share_capital_bop,			
+				'Eqt Contributions':share_capital_injections,
+				'Eqt Capital reductions':-share_capital_repayment,
+				'Eqt Closing balance':share_capital_eop,
 
 				'BS_a Property, Plant, and Equipment': PPE,
-				'BS_a Accounts receivables (EoP)': accounts_receivables_eop,
+				'BS_a Accounts receivables': accounts_receivables_eop,
+				'BS_a Cash or cash equivalents': total_cash,
+				'BS_a Operating account balance': operating_account_eop,
+				'BS_a DSRA balance': dsra_eop,
+
 				'BS_a Distribution account balance': distribution_account_eop,
-				'BS_a Debt service reserve account': dsra_eop,
 
 				'BS_a Total assets': total_assets,
 			
@@ -750,6 +771,7 @@ def project_view(request,id):
 			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()
 
 			final_repayment_date_debt=find_last_payment_date(period_end, senior_debt_balance_eop)
+			
 
 			data_dump_sidebar = np.array([
 				COD_formatted,
@@ -771,6 +793,8 @@ def project_view(request,id):
 				])
 
 
+		
+
 			return JsonResponse({
 				"df":df.to_dict(),
 				"df_sum":df_sum.to_dict(),
@@ -779,7 +803,7 @@ def project_view(request,id):
 				"table_projectIRR":table_projectIRR.to_dict(),
 				"table_equity":table_equity.to_dict(),
 				"table_debt":table_debt.to_dict(),
-
+				"calculation_detail":calculation_detail,
 				"table_financing_terms":table_financing_terms.to_dict(),
 				"table_audit":table_audit.to_dict(),
 				"dic_price_elec_keys":dic_price_elec_keys.tolist(),
@@ -804,12 +828,11 @@ def project_view(request,id):
 
 """USED"""
 
-def create_period_series(request,periodicity):
+def create_period_series(request,start_construction,construction_end,periodicity):
 
 	
 	liquidation = int(request.POST['liquidation'])
-	start_construction = request.POST['start_construction']
-	construction_end = request.POST['end_construction']
+
 	operating_life = int(request.POST['operating_life'])
 
 	formatted_start_construction = datetime.datetime.strptime(start_construction, "%Y-%m-%d").date()
@@ -866,6 +889,7 @@ def calculate_distribution_account(SHL_balance_bop, inp_SHL_margin_rate, days_in
 		dividends_paid = np.minimum(cash_available_for_dividends, distributable_profit)
 		cash_available_for_SHL_repayments = cash_available_for_dividends - dividends_paid
 		SHL_repayments = np.minimum(SHL_balance_bop, cash_available_for_SHL_repayments)
+		cash_available_for_redemption = cash_available_for_SHL_repayments - SHL_repayments
 		
 		distribution_account_eop = (transfers_distribution_account - SHL_interests_paid - dividends_paid - SHL_repayments).cumsum()
 		distribution_account_bop = distribution_account_eop - (transfers_distribution_account - SHL_interests_paid - dividends_paid - SHL_repayments)
@@ -887,6 +911,7 @@ def calculate_distribution_account(SHL_balance_bop, inp_SHL_margin_rate, days_in
 			'dividends_paid': dividends_paid,
 			'cash_available_for_SHL_repayments': cash_available_for_SHL_repayments,
 			'SHL_repayments': SHL_repayments,
+			'cash_available_for_redemption':cash_available_for_redemption,
 			'distribution_account_eop': distribution_account_eop,
 			'distribution_account_bop': distribution_account_bop,
 			'SHL_balance_eop': SHL_balance_eop,
@@ -899,17 +924,14 @@ def calculate_distribution_account(SHL_balance_bop, inp_SHL_margin_rate, days_in
 	return result
 
 
-def create_price_elec_dict(request):
+def create_price_elec_dict(request, construction_end,liquidation):
 	
 	choice = int(request.POST['price_elec_choice'])
 
-	construction_end = datetime.datetime.strptime(request.POST['end_construction'], "%Y-%m-%d").date()
-	COD = construction_end + datetime.timedelta(days=1)
-	COD_year = int(COD.year)
-
 	construction_end_year = construction_end.year
+	liquidation_year = liquidation.year
 
-	years = [str(year) for year in range(construction_end_year, construction_end_year+30)]
+	years = [str(year) for year in range(construction_end_year, liquidation_year+1)]
 
 	if choice == 1:
 		prefix = 'price_elec_low_y'
@@ -1022,11 +1044,15 @@ def import_seasonality(request):
 		inp_seasonality[i - 1] = float(request.POST[key])
 	return inp_seasonality
 
-def import_construction_costs(request):
+def import_construction_costs(request, construction_start, construction_end):
 	construction_costs = np.zeros(12)
-	for i in range(1, 13):
+
+	delta = relativedelta(construction_end, construction_start)
+	months = delta.years * 12 + delta.months + 1	
+
+	for i in range(1, months):
 		key = 'costs_m{}'.format(i)
-		construction_costs[i - 1] = float(request.POST[key])
+		construction_costs[i-1] = float(request.POST[key])
 	return construction_costs
 
 def create_flag_operations(COD,period_start,period_end,end_of_operations):
@@ -1113,14 +1139,17 @@ def determine_debt_constraint(debt_amount_DSCR,debt_amount_gearing):
 	return constraint
 
 
-def create_table_uses(construction_costs_max,optimised_devfee,interests_during_construction,upfront_fee,commitment_fee,total_costs,dsra_initial_funding_max):
+def create_table_uses(construction_costs_max,optimised_devfee,interests_during_construction,upfront_fee_max,commitment_fee,total_costs,dsra_initial_funding_max):
+
+	senior_debt_i_and_fees =upfront_fee_max+commitment_fee+interests_during_construction
 
 	table_table_uses = pd.DataFrame({
 				"Construction costs":["{:.1f}".format(construction_costs_max)],
 				"Development fee":["{:.1f}".format(optimised_devfee)],
-				"Arrangement fee (upfront)":["{:.1f}".format(upfront_fee)],
+				"Debt interests & fees":["{:.1f}".format(senior_debt_i_and_fees)],
+				"Upfront fee":["{:.1f}".format(upfront_fee_max)],
 				"Commitment fees":["{:.1f}".format(commitment_fee)],				
-				"Interests during construction":["{:.1f}".format(interests_during_construction)],
+				"IDC":["{:.1f}".format(interests_during_construction)],
 				"Initial DSRA funding":["{:.1f}".format(dsra_initial_funding_max)],
 				"Total":["{:.1f}".format(total_costs)],
 				})
@@ -1136,26 +1165,30 @@ def create_table_sources(share_capital_injections,SHL_injections,debt_amount):
 	fp_sources = equity_drawn+debt_amount
 
 	table_sources = pd.DataFrame({
-				"Share capital injections":["{:.1f}".format(share_capital_drawn)],
-				"Shareholder loan injections":["{:.1f}".format(shl_drawn)],
-				"Equity injections":["{:.1f}".format(equity_drawn)],
-				"Senior debt drawdowns":["{:.1f}".format(debt_amount)],
+				"Equity":["{:.1f}".format(equity_drawn)],				
+				"Share capital":["{:.1f}".format(share_capital_drawn)],
+				"Shareholder loan":["{:.1f}".format(shl_drawn)],
+				"Senior debt":["{:.1f}".format(debt_amount)],
 				"Total":["{:.1f}".format(fp_sources)],
 				})
 	return table_sources
 
 
-def create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo):
+def create_table_debt(DSCR_effective,debt_amount,debt_constraint,total_costs,flag_debt_amo,period_end,debt_cash_flows):
 	
 	DSCR_avg = DSCR_effective[flag_debt_amo == 1].mean()
 	gearing_eff = (debt_amount/total_costs)
 
+	debt_irr = xirr(pd.to_datetime(period_end).dt.date,debt_cash_flows)
+
+
 
 	table_debt = pd.DataFrame({
-					"Debt amount":["{:.1f}".format(debt_amount)],
-					"Debt constraint":[debt_constraint],
+					"Senior debt amount":["{:.1f}".format(debt_amount)],
+					"Senior debt constraint":[debt_constraint],
 					"Effective gearing":["{:.2%}".format(gearing_eff)],
 					"Average DSCR":["{:.2f}".format(DSCR_avg)+"x"],
+					"Debt IRR":["{:.2%}".format(debt_irr)],
 					})
 	return table_debt
 
@@ -1181,11 +1214,11 @@ def create_table_equity(construction_start,period_end,share_capital_cash_flows,S
 
 
 	table_equity = pd.DataFrame({
-				"Share capital":["{:.2%}".format(share_capital_irr)],
-				"Shareholder loan":["{:.2%}".format(SHL_irr)],
-				"Equity":["{:.2%}".format(equity_irr)],
+				"Share capital IRR":["{:.2%}".format(share_capital_irr)],
+				"Shareholder loan IRR":["{:.2%}".format(SHL_irr)],
+				"Equity IRR":["{:.2%}".format(equity_irr)],
 				"Payback date":[(payback_date)],
-				"Payback time (from Financial Close)":[(payback_time)],
+				"Payback time":[(payback_time)],
 
 				})
 
@@ -1314,7 +1347,7 @@ def create_table_financing_terms(request,construction_start,debt_amount,period_e
 	table_financing_terms = pd.DataFrame({
 				"":["Share capital","Shareholder loan","Senior Debt"],
 				"Equity injection":[equity_injection_choice[inp_injection],equity_injection_choice[inp_injection],equity_injection_choice[inp_injection]],
-				"Average life (from Financial Close)":["",average_SHL_life,average_debt_life],
+				"Average life (from FC)":["",average_SHL_life,average_debt_life],
 				"Date of final repayment":[final_repayment_date_equity,final_repayment_date_SHL,final_repayment_date_debt],
 				"Tenor (door-to-door)":[tenor_equity,tenor_SHL,tenor_debt],
 				"Subgearing":[subgearing_capital,subgearing_SHL,""],
@@ -1398,6 +1431,8 @@ def array_elec_prices(period_end_year,dic_price_elec):
 	for row in period_end_year:
 		if str(row) in dic_price_elec.keys():
 			electricity_prices.append(dic_price_elec[str(row)])
+		else:
+			electricity_prices.append(0)
 	
 	return electricity_prices
 

@@ -129,27 +129,6 @@ class ProjectForm(forms.ModelForm):
 		if sum_seasonality!=1:
 			self.add_error('seasonality_m1','Sum of seasonality factors must be 100%.')
 
-		# Construction costs
-		costs_m1 = cleaned_data.get('costs_m1')
-		costs_m2 = cleaned_data.get('costs_m2')
-		costs_m3 = cleaned_data.get('costs_m3')
-		costs_m4 = cleaned_data.get('costs_m4')
-		costs_m5 = cleaned_data.get('costs_m5')
-		costs_m6 = cleaned_data.get('costs_m6')
-		costs_m7 = cleaned_data.get('costs_m7')
-		costs_m8 = cleaned_data.get('costs_m8')
-		costs_m9 = cleaned_data.get('costs_m9')
-		costs_m10 = cleaned_data.get('costs_m10')
-		costs_m11 = cleaned_data.get('costs_m11')
-		costs_m12 = cleaned_data.get('costs_m12')
-
-		months_construction = (end_construction.year - start_construction.year) * 12 + (end_construction.month - start_construction.month) + 1
-
-		for i in range(2, 13):
-			cost_variable = f"costs_m{i}"
-			if locals().get(cost_variable, 0) > 0 and i > months_construction:
-				error_message = f"Construction costs out of construction period"
-				self.add_error(cost_variable, error_message)
 
 		length_construction = relativedelta(end_construction, start_construction).years
 		operating_life = cleaned_data.get('operating_life')

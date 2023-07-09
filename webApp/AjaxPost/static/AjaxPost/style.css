@@ -97,6 +97,8 @@ h3 {
 h4 {
     font-size: 0.75rem;
     text-decoration: underline;
+    margin-top: 0.5rem;
+
 }
 
 .navbar {
@@ -239,15 +241,59 @@ header {
     padding: 10px;
     box-shadow: 0 0 10px #ccc;
     margin-top: 10px;
-
 }
+
+
+
+#myTableEquity tr:nth-child(2) td:first-child,
+#myTableEquity tr:nth-child(3) td:first-child {
+    padding-left: 20px;
+  }  
+
+
+#myTableSHL tr:nth-child(2) td:first-child,
+#myTableSHL tr:nth-child(3) td:first-child,
+#myTableSHL tr:nth-child(4) td:first-child {
+    padding-left: 20px;
+  }  
+
+#myTableDebtAvailable tr:nth-child(2) td:first-child {
+    padding-left: 20px;
+  }  
+
+
+#myTableDebtBalance tr:nth-child(2) td:first-child,
+#myTableDebtBalance tr:nth-child(3) td:first-child {
+    padding-left: 20px;
+  }  
+
+
+#myTableRE tr:nth-child(3) td:first-child,
+#myTableRE tr:nth-child(4) td:first-child {
+    padding-left: 20px;
+  }  
+
+
+
+#myTableWC_receivables tr:nth-child(2) td:first-child,
+#myTableWC_receivables tr:nth-child(3) td:first-child {
+    padding-left: 20px;
+  }  
+
+
+#myTableWC_payables tr:nth-child(2) td:first-child,
+#myTableWC_payables tr:nth-child(3) td:first-child {
+    padding-left: 20px;
+  }  
+
+
 
 
 
 .box-calc {
     padding-left: 0px;
     overflow: auto; /* Add this line */
-    height:680px;
+    height:1075px;
 }
 
 .box {
@@ -264,6 +310,7 @@ header {
 .table td:first-child {
     min-width: 25em;
     max-width: 25em;
+    background-clip: padding-box;
 }  
 
 .table td:nth-child(2) {
@@ -277,26 +324,60 @@ header {
 }
 
 
-.table-sum td:first-child {
 
-}  
 
+#table_sum_sources tr:nth-child(2) td:first-child,
+#table_sum_sources tr:nth-child(3) td:first-child {
+  padding-left: 10px;
+}
+
+#table_sum_uses tr:nth-child(4) td:first-child,
+#table_sum_uses tr:nth-child(5) td:first-child,
+#table_sum_uses tr:nth-child(6) td:first-child {
+  padding-left: 10px;
+}
 
 .dates-wrapper {
 width: 100%;
   position: sticky;
   top: 0;
   z-index: 2;
+ 
 }
+
+
+#table-financing-terms {
+    width: 60%;
+}
+
+#myTableBSA tr:nth-child(4) td:first-child,
+#myTableBSA tr:nth-child(5) td:first-child,
+#myTableBSA tr:nth-child(6) td:first-child {
+    padding-left: 20px;
+  }  
+
+
 
 
 #myTableDate{
     background-color: rgb(242, 242, 242);
+    border-bottom-width:None;
+  z-index: 3;
+
 }
 
 #myTableDate td:first-child{
     background-color: rgb(242, 242, 242);
 }
+
+#myTableDate tr:first-child{
+    border-top: solid 1px #0d6efd;
+}
+#myTableDate tr:nth-child(2){
+    border-bottom: solid 1px #0d6efd;
+}
+
+
 
 .table-sum td{
     font-size: 0.75rem;
