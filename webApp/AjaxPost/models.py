@@ -4,7 +4,7 @@ import datetime
 from django.core.exceptions import ValidationError
 
 from django import forms
-
+from datetime import date
 
 
 class Project(models.Model):
@@ -31,24 +31,19 @@ class Project(models.Model):
 	technology = models.fields.CharField(choices=TECHNOLOGY_CHOICES,max_length=100,default="Solar")
 
 	#Timing
-	start_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	end_construction = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	operating_life = models.fields.IntegerField(default="20")
+	start_construction = models.fields.DateField(default=date(2022, 1, 1), blank=True, null=True)
+	end_construction = models.fields.DateField(default=date(2022, 12, 31), blank=True, null=True)
+	operating_life = models.fields.IntegerField(default="25")
 	liquidation = models.fields.IntegerField(default="6")
-
-
-
-
 
 	periodicity = models.fields.IntegerField(default="6")
 
-	panels_capacity = models.fields.IntegerField(default="2000")
-	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.04)
-	p50 = models.fields.IntegerField(default="2000")
-	p90_10y = models.fields.IntegerField(default="2000")
-	P99_10y = models.fields.IntegerField(default="2000")
+	panels_capacity = models.fields.IntegerField(default="2500")
+	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.4)
+	p50 = models.fields.IntegerField(default="1800")
+	p90_10y = models.fields.IntegerField(default="1700")
+	P99_10y = models.fields.IntegerField(default="1600")
 	production_choice = models.fields.IntegerField(default="2")
-
 
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m2 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.05)
@@ -63,27 +58,40 @@ class Project(models.Model):
 	seasonality_m11 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m12 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.02)
 
-	costs_m1 = models.fields.IntegerField(default="1000")
+	costs_m1 = models.fields.IntegerField(default="200")
 	costs_m2 = models.fields.IntegerField(default="0")
-	costs_m3 = models.fields.IntegerField(default="0")
-	costs_m4 = models.fields.IntegerField(default="0")
+	costs_m3 = models.fields.IntegerField(default="500")
+	costs_m4 = models.fields.IntegerField(default="300")
 	costs_m5 = models.fields.IntegerField(default="0")
-	costs_m6 = models.fields.IntegerField(default="0")
-	costs_m7 = models.fields.IntegerField(default="0")
-	costs_m8 = models.fields.IntegerField(default="0")
-	costs_m9 = models.fields.IntegerField(default="0")
-	costs_m10 = models.fields.IntegerField(default="0")
+	costs_m6 = models.fields.IntegerField(default="1000")
+	costs_m7 = models.fields.IntegerField(default="700")
+	costs_m8 = models.fields.IntegerField(default="600")
+	costs_m9 = models.fields.IntegerField(default="200")
+	costs_m10 = models.fields.IntegerField(default="300")
 	costs_m11 = models.fields.IntegerField(default="0")
-	costs_m12 = models.fields.IntegerField(default="0")
+	costs_m12 = models.fields.IntegerField(default="500")
+	costs_m13 = models.fields.IntegerField(default="0")
+	costs_m14 = models.fields.IntegerField(default="0")
+	costs_m15 = models.fields.IntegerField(default="0")
+	costs_m16 = models.fields.IntegerField(default="0")
+	costs_m17 = models.fields.IntegerField(default="0")
+	costs_m18 = models.fields.IntegerField(default="0")
+	costs_m19 = models.fields.IntegerField(default="0")
+	costs_m20 = models.fields.IntegerField(default="0")
+	costs_m21 = models.fields.IntegerField(default="0")
+	costs_m22 = models.fields.IntegerField(default="0")
+	costs_m23 = models.fields.IntegerField(default="0")
+	costs_m24 = models.fields.IntegerField(default="0")
 
-	start_contract = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	end_contract = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	contract_price = models.fields.DecimalField(max_digits=6, decimal_places=2, default=58)
-	contract_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	contract_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
 
-	price_elec_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
+	start_contract = models.fields.DateField(default=date(2023, 1, 1), blank=True, null=True)
+	end_contract = models.fields.DateField(default=date(2042, 12, 31), blank=True, null=True)
+	contract_price = models.fields.DecimalField(max_digits=6, decimal_places=2, default=130)
+	contract_indexation_start_date = models.fields.DateField(default=date(2023, 1, 1), blank=True, null=True)
+	contract_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.02)
+
+	price_elec_indexation_start_date = models.fields.DateField(default=date(2022, 1, 1), blank=True, null=True)
+	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.02)
 	price_elec_choice = models.fields.IntegerField(default="2")
 
 
@@ -117,6 +125,18 @@ class Project(models.Model):
 	price_elec_low_y28 = models.fields.IntegerField(default="50")
 	price_elec_low_y29 = models.fields.IntegerField(default="50")
 	price_elec_low_y30 = models.fields.IntegerField(default="50")
+	price_elec_low_y31 = models.fields.IntegerField(default="50")
+	price_elec_low_y32 = models.fields.IntegerField(default="50")
+	price_elec_low_y33 = models.fields.IntegerField(default="50")
+	price_elec_low_y34 = models.fields.IntegerField(default="50")
+	price_elec_low_y35 = models.fields.IntegerField(default="50")
+	price_elec_low_y36 = models.fields.IntegerField(default="50")
+	price_elec_low_y37 = models.fields.IntegerField(default="50")
+	price_elec_low_y38 = models.fields.IntegerField(default="50")
+	price_elec_low_y39 = models.fields.IntegerField(default="50")
+	price_elec_low_y40 = models.fields.IntegerField(default="50")
+	price_elec_low_y41 = models.fields.IntegerField(default="50")
+	price_elec_low_y42 = models.fields.IntegerField(default="50")
 
 	price_elec_med_y1 = models.fields.IntegerField(default="100")
 	price_elec_med_y2 = models.fields.IntegerField(default="100")
@@ -148,6 +168,19 @@ class Project(models.Model):
 	price_elec_med_y28 = models.fields.IntegerField(default="100")
 	price_elec_med_y29 = models.fields.IntegerField(default="100")
 	price_elec_med_y30 = models.fields.IntegerField(default="100")
+	price_elec_med_y31 = models.fields.IntegerField(default="100")
+	price_elec_med_y32 = models.fields.IntegerField(default="100")
+	price_elec_med_y33 = models.fields.IntegerField(default="100")
+	price_elec_med_y34 = models.fields.IntegerField(default="100")
+	price_elec_med_y35 = models.fields.IntegerField(default="100")
+	price_elec_med_y36 = models.fields.IntegerField(default="100")
+	price_elec_med_y37 = models.fields.IntegerField(default="100")
+	price_elec_med_y38 = models.fields.IntegerField(default="100")
+	price_elec_med_y39 = models.fields.IntegerField(default="100")
+	price_elec_med_y40 = models.fields.IntegerField(default="100")
+	price_elec_med_y41 = models.fields.IntegerField(default="100")
+	price_elec_med_y42 = models.fields.IntegerField(default="100")
+
 
 	price_elec_high_y1 = models.fields.IntegerField(default="150")
 	price_elec_high_y2 = models.fields.IntegerField(default="150")
@@ -179,18 +212,30 @@ class Project(models.Model):
 	price_elec_high_y28 = models.fields.IntegerField(default="150")
 	price_elec_high_y29 = models.fields.IntegerField(default="150")
 	price_elec_high_y30 = models.fields.IntegerField(default="150")
+	price_elec_high_y31 = models.fields.IntegerField(default="150")
+	price_elec_high_y32 = models.fields.IntegerField(default="150")
+	price_elec_high_y33 = models.fields.IntegerField(default="150")
+	price_elec_high_y34 = models.fields.IntegerField(default="150")
+	price_elec_high_y35 = models.fields.IntegerField(default="150")
+	price_elec_high_y36 = models.fields.IntegerField(default="150")
+	price_elec_high_y37 = models.fields.IntegerField(default="150")
+	price_elec_high_y38 = models.fields.IntegerField(default="150")
+	price_elec_high_y39 = models.fields.IntegerField(default="150")
+	price_elec_high_y40 = models.fields.IntegerField(default="150")
+	price_elec_high_y41 = models.fields.IntegerField(default="150")
+	price_elec_high_y42 = models.fields.IntegerField(default="150")
 
-	opex = models.fields.IntegerField(default="100")
-	opex_indexation_start_date = models.fields.DateField(default=datetime.date.today, blank=True, null=True)
-	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.05)
+	opex = models.fields.IntegerField(default="50")
+	opex_indexation_start_date = models.fields.DateField(default=date(2024, 1, 1), blank=True, null=True)
+	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.015)
 
 	debt_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
-	debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
-	debt_swap_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.5)
-	debt_reference_rate_buffer = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)
+	debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	debt_swap_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	debt_reference_rate_buffer = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	
-	debt_upfront_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
-	debt_commitment_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
+	debt_upfront_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1.5)
+	debt_commitment_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)
 	
 	debt_target_DSCR = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1.15)
 	debt_gearing_max = models.fields.DecimalField(max_digits=4, decimal_places=2, default=90)
@@ -200,14 +245,14 @@ class Project(models.Model):
 
 	corporate_income_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=30) 
 
-	devfee_choice = models.fields.IntegerField(default="1")
+	devfee_choice = models.fields.IntegerField(default="2")
 	devfee_paid_FC = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	devfee_paid_COD = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)
 
 
 	injection_choice = models.fields.IntegerField(default="1")
 	subgearing = models.fields.DecimalField(max_digits=4, decimal_places=2, default=90)
-	SHL_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
+	SHL_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=3)
 
 
 	calculation_detail = models.fields.IntegerField(default="2")
@@ -215,5 +260,5 @@ class Project(models.Model):
 	payment_delay_costs = models.fields.IntegerField(default="30")
 
 	DSRA_choice = models.fields.IntegerField(default="1")
-	initial_wc = models.fields.IntegerField(default="1")
-	cash_min = models.fields.IntegerField(default="1")
+	initial_wc = models.fields.IntegerField(default="0")
+	cash_min = models.fields.IntegerField(default="0")

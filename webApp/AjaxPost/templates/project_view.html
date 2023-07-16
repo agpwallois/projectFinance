@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load custom_filters %}
 
 {% block sidebar %}
 
@@ -423,152 +423,22 @@
 					   <h3>Monthly construction schedule</h3>
 
 
-								<div class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 1</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m1 }}
-									</div>
-								</div>	
+			
+					   		{% for field in project_form.visible_fields|slice:"26:50" %}
+					   		
+					   		<div id="costs_m{{ forloop.counter }}" class="row-inline-wrapper">
+								        <div class="row-inline-three-first">
+								            <p>Month {{ forloop.counter }}</p>
+								        </div>
+								        <div class="row-inline-three-second">
+								            <p>kEUR</p>
+								        </div>
+								        <div class="row-inline-three">
+								            {{ field }}
+								        </div>
+								    </div>
 
-								<div id="costs_m2" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 2</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m2 }}
-									</div>
-								</div>	
-
-								<div id="costs_m3" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 3</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m3 }}
-									</div>
-								</div>	
-
-								<div id="costs_m4" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 4</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m4 }}
-									</div>
-								</div>	
-
-
-								<div id="costs_m5" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 5</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m5 }}
-									</div>
-								</div>	
-
-								<div id="costs_m6" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 6</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m6 }}
-									</div>
-								</div>	
-
-								<div id="costs_m7" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 7</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m7 }}
-									</div>
-								</div>	
-
-								<div id="costs_m8" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 8</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m8 }}
-									</div>
-								</div>	
-
-								<div id="costs_m9" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 9</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m9 }}
-									</div>
-								</div>	
-
-								<div id="costs_m10" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 10</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m10 }}
-									</div>
-								</div>	
-
-								<div id="costs_m11" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 11</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m11 }}
-									</div>
-								</div>	
-
-
-								<div id="costs_m12" class="row-inline-wrapper">
-									<div class="row-inline-three-first">
-											<p>Month 12</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											{{ project_form.costs_m12 }}
-									</div>
-								</div>	
-
+					   		{% endfor %}
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first-underlined">
@@ -721,482 +591,45 @@
 									</div>
 								</div>
 
-							<div id="elec_y1" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel0"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y1 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y1 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y1 }}
+							<div class="columns-container">
 
-									</div>
+		   						<div class ="column-input">
+		   							{% for field in project_form.visible_fields|slice:"58:100" %}
+									              <div class ="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
+									{% endfor %}
+								</div>
+									  
+		   						<div class ="column-input">
+
+		   							{% for field in project_form.visible_fields|slice:"58:100" %}						        
+									            <p>{{ field }}</p>	
+									{% endfor %}
+
 								</div>
 
+								<div class ="column-input">
 
-							<div id="elec_y2" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel1"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y2 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y2 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y2 }}
+		   							{% for field in project_form.visible_fields|slice:"100:142" %}						        
+									            <p>{{ field }}</p>	
+									{% endfor %}
 
-									</div>
+								</div>
+								<div class ="column-input">
+
+		   							{% for field in project_form.visible_fields|slice:"142:184" %}						        
+									            <p>{{ field }}</p>	
+									{% endfor %}
+
 								</div>
 
-
-							<div id="elec_y3" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel2"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y3 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y3 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y3 }}
-									</div>
-								</div>
+					   		</div>
 
 
-							<div id="elec_y4" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel3"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y4 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y4 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y4 }}
-									</div>
-								</div>
+
+							
 
 
-							<div id="elec_y5" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel4"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y5 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y5 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y5 }}
-									</div>
-								</div>
 
-
-							<div id="elec_y6" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel5"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y6 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y6 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y6 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y7" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel6"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y7 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y7 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y7 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y8" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel7"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y8 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y8 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y8 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y9" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel8"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y9 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y9 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y9 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y10" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel9"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y10 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y10 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y10 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y11" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel10"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y11 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y11 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y11 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y12" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel11"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y12 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y12 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y12 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y13" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel12"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y13 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y13 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y13 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y14" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel13"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y14 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y14 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y14 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y15" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel14"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y15 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y15 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y15 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y16" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel15"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y16 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y16 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y16 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y17" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel16"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y17 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y17 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y17 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y18" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel17"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y18 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y18 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y18 }}
-									</div>
-								</div>
-
-							<div id="elec_y19" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel18"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y19 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y19 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y19 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y20" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel19"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y20 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y20 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y20 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y21" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel20"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y21 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y21 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y21 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y22" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel21"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y22 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y22 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y22 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y23" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel22"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y23 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y23 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y23 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y24" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel23"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y24 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y24 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y24 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y25" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel24"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y25 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y25 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y25 }}
-									</div>
-								</div>
-
-							<div id="elec_y26" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel25"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y26 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y26 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y26 }}
-									</div>
-								</div>
-
-							<div id="elec_y27" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel26"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y27 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y27 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y27 }}
-									</div>
-								</div>
-
-
-							<div id="elec_y28" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel27"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y28 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y28 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y28 }}
-									</div>
-								</div>
-
-							<div id="elec_y29" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel28"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y29 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y29 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y29 }}
-									</div>
-								</div>
-
-							<div id="elec_y30" class="row-inline-wrapper">
-									<div class="row-inline-four">
-											<div id="elecPriceLabel29"></div>
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_low_y30 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_med_y30 }}
-									</div>
-									<div class="row-inline-four">
-											{{ project_form.price_elec_high_y30 }}
-									</div>
-								</div>
-	
 
 					  </div>
 					</div>
@@ -2529,7 +1962,7 @@
 
 				$("#myTableAll").html();
 
-				for (var i = 0; i < 30; i++) {
+				for (var i = 0; i < 42; i++) {
 					$("#elecPriceLabel"+i).html(json.dic_price_elec_keys[i]);
 				}
 
@@ -2588,14 +2021,19 @@
 			},
 
 			error: function(json){
+			  
+			    try {
+			        const obj = JSON.parse(json.responseJSON.error);
+			        const array = Object.values(obj)[0];
+			        const firstElement = array[0];
+			        alert(firstElement.message);
+			    } catch (e) {
+			        alert(json.responseJSON.error_type+" "+json.responseJSON.message);
+			        console.log(json);
+			    }
 
-				obj = JSON.parse(json.responseJSON.error);
 
-				const array = Object.values(obj)[0];
-				const firstElement = array[0];
 
-				alert(firstElement.message)
-				console.log(firstElement.message)
 				
 
 			}
@@ -2660,7 +2098,7 @@
 
 	  // Show or hide the month fields based on the number of months
 	  monthFields.each(function(index) {
-		var monthIndex = index + 1;
+		var monthIndex = index;
 		if (monthIndex <= numMonths) {
 		  $(this).show();
 		} else {
@@ -2682,9 +2120,21 @@
 	var endDateField = $('#id_end_construction');
 	var operating_life = $('#id_operating_life');
 	var liquidationField = $('#id_liquidation');
-	var yearFields = $('[id^="elec_y"]');
+	var yearFieldsLow = $('[id^="id_price_elec_low"]');
+	var yearFieldsMed = $('[id^="id_price_elec_med"]');
+	var yearFieldsHigh = $('[id^="id_price_elec_high"]');
+	var yearFieldsLab = $('[id^="elecPriceLabel"]');
 
-	yearFields.hide();
+
+
+	yearFieldsLow.hide();
+	yearFieldsMed.hide();
+	yearFieldsHigh.hide();
+	yearFieldsLab.hide();
+
+
+
+
 	updateYearFieldsVisibility()
   
    // Show or hide the month fields based on the selected start and end dates
@@ -2697,16 +2147,20 @@
 	function updateYearFieldsVisibility() {
 		
 	var endDate = new Date(endDateField.val());
-	var yearB = endDate.getFullYear();
+	var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
+	var yearB = COD.getFullYear();
+
 	var operating_life_val = parseInt(operating_life.val());
-	endDate.setFullYear(yearB + operating_life_val);
-	var yearE = endDate.getFullYear();
-	  
+	var liquidationField_val = parseInt(liquidationField.val());
+	var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
+	var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
+	var yearE = latest_date.getFullYear();
+		  
 	  // Show or hide the month fields based on the number of months
-	  numYears = yearE-yearB+2
+	  numYears = yearE-yearB+1
 
 	  // Show or hide the month fields based on the number of months
-	  yearFields.each(function(index) {
+	  yearFieldsLow.each(function(index) {
 		var yearIndex = index + 1;
 		if (yearIndex <= numYears) {
 		  $(this).show();
@@ -2714,6 +2168,35 @@
 		  $(this).hide();
 		}
 	  });
+
+	  yearFieldsMed.each(function(index) {
+		var yearIndex = index + 1;
+		if (yearIndex <= numYears) {
+		  $(this).show();
+		} else {
+		  $(this).hide();
+		}
+	  });
+
+
+	  yearFieldsHigh.each(function(index) {
+		var yearIndex = index + 1;
+		if (yearIndex <= numYears) {
+		  $(this).show();
+		} else {
+		  $(this).hide();
+		}
+	  });
+
+	  yearFieldsLab.each(function(index) {
+		var yearIndex = index + 1;
+		if (yearIndex <= numYears) {
+		  $(this).show();
+		} else {
+		  $(this).hide();
+		}
+	  });
+
 	}
 
   });

@@ -3,6 +3,7 @@ from .models import Project
 from dateutil.relativedelta import relativedelta
 import math
 import datetime
+from django.core.exceptions import ValidationError
 
 PERIODICITY_CHOICES= [
 	('3', 'Quarterly'),
@@ -105,8 +106,18 @@ class ProjectForm(forms.ModelForm):
 		start_construction = cleaned_data.get('start_construction')
 		end_construction = cleaned_data.get('end_construction')
 
+
+		difference = (end_construction - start_construction).days
+		if difference>365*2:
+			raise ValidationError(
+				"Current maximum construction duration is 24 months."
+			)
+
+
 		if end_construction<start_construction:
-			self.add_error('end_construction','Construction end date should not occur before construction start date.')
+			raise ValidationError(
+				"Construction end date should not occur before construction start date."
+			)
 
 		# Offtake contract
 		start_contract = cleaned_data.get('start_contract')
@@ -121,8 +132,8 @@ class ProjectForm(forms.ModelForm):
 		# Seasonality
 		seasonality = []
 		for i in range(1, 13):
-		    seasonality_value = cleaned_data.get(f'seasonality_m{i}')
-		    seasonality.append(seasonality_value)
+			seasonality_value = cleaned_data.get(f'seasonality_m{i}')
+			seasonality.append(seasonality_value)
 
 		sum_seasonality = sum(seasonality)
 
@@ -135,6 +146,14 @@ class ProjectForm(forms.ModelForm):
 		debt_tenor = cleaned_data.get('debt_tenor')
 		debt_max_tenor = length_construction+operating_life
 
+
+
+		if operating_life>40:
+			raise ValidationError(
+				"Current maximum operating duration is 40 years."
+			)
+
+
 		if debt_tenor>debt_max_tenor:
 			self.add_error('debt_tenor','Debt tenor cannot exceed project life')
 
@@ -146,6 +165,5 @@ class ProjectForm(forms.ModelForm):
 			self.add_error('liquidation','Liquidation delay must be greater or equal to 0.')
 
 		return cleaned_data
-
 
 

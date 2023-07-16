@@ -502,6 +502,22 @@ width: 100%;
     align-items: stretch;
     }
 
+
+.year-box{
+    height:27.65px;
+      display: flex;
+      align-items: center; /* ou justify-content: center; */
+}
+
+.columns-container {
+    display: flex;
+}
+
+.column-input {
+    flex: 1;
+}
+
+
 .row-inline-two{
     flex: 1 1 0;
     display: flex;
