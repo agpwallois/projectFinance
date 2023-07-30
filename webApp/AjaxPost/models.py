@@ -88,10 +88,10 @@ class Project(models.Model):
 	end_contract = models.fields.DateField(default=date(2042, 12, 31), blank=True, null=True)
 	contract_price = models.fields.DecimalField(max_digits=6, decimal_places=2, default=130)
 	contract_indexation_start_date = models.fields.DateField(default=date(2023, 1, 1), blank=True, null=True)
-	contract_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.02)
+	contract_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 	price_elec_indexation_start_date = models.fields.DateField(default=date(2022, 1, 1), blank=True, null=True)
-	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.02)
+	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 	price_elec_choice = models.fields.IntegerField(default="2")
 
 
@@ -227,7 +227,7 @@ class Project(models.Model):
 
 	opex = models.fields.IntegerField(default="50")
 	opex_indexation_start_date = models.fields.DateField(default=date(2024, 1, 1), blank=True, null=True)
-	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.015)
+	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 	debt_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
 	debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
@@ -262,3 +262,8 @@ class Project(models.Model):
 	DSRA_choice = models.fields.IntegerField(default="1")
 	initial_wc = models.fields.IntegerField(default="0")
 	cash_min = models.fields.IntegerField(default="0")
+
+
+	sensi_production = models.fields.DecimalField(max_digits=3, decimal_places=0, default=-15)
+	sensi_opex = models.fields.DecimalField(max_digits=3, decimal_places=0, default=10)
+	sensi_inflation = models.fields.DecimalField(max_digits=3, decimal_places=0, default=1)

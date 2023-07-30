@@ -6,7 +6,6 @@
 body {
     font-family: 'Poppins', sans-serif;
     color: rgb(51, 51, 51);
-    font-size: 0.75rem;
 }
 
 header{
@@ -49,7 +48,6 @@ title-wrapper {
 
 
 h1-calc {
-  font-size: 0.9rem;
   color: #0d6efd;
   position: sticky;
   left: 0;
@@ -58,7 +56,6 @@ h1-calc {
 }
 
 h2-calc {
-  font-size: 0.9rem;
   padding-top: 10px;
   text-decoration: underline;
   margin-bottom: 0;
@@ -80,25 +77,22 @@ h1 {
 }
 
 h2 {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #0d6efd;
-
+    font-weight: 600;
     }
 
 h3 {
-    font-size: 0.9rem;
+    font-size: 1rem;
     padding-top:10px;
     text-decoration: underline;
     margin-bottom: 0;
-
-
 }
 
 h4 {
-    font-size: 0.75rem;
-    text-decoration: underline;
-    margin-top: 0.5rem;
-
+    line-height:1.5;
+    font-size: 1rem;
+    font-weight: 800;
 }
 
 .navbar {
@@ -152,6 +146,7 @@ header {
     padding-left: 15px;
     padding-top: 10px;
     padding-right: 15px;
+    font-size: 0.75rem;
 }
 
 #sidebar.active {
@@ -166,7 +161,7 @@ header {
   padding: 5px;
   background: rgb(242, 242, 242);
   color: rgb(92, 105, 117);
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 
@@ -203,7 +198,7 @@ header {
   color: #ffffff;
   cursor: pointer;
   display: inline-flex;
-  font-size: 0.75rem;
+  font-size: 1rem;
   justify-content: center;
   min-height: 30px;
   overflow: hidden;
@@ -218,12 +213,12 @@ header {
 }
 
 .table {
-  font-size: 0.75rem;
 
 }
 
-
-
+.table-sum tr:first-child{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
 
 .table th:first-child,
 .table td:first-child {
@@ -231,6 +226,7 @@ header {
   left: 0;
   z-index: 1;
   background-color: white;
+
 }
 
 
@@ -241,6 +237,7 @@ header {
     padding: 10px;
     box-shadow: 0 0 10px #ccc;
     margin-top: 10px;
+    border-radius: 5px;
 }
 
 
@@ -326,14 +323,14 @@ header {
 
 
 
-#table_sum_sources tr:nth-child(2) td:first-child,
-#table_sum_sources tr:nth-child(3) td:first-child {
+#table_sum_sources tr:nth-child(3) td:first-child,
+#table_sum_sources tr:nth-child(4) td:first-child {
   padding-left: 10px;
 }
 
-#table_sum_uses tr:nth-child(4) td:first-child,
 #table_sum_uses tr:nth-child(5) td:first-child,
-#table_sum_uses tr:nth-child(6) td:first-child {
+#table_sum_uses tr:nth-child(6) td:first-child,
+#table_sum_uses tr:nth-child(7) td:first-child {
   padding-left: 10px;
 }
 
@@ -380,8 +377,7 @@ width: 100%;
 
 
 .table-sum td{
-    font-size: 0.75rem;
-    line-height: 1em;
+
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -448,6 +444,67 @@ width: 100%;
     width: 100%;
 
 }
+
+
+#wrapper-btn-form_2{
+  display: flex;
+  justify-content: flex-end;
+
+
+}
+
+
+#btn-form_2{
+    background-color: white;
+    color : #0d6efd; 
+
+    }
+
+#summary_sensi tr:hover>td{
+  background-color: #0d6efd; 
+  color: #FFFFFF;
+  cursor: pointer; 
+}
+
+.red-cell {
+  color: red;
+  font-weight: bold;
+}
+
+#summary_sensi tr:hover td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+#summary_sensi tr:hover td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+
+
+
+.selected-row td:first-child {
+    background-color: #0d6efd; 
+    color: #FFFFFF; 
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.selected-row td:nth-child(2),
+.selected-row td:nth-child(3) {
+    background-color: #0d6efd; 
+    color: #FFFFFF; 
+
+}
+
+.selected-row td:last-child {
+    background-color: #0d6efd; 
+    color: #FFFFFF; 
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+
 
 
 #summary-financing{
@@ -532,6 +589,13 @@ width: 100%;
     padding-left:2px;
     }
 
+.row-inline-four{
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    padding-left:2px;
+    }
+
 .row-inline-three-first{
     display: flex;
     width:40%;
@@ -582,7 +646,6 @@ width: 100%;
 .nav-tabs .nav-item .nav-link {
     background: rgb(242, 242, 242);
     color: rgb(51, 51, 51);
-    font-size: 0.9rem;
 
 }
 
@@ -591,5 +654,13 @@ width: 100%;
     border-bottom: 3px solid;
 
 }
+
+#id_sensi_production,
+#id_sensi_opex,
+#id_sensi_inflation {
+    padding: 0px;
+
+}
+
 
 

@@ -3,15 +3,21 @@
 
 {% block sidebar %}
 
+<form method="POST" id="post-form">{% csrf_token %}
+
 <nav id="sidebar">
 	<div class="sidebar"><h1>{{ project.name }}</h1>
 
-		<form method="POST" id="post-form">{% csrf_token %}
+		
+
+			<div>{{ project_form.calculation_type }}</div>
 			<div class="fieldWrapper" id="the_post">
 
 				<div  class="btn-wrapper">
 				<input type="submit" value="Run" class="button" id="btn-form">
 				</div>
+
+
 
 				<div class="accordion" id="accordionSidebar">
 				  <div class="accordion-item">
@@ -1010,14 +1016,17 @@
 					</div>
 				  </div>				  
 
+			
+
+
 
 				  <div class="accordion-item">
-					<h2 class="accordion-header" id="headingEleven">
-					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+					<h2 class="accordion-header" id="headingTwelve">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwelve" aria-expanded="false" aria-controls="collapseTwelve">
 						Project details
 					  </button>
 					</h2>
-					<div id="collapseEleven" class="accordion-collapse collapse" aria-labelledby="headingEleven" data-bs-parent="#accordionSidebar">
+					<div id="collapseTwelve" class="accordion-collapse collapse" aria-labelledby="headingTwelve" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
 								<div class="row-inline-wrapper">
@@ -1075,14 +1084,19 @@
 				</div>
 
 				</div>
+	
+
+
 			</div>
-		</form>  
+
 	</div>
+
 </nav>
 
-{% endblock %}
 
-{% block content %}
+
+
+
 
 <div id="content">
 	<div id="content-nav">
@@ -1094,6 +1108,8 @@
 		</nav>
 
 	</div>
+
+
 
 	<div id="content-box">
 		<nav>
@@ -1116,7 +1132,7 @@
 						<div class="box-wrapper">
 
 						<div class="box" id="summary-fp">
-							<h2>Financing plan</h2>
+							<h2>FINANCING PLAN</h2>
 
 							<div class="summary-container-titles">
 								<div class="summary-titles">
@@ -1140,12 +1156,13 @@
 									</table>
 								</div>
 							</div>
-						</div>
-						</div>
 
+						</div>
+						</div>
+{% comment %}
 						<div class="box-wrapper">	
 						<div class="box" id="summary-financing">
-							<h2>Financing terms</h2>
+							<h2>FINANCING TERMS</h2>
 
 								<div class="summary-container">
 									<table class="table-sum" id="table-financing-terms">
@@ -1153,15 +1170,88 @@
 									</table>
 								</div>
 	
+							</div>
 						</div>
-						</div>
+
+{% endcomment %}
+
+		<div class="box-wrapper">		
+				<div class="box" id="summary-sensitivities">
+	
+
+
+							<h2>SENSITIVITIES</h2>
+	
+
+
+						<div class="summary-container">
+								<div class="summary">
+								
+
+		<table class="table-sum">
+	    <tbody>
+	    	<tr>
+	    		<th>Parameter</th>
+	    		<th>Factor</th>
+	    		<th></th>
+	    	</tr>	
+	        <tr>
+	            <td>Production</td>
+	            <td>{{ project_form.sensi_production }}</td>
+	            <td><div id="sensi_production"></div></td>
+
+	        </tr>
+	        <tr>
+	            <td>Operating costs</td>
+	            <td>{{ project_form.sensi_opex }}</td>
+	            <td><div id="sensi_opex"></div></td>
+	        </tr>
+	        <tr>
+	            <td>Inflation</td>
+	            <td>{{ project_form.sensi_inflation }}</td>
+	            <td><div id="sensi_inflation"></div></td>
+
+	        </tr>
+	    </tbody>
+	</table>
+
+
+								</div>
+
+								<div class="summary">
+								
+									<table class="table-sum">
+												<tbody id="summary_sensi"></tbody>
+									</table>
+
+								</div>
+							</div>
+
+
+			<div  class="btn-wrapper" id="wrapper-btn-form_2">
+				<input type="submit" value="← Back to Base Case" class="button" id="btn-form_2">
+				</div>
+
+				
+
+
+								
+
+
+				</div>
+
+			</div>
+
+
+
+
 
 					</div>
 
 					<div class="summary-container-right">
 					<div class="box-wrapper">	
 						<div class="box" id="summary-IRR">
-							<h2>Project and shareholder return</h2>
+							<h2>PROJECT AND SHAREHOLDER RETURN</h2>
 									<h4>Project IRR</h4>
 										
 										<table class="table-sum">
@@ -1179,16 +1269,18 @@
 
 						<div class="box-wrapper">	
 						<div class="box" id="summary-debt">
-							<h2>Senior debt</h2>
+							<h2>SENIOR DEBT</h2>
 										<table class="table-sum">
 											<tbody id="summary_debt"></tbody>
 										</table>
+
+
 						</div>
 						</div>
 
 						<div class="box-wrapper">	
 						<div class="box" id="summary-audit">
-							<h2>Audit and control</h2>
+							<h2>AUDIT AND CONTROL</h2>
 									<table class="table-sum">
 										<tbody id="summary_audit"></tbody>
 									</table>
@@ -1199,12 +1291,18 @@
 				</div>
 
 
-		<div class="box-wrapper">		
+
+
+		<div class="box-wrapper">
 				<div class="box" id="nav-summary-charts">
 					{% block jquery %}{% include 'charts.html' %}{% endblock %}
 				</div>
 
 			</div>
+
+
+
+
 		</div>
 			<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
 			
@@ -1532,8 +1630,54 @@
 <script type="text/javascript">
 
 	$(document).ready(function(){
+		$('#btn-form_2').hide();
+		$("#id_calculation_type").val('none');
 		$("#post-form").submit();
+
 	});
+
+	$("#summary_sensi").on('click', 'tr:nth-child(2)', function() {
+	        $("#id_calculation_type").val('sensi-prod');
+	        $("#post-form").submit();
+	        $('#btn-form_2').show();
+	});       
+
+
+	$("#summary_sensi").on('click', 'tr:nth-child(3)', function() {
+	        $("#id_calculation_type").val('sensi-opex');
+	        $("#post-form").submit();
+	        $('#btn-form_2').show();
+	});  
+
+
+	$("#summary_sensi").on('click', 'tr:nth-child(4)', function() {
+	        $("#id_calculation_type").val('sensi-inf');
+	        $("#post-form").submit();
+	        $('#btn-form_2').show();
+	});  
+
+
+	$(document).ready(function() {
+	    $("#summary_sensi").on('click', 'tr', function() {
+	        $("#summary_sensi tr").removeClass("selected-row");
+	        $(this).addClass("selected-row");
+	    });
+	});
+
+
+
+	$("#btn-form").on('click', function() {
+	        $("#id_calculation_type").val('none');
+	        $("#post-form").submit();
+	});     
+
+
+	$("#btn-form_2").on('click', function() {
+	        $("#id_calculation_type").val('none');
+	        $("#post-form").submit();
+	        $('#btn-form_2').hide();
+	});     
+
 
 
 	$(document).on('submit','#post-form', function(e){
@@ -1577,8 +1721,9 @@
 			"Payback time": "years from FC",
 
 
-			"Debt constraint": "text",
-			"Effective gearing": "%",
+			"Constraint": "text",
+			"Average life (from FC)": "years",
+			"Average DSCR": "x",
 			"Average DSCR": "x",
 			"Balance sheet": "true/false",
 			"Financing plan": "true/false",
@@ -1592,37 +1737,70 @@
 			"Equity injection":"text",
 			"Subgearing":"%",
 			"Debt IRR": "%",
-
+			"Production":"x",
+			"Operating costs":"x",			
+			"Inflation":"x",
+			"Debt maturity":"true/false",
 
 
 			};
 
 
+		const columnKey_exclude = {
+			"Production":"x",
+			"Operating costs":"x",			
+			"Inflation":"x",
+
+		};
+
+			function build_table(json_input, div_output) {
+			    var table_result = "";
+
+			    var table_result = "<tr>";
+			    var headers = json_input[""];
+
+			    $.each(headers, function (_, header) {
+			        table_result += "<th>" + header + "</th>";
+			    });
+			    table_result += "</tr>";
+
+			    delete json_input[""];
+
+			    $.each(json_input, function(key, data) {
+			 
+			        table_result += "<tr>";
+
+    				if (columnKey_exclude.hasOwnProperty(key)) {
+			        } else {
+			            table_result += "<td>" + key + "</td>";
+			        }
+			        
+			        
+					if (columnKey_exclude.hasOwnProperty(key)) {
+			        } else if (columnLabel_summary.hasOwnProperty(key)) {
+			            table_result += "<td>" + columnLabel_summary[key] + "</td>";
+			        } else {
+			            table_result += "<td>" + "kEUR" + "</td>";
+			        }
+
+			        $.each(data, function(index, data) {
+			                if (!data) {
+						        table_result += "<td class='red-cell'>" + data + "</td>";
+						    } else {
+						        table_result += "<td>" + data + "</td>";
+						    }
+			        });
+			        table_result += "</tr>";
+			    
+   			    });
+			
+			    $(div_output).html(table_result);
+			
+			}
 
 
-		function build_table(json_input,div_output) {
-			var table_result = []
-					$.each(json_input, function(key, data) {
-						table_result += "<tr>";
-						table_result += "<td>" + key + "</td>";
 
 
-						if (columnLabel_summary.hasOwnProperty(key)) {
-
-						  table_result += "<td>" + columnLabel_summary[key] + "</td>";
-
-						} else {
-						  
-						  table_result += "<td>" + "kEUR" + "</td>";
-						}
-
-					$.each(data, function(index, data) {
-						table_result += "<td>" + data + "</td>";
-					});
-						table_result += "</tr>";
-			});
-		$(div_output).html(table_result);
-		}
 
 
 		e.preventDefault(),
@@ -1957,6 +2135,11 @@
 
 				];
 
+
+				if (!$("#id_calculation_type").val().startsWith('sensi')) {
+  					tables.push({ data: json.table_sensi, selector: "#summary_sensi" });
+				}
+
 				tables.forEach(table => build_table(table.data, table.selector));
 
 
@@ -2067,6 +2250,89 @@
 
 
 <script>
+$(document).ready(function() {
+
+        var sensi_production_field = $('#id_sensi_production').val()+'%';
+        $('#sensi_production').text(sensi_production_field);
+
+        // Adding a listener to the input field
+        $('#id_sensi_production').on('input', function() {
+            var new_value = $(this).val();
+            $('#sensi_production').text(new_value+'%');
+        });
+
+
+
+
+
+
+
+});
+
+</script>
+
+<script>
+$(document).ready(function() {
+
+        var sensi_opex_field = $('#id_sensi_opex').val()+'%';
+        $('#sensi_opex').text(sensi_opex_field);
+
+        // Adding a listener to the input field
+        $('#id_sensi_opex').on('input', function() {
+            var new_value = $(this).val();
+            $('#sensi_opex').text(new_value+'%');
+        });
+
+});
+
+</script>
+
+<script>
+$(document).ready(function() {
+
+        var sensi_inflation_field = $('#id_sensi_inflation').val()+'%';
+        $('#sensi_inflation').text(sensi_inflation_field);
+
+        // Adding a listener to the input field
+        $('#id_sensi_inflation').on('input', function() {
+            var new_value = $(this).val();
+            $('#sensi_inflation').text(new_value+'%');
+        });
+
+});
+
+</script>
+
+
+<script>
+
+
+  $(document).ready(function() {
+    $('#id_sensi_production').on('input', function() {
+      $("#post-form").submit();
+    });
+  });
+
+
+$(document).ready(function() {
+    $('#id_sensi_opex').on('input', function() {
+      $("#post-form").submit();
+    });
+  });
+
+
+$(document).ready(function() {
+    $('#id_sensi_inflation').on('input', function() {
+      $("#post-form").submit();
+    });
+  });
+
+
+
+</script>
+
+
+<script>
   $(document).ready(function() {
 	// Get the start and end date fields
 	var startDateField = $('#id_start_construction');
@@ -2110,6 +2376,14 @@
   });
 
 </script>
+
+
+
+
+
+
+
+
 
 <script>
   $(document).ready(function() {
@@ -2205,7 +2479,7 @@
 
 
 
-
+</form>  
 
 {% endblock %}
 
