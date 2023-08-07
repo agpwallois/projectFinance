@@ -6,7 +6,7 @@
 <form method="POST" id="post-form">{% csrf_token %}
 
 <nav id="sidebar">
-	<div class="sidebar"><h1>{{ project.name }}</h1>
+	<div class="sidebar"><h1>Projet: {{ project.name }}</h1>
 
 		
 
@@ -14,7 +14,7 @@
 			<div class="fieldWrapper" id="the_post">
 
 				<div  class="btn-wrapper">
-				<input type="submit" value="Run" class="button" id="btn-form">
+				<input type="submit" value="Run Base Case" class="button" id="btn-form">
 				</div>
 
 
@@ -1104,6 +1104,7 @@
 		<nav>
 			<div class="container-nav">
 				<button type="button" id="sidebarCollapse" class="button"><</button>
+				<button type="button" id="featureRequest" class="button"><-Feature request-></button>
 			</div>
 		</nav>
 
@@ -1126,7 +1127,81 @@
 		<div class="tab-content">
 			<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
 				
+
+					<div class="box-wrapper">		
+				<div class="box" id="summary-sensitivities">
+	
+
+
+							<h2>SELECTED SCENARIO</h2>
+	
+
+
+		<div class="summary-container">
+								<div class="summary-scenario-left">
+								
+
+		<table class="table-sum" id="table-scenario-input">
+	    <tbody>
+	    	<tr>
+	    		<th>Scenario</th>
+	    		<th></th>
+	    		<th></th>
+	    	</tr>	
+	        <tr>
+	        	<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario1"></td>
+	            <td>Base Case</td>
+	            <td></td>
+	            <td></div></td>
+
+	        </tr>
+
+	        <tr>
+	        	<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2"></td>
+	            <td>Sensitivity: Production</td>
+	            <td>{{ project_form.sensi_production }}</td>
+	            <td><div id="sensi_production"></div></td>
+
+	        </tr>
+	        <tr>
+	        	<td>
+				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario3"></td>
+	            <td>Sensitivity: Operating costs</td>
+	            <td>{{ project_form.sensi_opex }}</td>
+	            <td><div id="sensi_opex"></div></td>
+	        </tr>
+
+	    </tbody>
+	</table>
+
+
+				</div>
+
+				<div class="summary-scenario-right">
+				
+					<table class="table-sum" id="table-scenario-output">
+								<tbody id="summary_sensi"></tbody>
+					</table>
+
+				</div>
+			</div>
+
+		
+
+
+								
+
+
+				</div>
+
+			</div>
+
+
+
 				<div class="nav-summary">
+
+
+
 					<div class="summary-container-left">
 
 						<div class="box-wrapper">
@@ -1175,72 +1250,7 @@
 
 {% endcomment %}
 
-		<div class="box-wrapper">		
-				<div class="box" id="summary-sensitivities">
-	
-
-
-							<h2>SENSITIVITIES</h2>
-	
-
-
-						<div class="summary-container">
-								<div class="summary">
-								
-
-		<table class="table-sum">
-	    <tbody>
-	    	<tr>
-	    		<th>Parameter</th>
-	    		<th>Factor</th>
-	    		<th></th>
-	    	</tr>	
-	        <tr>
-	            <td>Production</td>
-	            <td>{{ project_form.sensi_production }}</td>
-	            <td><div id="sensi_production"></div></td>
-
-	        </tr>
-	        <tr>
-	            <td>Operating costs</td>
-	            <td>{{ project_form.sensi_opex }}</td>
-	            <td><div id="sensi_opex"></div></td>
-	        </tr>
-	        <tr>
-	            <td>Inflation</td>
-	            <td>{{ project_form.sensi_inflation }}</td>
-	            <td><div id="sensi_inflation"></div></td>
-
-	        </tr>
-	    </tbody>
-	</table>
-
-
-								</div>
-
-								<div class="summary">
-								
-									<table class="table-sum">
-												<tbody id="summary_sensi"></tbody>
-									</table>
-
-								</div>
-							</div>
-
-
-			<div  class="btn-wrapper" id="wrapper-btn-form_2">
-				<input type="submit" value="← Back to Base Case" class="button" id="btn-form_2">
-				</div>
-
-				
-
-
-								
-
-
-				</div>
-
-			</div>
+		
 
 
 
@@ -1629,54 +1639,54 @@
 
 <script type="text/javascript">
 
-	$(document).ready(function(){
-		$('#btn-form_2').hide();
-		$("#id_calculation_type").val('none');
-		$("#post-form").submit();
+		$(document).ready(function(){
+		    setCalculationTypeAndSubmit('none');
+		    $("#RadioScenario1").prop('checked', true);
+		});
 
-	});
+		$("#btn-form").on('click', function() {
+		    setCalculationTypeAndSubmit('none');
+		    $("#RadioScenario1").prop('checked', true);
+		});
 
-	$("#summary_sensi").on('click', 'tr:nth-child(2)', function() {
-	        $("#id_calculation_type").val('sensi-prod');
-	        $("#post-form").submit();
-	        $('#btn-form_2').show();
-	});       
+		// Mapping of radio button IDs to their corresponding values
+		var radioValueMap = {
+		    'RadioScenario1': 'none',
+		    'RadioScenario2': 'sensi-prod',
+		    'RadioScenario3': 'sensi-opex',
+		};
 
+		// Generic event handler for radio buttons
+		$("[id^='RadioScenario']").on('change', function() {
+		    if ($(this).prop('checked')) {
+		        var value = radioValueMap[this.id];
+		        setCalculationTypeAndSubmit(value);
+		    }
+		});
 
-	$("#summary_sensi").on('click', 'tr:nth-child(3)', function() {
-	        $("#id_calculation_type").val('sensi-opex');
-	        $("#post-form").submit();
-	        $('#btn-form_2').show();
-	});  
-
-
-	$("#summary_sensi").on('click', 'tr:nth-child(4)', function() {
-	        $("#id_calculation_type").val('sensi-inf');
-	        $("#post-form").submit();
-	        $('#btn-form_2').show();
-	});  
-
-
-	$(document).ready(function() {
-	    $("#summary_sensi").on('click', 'tr', function() {
-	        $("#summary_sensi tr").removeClass("selected-row");
-	        $(this).addClass("selected-row");
-	    });
-	});
+		// Helper function to set the value and submit the form
+		function setCalculationTypeAndSubmit(value) {
+		    $("#id_calculation_type").val(value);
+		    $("#post-form").submit();
+		}
 
 
 
-	$("#btn-form").on('click', function() {
-	        $("#id_calculation_type").val('none');
-	        $("#post-form").submit();
-	});     
+		  $(document).ready(function() {
+		    $('#id_sensi_production').on('input', function() {
+		      $("#post-form").submit();
+		    });
+		  });
 
 
-	$("#btn-form_2").on('click', function() {
-	        $("#id_calculation_type").val('none');
-	        $("#post-form").submit();
-	        $('#btn-form_2').hide();
-	});     
+		$(document).ready(function() {
+		    $('#id_sensi_opex').on('input', function() {
+		      $("#post-form").submit();
+		    });
+		  });
+
+
+
 
 
 
@@ -1722,7 +1732,7 @@
 
 
 			"Constraint": "text",
-			"Average life (from FC)": "years",
+			"Average life": "years from FC",
 			"Average DSCR": "x",
 			"Average DSCR": "x",
 			"Balance sheet": "true/false",
@@ -1739,7 +1749,6 @@
 			"Debt IRR": "%",
 			"Production":"x",
 			"Operating costs":"x",			
-			"Inflation":"x",
 			"Debt maturity":"true/false",
 
 
@@ -1747,9 +1756,9 @@
 
 
 		const columnKey_exclude = {
-			"Production":"x",
-			"Operating costs":"x",			
-			"Inflation":"x",
+			"Base Case":"x",
+			"Sensi Production":"x",
+			"Sensi Opex":"x",			
 
 		};
 
@@ -1784,7 +1793,7 @@
 			        }
 
 			        $.each(data, function(index, data) {
-			                if (!data) {
+			                if (data =="False") {
 						        table_result += "<td class='red-cell'>" + data + "</td>";
 						    } else {
 						        table_result += "<td>" + data + "</td>";
@@ -2130,15 +2139,10 @@
 				  { data: json.table_uses, selector: "#summary_financing_plan_uses" },
 				  { data: json.table_sources, selector: "#summary_financing_plan_sources" },
 				  { data: json.table_financing_terms, selector: "#summary_financing_terms" },
-
-
-
+				  { data: json.table_sensi, selector: "#summary_sensi" },
 				];
 
 
-				if (!$("#id_calculation_type").val().startsWith('sensi')) {
-  					tables.push({ data: json.table_sensi, selector: "#summary_sensi" });
-				}
 
 				tables.forEach(table => build_table(table.data, table.selector));
 
@@ -2287,49 +2291,6 @@ $(document).ready(function() {
 
 </script>
 
-<script>
-$(document).ready(function() {
-
-        var sensi_inflation_field = $('#id_sensi_inflation').val()+'%';
-        $('#sensi_inflation').text(sensi_inflation_field);
-
-        // Adding a listener to the input field
-        $('#id_sensi_inflation').on('input', function() {
-            var new_value = $(this).val();
-            $('#sensi_inflation').text(new_value+'%');
-        });
-
-});
-
-</script>
-
-
-<script>
-
-
-  $(document).ready(function() {
-    $('#id_sensi_production').on('input', function() {
-      $("#post-form").submit();
-    });
-  });
-
-
-$(document).ready(function() {
-    $('#id_sensi_opex').on('input', function() {
-      $("#post-form").submit();
-    });
-  });
-
-
-$(document).ready(function() {
-    $('#id_sensi_inflation').on('input', function() {
-      $("#post-form").submit();
-    });
-  });
-
-
-
-</script>
 
 
 <script>
@@ -2478,6 +2439,11 @@ $(document).ready(function() {
 </script>
 
 
+<script>
+document.getElementById('featureRequest').addEventListener('click', function() {
+    window.location.href = "mailto:a.wallois@resonance-advisory.com?subject=Shango Feature Request&body=Dear Team,";
+});
+</script>
 
 </form>  
 

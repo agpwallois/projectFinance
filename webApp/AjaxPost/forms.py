@@ -79,7 +79,6 @@ class ProjectForm(forms.ModelForm):
 		'DSRA_choice': forms.RadioSelect(choices=DSRA_CHOICES),
 		'sensi_production': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
 		'sensi_opex': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
-		'sensi_inflation': forms.TextInput(attrs={'step': '1', 'type': 'range', 'value': '0', 'min': '-3', 'max': '3'}),
 		}
 	 
 	def __init__(self, *args, **kwargs):

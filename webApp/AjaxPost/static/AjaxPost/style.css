@@ -3,14 +3,17 @@
 */
 
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+html{
+    font-size: 10px;
+
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     color: rgb(51, 51, 51);
 }
 
-header{
-    font-size: 1rem;
-}
 
 
 /*
@@ -31,6 +34,7 @@ a:focus {
     color: inherit;
     text-decoration: none;
     transition: all 0.3s;
+    font-size: 1.5rem;
 }
 
 
@@ -133,7 +137,7 @@ header {
 }
 
 #sidebar {
-    width: 400px;
+    width: 320px;
     border-right: 1px solid rgb(221, 221, 221);
     position: fixed;
     left: 0;
@@ -146,11 +150,11 @@ header {
     padding-left: 15px;
     padding-top: 10px;
     padding-right: 15px;
-    font-size: 0.75rem;
+    font-size: 1rem;
 }
 
 #sidebar.active {
-    margin-left: -400px;
+    margin-left: -320px;
 }
 
 #accordionSidebar {
@@ -170,8 +174,11 @@ header {
 ----------------------------------------------------- */
 
 #content {
-    width: calc(100% - 400px);
-    padding: 40px;
+    width: calc(100% - 320px);
+    padding-top: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
     min-height: 100vh;
     transition: all 0.3s;
     position: absolute;
@@ -200,11 +207,11 @@ header {
   display: inline-flex;
   font-size: 1rem;
   justify-content: center;
-  min-height: 30px;
+  min-height: 20px;
   overflow: hidden;
   padding: 0px;
-  padding-left: 15px;
-  padding-right: 15px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 
@@ -212,13 +219,8 @@ header {
     width: 100%;
 }
 
-.table {
 
-}
 
-.table-sum tr:first-child{
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
 
 .table th:first-child,
 .table td:first-child {
@@ -243,47 +245,21 @@ header {
 
 
 #myTableEquity tr:nth-child(2) td:first-child,
-#myTableEquity tr:nth-child(3) td:first-child {
-    padding-left: 20px;
-  }  
-
-
+#myTableEquity tr:nth-child(3) td:first-child,
 #myTableSHL tr:nth-child(2) td:first-child,
 #myTableSHL tr:nth-child(3) td:first-child,
-#myTableSHL tr:nth-child(4) td:first-child {
-    padding-left: 20px;
-  }  
-
-#myTableDebtAvailable tr:nth-child(2) td:first-child {
-    padding-left: 20px;
-  }  
-
-
+#myTableSHL tr:nth-child(4) td:first-child,
+#myTableDebtAvailable tr:nth-child(2) td:first-child,
 #myTableDebtBalance tr:nth-child(2) td:first-child,
-#myTableDebtBalance tr:nth-child(3) td:first-child {
-    padding-left: 20px;
-  }  
-
-
+#myTableDebtBalance tr:nth-child(3) td:first-child,
 #myTableRE tr:nth-child(3) td:first-child,
-#myTableRE tr:nth-child(4) td:first-child {
-    padding-left: 20px;
-  }  
-
-
-
+#myTableRE tr:nth-child(4) td:first-child,
 #myTableWC_receivables tr:nth-child(2) td:first-child,
-#myTableWC_receivables tr:nth-child(3) td:first-child {
-    padding-left: 20px;
-  }  
-
-
+#myTableWC_receivables tr:nth-child(3) td:first-child,
 #myTableWC_payables tr:nth-child(2) td:first-child,
 #myTableWC_payables tr:nth-child(3) td:first-child {
     padding-left: 20px;
-  }  
-
-
+}
 
 
 
@@ -320,6 +296,30 @@ header {
     table-layout: fixed;
 }
 
+.table-sum td,
+.table-sum tr:first-child{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+#table-scenario-input td,
+#table-scenario-output td {
+    height: 21px;
+}
+    
+
+
+#table-scenario-input td:nth-child(3),
+#table-scenario-input td:nth-child(4) {
+    text-align: center;
+}
+
+
+#table-scenario-output {
+    text-align: center;
+}
 
 
 
@@ -376,10 +376,6 @@ width: 100%;
 
 
 
-.table-sum td{
-
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
 
 
 #table-financing-terms tbody tr:first-child td{
@@ -394,7 +390,7 @@ width: 100%;
 
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -400px;
+        margin-left: -320px;
     }
     #sidebar.active {
         margin-left: 0;
@@ -403,7 +399,7 @@ width: 100%;
         width: 100%;
     }
     #content.active {
-        width: calc(100% - 400px);
+        width: calc(100% - 320px);
     }
     #sidebarCollapse span {
         display: none;
@@ -440,46 +436,35 @@ width: 100%;
     width: 30%;
   /* Additional styles for the left container */
 }
+
+
 #summary-fp{
     width: 100%;
 
 }
 
 
-#wrapper-btn-form_2{
-  display: flex;
-  justify-content: flex-end;
+.summary-scenario-left {
 
-
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    padding-right: 10px;
+  /* Additional styles for the left container */
 }
 
 
-#btn-form_2{
-    background-color: white;
-    color : #0d6efd; 
-
-    }
-
-#summary_sensi tr:hover>td{
-  background-color: #0d6efd; 
-  color: #FFFFFF;
-  cursor: pointer; 
+.summary-scenario-right {
+    width: 50%;
+  /* Additional styles for the left container */
 }
+
+
 
 .red-cell {
   color: red;
   font-weight: bold;
 }
-
-#summary_sensi tr:hover td:first-child {
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-}
-#summary_sensi tr:hover td:last-child {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
 
 
 
@@ -545,9 +530,6 @@ width: 100%;
 
 }
 
-.btn {
-  font-size: 12px;
-}
 
 
 .accordion-body {
@@ -557,6 +539,8 @@ width: 100%;
 .row-inline-wrapper{
     display: flex;
     align-items: stretch;
+    height:auto,
+
     }
 
 
@@ -600,7 +584,7 @@ width: 100%;
     display: flex;
     width:40%;
     align-items: center;
-    min-height: 30px; 
+    min-height: 22px; 
 
     }
 
@@ -626,7 +610,7 @@ width: 100%;
 .form{
     display: block;
     width: 100%;
-    font-size: 0.75rem;
+    font-size: 1rem;
     padding: 0.20rem 0.375rem;
     line-height: 1;
     color: #305496;
@@ -646,6 +630,7 @@ width: 100%;
 .nav-tabs .nav-item .nav-link {
     background: rgb(242, 242, 242);
     color: rgb(51, 51, 51);
+    font-size: 1.25rem;
 
 }
 
@@ -663,4 +648,19 @@ width: 100%;
 }
 
 
+.form-check-input {
+    margin-left:15px;
 
+}
+
+.container-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+#featureRequest {
+    background-color: rgb(242, 242, 242);
+    color: #0d6efd;
+
+}

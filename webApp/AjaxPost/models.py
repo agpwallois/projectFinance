@@ -266,4 +266,3 @@ class Project(models.Model):
 
 	sensi_production = models.fields.DecimalField(max_digits=3, decimal_places=0, default=-15)
 	sensi_opex = models.fields.DecimalField(max_digits=3, decimal_places=0, default=10)
-	sensi_inflation = models.fields.DecimalField(max_digits=3, decimal_places=0, default=1)
