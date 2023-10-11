@@ -42,8 +42,10 @@ class Project(models.Model):
 	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.4)
 	p50 = models.fields.IntegerField(default="1800")
 	p90_10y = models.fields.IntegerField(default="1700")
-	P99_10y = models.fields.IntegerField(default="1600")
-	production_choice = models.fields.IntegerField(default="2")
+
+	#to be deleted
+	P99_10y = models.fields.IntegerField(default="1600", blank=True, null=True)
+	production_choice = models.fields.IntegerField(default="2", blank=True, null=True)
 
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m2 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.05)
@@ -263,6 +265,6 @@ class Project(models.Model):
 	initial_wc = models.fields.IntegerField(default="0")
 	cash_min = models.fields.IntegerField(default="0")
 
-
-	sensi_production = models.fields.DecimalField(max_digits=3, decimal_places=0, default=-15)
+	sensi_production = models.fields.DecimalField(max_digits=3, decimal_places=0, default=0)
 	sensi_opex = models.fields.DecimalField(max_digits=3, decimal_places=0, default=10)
+	sensi_inflation = models.fields.DecimalField(max_digits=3, decimal_places=0, default=1)

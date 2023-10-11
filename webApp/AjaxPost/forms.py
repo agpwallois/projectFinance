@@ -10,12 +10,6 @@ PERIODICITY_CHOICES= [
 	('6', 'Semi-annual'),
 	]
 
-PRODUCTION_CHOICES= [
-	('1', 'P50'),
-	('2', 'P90'),
-	('3', 'P99'),
-	]
-
 ELECTRICITY_PRICES_CHOICES= [
 	('1', 'Low'),
 	('2', 'Medium'),
@@ -71,13 +65,13 @@ class ProjectForm(forms.ModelForm):
 		'price_elec_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 		'periodicity': forms.RadioSelect(choices=PERIODICITY_CHOICES),
 		'opex_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
-		'production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
 		'price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
 		'devfee_choice': forms.RadioSelect(choices=DEV_FEE_CHOICES),
 		'injection_choice': forms.RadioSelect(choices=EQUITY_CHOICES),
 		'calculation_detail': forms.RadioSelect(choices=CALCULATION_DETAILS_CHOICES),
 		'DSRA_choice': forms.RadioSelect(choices=DSRA_CHOICES),
-		'sensi_production': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
+		'sensi_production': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-30', 'max': '30'}),
+		'sensi_inflation': forms.TextInput(attrs={'step': '1', 'type': 'range', 'value': '0', 'min': '-3', 'max': '3'}),
 		'sensi_opex': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
 		}
 	 
@@ -85,7 +79,6 @@ class ProjectForm(forms.ModelForm):
 		super(ProjectForm, self).__init__(*args, **kwargs)
 
 		exclude_from_formatting = [self.fields['periodicity'],
-								   self.fields['production_choice'],
 								   self.fields['price_elec_choice'],
 								   self.fields['devfee_choice'],
 								   self.fields['injection_choice'],

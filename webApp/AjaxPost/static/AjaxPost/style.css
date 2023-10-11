@@ -232,7 +232,10 @@ header {
 }
 
 
+#table-scenario-input-2 tr {
+    height:21px;
 
+}
 
 .box-wrapper {
     background: white;
