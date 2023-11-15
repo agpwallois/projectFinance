@@ -542,7 +542,8 @@ width: 100%;
 .row-inline-wrapper{
     display: flex;
     align-items: stretch;
-    height:auto,
+    height:auto;
+    margin-bottom: 3px;
 
     }
 
@@ -614,7 +615,7 @@ width: 100%;
     display: block;
     width: 100%;
     font-size: 1rem;
-    padding: 0.20rem 0.375rem;
+    padding: 0.30rem 0.375rem;
     line-height: 1;
     color: #305496;
     background-color: #FFFFCC;

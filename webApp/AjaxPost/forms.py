@@ -12,7 +12,7 @@ PERIODICITY_CHOICES= [
 
 ELECTRICITY_PRICES_CHOICES= [
 	('1', 'Low'),
-	('2', 'Medium'),
+	('2', 'Central'),
 	('3', 'High'),
 	]
 
@@ -27,6 +27,11 @@ COUNTRY_CHOICES= [
 	('3', 'Spain'),
 	]
 
+PRODUCTION_CHOICES= [
+	('1', 'P90'),
+	('2', 'P75'),
+	('3', 'P50'),
+	]
 
 DEV_FEE_CHOICES= [
 	('1', 'Yes'),
@@ -70,6 +75,12 @@ class ProjectForm(forms.ModelForm):
 		'injection_choice': forms.RadioSelect(choices=EQUITY_CHOICES),
 		'calculation_detail': forms.RadioSelect(choices=CALCULATION_DETAILS_CHOICES),
 		'DSRA_choice': forms.RadioSelect(choices=DSRA_CHOICES),
+		'production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
+
+		'sponsor_production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
+		'sponsor_price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
+
+
 		'sensi_production': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-30', 'max': '30'}),
 		'sensi_inflation': forms.TextInput(attrs={'step': '1', 'type': 'range', 'value': '0', 'min': '-3', 'max': '3'}),
 		'sensi_opex': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
@@ -84,6 +95,9 @@ class ProjectForm(forms.ModelForm):
 								   self.fields['injection_choice'],
 								   self.fields['calculation_detail'],
 								   self.fields['DSRA_choice'],
+								   self.fields['production_choice'],
+								   self.fields['sponsor_production_choice'],
+								   self.fields['sponsor_price_elec_choice'],
 					
 			
 								   ]

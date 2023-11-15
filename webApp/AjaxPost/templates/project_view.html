@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load custom_filters %}
 
@@ -6,11 +7,12 @@
 <form method="POST" id="post-form">{% csrf_token %}
 
 <nav id="sidebar">
-	<div class="sidebar"><h1>Projet: {{ project.name }}</h1>
+	<div class="sidebar"><h1>Project: {{ project.name }}</h1>
 
 		
 
 			<div>{{ project_form.calculation_type }}</div>
+			
 			<div class="fieldWrapper" id="the_post">
 
 				<div  class="btn-wrapper">
@@ -159,7 +161,7 @@
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
-											<p>P90 (lender case)</p>
+											<p>P90</p>
 									</div>
 									<div class="row-inline-three-second">
 											<p>hours p.a.</p>
@@ -171,7 +173,20 @@
 								
 								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
-											<p>P50 (sponsor case)</p>
+											<p>P75</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.p75 }}
+									</div>
+								</div>
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>P50</p>
 									</div>
 									<div class="row-inline-three-second">
 											<p>hours p.a.</p>
@@ -182,7 +197,31 @@
 								</div>
 
 
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Lender case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.production_choice }}
+								</div>
+							</div>
 
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Sponsor case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.sponsor_production_choice }}
+								</div>
+							</div>
 
 
 
@@ -405,7 +444,7 @@
 
 
 			
-					   		{% for field in project_form.visible_fields|slice:"26:50" %}
+					   		{% for field in project_form.visible_fields|slice:"27:51" %}
 					   		
 					   		<div id="costs_m{{ forloop.counter }}" class="row-inline-wrapper">
 								        <div class="row-inline-three-first">
@@ -541,9 +580,11 @@
 								</div>
 							</div>
 
+
+
 							<div class="row-inline-wrapper">
 								<div class="row-inline-three-first">
-										<p>Market price scenario</p>
+										<p>Lender case</p>
 								</div>
 								<div class="row-inline-three-second">
 										<p>choice</p>
@@ -552,6 +593,21 @@
 										{{ project_form.price_elec_choice }}
 								</div>
 							</div>
+
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Sponsor case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.sponsor_price_elec_choice }}
+								</div>
+							</div>
+
 
 			
 								<div class="row-inline-wrapper">
@@ -575,14 +631,14 @@
 							<div class="columns-container">
 
 		   						<div class ="column-input">
-		   							{% for field in project_form.visible_fields|slice:"58:100" %}
+		   							{% for field in project_form.visible_fields|slice:"59:101" %}
 									              <div class ="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
 									{% endfor %}
 								</div>
 									  
 		   						<div class ="column-input">
 
-		   							{% for field in project_form.visible_fields|slice:"58:100" %}						        
+		   							{% for field in project_form.visible_fields|slice:"59:101" %}						        
 									            <p>{{ field }}</p>	
 									{% endfor %}
 
@@ -590,14 +646,14 @@
 
 								<div class ="column-input">
 
-		   							{% for field in project_form.visible_fields|slice:"100:142" %}						        
+		   							{% for field in project_form.visible_fields|slice:"101:143" %}						        
 									            <p>{{ field }}</p>	
 									{% endfor %}
 
 								</div>
 								<div class ="column-input">
 
-		   							{% for field in project_form.visible_fields|slice:"142:184" %}						        
+		   							{% for field in project_form.visible_fields|slice:"143:185" %}						        
 									            <p>{{ field }}</p>	
 									{% endfor %}
 
@@ -674,10 +730,14 @@
 					</h2>
 					<div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
-							<h3>Term loan timeline</h3>
 
-						
 
+
+						<h3>Term loan timeline</h3>
+
+					
+
+								
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
@@ -848,6 +908,9 @@
 					  </div>
 					</div>
 				  </div>
+
+
+
 				  <div class="accordion-item">
 					<h2 class="accordion-header" id="headingEight">
 					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
@@ -1148,13 +1211,7 @@
 	    	</tr>	
 
 
-	        <tr>
-	        	<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2"></td>
-	            <td>P50</td>
-	            <td></td>
-	            <td></td>
 
-	        </tr>
 
 
 	        <tr>
@@ -1182,6 +1239,15 @@
 	            <td>Operating costs</td>
 	            <td>{{ project_form.sensi_opex }}</td>
 	            <td><div id="sensi_opex"></div></td>
+	        </tr>
+
+
+	        <tr>
+	        	<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2"></td>
+	            <td>Sponsor Case</td>
+	            <td></td>
+	            <td></td>
+
 	        </tr>
 
 	    </tbody>
@@ -1777,7 +1843,7 @@
 
 		const columnKey_exclude = {
 			"Lender Case":"x",
-			"Sensi P50":"x",
+			"Sponsor Case":"x",
 			"Sensi Inflation":"x",	
 			"Sensi Opex":"x",
 			"Sensi Production":"x",
@@ -2237,6 +2303,7 @@
 			        const array = Object.values(obj)[0];
 			        const firstElement = array[0];
 			        alert(firstElement.message);
+			        console.log(obj);
 			    } catch (e) {
 			        alert(json.responseJSON.error_type+" "+json.responseJSON.message);
 			        console.log(json);
@@ -2372,103 +2439,56 @@ $(document).ready(function() {
 </script>
 
 
-
-
-
-
-
-
-
 <script>
   $(document).ready(function() {
-	// Get the start and end date fields
+    // Get the input fields by ID prefixes
+    var fields = {
+      startDate: $('#id_start_construction'),
+      endDate: $('#id_end_construction'),
+      operatingLife: $('#id_operating_life'),
+      liquidation: $('#id_liquidation'),
+      yearLow: $('[id^="id_price_elec_low"]'),
+      yearMed: $('[id^="id_price_elec_med"]'),
+      yearHigh: $('[id^="id_price_elec_high"]'),
+      yearLabel: $('[id^="elecPriceLabel"]')
+    };
 
+    updateYearFieldsVisibility();
 
-  	var startDateField = $('#id_start_construction');
-	var endDateField = $('#id_end_construction');
-	var operating_life = $('#id_operating_life');
-	var liquidationField = $('#id_liquidation');
-	var yearFieldsLow = $('[id^="id_price_elec_low"]');
-	var yearFieldsMed = $('[id^="id_price_elec_med"]');
-	var yearFieldsHigh = $('[id^="id_price_elec_high"]');
-	var yearFieldsLab = $('[id^="elecPriceLabel"]');
+    // Attach change event handlers to all relevant fields
+    $.each(fields, function(key, field) {
+      field.change(updateYearFieldsVisibility);
+    });
 
+    function updateYearFieldsVisibility() {
+      var endDate = new Date(fields.endDate.val());
+      var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
+      var yearB = COD.getFullYear();
 
+      var operating_life_val = parseInt(fields.operatingLife.val());
+      var liquidationField_val = parseInt(fields.liquidation.val());
+      var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
+      var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
+      var yearE = latest_date.getFullYear();
 
-	yearFieldsLow.hide();
-	yearFieldsMed.hide();
-	yearFieldsHigh.hide();
-	yearFieldsLab.hide();
+      // Calculate the number of years
+      var numYears = yearE - yearB + 1;
 
-
-
-
-	updateYearFieldsVisibility()
-  
-   // Show or hide the month fields based on the selected start and end dates
-	startDateField.change(updateYearFieldsVisibility);
-	endDateField.change(updateYearFieldsVisibility);
-	operating_life.change(updateYearFieldsVisibility);
-	liquidationField.change(updateYearFieldsVisibility);
-
-
-	function updateYearFieldsVisibility() {
-		
-	var endDate = new Date(endDateField.val());
-	var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
-	var yearB = COD.getFullYear();
-
-	var operating_life_val = parseInt(operating_life.val());
-	var liquidationField_val = parseInt(liquidationField.val());
-	var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
-	var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
-	var yearE = latest_date.getFullYear();
-		  
-	  // Show or hide the month fields based on the number of months
-	  numYears = yearE-yearB+1
-
-	  // Show or hide the month fields based on the number of months
-	  yearFieldsLow.each(function(index) {
-		var yearIndex = index + 1;
-		if (yearIndex <= numYears) {
-		  $(this).show();
-		} else {
-		  $(this).hide();
-		}
-	  });
-
-	  yearFieldsMed.each(function(index) {
-		var yearIndex = index + 1;
-		if (yearIndex <= numYears) {
-		  $(this).show();
-		} else {
-		  $(this).hide();
-		}
-	  });
-
-
-	  yearFieldsHigh.each(function(index) {
-		var yearIndex = index + 1;
-		if (yearIndex <= numYears) {
-		  $(this).show();
-		} else {
-		  $(this).hide();
-		}
-	  });
-
-	  yearFieldsLab.each(function(index) {
-		var yearIndex = index + 1;
-		if (yearIndex <= numYears) {
-		  $(this).show();
-		} else {
-		  $(this).hide();
-		}
-	  });
-
-	}
-
+      // Show or hide the year fields based on the number of years
+      $.each(fields, function(key, field) {
+        if (key.startsWith('year')) {
+          field.each(function(index) {
+            var yearIndex = index + 1;
+            if (yearIndex <= numYears) {
+              $(this).show();
+            } else {
+              $(this).hide();
+            }
+          });
+        }
+      });
+    }
   });
-
 </script>
 
 

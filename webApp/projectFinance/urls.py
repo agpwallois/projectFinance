@@ -15,13 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from AjaxPost import views as AjaxPost
-import authentication.views
+from AjaxPost.views import project_list, project_view
+from authentication.views import LoginPageView
+
 
 urlpatterns = [
-	path('admin/', admin.site.urls, name='project-admin'),
-	path('auth/', authentication.views.LoginPageView.as_view(), name='login'),
-	path('', AjaxPost.ProjectListView.as_view(), name='project-list'),
-	path('projects/<int:id>/', AjaxPost.project_view, name='project_view'),
-	]
+	path('admin/', admin.site.urls),
+	path('', LoginPageView.as_view(), name='login'),
+	path('projects/', project_list, name='project_list'),
+	path('project/<int:id>/', project_view, name='project_view'),
+]
 
+admin.site.site_url = '/projects/'
+admin.site.site_header = "Shango Administration"

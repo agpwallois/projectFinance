@@ -41,11 +41,14 @@ class Project(models.Model):
 	panels_capacity = models.fields.IntegerField(default="2500")
 	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.4)
 	p50 = models.fields.IntegerField(default="1800")
+	p75 = models.fields.IntegerField(default="1750")
 	p90_10y = models.fields.IntegerField(default="1700")
 
-	#to be deleted
+	#tobedeleted
 	P99_10y = models.fields.IntegerField(default="1600", blank=True, null=True)
-	production_choice = models.fields.IntegerField(default="2", blank=True, null=True)
+
+
+	production_choice = models.fields.IntegerField(default="1")
 
 	seasonality_m1 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.03)
 	seasonality_m2 = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.05)
@@ -94,7 +97,7 @@ class Project(models.Model):
 
 	price_elec_indexation_start_date = models.fields.DateField(default=date(2022, 1, 1), blank=True, null=True)
 	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
-	price_elec_choice = models.fields.IntegerField(default="2")
+	price_elec_choice = models.fields.IntegerField(default="1")
 
 
 	price_elec_low_y1 = models.fields.IntegerField(default="50")
@@ -268,3 +271,7 @@ class Project(models.Model):
 	sensi_production = models.fields.DecimalField(max_digits=3, decimal_places=0, default=0)
 	sensi_opex = models.fields.DecimalField(max_digits=3, decimal_places=0, default=10)
 	sensi_inflation = models.fields.DecimalField(max_digits=3, decimal_places=0, default=1)
+
+
+	sponsor_production_choice = models.fields.IntegerField(default="3")
+	sponsor_price_elec_choice = models.fields.IntegerField(default="2")
