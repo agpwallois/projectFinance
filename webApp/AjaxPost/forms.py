@@ -2,8 +2,11 @@ from django import forms
 from .models import Project
 from dateutil.relativedelta import relativedelta
 import math
-import datetime
+from datetime import datetime
 from django.core.exceptions import ValidationError
+
+
+
 
 PERIODICITY_CHOICES= [
 	('3', 'Quarterly'),
@@ -70,15 +73,20 @@ class ProjectForm(forms.ModelForm):
 		'price_elec_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 		'periodicity': forms.RadioSelect(choices=PERIODICITY_CHOICES),
 		'opex_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
-		'price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
+
+		'price_elec_choice': forms.Select(choices=ELECTRICITY_PRICES_CHOICES),
+
 		'devfee_choice': forms.RadioSelect(choices=DEV_FEE_CHOICES),
 		'injection_choice': forms.RadioSelect(choices=EQUITY_CHOICES),
 		'calculation_detail': forms.RadioSelect(choices=CALCULATION_DETAILS_CHOICES),
 		'DSRA_choice': forms.RadioSelect(choices=DSRA_CHOICES),
-		'production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
+		'production_choice': forms.Select(choices=PRODUCTION_CHOICES),
 
-		'sponsor_production_choice': forms.RadioSelect(choices=PRODUCTION_CHOICES),
-		'sponsor_price_elec_choice': forms.RadioSelect(choices=ELECTRICITY_PRICES_CHOICES),
+		'sponsor_production_choice': forms.Select(choices=PRODUCTION_CHOICES),
+		'sponsor_price_elec_choice': forms.Select(choices=ELECTRICITY_PRICES_CHOICES),
+
+
+		'lease_indexation_start_date': forms.DateInput(attrs={'type': 'date',}),
 
 
 		'sensi_production': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-30', 'max': '30'}),
@@ -90,14 +98,10 @@ class ProjectForm(forms.ModelForm):
 		super(ProjectForm, self).__init__(*args, **kwargs)
 
 		exclude_from_formatting = [self.fields['periodicity'],
-								   self.fields['price_elec_choice'],
 								   self.fields['devfee_choice'],
 								   self.fields['injection_choice'],
 								   self.fields['calculation_detail'],
 								   self.fields['DSRA_choice'],
-								   self.fields['production_choice'],
-								   self.fields['sponsor_production_choice'],
-								   self.fields['sponsor_price_elec_choice'],
 					
 			
 								   ]
@@ -131,12 +135,29 @@ class ProjectForm(forms.ModelForm):
 		# Offtake contract
 		start_contract = cleaned_data.get('start_contract')
 		end_contract = cleaned_data.get('end_contract')
+		operating_life = cleaned_data.get('operating_life')
+		debt_tenor = cleaned_data.get('debt_tenor')
+		
+
+		operating_life_years = cleaned_data.get('operating_life')  # Convert 'operating_life' to an integer representing years
+
+		# Calculate 'end_operations' by adding 'operating_life' years to 'end_construction' (accounting for leap years)
+		end_operations = end_construction + relativedelta(years=operating_life_years)
 
 		if end_contract<start_contract:
 			self.add_error('end_contract','Contract end date should not occur before contract start date.')
 
 		if start_contract<end_construction:
 			self.add_error('start_contract','Contract start date should not occur before construction end date.')
+
+
+		if end_contract>end_operations:
+			self.add_error('end_contract','Contract end date should not occur after operations end date.')
+
+
+
+
+
 
 		# Seasonality
 		seasonality = []
@@ -151,8 +172,7 @@ class ProjectForm(forms.ModelForm):
 
 
 		length_construction = relativedelta(end_construction, start_construction).years
-		operating_life = cleaned_data.get('operating_life')
-		debt_tenor = cleaned_data.get('debt_tenor')
+
 		debt_max_tenor = length_construction+operating_life
 
 

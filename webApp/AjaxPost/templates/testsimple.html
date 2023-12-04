@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block landingcss %}
+		<link rel="stylesheet" href="{% static 'AjaxPost/style_landing.css' %}" />
+
+{% block content %}
+<!-- Button trigger modal -->
+<!-- Modal -->
+
+<html>
+<head>
+    <title>Test Simple Template</title>
+</head>
+<body>
+    <h1>API Response:</h1>
+    <pre>
+        {{ response_content }}
+       
+    </pre>
+</body>
+</html>
+
+
+
+
+{% endblock %}
+{% endblock %}

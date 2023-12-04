@@ -29,6 +29,7 @@
                     <th>Project name</th>
                     <th>Technology</th>
                     <th>Country</th>
+                    <th>Commune</th>
                     <th>Created on</th>
                     <th>Updated on</th>
 
@@ -39,6 +40,7 @@
                 <td><a href="{% url 'project_view' project.id %}">{{ project.name }}</a></td>
                 <td><a href="{% url 'project_view' project.id %}">{{ project.technology }}</a></td>
                 <td><a href="{% url 'project_view' project.id %}">{{ project.country }}</a></td>
+                <td><a href="{% url 'project_view' project.id %}">{{ project.commune }}</a></td>
                 <td><a href="{% url 'project_view' project.id %}">{{ project.created_date }}</a></td>
                 <td><a href="{% url 'project_view' project.id %}">{{ project.updated_date }}</a></td>
 

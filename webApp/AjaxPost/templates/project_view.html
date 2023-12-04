@@ -7,7 +7,7 @@
 <form method="POST" id="post-form">{% csrf_token %}
 
 <nav id="sidebar">
-	<div class="sidebar"><h1>Project: {{ project.name }}</h1>
+	<div class="sidebar"><h1 id="project_name">{{ project_form.technology.value }}: {{ project.name }} ({{ project_form.country.value }})</h1>
 
 		
 
@@ -133,7 +133,8 @@
 					  <div class="accordion-body">
 						<h3>Capacity</h3>
 
-								<div class="row-inline-wrapper">
+								
+								<div class="row-inline-wrapper" id="solar_panels_capacity">
 									<div class="row-inline-three-first">
 											<p>Installed capacity</p>
 									</div>
@@ -145,7 +146,7 @@
 									</div>
 								</div>
 
-								<div class="row-inline-wrapper">
+								<div class="row-inline-wrapper" id="solar_panels_degradation">
 									<div class="row-inline-three-first">
 											<p>Annual degradation</p>
 									</div>
@@ -156,8 +157,73 @@
 											{{ project_form.annual_degradation }}
 									</div>
 								</div>
+								
+								
+								<div class="row-inline-wrapper" id="wind_turbine_number">
+									<div class="row-inline-three-first">
+											<p>Wind turbines installed</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>#</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.wind_turbine_installed }}
+									</div>
+								</div>
 
-						<h3>Production</h3>
+								<div class="row-inline-wrapper" id="wind_turbine_capacity">
+									<div class="row-inline-three-first">
+											<p>Capacity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>MW/WTG</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.capacity_per_turbine }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper" id="wind_project_capacity">
+									<div class="row-inline-three-first">
+											<p>Installed capacity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kWp</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="installed_capacity"></div>
+									</div>
+								</div>
+								
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#PropertyTaxModal">
+											<h6>Production</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="PropertyTaxModal" tabindex="-1" role="dialog" aria-labelledby="PropertyTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="PropertyTaxModalLabel">Production</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									        La dette d'un projet dans les énergies renouvelables est généralement dimensionnée en fonction de l'hypothèse P90, ce qui signifie que l'on prend en compte une estimation prudente de la production énergétique avec une probabilité de 90 %. Cela permet de minimiser les risques pour les créanciers en tenant compte des fluctuations naturelles de la production. En revanche, le cas sponsor, souvent le promoteur du projet, peut utiliser l'hypothèse de P50, qui est plus optimiste, car il est prêt à assumer un certain niveau de risque pour le projet. Cette approche assure la sécurité financière des investisseurs tout en reflétant la confiance du promoteur dans le projet.
+								      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
 
 								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
@@ -397,6 +463,41 @@
 					<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
+
+					
+
+					   <h3>Monthly construction schedule</h3>
+
+
+			
+							{% for field in project_form.visible_fields|slice:"27:51" %}
+							
+							<div id="costs_m{{ forloop.counter }}" class="row-inline-wrapper">
+										<div class="row-inline-three-first">
+											<p>Month {{ forloop.counter }}</p>
+										</div>
+										<div class="row-inline-three-second">
+											<p>kEUR</p>
+										</div>
+										<div class="row-inline-three">
+											{{ field }}
+										</div>
+									</div>
+
+							{% endfor %}
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first-underlined">
+											<p>Total</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="sumConstructionCosts"></div>
+									</div>
+								</div>	
+
 					   <h3>Development fee</h3>
 
 		
@@ -438,39 +539,7 @@
 								</div>	
 
 
-					
 
-					   <h3>Monthly construction schedule</h3>
-
-
-			
-					   		{% for field in project_form.visible_fields|slice:"27:51" %}
-					   		
-					   		<div id="costs_m{{ forloop.counter }}" class="row-inline-wrapper">
-								        <div class="row-inline-three-first">
-								            <p>Month {{ forloop.counter }}</p>
-								        </div>
-								        <div class="row-inline-three-second">
-								            <p>kEUR</p>
-								        </div>
-								        <div class="row-inline-three">
-								            {{ field }}
-								        </div>
-								    </div>
-
-					   		{% endfor %}
-
-								<div class="row-inline-wrapper">
-									<div class="row-inline-three-first-underlined">
-											<p>Total</p>
-									</div>
-									<div class="row-inline-three-second">
-											<p>kEUR</p>
-									</div>
-									<div class="row-inline-three">
-											<div id="sumConstructionCosts"></div>
-									</div>
-								</div>	
 
 								
 
@@ -630,36 +699,36 @@
 
 							<div class="columns-container">
 
-		   						<div class ="column-input">
-		   							{% for field in project_form.visible_fields|slice:"59:101" %}
-									              <div class ="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
+								<div class ="column-input">
+									{% for field in project_form.visible_fields|slice:"59:101" %}
+												  <div class ="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
 									{% endfor %}
 								</div>
 									  
-		   						<div class ="column-input">
+								<div class ="column-input">
 
-		   							{% for field in project_form.visible_fields|slice:"59:101" %}						        
-									            <p>{{ field }}</p>	
+									{% for field in project_form.visible_fields|slice:"59:101" %}						        
+												<p>{{ field }}</p>	
 									{% endfor %}
 
 								</div>
 
 								<div class ="column-input">
 
-		   							{% for field in project_form.visible_fields|slice:"101:143" %}						        
-									            <p>{{ field }}</p>	
+									{% for field in project_form.visible_fields|slice:"101:143" %}						        
+												<p>{{ field }}</p>	
 									{% endfor %}
 
 								</div>
 								<div class ="column-input">
 
-		   							{% for field in project_form.visible_fields|slice:"143:185" %}						        
-									            <p>{{ field }}</p>	
+									{% for field in project_form.visible_fields|slice:"143:185" %}						        
+												<p>{{ field }}</p>	
 									{% endfor %}
 
 								</div>
 
-					   		</div>
+							</div>
 
 
 
@@ -680,7 +749,8 @@
 					<div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
-
+							<h3>O&M</h3>
+	  	
 								<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
 											<p>Operating costs</p>
@@ -717,7 +787,50 @@
 									</div>
 								</div>	
 
-			
+						<h3>Lease</h3>
+	  	
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Lease</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.lease }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation base date</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.lease_indexation_start_date }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.lease_indexation }}
+									</div>
+								</div>	
+		
+
+
+
+
+
+
 					  </div>
 					</div>
 				  </div>
@@ -776,6 +889,21 @@
 											{{ project_form.periodicity }}
 									</div>
 								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Quarter/Semester-end rounding</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>boolean</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.timeline_quarters_ceiling }}
+									</div>
+								</div>	
+
+
 
 							<h3>Sizing constraints</h3>
 
@@ -920,6 +1048,7 @@
 					<div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
 					  <div class="accordion-body">
 
+						<h3>Corporate income tax</h3>
 
 							<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
@@ -933,7 +1062,429 @@
 									</div>
 								</div>	
 
+
+
+			
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#DevTaxModal">
+											<h6>Development tax</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+
+									<div class="modal fade" id="DevTaxModal" tabindex="-1" role="dialog" aria-labelledby="DevTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="DevTaxModalLabel">Taxe d'Aménagement à {{ project_form.commune.value }}</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+											<div class="modal-body">
+
+											    <div id="api_dev_tax_commune"></div>
+											    <a href="https://data.economie.gouv.fr/explore/dataset/delta_deliberation_tam_17_01_23">Data Source</a>
+											</div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper" id="solar_panels_surface">
+									<div class="row-inline-three-first">
+											<p>Panels surface area</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>m2</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.panels_surface }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper" id="solar_devtax_cost">
+									<div class="row-inline-three-first">
+											<p>Tax base per m2</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>EUR/m2</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_taxable_base_solar }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper" id="wind_devtax_cost">
+									<div class="row-inline-three-first">
+											<p>Tax base per WTG</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>EUR/WTG</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_taxable_base_wind }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_commune_tax }}
+									</div>
+								</div>	
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Department tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_department_tax }}
+									</div>
+								</div>	
+			
+
+						<div class="row-inline-wrapper" id="solar_arctax_title">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#ArchTaxModal">
+											<h6>Archeological tax</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="ArchTaxModal" tabindex="-1" role="dialog" aria-labelledby="ArchTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="ArchTaxModalLabel">Taxe Archéologique Préventive</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									       Le montant de la taxe d'archéologie préventive est calculé en multipliant les 3 éléments suivants :
+											
+											<ul>	
+											<li>Surface taxable</li>
+											<li>Valeur forfaitaire</li>
+											<li>Taux</li>
+											</ul>
+
+											La formule de calcul est donc la suivante : Surface taxable x Valeur forfaitaire x Taux.
+
+											La surface taxable est multipliée par une valeur forfaitaire au mètre carré, actualisée chaque année.
+											Une valeur forfaitaire spécifique s'applique à certains aménagements.
+
+											<ul>	
+											<li>Éolienne de plus de 12 m : 3 000 € par éolienne</li>
+											<li>Panneau photovoltaïque fixé au sol: 10 € par m² de surface de panneau</li>
+											</ul>							
+										
+											Le taux de la taxe est égal à 0,40 % de la valeur forfaitaire de l'ensemble immobilier.
+
+									      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+
+
+							<div class="row-inline-wrapper" id="solar_arctax_base">
+									<div class="row-inline-three-first">
+											<p>Tax base per m2</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>EUR/m2</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.archeological_tax_base_solar }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper" id="solar_arctax_cost">
+									<div class="row-inline-three-first">
+											<p>Tax rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.archeological_tax }}
+									</div>
+								</div>	
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#PTaxModal">
+											<h6>Property tax</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="PTaxModal" tabindex="-1" role="dialog" aria-labelledby="PTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="PTaxModalLabel">Taxe Foncière sur les Propriétés Bâties (TFPB) à {{ project_form.commune.value }}</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+							      	    
+									    <div id="tfpb_rates"></div>
+									    <a href="https://www.data.gouv.fr/fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-3/#/resources">Data Source</a>
+
+									      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
 						
+
+
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_commune_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Department tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_department_tax }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Region tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_region_tax }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Equipment tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_additional_tax }}
+									</div>
+								</div>	
+
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#CFEModal">
+											<h6>Cotisation Foncière des Entreprises (CFE)</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="CFEModal" tabindex="-1" role="dialog" aria-labelledby="CFEModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="CFEModalLabel">Cotisation Foncière des Entreprises (CFE)</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									        ...
+									      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+		
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Reduction in tax base in first year of application</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_discount_tax_base_y1 }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Standard reduction in land value for tax base</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_discount_tax_base }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Management fees</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_mgt_fee }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_commune_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Intercommunal rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_intercommunal_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Specific equipment rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_specific_eqp_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Local CCI rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_localCCI_tax }}
+									</div>
+								</div>	
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q1 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q1 }}
+									</div>
+								</div>	
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q2 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q2 }}
+									</div>
+								</div>	
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q3 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q3 }}
+									</div>
+								</div>	
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q4 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q4 }}
+									</div>
+								</div>	
+
 					 </div>
 					</div>
 					</div>
@@ -1102,6 +1653,20 @@
 											{{ project_form.country }}
 									</div>
 								</div>	
+
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.commune }}
+									</div>
+								</div>	
+
 											
 					<div class="row-inline-wrapper">
 									<div class="row-inline-three-first">
@@ -1113,8 +1678,7 @@
 									<div class="row-inline-three">
 											{{ project_form.calculation_detail }}
 									</div>
-								</div>	
-											
+								</div>										
 
 					  </div>
 					</div>
@@ -1157,10 +1721,8 @@
 				<a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Dashboard</a>
 			  </li>
 			  
-
-
 			  <li class="nav-item">
-				<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Calculation</a>
+				<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Computation</a>
 			  </li>
 			</ul>
 		</nav>
@@ -1183,74 +1745,74 @@
 								
 
 		<table class="table-sum" id="table-scenario-input">
-	    <tbody>
-	    	<tr>
-	    		<th>Base Case</th>
-	    		<th></th>
-	    		<th></th>
-	    	</tr>	
-	        <tr>
-	        	<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario1"></td>
-	            <td>Lender Case</td>
-	            <td></td>
-	            <td></td>
+		<tbody>
+			<tr>
+				<th>Base Case</th>
+				<th></th>
+				<th></th>
+			</tr>	
+			<tr>
+				<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario1"></td>
+				<td>Lender Case</td>
+				<td></td>
+				<td></td>
 
-	        </tr>
+			</tr>
 
 
-	    </tbody>
+		</tbody>
 
 	</table>
 
 		<table class="table-sum" id="table-scenario-input-2">
-	    <tbody>
-	    	<tr>
-	    		<th>Sensitivities</th>
-	    		<th></th>
-	    		<th></th>
-	    	</tr>	
+		<tbody>
+			<tr>
+				<th>Sensitivities</th>
+				<th></th>
+				<th></th>
+			</tr>	
 
 
 
 
 
-	        <tr>
-	        	<td>
+			<tr>
+				<td>
 				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario3"></td>
-	            <td>Production</td>
-	            <td>{{ project_form.sensi_production}}</td>
-	            <td><div id="sensi_production"></div></td>
-	        </tr>
+				<td>Production</td>
+				<td>{{ project_form.sensi_production}}</td>
+				<td><div id="sensi_production"></div></td>
+			</tr>
 
 
-	        <tr>
-	        	<td>
+			<tr>
+				<td>
 				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario4"></td>
-	            <td>Inflation</td>
-	            <td>{{ project_form.sensi_inflation}}</td>
-	            <td><div id="sensi_inflation"></div></td>
-	        </tr>
+				<td>Inflation</td>
+				<td>{{ project_form.sensi_inflation}}</td>
+				<td><div id="sensi_inflation"></div></td>
+			</tr>
 
 
 
-	        <tr>
-	        	<td>
+			<tr>
+				<td>
 				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario5"></td>
-	            <td>Operating costs</td>
-	            <td>{{ project_form.sensi_opex }}</td>
-	            <td><div id="sensi_opex"></div></td>
-	        </tr>
+				<td>Operating costs</td>
+				<td>{{ project_form.sensi_opex }}</td>
+				<td><div id="sensi_opex"></div></td>
+			</tr>
 
 
-	        <tr>
-	        	<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2"></td>
-	            <td>Sponsor Case</td>
-	            <td></td>
-	            <td></td>
+			<tr>
+				<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2"></td>
+				<td>Sponsor Case</td>
+				<td></td>
+				<td></td>
 
-	        </tr>
+			</tr>
 
-	    </tbody>
+		</tbody>
 
 	</table>
 
@@ -1315,21 +1877,7 @@
 
 						</div>
 						</div>
-{% comment %}
-						<div class="box-wrapper">	
-						<div class="box" id="summary-financing">
-							<h2>FINANCING TERMS</h2>
 
-								<div class="summary-container">
-									<table class="table-sum" id="table-financing-terms">
-										<tbody id="summary_financing_terms"></tbody>
-									</table>
-								</div>
-	
-							</div>
-						</div>
-
-{% endcomment %}
 
 		
 
@@ -1360,7 +1908,7 @@
 
 						<div class="box-wrapper">	
 						<div class="box" id="summary-debt">
-							<h2>SENIOR DEBT</h2>
+							<h2>SENIOR DEBT METRICS</h2>
 										<table class="table-sum">
 											<tbody id="summary_debt"></tbody>
 										</table>
@@ -1381,8 +1929,21 @@
 					</div>
 				</div>
 
-						<div class="box-wrapper">
-			<h2>CHARTS</h2>
+			
+			<div class="box-wrapper">
+				<div class="box-wrapper-chart">
+		
+					<div class="left">
+			<h2>MAIN CHARTS</h2>
+			     </div>
+
+			     <div class="right">
+			    <select id="myDropdown">
+			        <option value="annual">Annual</option>
+			        <option value="debt_periodicity">Debt service periodicity</option>
+			    </select>
+			    </div>
+			   </div>
 				<div class="box" id="nav-summary-charts">
 					{% block jquery %}{% include 'charts.html' %}{% endblock %}
 				</div>
@@ -1392,6 +1953,19 @@
 
 		</div>
 			
+		<div class="tab-pane" id="nav-fs" role="tabpanel" aria-labelledby="messages-tab">
+			
+			<div class="box-wrapper">	
+				<div class="box">
+
+			<h1-calc>Income statement</h1-calc>
+					<table class="table">
+						<tbody id="myTableISAnnual"></tbody>
+					</table>
+
+			</div>
+		</div>
+		</div>
 
 			<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
 			
@@ -1471,6 +2045,11 @@
 						<tbody id="myTableOpex"></tbody>
 					</table>
 
+				<h3-calc class="detailed">Lease</h3-calc>
+
+					<table class="table detailed">
+						<tbody id="myTableLease"></tbody>
+					</table>
 
 
 					<title-wrapper class="detailed">	
@@ -1500,6 +2079,61 @@
 					<table class="table">
 						<tbody id="myTableRE"></tbody>
 					</table> 		
+
+
+
+				<title-wrapper class="detailed">	
+				<h1-calc>Network and local taxes</h1-calc>
+					<h3-calc>Development tax</h3-calc>
+
+				</title-wrapper>			
+
+					<table class="table">
+						<tbody id="myTableDevTax"></tbody>
+					</table> 		
+
+					<h3-calc>Archeological tax</h3-calc>
+
+					<table class="table">
+						<tbody id="myTableArchTax"></tbody>
+					</table> 		
+
+					<h3-calc>Network tax</h3-calc>
+
+					<table class="table">
+						<tbody id="myTableNetwTax"></tbody>
+					</table> 	
+
+
+					</table> 		
+
+					<h3-calc>Property tax</h3-calc>
+
+					<table class="table">
+						<tbody id="myTablePropertyTax"></tbody>
+					</table> 	
+
+
+					<title-wrapper class="detailed">	
+				<h1-calc>CFE</h1-calc>
+					<h3-calc>CFE tax base</h3-calc>
+				</title-wrapper>
+
+					<table class="table">
+						<tbody id="myTableCFETaxBase"></tbody>
+					</table> 	
+
+					<h3-calc>Gross CFE due</h3-calc>
+
+					<table class="table">
+						<tbody id="myTableCFETaxDue"></tbody>
+					</table> 	
+
+					<h3-calc>CFE payments</h3-calc>
+
+					<table class="table">
+						<tbody id="myTableCFETaxPay"></tbody>
+					</table> 	
 
 
 
@@ -1719,58 +2353,58 @@
 <script type="text/javascript">
 
 		$(document).ready(function(){
-		    setCalculationTypeAndSubmit('none');
-		    $("#RadioScenario1").prop('checked', true);
+			setCalculationTypeAndSubmit('none');
+			$("#RadioScenario1").prop('checked', true);
 		});
 
 		$("#btn-form").on('click', function() {
-		    setCalculationTypeAndSubmit('none');
-		    $("#RadioScenario1").prop('checked', true);
+			setCalculationTypeAndSubmit('none');
+			$("#RadioScenario1").prop('checked', true);
 		});
 
 		// Mapping of radio button IDs to their corresponding values
 		var radioValueMap = {
-		    'RadioScenario1': 'none',
-		    'RadioScenario2': 'sensi-p50',
-		    'RadioScenario3': 'sensi-production',
-		    'RadioScenario4': 'sensi-inflation',
-		    'RadioScenario5': 'sensi-opex',
+			'RadioScenario1': 'none',
+			'RadioScenario2': 'sensi-p50',
+			'RadioScenario3': 'sensi-production',
+			'RadioScenario4': 'sensi-inflation',
+			'RadioScenario5': 'sensi-opex',
 
 		};
 
 		// Generic event handler for radio buttons
 		$("[id^='RadioScenario']").on('change', function() {
-		    if ($(this).prop('checked')) {
-		        var value = radioValueMap[this.id];
-		        setCalculationTypeAndSubmit(value);
-		    }
+			if ($(this).prop('checked')) {
+				var value = radioValueMap[this.id];
+				setCalculationTypeAndSubmit(value);
+			}
 		});
 
 		// Helper function to set the value and submit the form
 		function setCalculationTypeAndSubmit(value) {
-		    $("#id_calculation_type").val(value);
-		    $("#post-form").submit();
+			$("#id_calculation_type").val(value);
+			$("#post-form").submit();
 		}
 
 		$(document).ready(function() {
-		    $('#id_sensi_production').on('input', function() {
-		      $("#post-form").submit();
-		    });
+			$('#id_sensi_production').on('input', function() {
+			  $("#post-form").submit();
+			});
 		  });
 
 
 
 		$(document).ready(function() {
-		    $('#id_sensi_opex').on('input', function() {
-		      $("#post-form").submit();
-		    });
+			$('#id_sensi_opex').on('input', function() {
+			  $("#post-form").submit();
+			});
 		  });
 
 
 		$(document).ready(function() {
-		    $('#id_sensi_inflation').on('input', function() {
-		      $("#post-form").submit();
-		    });
+			$('#id_sensi_inflation').on('input', function() {
+			  $("#post-form").submit();
+			});
 		  });
 
 
@@ -1852,47 +2486,47 @@
 		};
 
 			function build_table(json_input, div_output) {
-			    var table_result = "";
+				var table_result = "";
 
-			    var table_result = "<tr>";
-			    var headers = json_input[""];
+				var table_result = "<tr>";
+				var headers = json_input[""];
 
-			    $.each(headers, function (_, header) {
-			        table_result += "<th>" + header + "</th>";
-			    });
-			    table_result += "</tr>";
+				$.each(headers, function (_, header) {
+					table_result += "<th>" + header + "</th>";
+				});
+				table_result += "</tr>";
 
-			    delete json_input[""];
+				delete json_input[""];
 
-			    $.each(json_input, function(key, data) {
+				$.each(json_input, function(key, data) {
 			 
-			        table_result += "<tr>";
+					table_result += "<tr>";
 
-    				if (columnKey_exclude.hasOwnProperty(key)) {
-			        } else {
-			            table_result += "<td>" + key + "</td>";
-			        }
-			        
-			        
 					if (columnKey_exclude.hasOwnProperty(key)) {
-			        } else if (columnLabel_summary.hasOwnProperty(key)) {
-			            table_result += "<td>" + columnLabel_summary[key] + "</td>";
-			        } else {
-			            table_result += "<td>" + "kEUR" + "</td>";
-			        }
+					} else {
+						table_result += "<td>" + key + "</td>";
+					}
+					
+					
+					if (columnKey_exclude.hasOwnProperty(key)) {
+					} else if (columnLabel_summary.hasOwnProperty(key)) {
+						table_result += "<td>" + columnLabel_summary[key] + "</td>";
+					} else {
+						table_result += "<td>" + "kEUR" + "</td>";
+					}
 
-			        $.each(data, function(index, data) {
-			                if (data =="False") {
-						        table_result += "<td class='red-cell'>" + data + "</td>";
-						    } else {
-						        table_result += "<td>" + data + "</td>";
-						    }
-			        });
-			        table_result += "</tr>";
-			    
-   			    });
+					$.each(data, function(index, data) {
+							if (data =="False") {
+								table_result += "<td class='red-cell'>" + data + "</td>";
+							} else {
+								table_result += "<td>" + data + "</td>";
+							}
+					});
+					table_result += "</tr>";
+				
+				});
 			
-			    $(div_output).html(table_result);
+				$(div_output).html(table_result);
 			
 			}
 
@@ -1932,6 +2566,8 @@
 
 				  Mkt_i: { selector: "#myTableMkt" },
 				  Opex: { selector: "#myTableOpex" },
+				  Lease: { selector: "#myTableLease" },
+
 				  Prod: { selector: "#myTableProd" },
 				  IS: { selector: "#myTableIS" },
 				  Price: { selector: "#myTablePrice" },
@@ -1950,6 +2586,17 @@
 				  FP_s: { selector: "#myTableFPSources" },
 				  CFADS: { selector: "#myTableCFADS" },
 
+
+				  DevTax: { selector: "#myTableDevTax" },
+				  ArchTax: { selector: "#myTableArchTax" },
+
+				  PropTax: { selector: "#myTablePropertyTax" },
+				  CFETaxBase: { selector: "#myTableCFETaxBase" },
+				  CFETaxDue: { selector: "#myTableCFETaxDue" },
+				  CFETaxPay: { selector: "#myTableCFETaxPay" },
+
+
+
 				  DistrBOP: { selector: "#DistrAccountBOP" },
 				  DistrSHLi: { selector: "#DistrAccountSHLi" },
 				  DistrDiv: { selector: "#DistrAccountDiv" },
@@ -1965,19 +2612,19 @@
 
 
 				const dict_simplified = {
-				  	Date: { selector: "#myTableDate" },
-				  	IS: { selector: "#myTableIS" },
-				 	RE_b: { selector: "#myTableRE" },
-				  	CF_op: { selector: "#myTableCF_operating" },
-				  	CF_in: { selector: "#myTableCF_inesting" },
-				  	CF_fi: { selector: "#myTableCF_financing" },
-				 	CFADS: { selector: "#myTableCFADS" },
-				 	CFDSRA : { selector: "#myTableCF_DSRA" },
-				  	CFDistr : { selector: "#myTableCF_distrib" },
+					Date: { selector: "#myTableDate" },
+					IS: { selector: "#myTableIS" },
+					RE_b: { selector: "#myTableRE" },
+					CF_op: { selector: "#myTableCF_operating" },
+					CF_in: { selector: "#myTableCF_inesting" },
+					CF_fi: { selector: "#myTableCF_financing" },
+					CFADS: { selector: "#myTableCFADS" },
+					CFDSRA : { selector: "#myTableCF_DSRA" },
+					CFDistr : { selector: "#myTableCF_distrib" },
 
-				  	BS_a: { selector: "#myTableBSA" },
-				  	BS_l: { selector: "#myTableBSL" },
-				  	Audit: { selector: "#myTableAudit" }
+					BS_a: { selector: "#myTableBSA" },
+					BS_l: { selector: "#myTableBSL" },
+					Audit: { selector: "#myTableAudit" }
 					};
 
 				var dict = {};
@@ -1999,6 +2646,8 @@
 				" Years in period": formatAsPercent,
 				" Construction": formatAsInt,
 				" Percentage in contract period": formatAsPercent,
+				" Percentage in operations period": formatAsPercent,
+
 				" Indexation": formatAsPercent,
 				" Discount factor": formatAsPercent,
 				" Cumulative discount factor": formatAsPercent,
@@ -2036,7 +2685,18 @@
 				" Contract start date": "date",
 				" Contract end date": "date",
 				" Days in contract period": "days",
+				" Days during construction": "days",
+				" Days during operations": "days",
+
+				" Quarter": "true/false",
+				" Start of calendar year": "true/false",
+
+
+
 				" Percentage in contract period": "%",
+
+				" Percentage in operations period": "%",
+
 				" Indexation period": "true/false",
 				" Indexation start date": "date",
 				" Indexation end date": "date",
@@ -2109,10 +2769,6 @@
 				];
 
 
-
-
-				
-
 				for (const key in dict) {
 				  const entry = dict[key];
 				  const { selector } = entry;
@@ -2180,6 +2836,11 @@
 				  $(selector).html(tableContent);
 				}
 
+
+
+
+
+
 				function formatDSCR(dataValue) {
 					
 					const formattedValue = dataValue.toFixed(2) + "x";
@@ -2227,7 +2888,6 @@
 				  { data: json.table_audit, selector: "#summary_audit" },
 				  { data: json.table_uses, selector: "#summary_financing_plan_uses" },
 				  { data: json.table_sources, selector: "#summary_financing_plan_sources" },
-				  { data: json.table_financing_terms, selector: "#summary_financing_terms" },
 				  { data: json.table_sensi, selector: "#summary_sensi" },
 				];
 
@@ -2244,6 +2904,7 @@
 
 				var dict_sidebar = {
 				formatted_date_COD:"#dateCOD",
+				installed_capacity:"#installed_capacity",
 				end_of_operations_formatted:"#dateRetirement",
 				sum_seasonality:"#sumSeasonality",
 				sum_construction_costs:"#sumConstructionCosts",
@@ -2257,6 +2918,54 @@
 				}
 
 
+
+		        function createTable(data) {
+		            var table = "<table>";
+		            
+		            for (var key in data) {
+		                var percentage = (data[key]).toFixed(2) + "%"; // Format as percentage with two decimal places
+		                table += "<tr><td>" + key + "</td><td>" + percentage + "</td></tr>";
+		            }
+		            
+		            table += "</table>";
+		            return table;
+		        }
+
+		        $("#tfpb_rates").html(createTable(json.tfpb_rates));
+				$("#api_dev_tax_commune").html(createTable(json.dev_tax_rates));
+
+
+
+				myChart.data.labels = Object.values(json.monthly['Date']);
+				myChart.data.datasets[0].data = Object.values(json.monthly['Construction costs']);
+				myChart.data.datasets[1].data = Object.values(json.monthly['Construction costs cumul']);
+				myChart.data.datasets[2].data = Object.values(json.monthly['Development fee']);
+				myChart.data.datasets[3].data = Object.values(json.monthly['Debt fees']);
+				myChart.data.datasets[4].data = Object.values(json.monthly['DSRA initial funding']);
+				myChart.data.datasets[5].data = Object.values(json.monthly['Local taxes']);
+
+				myChart.update();
+
+				myChart2.data.labels = Object.values(json.monthly['Date']);
+				myChart2.data.datasets[0].data = Object.values(json.monthly['Share capital injections']);
+				myChart2.data.datasets[1].data = Object.values(json.monthly['SHL injections']);
+				myChart2.data.datasets[2].data = Object.values(json.monthly['Debt injections']);
+				myChart2.data.datasets[3].data = Object.values(json.monthly['Total uses']);
+				myChart2.data.datasets[4].data = Object.values(json.monthly['Gearing']);
+				myChart2.update();	
+
+				const charts = [myChart3, myChart7, myChart9, myChart10, myChart11, myChart12, myChart13];
+
+
+
+				function updateChartAnnual(chart, datasets) {
+					chart.data.labels = Object.values(json.annual['Year']);
+					datasets.forEach((data, index) => {
+						chart.data.datasets[index].data = data;
+					});
+					chart.update();
+				}
+
 				function updateChart(chart, datasets) {
 					chart.data.labels = Object.values(json.df['Date Period end']);
 					datasets.forEach((data, index) => {
@@ -2266,48 +2975,69 @@
 				}
 
 				const datasets = [
-				  [Object.values(json.df['Prod Production']), Object.values(json.df['Prod Capacity degradation factor'])],
-				  [Object.values(json.df['IS Contracted revenues']), Object.values(json.df['IS Uncontracted electricity revenues'])],
-				  [Object.values(json.df['Operating expenses pos'])],
-				  [Object.values(json.df['IS EBITDA']), Object.values(json.df['EBITDA margin'])],
-				  [Object.values(json.df['FP_u Construction costs']), Object.values(json.df['Cumulative total uses'])],
-				  [Object.values(json.df['Share capital injections neg']),Object.values(json.df['Shareholder loan injections neg']),Object.values(json.df['Senior debt drawdowns neg']), Object.values(json.df['FP_u Total uses']),Object.values(json.df['Gearing during financing plan'])],
+				  [Object.values(json.df['Operating expenses pos']),Object.values(json.df['Lease pos']),Object.values(json.df['IS Contracted revenues']), Object.values(json.df['IS Uncontracted electricity revenues']),Object.values(json.df['Debt service'])],
 				  [Object.values(json.df['Sizing Interests during operations']), Object.values(json.df['Senior debt repayments']), Object.values(json.df['Ratio DSCR'])],
-				  [Object.values(json.df['Sizing Target DS']), Object.values(json.df['Sizing CFADS'])],
 				  [Object.values(json.df['FP_s Senior debt drawdowns']),Object.values(json.df['Senior debt repayments']), Object.values(json.df['Debt_b Closing balance'])],
-
-
 				  [Object.values(json.df['Ratio DSCR']), Object.values(json.df['Ratio LLCR']), Object.values(json.df['Ratio PLCR'])],
-
 				  [Object.values(json.df['Debt service']), Object.values(json.df['DSRA DSRA (BoP)'])],
-
 				  [Object.values(json.df['Share capital injections and repayment']), Object.values(json.df['Shareholder loan injections and repayment']), Object.values(json.df['Dividends paid pos']),Object.values(json.df['IRR curve'])],
 				  [Object.values(json.df['RE_b Balance brought forward']), Object.values(json.df['DistrEOP Distribution account balance']), Object.values(json.df['Dividends paid pos']), Object.values(json.df['Share capital repayment pos'])],
+				];
 
+				const datasets_annual = [
+				  [Object.values(json.annual['Opex']), Object.values(json.annual['Lease']),Object.values(json.annual['Contracted revenues']), Object.values(json.annual['Merchant revenues']),Object.values(json.annual['Debt service'])],
+				  [Object.values(json.annual['Senior debt interests']), Object.values(json.annual['Senior debt repayments']), Object.values(json.annual['DSCR'])],
+				  [Object.values(json.annual['Senior debt drawdowns']), Object.values(json.annual['Senior debt repayments']), Object.values(json.end_year['Senior debt EOP'])],
+				  [Object.values(json.annual['DSCR']), Object.values(json.end_year['LLCR']), Object.values(json.end_year['PLCR'])],
+				  [Object.values(json.annual['Debt service']), Object.values(json.end_year['DSRA EOP'])],
+				  [Object.values(json.annual['Share capital flows']), Object.values(json.annual['SHL flows']), Object.values(json.annual['Dividends']), Object.values(json.end_year['IRR curve'])],
+				  [Object.values(json.end_year['Retained earnings BOP']), Object.values(json.end_year['Distribution account EOP']), Object.values(json.annual['Dividends']), Object.values(json.annual['Share capital repayment'])],
 
 				];
 
-				const charts = [myChart, myChart2, myChart3, myChart4, myChart5, myChart6, myChart7, myChart8, myChart9, myChart10, myChart11, myChart12, myChart13];
+		     charts.forEach((chart, index) => {
+			 	 updateChartAnnual(chart, datasets_annual[index]);
 
-				charts.forEach((chart, index) => {
-				  updateChart(chart, datasets[index]);
 				});
 
-		
+	        $(document).ready(function () {
+	            $("#myDropdown").change(function () {
+	                var selectedOption = $(this).val();
+	                if (selectedOption === "annual") {
+		            
+		            charts.forEach((chart, index) => {
+				 	 updateChartAnnual(chart, datasets_annual[index]);
+
+					});
+
+	                } else if (selectedOption === "debt_periodicity") {
+	                    // Perform actions for Quarterly selection
+		            charts.forEach((chart, index) => {
+				 	 updateChart(chart, datasets[index]);
+
+					});
+	                }
+	            });
+	        });
+
+
+
+
+
 			},
 
 			error: function(json){
 			  
-			    try {
-			        const obj = JSON.parse(json.responseJSON.error);
-			        const array = Object.values(obj)[0];
-			        const firstElement = array[0];
-			        alert(firstElement.message);
-			        console.log(obj);
-			    } catch (e) {
-			        alert(json.responseJSON.error_type+" "+json.responseJSON.message);
-			        console.log(json);
-			    }
+				try {
+					const obj = JSON.parse(json.responseJSON.error);
+					const array = Object.values(obj)[0];
+					const firstElement = array[0];
+					alert(firstElement.message);
+					console.log(obj);
+				} catch (e) {
+					alert(json.responseJSON.error_type+" "+json.responseJSON.message);
+					console.log(json);
+				}
 
 
 
@@ -2319,6 +3049,9 @@
 	});
 
 </script>
+
+
+
 
 <script type="text/javascript">
 
@@ -2347,14 +3080,14 @@
 <script>
 $(document).ready(function() {
 
-        var sensi_production_field = $('#id_sensi_production').val()+'%';
-        $('#sensi_production').text(sensi_production_field);
+		var sensi_production_field = $('#id_sensi_production').val()+'%';
+		$('#sensi_production').text(sensi_production_field);
 
-        // Adding a listener to the input field
-        $('#id_sensi_production').on('input', function() {
-            var new_value = $(this).val();
-            $('#sensi_production').text(new_value+'%');
-        });
+		// Adding a listener to the input field
+		$('#id_sensi_production').on('input', function() {
+			var new_value = $(this).val();
+			$('#sensi_production').text(new_value+'%');
+		});
 
 });
 
@@ -2364,14 +3097,14 @@ $(document).ready(function() {
 <script>
 $(document).ready(function() {
 
-        var sensi_opex_field = $('#id_sensi_opex').val()+'%';
-        $('#sensi_opex').text(sensi_opex_field);
+		var sensi_opex_field = $('#id_sensi_opex').val()+'%';
+		$('#sensi_opex').text(sensi_opex_field);
 
-        // Adding a listener to the input field
-        $('#id_sensi_opex').on('input', function() {
-            var new_value = $(this).val();
-            $('#sensi_opex').text(new_value+'%');
-        });
+		// Adding a listener to the input field
+		$('#id_sensi_opex').on('input', function() {
+			var new_value = $(this).val();
+			$('#sensi_opex').text(new_value+'%');
+		});
 
 });
 
@@ -2380,18 +3113,21 @@ $(document).ready(function() {
 <script>
 $(document).ready(function() {
 
-        var sensi_inflation_field = $('#id_sensi_inflation').val()+'%';
-        $('#sensi_inflation').text(sensi_inflation_field);
+		var sensi_inflation_field = $('#id_sensi_inflation').val()+'%';
+		$('#sensi_inflation').text(sensi_inflation_field);
 
-        // Adding a listener to the input field
-        $('#id_sensi_inflation').on('input', function() {
-            var new_value = $(this).val();
-            $('#sensi_inflation').text(new_value+'%');
-        });
+		// Adding a listener to the input field
+		$('#id_sensi_inflation').on('input', function() {
+			var new_value = $(this).val();
+			$('#sensi_inflation').text(new_value+'%');
+		});
 
 });
 
 </script>
+
+
+
 
 <script>
   $(document).ready(function() {
@@ -2439,62 +3175,95 @@ $(document).ready(function() {
 </script>
 
 
+
+
+<script>
+    const myField = document.getElementById("project_name");
+
+    // Grouping related elements by their IDs
+    const windElements = ['wind_turbine_capacity', 'wind_turbine_number', 'wind_project_capacity', 'wind_devtax_cost'];
+    const solarElements = ['solar_panels_capacity', 'solar_panels_degradation', 'solar_panels_surface', 'solar_devtax_cost', 'solar_arctax_base', 'solar_arctax_cost', 'solar_arctax_title'];
+
+    function toggleDivVisibility() {
+        // Helper function to change visibility
+        const setVisibility = (ids, visible) => ids.forEach(id => {
+            const elem = document.getElementById(id);
+            if (visible) {
+                elem.style.visibility = 'visible';
+                elem.style.position = 'static';
+            } else {
+                elem.style.visibility = 'hidden';
+                elem.style.position = 'absolute';
+            }
+        });
+
+        const isSolar = myField.textContent.startsWith("Solar");
+        setVisibility(windElements, !isSolar);
+        setVisibility(solarElements, isSolar);
+    }
+
+    toggleDivVisibility();
+
+    myField.addEventListener('change', toggleDivVisibility);
+</script>
+
+
 <script>
   $(document).ready(function() {
-    // Get the input fields by ID prefixes
-    var fields = {
-      startDate: $('#id_start_construction'),
-      endDate: $('#id_end_construction'),
-      operatingLife: $('#id_operating_life'),
-      liquidation: $('#id_liquidation'),
-      yearLow: $('[id^="id_price_elec_low"]'),
-      yearMed: $('[id^="id_price_elec_med"]'),
-      yearHigh: $('[id^="id_price_elec_high"]'),
-      yearLabel: $('[id^="elecPriceLabel"]')
-    };
+	// Get the input fields by ID prefixes
+	var fields = {
+	  startDate: $('#id_start_construction'),
+	  endDate: $('#id_end_construction'),
+	  operatingLife: $('#id_operating_life'),
+	  liquidation: $('#id_liquidation'),
+	  yearLow: $('[id^="id_price_elec_low"]'),
+	  yearMed: $('[id^="id_price_elec_med"]'),
+	  yearHigh: $('[id^="id_price_elec_high"]'),
+	  yearLabel: $('[id^="elecPriceLabel"]')
+	};
 
-    updateYearFieldsVisibility();
+	updateYearFieldsVisibility();
 
-    // Attach change event handlers to all relevant fields
-    $.each(fields, function(key, field) {
-      field.change(updateYearFieldsVisibility);
-    });
+	// Attach change event handlers to all relevant fields
+	$.each(fields, function(key, field) {
+	  field.change(updateYearFieldsVisibility);
+	});
 
-    function updateYearFieldsVisibility() {
-      var endDate = new Date(fields.endDate.val());
-      var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
-      var yearB = COD.getFullYear();
+	function updateYearFieldsVisibility() {
+	  var endDate = new Date(fields.endDate.val());
+	  var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
+	  var yearB = COD.getFullYear();
 
-      var operating_life_val = parseInt(fields.operatingLife.val());
-      var liquidationField_val = parseInt(fields.liquidation.val());
-      var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
-      var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
-      var yearE = latest_date.getFullYear();
+	  var operating_life_val = parseInt(fields.operatingLife.val());
+	  var liquidationField_val = parseInt(fields.liquidation.val());
+	  var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
+	  var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
+	  var yearE = latest_date.getFullYear();
 
-      // Calculate the number of years
-      var numYears = yearE - yearB + 1;
+	  // Calculate the number of years
+	  var numYears = yearE - yearB + 1;
 
-      // Show or hide the year fields based on the number of years
-      $.each(fields, function(key, field) {
-        if (key.startsWith('year')) {
-          field.each(function(index) {
-            var yearIndex = index + 1;
-            if (yearIndex <= numYears) {
-              $(this).show();
-            } else {
-              $(this).hide();
-            }
-          });
-        }
-      });
-    }
+	  // Show or hide the year fields based on the number of years
+	  $.each(fields, function(key, field) {
+		if (key.startsWith('year')) {
+		  field.each(function(index) {
+			var yearIndex = index + 1;
+			if (yearIndex <= numYears) {
+			  $(this).show();
+			} else {
+			  $(this).hide();
+			}
+		  });
+		}
+	  });
+	}
   });
 </script>
 
 
 <script>
 document.getElementById('featureRequest').addEventListener('click', function() {
-    window.location.href = "mailto:a.wallois@resonance-advisory.com?subject=Shango Feature Request&body=Dear Team,";
+	window.location.href = "mailto:a.wallois@resonance-advisory.com?subject=Shango Feature Request&body=Dear Team,";
 });
 </script>
 

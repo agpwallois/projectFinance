@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'AjaxPost',
     'authentication',
+    'api_integration',
 ]
 
 MIDDLEWARE = [

@@ -11,7 +11,7 @@
 <body>
     <header>
         <h1 class="text-blue">Shango</h1>
-        <h2>Empowering green energy developers worldwide with Shango's financial tools.</h2>
+        <h2>Empowering green energy developers with Shango's financial tools.</h2>
     </header>
     <main>
         <form method="post">{% csrf_token %}
@@ -26,11 +26,15 @@
 			        <p id="message">{{ message }}</p>
 			    {% endif %}
 			</div>
+            <p align="center"><a href="/projects/">Go to sandbox without log in</a></p>
 
         </form>
 
+
+
     
     </main>
+    
   
 </body>
 </html>

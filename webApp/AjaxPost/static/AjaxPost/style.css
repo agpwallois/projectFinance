@@ -93,6 +93,18 @@ h3 {
     margin-bottom: 0;
 }
 
+h6 {
+    font-size: 1rem;
+    padding-top:10px;
+    text-decoration: underline;
+    margin-bottom: 0;
+}
+
+h6:hover {
+    cursor: pointer;
+    color: #0d6efd;
+    }
+
 h4 {
     line-height:1.5;
     font-size: 1rem;
@@ -333,9 +345,12 @@ header {
 
 #table_sum_uses tr:nth-child(5) td:first-child,
 #table_sum_uses tr:nth-child(6) td:first-child,
-#table_sum_uses tr:nth-child(7) td:first-child {
+#table_sum_uses tr:nth-child(7) td:first-child, 
+#table_sum_uses tr:nth-child(9) td:first-child, 
+#table_sum_uses tr:nth-child(10) td:first-child {
   padding-left: 10px;
 }
+
 
 .dates-wrapper {
 width: 100%;
@@ -549,9 +564,9 @@ width: 100%;
 
 
 .year-box{
-    height:27.65px;
-      display: flex;
-      align-items: center; /* ou justify-content: center; */
+    height:24px;
+    display: flex;
+    align-items: center; /* ou justify-content: center; */
 }
 
 .columns-container {
@@ -667,4 +682,27 @@ width: 100%;
     background-color: rgb(242, 242, 242);
     color: #0d6efd;
 
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.5); 
+}
+.modal-backdrop {
+  display: none;
+}
+
+
+.box-wrapper-chart {
+    display: flex;
+}
+
+.left {
+    flex: 1;
+    margin-right: 10px; /* Adjust the margin as needed */
+}
+
+
+.right {
+    flex: 1;
+    text-align: right;
 }

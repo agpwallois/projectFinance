@@ -14,9 +14,10 @@ Including another URLconf
 	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from AjaxPost.views import project_list, project_view
+from django.urls import path, include
+from AjaxPost.views import project_list, project_view, test, testsimple
 from authentication.views import LoginPageView
+from api_integration import views
 
 
 urlpatterns = [
@@ -24,6 +25,10 @@ urlpatterns = [
 	path('', LoginPageView.as_view(), name='login'),
 	path('projects/', project_list, name='project_list'),
 	path('project/<int:id>/', project_view, name='project_view'),
+	path('test/<int:id>/', test, name='test'),
+	path('testsimple', testsimple, name='testsimple'),
+	path('api/', include('api_integration.urls', namespace='api')),
+
 ]
 
 admin.site.site_url = '/projects/'

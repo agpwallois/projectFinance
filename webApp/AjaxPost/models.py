@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from django import forms
 from datetime import date
-
+from .commune_choices import COMMUNE_CHOICES
 
 class Project(models.Model):
 
@@ -18,7 +18,8 @@ class Project(models.Model):
 	)
 
 	TECHNOLOGY_CHOICES = (
-		('Solar', 'Solar'),
+		('Solar - ground-mounted', 'Solar - ground-mounted'),
+		('Solar - rooftop', 'Solar - rooftop'),
 		('Wind', 'Wind'),
 	)
 
@@ -38,8 +39,8 @@ class Project(models.Model):
 
 	periodicity = models.fields.IntegerField(default="6")
 
-	panels_capacity = models.fields.IntegerField(default="2500")
-	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.4)
+	panels_capacity = models.fields.IntegerField(default="2500", blank=True, null=True)
+	annual_degradation = models.fields.DecimalField(max_digits=5, decimal_places=3, default=0.4, blank=True, null=True)
 	p50 = models.fields.IntegerField(default="1800")
 	p75 = models.fields.IntegerField(default="1750")
 	p90_10y = models.fields.IntegerField(default="1700")
@@ -275,3 +276,41 @@ class Project(models.Model):
 
 	sponsor_production_choice = models.fields.IntegerField(default="3")
 	sponsor_price_elec_choice = models.fields.IntegerField(default="2")
+
+	wind_turbine_installed = models.fields.IntegerField(default="3", blank=True, null=True)
+	capacity_per_turbine = models.fields.IntegerField(default="2", blank=True, null=True)
+	timeline_quarters_ceiling = models.BooleanField(default=False, null=True)
+
+	panels_surface = models.fields.DecimalField(max_digits=10, decimal_places=2, default=0)
+	dev_tax_taxable_base_solar = models.fields.DecimalField(max_digits=6, decimal_places=2, default=10)
+	dev_tax_taxable_base_wind = models.fields.DecimalField(max_digits=6, decimal_places=2, default=3000)
+	dev_tax_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	dev_tax_department_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	
+	commune = models.fields.CharField(choices=COMMUNE_CHOICES,max_length=100,default="Apremont")
+
+	archeological_tax_base_solar = models.fields.DecimalField(max_digits=8, decimal_places=2, default=10)
+	archeological_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.4)
+
+
+	lease = models.fields.IntegerField(default="50")
+	lease_indexation_start_date = models.fields.DateField(default=date(2024, 1, 1), blank=True, null=True)
+	lease_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
+
+
+	tfpb_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	tfpb_department_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	tfpb_additional_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	tfpb_region_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+
+	cfe_discount_tax_base_y1 = models.fields.DecimalField(max_digits=4, decimal_places=2, default=50)
+	cfe_discount_tax_base = models.fields.DecimalField(max_digits=4, decimal_places=2, default=30)
+	cfe_mgt_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=3)
+	cfe_instal_q1= models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	cfe_instal_q2= models.fields.DecimalField(max_digits=4, decimal_places=2, default=50)
+	cfe_instal_q3= models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	cfe_instal_q4= models.fields.DecimalField(max_digits=4, decimal_places=2, default=50)
+	cfe_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	cfe_intercommunal_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	cfe_specific_eqp_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	cfe_localCCI_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
