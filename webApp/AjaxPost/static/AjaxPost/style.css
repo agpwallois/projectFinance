@@ -126,12 +126,14 @@ header {
     border-bottom: 1px solid rgb(221, 221, 221);
     width: 100%;
     background-color: white; 
-    padding: 10px;
-    height:40px;
+    padding-left: 15px; /* Adjust the padding top and bottom */
+    height: 40px; /* Adjust the height as needed */
     margin: 0px;
     position: fixed;
     z-index: 2;
     font-weight: bold;
+    display: flex; /* Add this to use flexbox */
+    align-items: center;
 }
 
 
@@ -156,7 +158,7 @@ header {
     top: 40px;
     height: 100vh;
     z-index: 1;
-    background: rgb(242, 242, 242);
+    background: rgb(244, 244, 244);
     transition: all 0.3s;
     padding-bottom: 40px;
     padding-left: 15px;
@@ -175,7 +177,7 @@ header {
 
 .accordion-button {
   padding: 5px;
-  background: rgb(242, 242, 242);
+  background: rgb(244, 244, 244);
   color: rgb(92, 105, 117);
   font-size: 1rem;
 }
@@ -196,13 +198,13 @@ header {
     position: absolute;
     right: 0;
     color: rgb(59, 69, 78);
-    background: rgb(242, 242, 242);
+    background: rgb(244, 244, 244);
 }
 
 #content-nav{
     margin-top: 5px;
     margin-bottom: 10px;
-    background: rgb(242, 242, 242);
+    background: rgb(244, 244, 244);
 
     }
 
@@ -251,28 +253,28 @@ header {
 
 .box-wrapper {
     background: white;
-    padding: 10px;
-    box-shadow: 0 0 10px #ccc;
+    padding: 20px;
     margin-top: 10px;
-    border-radius: 5px;
+    border-radius: 3px;
+    border: solid 1px rgb(221,221,221);
 }
 
 
 
-#myTableEquity tr:nth-child(2) td:first-child,
-#myTableEquity tr:nth-child(3) td:first-child,
-#myTableSHL tr:nth-child(2) td:first-child,
-#myTableSHL tr:nth-child(3) td:first-child,
-#myTableSHL tr:nth-child(4) td:first-child,
-#myTableDebtAvailable tr:nth-child(2) td:first-child,
-#myTableDebtBalance tr:nth-child(2) td:first-child,
-#myTableDebtBalance tr:nth-child(3) td:first-child,
-#myTableRE tr:nth-child(3) td:first-child,
-#myTableRE tr:nth-child(4) td:first-child,
-#myTableWC_receivables tr:nth-child(2) td:first-child,
-#myTableWC_receivables tr:nth-child(3) td:first-child,
-#myTableWC_payables tr:nth-child(2) td:first-child,
-#myTableWC_payables tr:nth-child(3) td:first-child {
+#Eqt tr:nth-child(2) td:first-child,
+#Eqt tr:nth-child(3) td:first-child,
+#SHL tr:nth-child(2) td:first-child,
+#SHL tr:nth-child(3) td:first-child,
+#SHL tr:nth-child(4) td:first-child,
+#Debt_a tr:nth-child(2) td:first-child,
+#Debt_b tr:nth-child(2) td:first-child,
+#Debt_b tr:nth-child(3) td:first-child,
+#RE_b tr:nth-child(3) td:first-child,
+#RE_b tr:nth-child(4) td:first-child,
+#WCRec tr:nth-child(2) td:first-child,
+#WCRec tr:nth-child(3) td:first-child,
+#WCPay tr:nth-child(2) td:first-child,
+#WCPay tr:nth-child(3) td:first-child {
     padding-left: 20px;
 }
 
@@ -365,30 +367,30 @@ width: 100%;
     width: 60%;
 }
 
-#myTableBSA tr:nth-child(4) td:first-child,
-#myTableBSA tr:nth-child(5) td:first-child,
-#myTableBSA tr:nth-child(6) td:first-child {
+#BS_a tr:nth-child(4) td:first-child,
+#BS_a tr:nth-child(5) td:first-child,
+#BS_a tr:nth-child(6) td:first-child {
     padding-left: 20px;
   }  
 
 
 
 
-#myTableDate{
-    background-color: rgb(242, 242, 242);
+#Dates{
+    background-color: rgb(244, 244, 244);
     border-bottom-width:None;
   z-index: 3;
 
 }
 
-#myTableDate td:first-child{
-    background-color: rgb(242, 242, 242);
+#Dates td:first-child{
+    background-color: rgb(244, 244, 244);
 }
 
-#myTableDate tr:first-child{
+#Dates tr:first-child{
     border-top: solid 1px #0d6efd;
 }
-#myTableDate tr:nth-child(2){
+#Dates tr:nth-child(2){
     border-bottom: solid 1px #0d6efd;
 }
 
@@ -435,8 +437,24 @@ width: 100%;
 }
 
 
+.charts-container-vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+}
+
+
+
+
 .nav-summary {
     display: flex;
+
+}
+
+.summary-container {
+    display: flex;
+    align-items: flex-end;
+    width:100%;
 
 }
 
@@ -456,18 +474,11 @@ width: 100%;
 }
 
 
-#summary-fp{
-    width: 100%;
-
-}
-
-
 .summary-scenario-left {
 
     display: flex;
     flex-direction: column;
     width: 50%;
-    padding-right: 10px;
   /* Additional styles for the left container */
 }
 
@@ -477,6 +488,10 @@ width: 100%;
   /* Additional styles for the left container */
 }
 
+#summary-fp{
+    width: 100%;
+
+}
 
 
 .red-cell {
@@ -526,13 +541,17 @@ width: 100%;
 
 }
 
+#shango {
 
-.summary-container {
-    display: flex;
-    align-items: flex-end;
-    width:100%;
+font-family:'Source Serif 4';
+font-size: 2.5rem;
+font-weight: 800;
+}
+
 
 }
+
+
 
 .summary {
 
@@ -545,9 +564,19 @@ width: 100%;
     padding-right: 30px;
     padding-left: 30px;
     padding-top: 10px;
+    padding-bottom: 10px;
 
 }
 
+.graph-dev {
+    display: flex;
+    width: 30%;
+    padding-right: 30px;
+    padding-left: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
 
 
 .accordion-body {
@@ -647,7 +676,7 @@ width: 100%;
 
 
 .nav-tabs .nav-item .nav-link {
-    background: rgb(242, 242, 242);
+    background: rgb(244, 244, 244);
     color: rgb(51, 51, 51);
     font-size: 1.25rem;
 
@@ -678,11 +707,7 @@ width: 100%;
 }
 
 
-#featureRequest {
-    background-color: rgb(242, 242, 242);
-    color: #0d6efd;
 
-}
 
 .modal {
   background: rgba(0, 0, 0, 0.5); 
@@ -706,3 +731,8 @@ width: 100%;
     flex: 1;
     text-align: right;
 }
+
+#nav-history {
+    margin-bottom: 10px;
+}
+

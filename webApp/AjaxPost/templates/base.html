@@ -13,12 +13,14 @@
 
 				<!-- Custom Scroller CSS -->
 				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+				<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;700&display=swap" rel="stylesheet">
 
 
 			    <link rel="stylesheet" href="{% static 'AjaxPost/style.css' %}" />
 			    <link rel="shortcut icon" type="image/png" href="{% static 'AjaxPost/favicon.ico' %}"/>
+			    
 
-			    	{% block landingcss %}{% endblock %}
+			    {% block landingcss %}{% endblock %}
 
 	</head>
 	<body>
@@ -34,21 +36,16 @@
 		    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
 		<header>
-			<a href="{% url 'project_list' %}"><img style="width: 21.5px; height: 21.5px;vertical-align: text-top;"src="{% static 'AjaxPost/favicon.ico' %}"/></a>
-			<a href="{% url 'project_list' %}">Shango</a>
+			<a href="{% url 'project_list' %}"><img style="width: 20px; height: 20px;vertical-align: text-top;"src="{% static 'AjaxPost/favicon.ico' %}"/></a>
+			<a href="{% url 'project_list' %}" id="shango">shango</a>
 		</header>
 
 		<wrapper>
-
-			<sidebar>
-			    {% block sidebar %}{% endblock %}
-			</sidebar>
 
 			<content>
 				{% block content %}{% endblock %}
 			</content>
 
-				{% block script %}{% endblock %}
 		</wrapper>
 		
 	</body>

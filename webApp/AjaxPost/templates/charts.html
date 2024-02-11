@@ -2,37 +2,37 @@
 
 <div class="charts-container">
 
-	<div class="graph"><canvas id="myChart"></canvas></div>
-	<div class="graph"><canvas id="myChart2"></canvas></div>
+	<div class="graph"><canvas id="chartProjectCosts"></canvas></div>
+	<div class="graph"><canvas id="chartFinPlan"></canvas></div>
 
 </div>
 
 <div class="charts-container">
 
-	<div class="graph"><canvas id="myChart3"></canvas></div>
-	<div class="graph"><canvas id="myChart12"></canvas></div>
-
-</div>
-
-
-<div class="charts-container">
-
-	<div class="graph"><canvas id="myChart7"></canvas></div>
-	<div class="graph"><canvas id="myChart9"></canvas></div>
-
-</div>
-
-<div class="charts-container">
-
-	<div class="graph"><canvas id="myChart10"></canvas></div>
-	<div class="graph"><canvas id="myChart11"></canvas></div>
+	<div class="graph"><canvas id="chartCashFlow"></canvas></div>
+	<div class="graph"><canvas id="chartEqtFlow"></canvas></div>
 
 </div>
 
 
 <div class="charts-container">
 
-	<div class="graph"><canvas id="myChart13"></canvas></div>
+	<div class="graph"><canvas id="chartDebtS"></canvas></div>
+	<div class="graph"><canvas id="chartDebtOut"></canvas></div>
+
+</div>
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartDSCR"></canvas></div>
+	<div class="graph"><canvas id="chartDSRA"></canvas></div>
+
+</div>
+
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartCash"></canvas></div>
 
 </div>
 
@@ -43,8 +43,8 @@
 
 
 
-const ctx = document.getElementById('myChart');
-const myChart = new Chart(ctx, {
+const ctx = document.getElementById('chartProjectCosts');
+const chartProjectCosts = new Chart(ctx, {
     type: 'bar',
     data: {
         labels: ["1", "2", "3", "4", "5", "6"],
@@ -115,8 +115,8 @@ const myChart = new Chart(ctx, {
     }
 });
 
-const ctx2 = document.getElementById('myChart2');
-const myChart2 = new Chart(ctx2, {
+const ctx2 = document.getElementById('chartFinPlan');
+const chartFinPlan = new Chart(ctx2, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -220,8 +220,8 @@ const myChart2 = new Chart(ctx2, {
 });
 
 
-const ctx3 = document.getElementById('myChart3');
-const myChart3 = new Chart(ctx3, {
+const ctx3 = document.getElementById('chartCashFlow');
+const chartCashFlow = new Chart(ctx3, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -320,8 +320,8 @@ const myChart3 = new Chart(ctx3, {
 
 
 
-const ctx7 = document.getElementById('myChart7');
-const myChart7 = new Chart(ctx7, {
+const ctx7 = document.getElementById('chartDebtS');
+const chartDebtS = new Chart(ctx7, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -403,8 +403,8 @@ const myChart7 = new Chart(ctx7, {
 
 
 
-const ctx9 = document.getElementById('myChart9');
-const myChart9 = new Chart(ctx9, {
+const ctx9 = document.getElementById('chartDebtOut');
+const chartDebtOut = new Chart(ctx9, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -464,8 +464,8 @@ const myChart9 = new Chart(ctx9, {
 });
 
 
-const ctx10= document.getElementById('myChart10');
-const myChart10 = new Chart(ctx10, {
+const ctx10= document.getElementById('chartDSCR');
+const chartDSCR = new Chart(ctx10, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -541,8 +541,8 @@ const myChart10 = new Chart(ctx10, {
 
 
 
-const ctx11 = document.getElementById('myChart11');
-const myChart11 = new Chart(ctx11, {
+const ctx11 = document.getElementById('chartDSRA');
+const chartDSRA = new Chart(ctx11, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -591,8 +591,8 @@ const myChart11 = new Chart(ctx11, {
 });
 
 
-const ctx12 = document.getElementById('myChart12');
-const myChart12 = new Chart(ctx12, {
+const ctx12 = document.getElementById('chartEqtFlow');
+const chartEqtFlow = new Chart(ctx12, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{
@@ -684,8 +684,8 @@ const myChart12 = new Chart(ctx12, {
 });
 
 
-const ctx13 = document.getElementById('myChart13');
-const myChart13 = new Chart(ctx13, {
+const ctx13 = document.getElementById('chartCash');
+const chartCash = new Chart(ctx13, {
 	data: {
 		labels: ["1","2","3","4","5","6"],
 		datasets: [{

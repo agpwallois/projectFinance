@@ -31,3 +31,11 @@ class LoginPageView(View):
 
 
 
+class HomePageView(View):
+	template_home = 'authentication/home.html'
+
+	def get(self, request):
+		return render(request, self.template_home)
+	
+	def post(self, request):
+		return render(request, self.template_home)

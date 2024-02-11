@@ -1,0 +1,336 @@
+body { 
+    padding: 0; /* resets default padding */
+    font-family: 'Alliance No.1', sans-serif;
+    min-height: 100vh; /* ensures the body takes at least the full viewport height */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    width: 70%;
+    margin: 0 auto;
+}
+
+header {
+    position: fixed;
+    background-color: #ffffff; /* Specify your desired background color */
+    z-index: 1000; /* Ensure the header stays above other content */
+    width: 70%;
+    margin: 0 auto;
+}
+
+content { 
+    margin-top: 150px;
+    font:;
+
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid black; /* Add a border at the bottom of each div */
+    margin-top: 40px; /* Add some space between the divs */
+    padding-top: 40px;
+
+}
+
+
+.footer-column {
+    flex: 1; /* Allows columns to grow and take up equal space */
+    min-width: 0; /* Prevents flex items from growing beyond their content size */
+}
+
+.footer-column:first-child {
+    flex: 0 0 40%; /* Takes up 30% of the space, doesn't grow or shrink */
+}
+
+.footer-column ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+
+
+
+
+
+h1 {
+font-weight: 600;
+font-size: 3rem;
+}
+
+
+h2 {
+font-weight: 600;
+font-size: 2rem;
+}
+
+h3 {
+font-weight: 600;
+font-size: 1.5rem;
+}
+
+
+
+h4 {
+color: grey;
+font-size: 0.75rem;
+}
+
+
+
+.title-container {
+    position: relative; /* Make the container position relative */
+    overflow: hidden; /* Hide overflowing content */
+}
+
+.animated-title::before {
+    content: ''; /* Add content to the before pseudo-element */
+    position: absolute; /* Position it absolutely inside the container */
+    top: 0;
+    left: 0; /* Keep it starting from the left */
+    width: 0; /* Start with zero width */
+    height: 100%;
+    background-color: white; /* Match the background color of the container */
+    animation: 1s slidein; /* Apply the revealText animation */
+    z-index: 1; /* Ensure the pseudo-element is below the text */
+}
+
+@keyframes slidein {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+
+
+.word {
+    height: 4rem; /* Set a fixed height for the div */
+    overflow: hidden; /* Hide overflow text */
+}
+
+shango {
+font-weight: 800;
+font-size: 2rem;
+font-family: 'Source Serif 4';
+}
+
+.hero { text-align: center; padding: 50px 20px; }
+
+.section { margin: 20px 0; }
+
+.section h2 { text-align: center; }
+
+.with-separator {
+    border-top: 1px solid black; /* Add a border at the bottom of each div */
+    margin-top: 40px; /* Add some space between the divs */
+    padding-top: 40px;
+
+}
+
+
+
+
+.columns-container {
+    display: flex;
+    justify-content: space-between; /* Adjusts the spacing between columns */
+    gap: 20px; /* Optional: Adds space between the columns */
+}
+
+.column {
+    flex: 1; /* Each column takes equal width */
+    padding: 20px; /* Padding around the content of each column */
+    gap: 10px; /* Space between title, text, and link */
+}
+
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* Adjust margin as needed */
+}
+
+
+.column h3 {
+    margin: 0; /* Removes default margin from titles */
+}
+
+.column p {
+    margin: 0; /* Removes default margin from paragraphs */
+}
+
+.column a {
+    margin-top: auto; /* Pushes the link to the bottom of the column */
+    color:grey;
+    /* Additional styling for the link */
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+nav-bottom {
+    display: flex;
+    justify-content: space-between; /* Add space between hyperlinks */
+    margin-top: 5px;
+    margin-bottom: 20px;
+
+}
+
+nav-bottom a {
+    color: grey; /* Set the default color to grey */
+    text-decoration: none; /* Remove underline */
+    position: relative;
+    margin-right: 10px;
+}
+
+nav-bottom a::before {
+    content: ''; /* Add content for pseudo-element */
+    position: absolute;
+    bottom: 20px; /* Position the line above the text */
+    left: 0;
+    width: 0; /* Set initial width to 0 */
+    height: 1px;
+    background-color: black; /* Change color to black */
+    transition: width 0.3s ease; /* Transition width property */
+}
+
+nav-bottom a:hover {
+    color: black; /* Change text color to black on hover */
+}
+
+nav-bottom a:hover::before {
+    width: 100%; /* Expand width to 100% on hover */
+}
+
+
+
+.nav-left {
+    order: 1; /* Place the left div first */
+}
+
+.nav-middle {
+    order: 2; /* Place the middle div second */
+    margin-left: auto; /* Push the right div to the right side */
+}
+
+.nav-right {
+    order: 3; /* Place the right div last */
+    margin-left: auto; /* Push the right div to the right side */
+}
+
+
+
+
+.button { 
+display: inline-block; 
+padding: 5px 10px; 
+color: black; 
+border:1px solid black;
+font-weight: bold;
+text-decoration: none;
+font-weight: normal; 
+}
+
+.button:hover { 
+display: inline-block; 
+padding: 5px 10px; 
+background-color: black; 
+color: white; 
+text-decoration: none;
+font-weight: normal; 
+border:1px solid black; 
+}
+
+
+.image {
+    width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#image-one {
+        width: 30%;
+        margin-left: 20px;
+
+}
+
+#image-two {
+        width: 20%;
+
+}
+
+#image-three {
+        width: 15%;
+        margin-left: 20px;
+
+}
+
+
+/* Style the form element */
+form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+/* Style the input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+/* Style the submit button */
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+button[type="submit"]:hover {
+    background: #0056b3;
+}
+
+
+
+
+.footer-column ul li a.hover-effect {
+  color: black; /* Initial color */
+  text-decoration: none; /* Remove underline */
+  transition: transform 0.3s ease; /* Add transition for smooth effect */
+  display: inline-block;
+  position: relative;
+}
+
+.footer-column ul li a.hover-effect:hover {
+  transform: translateX(10px); /* Move slightly to the right on hover */
+  color:grey;
+}
+
+.footer-column ul li a.hover-effect::before {
+  content: ''; /* Add a pseudo-element for the line */
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 10px;
+  height: 1px; /* Adjust the height of the line as needed */
+  transition: transform 0.3s ease, background-color 0.3s ease; /* Add transitions */
+}
+
+.footer-column ul li a.hover-effect:hover::before {
+  background-color: grey; /* Optional: change the line color on hover */
+}

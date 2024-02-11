@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% load custom_filters %}
 
-{% block sidebar %}
+{% block content %}
 
 <form method="POST" id="post-form">{% csrf_token %}
 
@@ -1601,6 +1601,21 @@
 								</div>	
 
 
+					<h3>Valuation</h3>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Discount factor</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.discount_factor_valuation }}
+									</div>
+								</div>	
+
+
 					  </div>
 					</div>
 				  </div>				  
@@ -1697,22 +1712,23 @@
 
 
 
-
-
-
 <div id="content">
 	<div id="content-nav">
 
 		<nav>
 			<div class="container-nav">
 				<button type="button" id="sidebarCollapse" class="button"><</button>
-				<button type="button" id="featureRequest" class="button"><-Feature request-></button>
+
+		<div class="form-check form-switch">
+		    	{{ project_form.financial_close_check }}
+		    <label class="form-check-label" for="flexSwitchCheckDefault">Financial Close model</label>
+		</div>
+
 			</div>
 		</nav>
 
 	</div>
-
-
+			
 
 	<div id="content-box">
 		<nav>
@@ -1724,6 +1740,17 @@
 			  <li class="nav-item">
 				<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Computation</a>
 			  </li>
+
+			  <li class="nav-item" id="tab-archives" style="display: none">
+				<a class="nav-link" href="#nav-archives" data-bs-toggle="tab">Archives</a>
+			  </li>
+
+			  <li class="nav-item" id="tab-valuation" style="display: none">
+				<a class="nav-link" href="#nav-valuation" data-bs-toggle="tab">Valuation</a>
+			  </li>
+
+
+
 			</ul>
 		</nav>
 
@@ -1736,7 +1763,7 @@
 	
 
 
-							<h2>SELECTED SCENARIO</h2>
+							<h2>Selected Scenario</h2>
 	
 
 
@@ -1829,28 +1856,19 @@
 				</div>
 			</div>
 
-		
-
-
-								
-
-
+	
 				</div>
-
 			</div>
 
 
 
 				<div class="nav-summary">
-
-
-
 					<div class="summary-container-left">
 
 						<div class="box-wrapper">
 
 						<div class="box" id="summary-fp">
-							<h2>FINANCING PLAN</h2>
+							<h2>Financing Plan</h2>
 
 							<div class="summary-container-titles">
 								<div class="summary-titles">
@@ -1890,7 +1908,7 @@
 					<div class="summary-container-right">
 					<div class="box-wrapper">	
 						<div class="box" id="summary-IRR">
-							<h2>PROJECT AND SHAREHOLDER RETURN</h2>
+							<h2>Project and Shareholder Return</h2>
 									<h4>Project IRR</h4>
 										
 										<table class="table-sum">
@@ -1908,7 +1926,7 @@
 
 						<div class="box-wrapper">	
 						<div class="box" id="summary-debt">
-							<h2>SENIOR DEBT METRICS</h2>
+							<h2>Senior Debt metrics</h2>
 										<table class="table-sum">
 											<tbody id="summary_debt"></tbody>
 										</table>
@@ -1919,7 +1937,7 @@
 
 						<div class="box-wrapper">	
 						<div class="box" id="summary-audit">
-							<h2>AUDIT AND CONTROL</h2>
+							<h2>Audit and Control</h2>
 									<table class="table-sum">
 										<tbody id="summary_audit"></tbody>
 									</table>
@@ -1934,7 +1952,7 @@
 				<div class="box-wrapper-chart">
 		
 					<div class="left">
-			<h2>MAIN CHARTS</h2>
+			<h2>Charts</h2>
 			     </div>
 
 			     <div class="right">
@@ -1960,7 +1978,7 @@
 
 			<h1-calc>Income statement</h1-calc>
 					<table class="table">
-						<tbody id="myTableISAnnual"></tbody>
+						<tbody id="ISAnnual"></tbody>
 					</table>
 
 			</div>
@@ -1978,7 +1996,7 @@
 				
 				<div class="dates-wrapper">
 					<table class="table">
-						<tbody id="myTableDate"></tbody>
+						<tbody id="Dates"></tbody>
 					</table>
 				</div>
 
@@ -1988,28 +2006,28 @@
 				</title-wrapper>
 					
 					<table class="table detailed">
-						<tbody id="myTableFlagMod"></tbody>
+						<tbody id="FlagsM"></tbody>
 					</table>
 
 
 				<h3-calc class="detailed">Construction</h3-calc>
 
 					<table class="table detailed">
-						<tbody id="myTableFlagCons"></tbody>
+						<tbody id="FlagsC"></tbody>
 					</table>
 
 				<h3-calc class="detailed">Operating period</h3-calc>
 
 
 					<table class="table detailed">
-						<tbody id="myTableFlagOp"></tbody>
+						<tbody id="FlagOp"></tbody>
 					</table>
 
 
 				<h3-calc class="detailed">Offtake contract</h3-calc>
 					
 					<table class="table detailed">
-						<tbody id="myTableOftk"></tbody>
+						<tbody id="FlagOftk_t"></tbody>
 					</table>
 
 
@@ -2019,7 +2037,7 @@
 				</title-wrapper>
 
 				<table class="table detailed">
-						<tbody id="myTableFin"></tbody>
+						<tbody id="FlagFin"></tbody>
 					</table>
 
 				<title-wrapper class="detailed">	
@@ -2030,25 +2048,25 @@
 				</title-wrapper>
 
 					<table class="table detailed">
-						<tbody id="myTableOftkIndex"></tbody>
+						<tbody id="FlagOftk_i"></tbody>
 					</table>
 
 				<h3-calc class="detailed">Electricity market price</h3-calc>
 
 					<table class="table detailed">
-						<tbody id="myTableMkt"></tbody>
+						<tbody id="Mkt_i"></tbody>
 					</table>
 
 				<h3-calc class="detailed">Operating expenses</h3-calc>
 
 					<table class="table detailed">
-						<tbody id="myTableOpex"></tbody>
+						<tbody id="Opex"></tbody>
 					</table>
 
 				<h3-calc class="detailed">Lease</h3-calc>
 
 					<table class="table detailed">
-						<tbody id="myTableLease"></tbody>
+						<tbody id="Lease"></tbody>
 					</table>
 
 
@@ -2058,26 +2076,26 @@
 				</title-wrapper>
 
 					<table class="table detailed">
-						<tbody id="myTableProd"></tbody>
+						<tbody id="Prod"></tbody>
 					</table>
 
 					<h3-calc class="detailed">Prices</h3-calc>
 
 					<table class="table detailed">
-						<tbody id="myTablePrice"></tbody>
+						<tbody id="Price"></tbody>
 					</table>
 
 
 
 				<h1-calc>Income statement</h1-calc>
 					<table class="table">
-						<tbody id="myTableIS"></tbody>
+						<tbody id="IS"></tbody>
 					</table>
 
 					<h3-calc>Retained earnings</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableRE"></tbody>
+						<tbody id="RE_b"></tbody>
 					</table> 		
 
 
@@ -2089,13 +2107,13 @@
 				</title-wrapper>			
 
 					<table class="table">
-						<tbody id="myTableDevTax"></tbody>
+						<tbody id="DevTax"></tbody>
 					</table> 		
 
 					<h3-calc>Archeological tax</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableArchTax"></tbody>
+						<tbody id="ArchTax"></tbody>
 					</table> 		
 
 					<h3-calc>Network tax</h3-calc>
@@ -2110,7 +2128,7 @@
 					<h3-calc>Property tax</h3-calc>
 
 					<table class="table">
-						<tbody id="myTablePropertyTax"></tbody>
+						<tbody id="PropTax"></tbody>
 					</table> 	
 
 
@@ -2120,19 +2138,19 @@
 				</title-wrapper>
 
 					<table class="table">
-						<tbody id="myTableCFETaxBase"></tbody>
+						<tbody id="CFETaxBase"></tbody>
 					</table> 	
 
 					<h3-calc>Gross CFE due</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableCFETaxDue"></tbody>
+						<tbody id="CFETaxDue"></tbody>
 					</table> 	
 
 					<h3-calc>CFE payments</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableCFETaxPay"></tbody>
+						<tbody id="CFETaxPay"></tbody>
 					</table> 	
 
 
@@ -2144,20 +2162,20 @@
 				</title-wrapper>
 
 				<table class="table detailed">
-						<tbody id="myTableWC_receivables"></tbody>
+						<tbody id="WCRec"></tbody>
 					</table>
 
 
 					<h3-calc class="detailed">Accounts payables</h3-calc>
 
 				<table class="table detailed">
-						<tbody id="myTableWC_payables"></tbody>
+						<tbody id="WCPay"></tbody>
 					</table>
 					
 					<h3-calc class="detailed">Working capital</h3-calc>
 
 				<table class="table detailed">
-						<tbody id="myTableWC_movement"></tbody>
+						<tbody id="WCMov"></tbody>
 					</table>
 
 
@@ -2170,49 +2188,49 @@
 
 
 					<table class="table">
-						<tbody id="myTableOpAccB"></tbody>
+						<tbody id="OpAccB"></tbody>
 					</table>
 
 					<h3-calc>Cash flow from operating activities</h3-calc>
 
 
 					<table class="table">
-						<tbody id="myTableCF_operating"></tbody>
+						<tbody id="CF_op"></tbody>
 					</table>
 
 					<h3-calc>Cash flow from investing activities</h3-calc>
 				
 					<table class="table">
-						<tbody id="myTableCF_inesting"></tbody>
+						<tbody id="CF_in"></tbody>
 					</table>
 
 					<h3-calc>Cash flow from financing activities</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableCF_financing"></tbody>
+						<tbody id="CF_fi"></tbody>
 					</table>
 					
 					<h3-calc>Cash available for senior debt service</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableCFADS"></tbody>
+						<tbody id="CFADS"></tbody>
 					</table>
 
 					<h3-calc>Senior DSRA</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableCF_DSRA"></tbody>
+						<tbody id="CFDSRA"></tbody>
 					</table>
 
 					<h3-calc>Cash available for distribution</h3-calc>
 
 					<table class="table">
-						<tbody id="myTableCF_distrib"></tbody>
+						<tbody id="CFDistr"></tbody>
 					</table>
 
 
 				<table class="table">
-						<tbody id="myTableOpAccE"></tbody>
+						<tbody id="OpAccE"></tbody>
 					</table>
 
 
@@ -2220,37 +2238,37 @@
 
 
 				<table class="table detailed">
-						<tbody id="DistrAccountBOP"></tbody>
+						<tbody id="DistrBOP"></tbody>
 				</table>
 
 					<h3-calc class="detailed">Shareholder loan interest</h3-calc>
 
 				<table class="table detailed">
-						<tbody id="DistrAccountSHLi"></tbody>
+						<tbody id="DistrSHLi"></tbody>
 				</table>
 
 					<h3-calc class="detailed">Dividends</h3-calc>
 
 				<table class="table detailed">
-						<tbody id="DistrAccountDiv"></tbody>
+						<tbody id="DistrDiv"></tbody>
 				</table>
 
 					<h3-calc class="detailed">Shareholder loan repayment</h3-calc>
 
 				<table class="table detailed">
-						<tbody id="DistrAccountSHLp"></tbody>
+						<tbody id="DistrSHLp"></tbody>
 				</table>
 
 					<h3-calc class="detailed">Share capital reduction</h3-calc>
 
 			<table class="table detailed">
-						<tbody id="DistrAccountSC"></tbody>
+						<tbody id="DistrSC"></tbody>
 				</table>
 
 				<h3-calc class="detailed">Distribution account balance</h3-calc>
 
 				<table class="table detailed">
-						<tbody id="DistrAccountEOP"></tbody>
+						<tbody id="DistrEOP"></tbody>
 				</table>
 
 
@@ -2261,12 +2279,12 @@
 				</title-wrapper>
 
 						<table class="table detailed">
-							<tbody id="myTableFPUses"></tbody>
+							<tbody id="FP_u"></tbody>
 						</table>
 
 					<h3-calc class="detailed">Sources</h3-calc>
 					<table class="table detailed">
-						<tbody id="myTableFPSources"></tbody>
+						<tbody id="FP_s"></tbody>
 					</table>
 
 				<title-wrapper class="detailed">	
@@ -2276,15 +2294,15 @@
 				</title-wrapper>
 
 				<table class="table detailed">
-					<tbody id="myTableEquity"></tbody>
+					<tbody id="Eqt"></tbody>
 				</table>
 				<h3-calc class="detailed">Shareholder loan</h3-calc>
 				<table class="table detailed">
-					<tbody id="myTableSHL"></tbody>
+					<tbody id="SHL"></tbody>
 				</table>
 
 				<table class="table detailed">
-					<tbody id="myTableSHL_i"></tbody>
+					<tbody id="iSHL"></tbody>
 				</table>
 
 				<title-wrapper class="detailed">	
@@ -2294,28 +2312,28 @@
 				</title-wrapper>
 
 				<table class="table detailed">
-					<tbody id="myTableDebtAvailable"></tbody>
+					<tbody id="Debt_a"></tbody>
 				</table>
 
 				<h3-calc class="detailed">Drawdowns, repayments and balance</h3-calc>
 				<table class="table detailed">
-					<tbody id="myTableDebtBalance"></tbody>
+					<tbody id="Debt_b"></tbody>
 				</table>
 
 				<h3-calc class="detailed">Interest and fees</h3-calc>
 				<table class="table detailed">
-					<tbody id="myTableSeniorDebt"></tbody>
+					<tbody id="Debt_i"></tbody>
 				</table>
 
 				<h3-calc class="detailed">Sizing and sculpting</h3-calc>
 				<table class="table detailed">
-					<tbody id="myTableSizing"></tbody>
+					<tbody id="Sizing"></tbody>
 				</table>
 
 
 				<h3-calc class="detailed">Debt service reserve account</h3-calc>
 				<table class="table detailed">
-					<tbody id="myTableDSRA"></tbody>
+					<tbody id="DSRA"></tbody>
 				</table>
 
 				<title-wrapper>	
@@ -2324,17 +2342,17 @@
 				</title-wrapper>
 
 						<table class="table">
-							<tbody id="myTableBSA"></tbody>
+							<tbody id="BS_a"></tbody>
 						</table>
 
 					<h3-calc class="detailed">Liabilities</h3-calc>
 						<table class="table">
-							<tbody id="myTableBSL"></tbody>
+							<tbody id="BS_l"></tbody>
 						</table>
 
 				<h1-calc >Audit</h1-calc>
 					<table class="table">
-						<tbody id="myTableAudit"></tbody>
+						<tbody id="Audit"></tbody>
 					</table>
 
 				<table class="table">
@@ -2344,7 +2362,66 @@
 				</div>
 			</div>
 		</div>
+
+
+			<div class="tab-pane" id="nav-archives" role="tabpanel" aria-labelledby="messages-tab">
+
+
+
+						<div class="box-wrapper" >
+
+						<div class="box">
+							<h2>Overview</h2>
+
+
+					 	<table class="table-sum">
+								<tbody id="summary_outcome"></tbody>
+							</table>  
+
+
+
+					</div>
+					</div>
+
+
+
+			<div class="box-wrapper">
+		
+			<h2>Charts</h2>
+
+				<div class="box" id="nav-summary-charts">
+						 {% block test %}{% include 'charts_operations.html' %}{% endblock %}
+				</div>
+
+			</div>
+
+
+
+
 		</div>
+
+			<div class="tab-pane" id="nav-valuation" role="tabpanel" aria-labelledby="messages-tab">
+
+
+					<div class="box-wrapper">	
+						<div class="box">
+							<h2>Valuation <script>
+							var options = { year: 'numeric', month: 'long', day: 'numeric' };
+							var formattedDate = new Date().toLocaleDateString(undefined, options);
+							document.write(formattedDate);
+							</script></h2>						
+
+						<table class="table-sum">
+											<tbody id="summary_valuation"></tbody>
+										</table>  
+		
+						</div>
+						</div>
+
+		</div>
+
+
+
 	</div>
 </div>
 
@@ -2394,6 +2471,9 @@
 
 
 
+
+
+
 		$(document).ready(function() {
 			$('#id_sensi_opex').on('input', function() {
 			  $("#post-form").submit();
@@ -2408,6 +2488,11 @@
 		  });
 
 
+		$(document).ready(function() {
+			$('#flexSwitchCheckDefault').on('input', function() {
+			  $("#post-form").submit();
+			});
+		  });
 
 
 	$(document).on('submit','#post-form', function(e){
@@ -2470,6 +2555,10 @@
 			"Production":"x",
 			"Operating costs":"x",			
 			"Debt maturity":"true/false",
+			"Discount factor":"%",
+			"Unit":"",
+			"Total Uses":"",
+			"Total Sources":"",
 
 
 			};
@@ -2543,90 +2632,30 @@
 			success:function(json){
 				console.log(json);
 
-				var results = []
+				// Create a dictionnary of key selectors based on df keys
+				var dict_full = {};
+				$.each(json.df, function(key, value) {
+				
+				  dict_full[key] = { selector: "#" + key };
+				});
 
-				const dict_full = {
-				  Date: { selector: "#myTableDate" },
-				  FlagMod: { selector: "#myTableFlagMod" },
-				  FlagCons: { selector: "#myTableFlagCons" },
-				  FlagOp: { selector: "#myTableFlagOp" },
-				  FlagOftk_t: { selector: "#myTableOftk" },
-				  FlagOftk_i: { selector: "#myTableOftkIndex" },
-
-				  FlagFin: { selector: "#myTableFin" },
-
-				  WCRec : { selector: "#myTableWC_receivables" },
-				  WCPay : { selector: "#myTableWC_payables" },
-				  WCMov : { selector: "#myTableWC_movement" },
-				  DSRA : { selector: "#myTableDSRA" },
-				  CFDSRA : { selector: "#myTableCF_DSRA" },
-				  CFDistr : { selector: "#myTableCF_distrib" },
-				  OpAccB : { selector: "#myTableOpAccB" },
-				  OpAccE : { selector: "#myTableOpAccE" },
-
-				  Mkt_i: { selector: "#myTableMkt" },
-				  Opex: { selector: "#myTableOpex" },
-				  Lease: { selector: "#myTableLease" },
-
-				  Prod: { selector: "#myTableProd" },
-				  IS: { selector: "#myTableIS" },
-				  Price: { selector: "#myTablePrice" },
-				  Sizing: { selector: "#myTableSizing" },
-				  Eqt: { selector: "#myTableEquity" },
-				  SHL: { selector: "#myTableSHL" },
-				  iSHL: { selector: "#myTableSHL_i" },
-  
-				  Debt_a: { selector: "#myTableDebtAvailable" },
-				  Debt_b: { selector: "#myTableDebtBalance" },
-				  Debt_i: { selector: "#myTableSeniorDebt" },
-				  CF_op: { selector: "#myTableCF_operating" },
-				  CF_in: { selector: "#myTableCF_inesting" },
-				  CF_fi: { selector: "#myTableCF_financing" },
-				  FP_u: { selector: "#myTableFPUses" },
-				  FP_s: { selector: "#myTableFPSources" },
-				  CFADS: { selector: "#myTableCFADS" },
-
-
-				  DevTax: { selector: "#myTableDevTax" },
-				  ArchTax: { selector: "#myTableArchTax" },
-
-				  PropTax: { selector: "#myTablePropertyTax" },
-				  CFETaxBase: { selector: "#myTableCFETaxBase" },
-				  CFETaxDue: { selector: "#myTableCFETaxDue" },
-				  CFETaxPay: { selector: "#myTableCFETaxPay" },
-
-
-
-				  DistrBOP: { selector: "#DistrAccountBOP" },
-				  DistrSHLi: { selector: "#DistrAccountSHLi" },
-				  DistrDiv: { selector: "#DistrAccountDiv" },
-				  DistrSHLp: { selector: "#DistrAccountSHLp" },
-				  DistrSC: { selector: "#DistrAccountSC" },
-				  DistrEOP: { selector: "#DistrAccountEOP" },
-
-				  RE_b: { selector: "#myTableRE" },
-				  BS_a: { selector: "#myTableBSA" },
-				  BS_l: { selector: "#myTableBSL" },
-				  Audit: { selector: "#myTableAudit" }
-				};
-
-
+				// Initialize a simplified dictionary 
 				const dict_simplified = {
-					Date: { selector: "#myTableDate" },
-					IS: { selector: "#myTableIS" },
-					RE_b: { selector: "#myTableRE" },
-					CF_op: { selector: "#myTableCF_operating" },
-					CF_in: { selector: "#myTableCF_inesting" },
-					CF_fi: { selector: "#myTableCF_financing" },
-					CFADS: { selector: "#myTableCFADS" },
-					CFDSRA : { selector: "#myTableCF_DSRA" },
-					CFDistr : { selector: "#myTableCF_distrib" },
-
-					BS_a: { selector: "#myTableBSA" },
-					BS_l: { selector: "#myTableBSL" },
-					Audit: { selector: "#myTableAudit" }
+					Dates: { selector: "#Dates" },
+					IS: { selector: "#IS" },
+					RE_b: { selector: "#RE_b" },
+					CF_op: { selector: "#CF_op" },
+					CF_in: { selector: "#CF_in" },
+					CF_fi: { selector: "#CF_fi" },
+					CFADS: { selector: "#CFADS" },
+					CFDSRA : { selector: "#CFDSRA" },
+					CFDistr : { selector: "#CFDistr" },
+					BS_a: { selector: "#BS_a" },
+					BS_l: { selector: "#BS_l" },
+					Audit: { selector: "#Audit" }
 					};
 
+				// Select dictionary detail level based on user input
 				var dict = {};
 				if (json.calculation_detail === 1) {
 				  dict = dict_simplified;
@@ -2637,25 +2666,24 @@
 				}
 
 				const columnFormatting = {
-				" Target DSCR": formatDSCR,
-				" Average interest rate": formatAsPercent,
-				" Seasonality": formatAsPercent,
-				" Year": formatAsInt,
-				" Days in period": formatAsInt,
-				" Days in year": formatAsInt,
-				" Years in period": formatAsPercent,
-				" Construction": formatAsInt,
-				" Percentage in contract period": formatAsPercent,
-				" Percentage in operations period": formatAsPercent,
-
-				" Indexation": formatAsPercent,
-				" Discount factor": formatAsPercent,
-				" Cumulative discount factor": formatAsPercent,
-				" Capacity degradation factor": formatAsPercent,
-				" Years from indexation start date": formatAsFloat,
-				" Cash available for dividends": formatOther,
-				" Dividends declared": formatOther,
-				" Dividends paid": formatOther,
+				"Target DSCR": formatDSCR,
+				"Average interest rate": formatAsPercent,
+				"Seasonality": formatAsPercent,
+				"Year": formatAsInt,
+				"Days in period": formatAsInt,
+				"Days in year": formatAsInt,
+				"Years in period": formatAsPercent,
+				"Construction": formatAsInt,
+				"Percentage in contract period": formatAsPercent,
+				"Percentage in operations period": formatAsPercent,
+				"Indexation": formatAsPercent,
+				"Discount factor": formatAsPercent,
+				"Cumulative discount factor": formatAsPercent,
+				"Capacity degradation factor": formatAsPercent,
+				"Years from indexation start date": formatAsFloat,
+				"Cash available for dividends": formatOther,
+				"Dividends declared": formatOther,
+				"Dividends paid": formatOther,
 
 				  // Add more column names and corresponding formatting functions here
 				};
@@ -2664,79 +2692,66 @@
 
 
 				const columnLabel = {
-				" Period start": "date",
-				" Period end": "date",
-				" Year": "year",
-				" Days in period": "days",
-				" Days in year": "days",
-				" Years in period": "years",
-				" Construction start": "#",
-				" Construction": "#",
-				" Construction end": "#",
-				" Operations": "true/false",
-				" Years during operations": "year",
-				" Years from COD (BoP)": "years",
-				" Years from COD (EoP)": "years",
-				" Years from COD (avg.)": "years",
-				" Seasonality": "%",
-				" Liquidation": "true/false",
-				" Liquidation end": "true/false",
-				" Contract period": "true/false",
-				" Contract start date": "date",
-				" Contract end date": "date",
-				" Days in contract period": "days",
-				" Days during construction": "days",
-				" Days during operations": "days",
-
-				" Quarter": "true/false",
-				" Start of calendar year": "true/false",
-
-
-
-				" Percentage in contract period": "%",
-
-				" Percentage in operations period": "%",
-
-				" Indexation period": "true/false",
-				" Indexation start date": "date",
-				" Indexation end date": "date",
-				" Indexation (days)": "days",
-				" Years from indexation start date": "years",
-				" Indexation": "%",
-				" Capacity before degradation": "MW",
-				" Capacity degradation factor": "%",
-
-				" Capacity after degradation": "MW",
-				" Production": "MWh",
-				" Electricity market price (unindexed)": "EUR",
-				" Electricity market price (indexed)": "EUR",
-				" Contract price (unindexed)": "EUR",
-				" Contract price (indexed)": "EUR",
-
-
-				" Amortisation period": "true/false",
-
-
-				" Target DSCR": "x",
-				" Average interest rate": "%",
-				" Discount factor": "%",
-				" Cumulative discount factor": "%",
-
-				" Financing plan balanced": "test",
-				" Balance sheet balanced": "test",
+				"Period start": "date",
+				"Period end": "date",
+				"Year": "year",
+				"Days in period": "days",
+				"Days in year": "days",
+				"Years in period": "years",
+				"Construction start": "#",
+				"Construction": "#",
+				"Construction end": "#",
+				"Operations": "true/false",
+				"Years during operations": "year",
+				"Years from COD (BoP)": "years",
+				"Years from COD (EoP)": "years",
+				"Years from COD (avg.)": "years",
+				"Seasonality": "%",
+				"Liquidation": "true/false",
+				"Liquidation end": "true/false",
+				"Contract period": "true/false",
+				"Contract start date": "date",
+				"Contract end date": "date",
+				"Days in contract period": "days",
+				"Days during construction": "days",
+				"Days during operations": "days",
+				"Quarter": "true/false",
+				"Start of calendar year": "true/false",
+				"Percentage in contract period": "%",
+				"Percentage in operations period": "%",
+				"Indexation period": "true/false",
+				"Indexation start date": "date",
+				"Indexation end date": "date",
+				"Indexation (days)": "days",
+				"Years from indexation start date": "years",
+				"Indexation": "%",
+				"Capacity before degradation": "MW",
+				"Capacity degradation factor": "%",
+				"Capacity after degradation": "MW",
+				"Production": "MWh",
+				"Electricity market price (unindexed)": "EUR",
+				"Electricity market price (indexed)": "EUR",
+				"Contract price (unindexed)": "EUR",
+				"Contract price (indexed)": "EUR",
+				"Amortisation period": "true/false",
+				"Target DSCR": "x",
+				"Average interest rate": "%",
+				"Discount factor": "%",
+				"Cumulative discount factor": "%",
+				"Financing plan balanced": "test",
+				"Balance sheet balanced": "test",
 
 
 				  // Add more column names and corresponding formatting functions here
 				};
 
 
-
-
 				const excludedColumns = [
-				  "Period start",
-				  "Period end",
+				  "Period",
 				  "Year",
-				  "Days in",
+				  "year",
+
+				  "Days",
 				  "Seasonality",
 				  
 				  "Percentage",
@@ -2747,7 +2762,6 @@
 				  "Total assets",
 				  "Retained earnings",
 				  "Total liabilities",
-				  "Financing plan balanced",
 				  
 				  "balance",
 				  "Balance",
@@ -2764,79 +2778,57 @@
 				  "Property, Plant",
 				  "liquidity",
 				  "Accounts",
-
-
 				];
 
 
-				for (const key in dict) {
-				  const entry = dict[key];
-				  const { selector } = entry;
-				  const dictKey = key;
-				  let tableContent = "";
+			for (const key in dict) {
+			  const { selector } = dict[key];
+			  let tableContent = "<table>";
 
-				  $.each(json.df, function (dataKey, data) {
-					if (dataKey.startsWith(dictKey)) {
-						const pd_column_name = dataKey.substring(dictKey.length)
+			  for (const subKey in json.df) {
+			    if (subKey.startsWith(key)) {
+			      const data = json.df[subKey];
 
-					  tableContent += "<tr>";
-					  tableContent += "<td>" + pd_column_name + "</td>";
+			      tableContent += "<tr>";
+			      $.each(data, function (index, dataValue) {
+			        tableContent += "<td>";
+			        tableContent += index;
+			        tableContent += "</td>";
 
-					
-					if (columnLabel.hasOwnProperty(pd_column_name)) {
+			        if (columnLabel.hasOwnProperty(index)) {
+			          tableContent += "<td>" + columnLabel[index] + "</td>";
+			        } else {
+			          tableContent += "<td>" + "kEUR" + "</td>";
+			        }
 
-					  tableContent += "<td>" + columnLabel[pd_column_name] + "</td>";
+			        if (excludedColumns.includes(index)) {
 
-					} else {
-					  
-					  tableContent += "<td>" + "kEUR" + "</td>";
-					}
+			        	tableContent += "<td></td>";
+			        } else {
 
-					const isExcluded = excludedColumns.some((column) => pd_column_name.includes(column));
+				          tableContent += "<td>" + formatOther(json.df_sum[subKey][index]) + "</td>";
+				    }    
 
-					if (isExcluded) {
+			        $.each(dataValue, function (i, datapoint) {
+			          if (columnFormatting.hasOwnProperty(index)) {
+			            const formattedValue = columnFormatting[index](datapoint);
+			            tableContent += "<td>" + formattedValue + "</td>";
+			          } else if (!containsExcludedWords(index)) {
+			            const formattedValue = formatOther(datapoint);
+			            tableContent += "<td>" + formattedValue + "</td>";
+			          } else {
+			            tableContent += "<td>" + datapoint + "</td>";
+			          }
+			        });
 
-					  tableContent += "<td>" + "" + "</td>";
+			        tableContent += "</tr>";
+			      });
+			    }
+			  }
 
-					} else {
-					  
-					  tableContent += "<td>" + formatOther(json.df_sum[dataKey]) + "</td>";
-					}
-
-					  $.each(data, function (index, dataValue) {
-						
-						if (columnFormatting.hasOwnProperty(pd_column_name)) {
-						const formattedValue = columnFormatting[pd_column_name](dataValue);
-						
-						tableContent += "<td>";
-						tableContent += formattedValue;
-						tableContent += "</td>";					
-
-					} else if (!containsExcludedWords(pd_column_name)) {
-						
-						const formattedValue = formatOther(dataValue);
-
-						tableContent += "<td>";
-						tableContent += formattedValue;
-						tableContent += "</td>";
-					  
-
-					} else {
-
-						tableContent += "<td>";
-						tableContent += dataValue;
-						tableContent += "</td>";
-
-					}
-					});
-
-					}
-				  });
-
-				  $(selector).html(tableContent);
-				}
-
-
+			  tableContent += "</table>";
+			  $(selector).html(tableContent);
+			}
 
 
 
@@ -2882,18 +2874,29 @@
 }
 
 				const tables = [
-				  { data: json.table_debt, selector: "#summary_debt" },
-				  { data: json.table_projectIRR, selector: "#summary_project" },
-				  { data: json.table_equity, selector: "#summary_equity" },
-				  { data: json.table_audit, selector: "#summary_audit" },
-				  { data: json.table_uses, selector: "#summary_financing_plan_uses" },
-				  { data: json.table_sources, selector: "#summary_financing_plan_sources" },
-				  { data: json.table_sensi, selector: "#summary_sensi" },
+				  { data: json.tables['Debt metrics'], selector: "#summary_debt" },
+				  { data: json.tables['Project IRR'], selector: "#summary_project" },
+				  { data: json.tables['Equity metrics'], selector: "#summary_equity" },
+				  { data: json.tables['Audit'], selector: "#summary_audit" },
+				  { data: json.tables['Uses'], selector: "#summary_financing_plan_uses" },
+				  { data: json.tables['Sources'], selector: "#summary_financing_plan_sources" },
+				  { data: json.tables['Sensi'], selector: "#summary_sensi" },
+				  { data: json.tables['Valuation'], selector: "#summary_valuation" },
+				  { data: json.tables['Outcome'], selector: "#summary_outcome" },
+
 				];
 
-
-
 				tables.forEach(table => build_table(table.data, table.selector));
+
+
+
+
+
+
+
+
+
+
 
 
 				$("#myTableAll").html();
@@ -2936,30 +2939,118 @@
 
 
 
-				myChart.data.labels = Object.values(json.monthly['Date']);
-				myChart.data.datasets[0].data = Object.values(json.monthly['Construction costs']);
-				myChart.data.datasets[1].data = Object.values(json.monthly['Construction costs cumul']);
-				myChart.data.datasets[2].data = Object.values(json.monthly['Development fee']);
-				myChart.data.datasets[3].data = Object.values(json.monthly['Debt fees']);
-				myChart.data.datasets[4].data = Object.values(json.monthly['DSRA initial funding']);
-				myChart.data.datasets[5].data = Object.values(json.monthly['Local taxes']);
+				if ($("#flexSwitchCheckDefault").prop("checked")) {
 
-				myChart.update();
+				$("#tab-archives").show();
+				$("#tab-valuation").show();
 
-				myChart2.data.labels = Object.values(json.monthly['Date']);
-				myChart2.data.datasets[0].data = Object.values(json.monthly['Share capital injections']);
-				myChart2.data.datasets[1].data = Object.values(json.monthly['SHL injections']);
-				myChart2.data.datasets[2].data = Object.values(json.monthly['Debt injections']);
-				myChart2.data.datasets[3].data = Object.values(json.monthly['Total uses']);
-				myChart2.data.datasets[4].data = Object.values(json.monthly['Gearing']);
-				myChart2.update();	
+				chartProduction.data.labels = Object.values(json.FC_results['Dates']['Period end']);
+				chartProduction.data.datasets[0].data = Object.values(json.df_sum_y['Prod']['Production']);
+				chartProduction.data.datasets[1].data = Object.values(json.FC_results['Prod']['Production']);
+				chartProduction.update();
+				}
 
-				const charts = [myChart3, myChart7, myChart9, myChart10, myChart11, myChart12, myChart13];
 
+
+				chartProjectCosts.data.labels = Object.values(json.df_construction['Dates']['Period end']);
+				chartProjectCosts.data.datasets[0].data = Object.values(json.df_construction['FP_u']['Construction costs']);
+				chartProjectCosts.data.datasets[1].data = Object.values(json.df_construction['Graphs']['Cumulative total uses']);
+				chartProjectCosts.data.datasets[2].data = Object.values(json.df_construction['FP_u']['Development fee']);
+				chartProjectCosts.data.datasets[3].data = Object.values(json.df_construction['Graphs']['Debt fees']);
+				chartProjectCosts.data.datasets[4].data = Object.values(json.df_construction['FP_u']['Initial DSRA funding']);
+				chartProjectCosts.data.datasets[5].data = Object.values(json.df_construction['Graphs']['Local taxes']);
+
+				chartProjectCosts.update();
+
+				chartFinPlan.data.labels = Object.values(json.df_construction['Dates']['Period end']);
+				chartFinPlan.data.datasets[0].data = Object.values(json.df_construction['Graphs']['Share capital injections neg']);
+				chartFinPlan.data.datasets[1].data = Object.values(json.df_construction['Graphs']['Shareholder loan injections neg']);
+				chartFinPlan.data.datasets[2].data = Object.values(json.df_construction['Graphs']['Senior debt drawdowns neg']);
+				chartFinPlan.data.datasets[3].data = Object.values(json.df_construction['FP_u']['Total uses']);
+				chartFinPlan.data.datasets[4].data = Object.values(json.df_construction['Graphs']['Gearing during financing plan']);
+				chartFinPlan.update();	
+
+
+				const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR, chartDSRA, chartCash];
+
+				const datasets = [
+				  [Object.values(json.df['Graphs']['Operating expenses pos']), 
+				  	Object.values(json.df['Graphs']['Lease pos']),
+				  	Object.values(json.df['IS']['Contracted revenues']), 
+				  	Object.values(json.df['IS']['Uncontracted electricity revenues']),
+				  	Object.values(json.df['Graphs']['Debt service'])],
+				
+				  [Object.values(json.df['Graphs']['Share capital injections and repayment']), 
+				  	Object.values(json.df['Graphs']['Shareholder loan injections and repayment']),
+				  	Object.values(json.df['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['Graphs']['IRR curve'])],
+
+				  [Object.values(json.df['Sizing']['Interests during operations']), 
+				  	Object.values(json.df['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['Ratio']['DSCR'])],
+
+
+				  [Object.values(json.df['Debt_b']['Drawdowns']), 
+				  	Object.values(json.df['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['Debt_b']['Closing balance'])],
+
+				  [Object.values(json.df['Ratio']['DSCR']), 
+				  	Object.values(json.df['Ratio']['LLCR']),
+				  	Object.values(json.df['Ratio']['PLCR'])],
+
+
+				  [Object.values(json.df['Graphs']['Debt service']), 
+				  	Object.values(json.df['DSRA']['DSRA (BoP)'])],
+
+
+				  [Object.values(json.df['RE_b']['Balance brought forward']), 
+				  	Object.values(json.df['Distrib_EOP']['Distribution account balance']),
+				  	Object.values(json.df['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['Graphs']['Share capital repayment pos'])],
+
+
+				];
+
+				const datasets_annual = [
+				  [Object.values(json.df_sum_y['Graphs']['Operating expenses pos']), 
+				  	Object.values(json.df_sum_y['Graphs']['Lease pos']),
+				  	Object.values(json.df_sum_y['IS']['Contracted revenues']), 
+				  	Object.values(json.df_sum_y['IS']['Uncontracted electricity revenues']),
+				  	Object.values(json.df_sum_y['Graphs']['Debt service'])],
+
+
+				  [Object.values(json.df_sum_y['Graphs']['Share capital injections and repayment']), 
+				  	Object.values(json.df_sum_y['Graphs']['Shareholder loan injections and repayment']),
+				  	Object.values(json.df_sum_y['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df_end_y['Graphs']['IRR curve'])],
+
+
+				  [Object.values(json.df_sum_y['Sizing']['Interests during operations']), 
+				  	Object.values(json.df_sum_y['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df_end_y['Ratio']['DSCR'])],
+
+
+				  [Object.values(json.df_sum_y['Debt_b']['Drawdowns']), 
+				  	Object.values(json.df_sum_y['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df_end_y['Debt_b']['Closing balance'])],
+
+				  [Object.values(json.df_end_y['Ratio']['DSCR']), 
+				  	Object.values(json.df_end_y['Ratio']['LLCR']),
+				  	Object.values(json.df_end_y['Ratio']['PLCR'])],
+
+				  [Object.values(json.df_sum_y['Graphs']['Debt service']), 
+				  	Object.values(json.df_end_y['DSRA']['DSRA (BoP)'])],
+
+				  [Object.values(json.df_end_y['RE_b']['Balance brought forward']), 
+				  	Object.values(json.df_end_y['Distrib_BOP']['Balance brought forward']),
+				  	Object.values(json.df_sum_y['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df_sum_y['Graphs']['Share capital repayment pos'])],
+
+				];
 
 
 				function updateChartAnnual(chart, datasets) {
-					chart.data.labels = Object.values(json.annual['Year']);
+					chart.data.labels = Object.values(json.df_sum_y['Dates']['Period end']);
 					datasets.forEach((data, index) => {
 						chart.data.datasets[index].data = data;
 					});
@@ -2967,38 +3058,25 @@
 				}
 
 				function updateChart(chart, datasets) {
-					chart.data.labels = Object.values(json.df['Date Period end']);
+					chart.data.labels = Object.values(json.df['Dates']['Period end']);
 					datasets.forEach((data, index) => {
 						chart.data.datasets[index].data = data;
 					});
 					chart.update();
 				}
 
-				const datasets = [
-				  [Object.values(json.df['Operating expenses pos']),Object.values(json.df['Lease pos']),Object.values(json.df['IS Contracted revenues']), Object.values(json.df['IS Uncontracted electricity revenues']),Object.values(json.df['Debt service'])],
-				  [Object.values(json.df['Sizing Interests during operations']), Object.values(json.df['Senior debt repayments']), Object.values(json.df['Ratio DSCR'])],
-				  [Object.values(json.df['FP_s Senior debt drawdowns']),Object.values(json.df['Senior debt repayments']), Object.values(json.df['Debt_b Closing balance'])],
-				  [Object.values(json.df['Ratio DSCR']), Object.values(json.df['Ratio LLCR']), Object.values(json.df['Ratio PLCR'])],
-				  [Object.values(json.df['Debt service']), Object.values(json.df['DSRA DSRA (BoP)'])],
-				  [Object.values(json.df['Share capital injections and repayment']), Object.values(json.df['Shareholder loan injections and repayment']), Object.values(json.df['Dividends paid pos']),Object.values(json.df['IRR curve'])],
-				  [Object.values(json.df['RE_b Balance brought forward']), Object.values(json.df['DistrEOP Distribution account balance']), Object.values(json.df['Dividends paid pos']), Object.values(json.df['Share capital repayment pos'])],
-				];
 
-				const datasets_annual = [
-				  [Object.values(json.annual['Opex']), Object.values(json.annual['Lease']),Object.values(json.annual['Contracted revenues']), Object.values(json.annual['Merchant revenues']),Object.values(json.annual['Debt service'])],
-				  [Object.values(json.annual['Senior debt interests']), Object.values(json.annual['Senior debt repayments']), Object.values(json.annual['DSCR'])],
-				  [Object.values(json.annual['Senior debt drawdowns']), Object.values(json.annual['Senior debt repayments']), Object.values(json.end_year['Senior debt EOP'])],
-				  [Object.values(json.annual['DSCR']), Object.values(json.end_year['LLCR']), Object.values(json.end_year['PLCR'])],
-				  [Object.values(json.annual['Debt service']), Object.values(json.end_year['DSRA EOP'])],
-				  [Object.values(json.annual['Share capital flows']), Object.values(json.annual['SHL flows']), Object.values(json.annual['Dividends']), Object.values(json.end_year['IRR curve'])],
-				  [Object.values(json.end_year['Retained earnings BOP']), Object.values(json.end_year['Distribution account EOP']), Object.values(json.annual['Dividends']), Object.values(json.annual['Share capital repayment'])],
-
-				];
-
-		     charts.forEach((chart, index) => {
-			 	 updateChartAnnual(chart, datasets_annual[index]);
+		     	charts.forEach((chart, index) => {
+			 	 	updateChartAnnual(chart, datasets_annual[index]);
 
 				});
+
+
+
+
+
+
+
 
 	        $(document).ready(function () {
 	            $("#myDropdown").change(function () {
@@ -3027,7 +3105,8 @@
 			},
 
 			error: function(json){
-			  
+
+
 				try {
 					const obj = JSON.parse(json.responseJSON.error);
 					const array = Object.values(obj)[0];
@@ -3035,7 +3114,7 @@
 					alert(firstElement.message);
 					console.log(obj);
 				} catch (e) {
-					alert(json.responseJSON.error_type+" "+json.responseJSON.message);
+					alert(json.responseJSON.error_type+" "+json.responseJSON.line_number+" "+json.responseJSON.message);
 					console.log(json);
 				}
 
@@ -3262,9 +3341,12 @@ $(document).ready(function() {
 
 
 <script>
-document.getElementById('featureRequest').addEventListener('click', function() {
-	window.location.href = "mailto:a.wallois@resonance-advisory.com?subject=Shango Feature Request&body=Dear Team,";
-});
+
+
+
+
+
+
 </script>
 
 </form>  

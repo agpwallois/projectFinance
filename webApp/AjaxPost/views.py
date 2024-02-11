@@ -2,7 +2,7 @@
 import calendar
 import datetime
 import time
-
+from collections import defaultdict
 # Third-party imports
 import pandas as pd
 import numpy as np
@@ -10,16 +10,19 @@ from dateutil.relativedelta import relativedelta
 from dateutil import parser
 from dateutil.parser import ParserError
 from pyxirr import xirr
+import traceback
 
 # Django imports
 from django.http import JsonResponse
 from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from django.db.models import Sum, Case, When, Value, IntegerField, F
 
 # Application-specific imports
 from .forms import ProjectForm
-from .models import Project
+from .models import Project, ComputationResult, SponsorCaseResult
 from .property_taxes import property_tax, tfpb_standard_reduction
 import requests
 from django.urls import reverse
@@ -29,19 +32,19 @@ from .taxes import data
 
 
 def testsimple(request):
-    # Call the get_data function to get the response
-    response = json.loads(get_data(request, "VERMENTON").content)
-    taux_value = response['data']['results'][0]['taux']
+	# Call the get_data function to get the response
+	response = json.loads(get_data(request, "VERMENTON").content)
+	taux_value = response['data']['results'][0]['taux']
 
-    # Pass the 'response' data as a context variable to the template
-    context = {
+	# Pass the 'response' data as a context variable to the template
+	context = {
 	'response_content': taux_value,
 
-    }
+	}
 
 
 
-    return render(request, 'testsimple.html', context)
+	return render(request, 'testsimple.html', context)
 
 def test(request, id):
 	if request.method == "POST":
@@ -94,7 +97,90 @@ def function_test(request,id):
 
 def project_list(request):
 	projects = Project.objects.all()
-	context = {'projects': projects}
+	project_data = {}
+	
+	project_counts_tech = Project.objects.values('technology').annotate(total_projects=Count('id'))
+	project_counts_country = Project.objects.values('country').annotate(total_projects=Count('id'))
+
+
+	capacity_per_tech = Project.objects.filter(financial_close_check=False).values('technology').annotate(
+		total_capacity=Sum(
+			Case(
+				When(technology='Wind', then=F('wind_turbine_installed') * F('capacity_per_turbine') * 1000),
+				default=F('panels_capacity'),
+				output_field=IntegerField(),
+			)
+		)
+	)
+
+	capacity_per_country = Project.objects.filter(financial_close_check=False).values('country').annotate(
+		total_capacity=Sum(
+			Case(
+				When(technology='Wind', then=F('wind_turbine_installed') * F('capacity_per_turbine') * 1000),
+				default=F('panels_capacity'),
+				output_field=IntegerField(),
+			)
+		)
+	)
+
+	for project in projects:
+		if project.technology == 'Wind':
+			project.calculated_value = project.wind_turbine_installed * project.capacity_per_turbine * 1000
+		else:
+			project.calculated_value = project.panels_capacity
+
+
+	for project in projects:
+		try:
+			sponsor_result = SponsorCaseResult.objects.get(project=project).sponsor_case_result
+			project_data[project.id] = sponsor_result
+		except SponsorCaseResult.DoesNotExist:
+			# Handle the case where computed data doesn't exist for a project
+			project_data[project.id] = None
+
+
+	technology_yearly_total_revenues_sum = defaultdict(dict)
+	country_yearly_total_revenues_sum = defaultdict(dict)
+
+	for project in projects:
+		try:
+			sponsor_result = SponsorCaseResult.objects.get(project=project).sponsor_case_result
+			technology = project.technology
+			country = project.country
+
+			for year, value in sponsor_result['Dates']['Period end'].items():
+				year = int(year)
+
+				current_sum = sponsor_result['IS']['Total revenues'].get(str(year), 0)
+
+				technology_yearly_total_revenues_sum[technology][year] = \
+				technology_yearly_total_revenues_sum[technology].get(year, 0) + current_sum
+
+				country_yearly_total_revenues_sum[country][year] = \
+				country_yearly_total_revenues_sum[country].get(year, 0) + current_sum
+
+		except SponsorCaseResult.DoesNotExist:
+			pass
+	
+
+	yearly_revenues_technology = json.dumps(technology_yearly_total_revenues_sum)
+	yearly_revenues_country = json.dumps(country_yearly_total_revenues_sum)
+
+
+
+
+	context = {'projects': projects,
+				'project_counts_tech': project_counts_tech,
+				'project_counts_country': project_counts_country,
+				'capacity_per_tech': capacity_per_tech,
+				'capacity_per_country': capacity_per_country,
+				'project_data': project_data,
+				'yearly_revenues_technology': yearly_revenues_technology,
+				'yearly_revenues_country': yearly_revenues_country,
+				
+	}
+
+
 	return render(request, 'projects_list.html', context)
 
 
@@ -167,11 +253,8 @@ def handle_post_request(request,id):
 		dict_scenario = create_scenario_dict(inputs)
 
 		dfs = {}
-		results_sensi = {}
-		results_equity = {}
-		results_projectIRR = {}
-		results_debt = {}
-		results_audit= {}
+		computation_to_display = {}
+		results_to_display = {}
 
 		for key in dict_scenario:
 			
@@ -205,13 +288,10 @@ def handle_post_request(request,id):
 			total_costs=sum_construction_costs
 			total_uses=construction_costs
 			total_uses_cumul = total_uses.cumsum()
-
 			distributable_profit = np.full(data_length, 1)
-
 			SHL_balance_bop = np.full(data_length, 1)
 			SHL_interests_construction= np.full(data_length, 0)
 			SHL_interests_operations= np.full(data_length, 0)
-			
 			operating_account_eop= np.full(data_length, 0)
 			dsra_bop= np.full(data_length, 0)
 			DSRA_initial_funding= np.full(data_length, 0)
@@ -387,380 +467,437 @@ def handle_post_request(request,id):
 
 			gearing_during_finplan = injections['debt'].cumsum()/(injections['equity'].cumsum()+injections['debt'].cumsum())
 
-
 			""" Output sidebar """
-
 
 			COD_formatted = format_single_date(inputs['COD'])
 			end_of_operations_formatted = format_single_date(inputs['end_of_operations'])
 			liquidation_formatted = format_single_date(inputs['liquidation_date'])
 			debt_maturity_formatted = format_single_date(inputs['debt_maturity'])
 
+			sum_seasonality = np.sum(seasonality)/ np.sum(seasonality)* 100
+
+			debt_fees = senior_debt['senior_debt_idc']+senior_debt['upfront_fee']+senior_debt['commitment_fees']
 	
 
-			sum_seasonality = np.sum(seasonality)/ np.sum(seasonality)* 100
-			
+			valuation = calc_valuation(inputs['valuation_df'],date_series['end_period'],equity_cash_flows)
 
+			dict_to_display = {
+				"Dates": {
+					"Period start": format_date(date_series,'start_period').tolist(),
+					"Period end": format_date(date_series,'end_period').tolist(),
+				},
+				"FlagsC": {
+					"Construction": flags['construction'].tolist(),
+					"Construction start": flags['construction_start'].tolist(),
+					"Construction end": flags['construction_end'].tolist(),			
+				},
+				"FlagsM": {
+					"Year": time_series['series_end_period_year'].tolist(),
+					"Days in period": days_series['period'].tolist(),
+					"Days in year": time_series['days_in_year'].tolist(),
+					"Years in period": time_series['years_in_period'].tolist(),		
+					"Quarter": time_series['quarters'],	
+					"Start of calendar year": flags['start_calendar_year'].tolist(),				
+				},
+				"FlagOftk_i": {
+					"Indexation period": flags['contract_index_period'].tolist(),
+					"Indexation start date": format_date(date_series,'start_contract_index').tolist(),
+					"Indexation end date": format_date(date_series,'end_contract_index').tolist(),
+					"Indexation (days)": days_series['contracted_index'] .tolist(),
+					"Indexation": index['contracted'].tolist(),			
+				},
+				"FlagOp": {
+					'Operations': flags['operations'].tolist(),
+					'Years from COD (BoP)': time_series['years_from_COD_bop'].tolist(),
+					'Years from COD (EoP)': time_series['years_from_COD_eop'].tolist(),
+					'Years from COD (avg.)': time_series['years_from_COD_avg'].tolist(),
+					'Years during operations': time_series['years_during_operations'].tolist(),
+					'Liquidation': flags['liquidation'].tolist(),
+					'Liquidation end': flags['liquidation_end'].tolist(),
+					'Seasonality':seasonality,
+					'Days in operations':days_series['days_operations'].tolist(),
+					'Percentage in operations period': time_series['pct_in_operations_period'].tolist(),		
+				},				
+				"FlagFin": {
+					"Amortisation period": flags["debt_amo"].tolist(),	
+					"Days during construction": days_series["debt_interest_construction"].tolist(),	
+					"Days during operations": days_series["debt_interest_operations"].tolist(),	
+				},
+				"IS": {
+					"Contracted revenues": revenues["contracted"].tolist(),
+					"Uncontracted electricity revenues": revenues["merchant"].tolist(),
+					"Total revenues": revenues["total"].tolist(),
+					"Operating expenses": opex.tolist(),
+					"Lease": (-1*lease).tolist(),
+					"Property tax": (-1*tfpb).tolist(),
+					"EBITDA": EBITDA.tolist(),
+					"Depreciation": (-1*depreciation).tolist(),
+					"EBIT": income_statement["EBIT"].tolist(),
+					"Senior debt interests": (-1*senior_debt["interests_operations"]).tolist(),
+					"Shareholder loan interests": (-1*SHL_interests_operations).tolist(),
+					"EBT": income_statement["EBT"].tolist(),
+					"Corporate income tax": (-1*income_statement["corporate_income_tax"]).tolist(),
+					"Net income": income_statement["net_income"].tolist(),
+				  },
+				"Mkt_i": {
+					"Indexation": index["merchant"].tolist(),
+					"Indexation (days)": days_series["merchant_index"].tolist(),
+					"Indexation end date": format_date(date_series, "end_elec_index").tolist(),
+					"Indexation period": flags["merchant_index_period"].tolist(),
+					"Indexation start date": format_date(date_series, "start_elec_index").tolist(),
+				},
+				"Opex": {
+					"Indexation": index["opex"].tolist(),
+					"Indexation (days)": days_series["opex_index"].tolist(),
+					"Indexation end date": format_date(date_series, "end_opex_index").tolist(),
+					"Indexation period": flags["opex_index_period"].tolist(),
+					"Indexation start date": format_date(date_series, "start_opex_index").tolist(),
+					"Years from indexation start date": years_from_base_dates["opex_index"].tolist(),
+				},
+				"Lease": {
+					"Indexation": index["lease"].tolist(),
+					"Indexation (days)": days_series["lease_index"].tolist(),
+					"Indexation end date": format_date(date_series, "end_lease_index").tolist(),
+					"Indexation period": flags["lease_index_period"].tolist(),
+					"Indexation start date": format_date(date_series, "start_lease_index").tolist(),
+					"Years from indexation start date": years_from_base_dates["lease_index"].tolist(),
+				},
+				"Price": {
+					"Contract price (unindexed)": prices["contracted_real"].tolist(),
+					"Contract price (indexed)": prices["contracted_nom"].tolist(),
+					"Electricity market price (unindexed)": prices["merchant_real"],
+					"Electricity market price (indexed)": prices["merchant_nom"].tolist(),
+				},
+				"Prod": {
+					"Capacity after degradation": capacity["after_degradation"].tolist(),
+					"Capacity before degradation": capacity["before_degradation"].tolist(),
+					"Capacity degradation factor": capacity["degradation_factor"].tolist(),
+					"Production": production.tolist(),
+				},
+				"WCRec": {
+					"Accounts receivables (BoP)": working_cap["acc_receivables_bop"].tolist(),
+					"Revenue accrued in period": revenues["total"].tolist(),
+					"Payment received in period": ((-1*working_cap["revenues_paid"])+(-1*working_cap["acc_receivables_bop"])).tolist(),
+					"Accounts receivables (EoP)": working_cap["acc_receivables_eop"].tolist(),
+				},
+				"WCPay": {
+					"Accounts payables (BoP)": working_cap["acc_payables_bop"].tolist(),
+					"Costs accrued in period": (opex+lease).tolist(),
+					"Payment made in period": ((-1*working_cap["costs_paid"])+(-1*working_cap["acc_payables_bop"])).tolist(),
+					"Accounts payables (EoP)": working_cap["acc_payables_eop"].tolist(),
+				},
+				"CF_op": {
+					"EBITDA": EBITDA.tolist(),
+					"Net movement in working capital": working_cap["wc_variation"].tolist(),
+					"Corporate income tax": (-1*income_statement["corporate_income_tax"]).tolist(),
+					"Cash flows from operating activities": cf_statement["cash_flows_operating"].tolist(),
+				},
+				"CF_in": {
+					"Construction costs": (-1*construction_costs).tolist(),
+					"Development tax": (-1*development_tax).tolist(),
+					"Archaeological tax": (-1*archeological_tax).tolist(),
+					"Development fee": (-1*development_fee).tolist(),
+					"Capitalised IDC": (-1*senior_debt["senior_debt_idc"]).tolist(),
+					"Cash flows from investing activities": cf_statement["cash_flows_investing"].tolist(),
+				},
+				"CF_fi": {
+					"Arrangement fee (upfront)": (-1*senior_debt["upfront_fee"]).tolist(),
+					"Commitment fees": (-1*senior_debt["commitment_fees"]).tolist(),
+					"Senior debt drawdowns": injections["debt"].tolist(),
+					"Equity injections": injections["equity"].tolist(),
+					"Cash flows from financing activities": cf_statement["cash_flows_financing"].tolist(),
+				},
+				"WCMov": {
+					"Cash flow from (to) creditors": (-1*working_cap["cashflows_from_creditors"]).tolist(),
+					"Cash flow from (to) debtors": working_cap["cashflows_from_debtors"].tolist(),
+					"Net movement in working capital": working_cap["wc_variation"].tolist(),
+				},
+				"CFADS": {
+					"CFADS": CFADS.tolist(),
+					"Senior debt interests": (-1*senior_debt['interests_operations']).tolist(),
+					"Senior debt principal": (-1*senior_debt_repayments).tolist(),
+				},
+				"CFDSRA": {
+					"Additions to DSRA": (-1*DSRA["dsra_additions"]).tolist(),
+					"Release of excess funds": (-1*DSRA["dsra_release"]).tolist(),
+				},
+				"CFDistr": {
+					"Cash available for distribution": cash_available_for_distribution.tolist(),
+					"Transfers to distribution account": (-1*transfers_distribution_account).tolist(),
+				},
+				"OpAcc": {
+					"Operating account balance (BoP)": operating_account_bop.tolist(),
+					"Operating account balance (EoP)": operating_account_eop.tolist(),
+				},
+				"FP_u": {
+					"Construction costs": construction_costs.tolist(),
+					"Development fee": development_fee.tolist(),
+					"Development tax": development_tax.tolist(),
+					"Archaeological tax": archeological_tax.tolist(),
+					"Interests during construction": senior_debt["senior_debt_idc"].tolist(),
+					"Arrangement fee (upfront)": senior_debt["upfront_fee"].tolist(),
+					"Commitment fees": senior_debt["commitment_fees"].tolist(),
+					"Initial DSRA funding": DSRA_initial_funding.tolist(),
+					"Total uses": total_uses.tolist(),
+				},
+				"FP_s": {
+					"Senior debt drawdowns": injections['debt'].tolist(),
+					"Share capital injections": injections['share_capital'].tolist(),
+					"Shareholder loan injections": injections['SHL'].tolist(),
+					"Total sources": total_sources.tolist(),
+				},
+				"Debt_a": {
+					"Amount available (BoP)": senior_debt["senior_debt_available_bop"].tolist(),
+					"Drawdowns": (-1*injections['debt']).tolist(),
+					"Amount available (EoP)": senior_debt["senior_debt_available_eop"].tolist(),
+				},
+				"Debt_b": {
+					"Opening balance": senior_debt["balance_bop"].tolist(),
+					"Drawdowns": injections['debt'].tolist(),
+					"Scheduled repayments": (-1*senior_debt_repayments).tolist(),
+					"Closing balance": senior_debt["balance_eop"].tolist(),
+				},
+				"Debt_i": {
+					"Arrangement fee (upfront)": senior_debt["upfront_fee"].tolist(),
+					"Commitment fees": senior_debt["commitment_fees"].tolist(),
+					"Debt interests": senior_debt["interests"].tolist(),
+				},
+				"Sizing": {
+					"CFADS": CFADS_amo.tolist(),
+					"Target DSCR": debt_amount_DSCR["target_DSCR"].tolist(),
+					"Target DS": debt_amount_DSCR["target_DS"].tolist(),
+					"Average interest rate": discount_factor["avg_interest_rate"].tolist(),
+					"Discount factor": discount_factor["discount_factor"].tolist(),
+					"Cumulative discount factor": discount_factor["discount_factor_cumul"].tolist(),
+					"Interests during operations": senior_debt["interests_operations"].tolist(),
+					"Debt repayment target": senior_debt_repayments_target.tolist(),
+				},
+				"DSRA": {
+					"Cash available for DSRA": DSRA["cash_available_for_dsra"].tolist(),
+					"DSRA target liquidity": DSRA["dsra_target"].tolist(),
+					"DSRA target additions": DSRA["dsra_additions_required"].tolist(),
+					"DSRA (BoP)": DSRA["dsra_bop"].tolist(),
+					"Additions to DSRA": DSRA["dsra_additions"].tolist(),
+					"Release of excess funds": DSRA["dsra_release"].tolist(),
+					"DSRA (EoP)": DSRA["dsra_eop"].tolist(),
+				},
+				"Distrib_BOP": {
+					"Balance brought forward": distribution_account["distribution_account_bop"].tolist(),
+					"Transfers to distribution account": transfers_distribution_account.tolist(),
+				},
+				"Distrib_SHLi": {
+					"Cash available for interests": distribution_account["cash_available_for_SHL_interests"].tolist(),
+					"Shareholder loan interests paid": (-1*distribution_account["SHL_interests_paid"]).tolist(),
+				},
+				"Distrib_Div": {
+					"Cash available for dividends": distribution_account["cash_available_for_dividends"].tolist(),
+					"Dividends paid": (-1*distribution_account["dividends_paid"]).tolist(),
+				},
+				"Distrib_SHLp": {
+					"Cash available for repayment": distribution_account["cash_available_for_SHL_repayments"].tolist(),
+					"Shareholder loan repayment": (-1*distribution_account["SHL_repayments"]).tolist(),
+				},
+				"Distrib_SC": {
+					"Cash available for reductions": distribution_account["cash_available_for_redemption"].tolist(),
+					"Share capital reductions": (-1*share_capital_repayment).tolist(),
+				},
+				"Distrib_EOP": {
+					"Distribution account balance": distribution_account_eop.tolist(),
+				},
+				"DevTax": {
+					"Development tax": development_tax.tolist(),
+				},
+				"ArchTax": {
+					"Archeological tax": archeological_tax.tolist(),
+				},
+				"PropTax": {
+					"Property value": gross_property_value.tolist(),
+					"Land value": gross_land_value.tolist(),
+					"Property tax": tfpb.tolist(),
+				},
+				"CFETaxBase": {
+					"Property value before deductions": gross_property_value.tolist(),
+					"Standard deduction": (-1*cfe_std_deduction).tolist(),
+					"Tax base": cfe_tax_base.tolist(),
+					"Notional CFE due in period": cfe_due.tolist(),
+					"Local tax management fee due": cfe_mgt_fee.tolist(),
+					"Gross CFE due": cfe_total_due.tolist(),
+				},
+				"SHL": {
+					"Opening balance": distribution_account['SHL_balance_bop'].tolist(),
+					"Drawdowns": injections['SHL'].tolist(),
+					"Capitalised interest": SHL_interests_construction.tolist(),
+					"Repayment": (-1*distribution_account['SHL_repayments']).tolist(),
+					"Closing balance": distribution_account['SHL_balance_eop'].tolist(),
+				},
+				"iSHL": {
+					"Interests (construction)": SHL_interests_construction.tolist(),
+					"Interests (operations)": SHL_interests_operations.tolist(),
+				},
+				"RE_b": {
+					"Distributable profit": distribution_account['distributable_profit'].tolist(),
+					"Balance brought forward": distribution_account['retained_earnings_bop'].tolist(),
+					"Net income": income_statement['net_income'].tolist(),
+					"Dividends declared": (-1*distribution_account['dividends_paid']).tolist(),
+					"Retained earnings": distribution_account['retained_earnings_eop'].tolist(),
+				},
+				"Eqt": {
+					"Opening balance": share_capital_bop.tolist(),
+					"Contributions": injections['share_capital'].tolist(),
+					"Capital reductions": (-1*share_capital_repayment).tolist(),
+					"Closing balance": share_capital_eop.tolist(),
+				},
+				"BS_a": {
+					"Property, Plant, and Equipment": PPE.tolist(),
+					"Accounts receivables": working_cap['acc_receivables_eop'].tolist(),
+					"Cash or cash equivalents": total_cash.tolist(),
+					"Operating account balance": operating_account_eop.tolist(),
+					"DSRA balance": DSRA['dsra_eop'].tolist(),
+					"Distribution account balance": distribution_account_eop.tolist(),
+					"Total assets": total_assets.tolist(),
+				},
+				"BS_l": {
+					"Share capital (EoP)": share_capital_eop.tolist(),
+					"Retained earnings": distribution_account['retained_earnings_eop'].tolist(),
+					"Shareholder loan (EoP)": distribution_account['SHL_balance_eop'].tolist(),
+					"Senior debt (EoP)": senior_debt['balance_eop'].tolist(),
+					"Accounts payables (EoP)": working_cap['acc_payables_eop'].tolist(),
+					"Total liabilities": total_liabilities.tolist(),
+				},
+				"Ratio": {
+					"DSCR": DSCR_effective.tolist(),
+					"LLCR": LLCR.tolist(),
+					"PLCR": PLCR.tolist(),
+				},
 
-			data_detailed = {
-				'test': DSRA['dsra_mov'],
+				"Audit": {
+					"Balance sheet balanced": audit['balance_sheet'].tolist(),
+					"Financing plan balanced": audit['financing_plan'].tolist(),
+				},
+				"Graphs": {
+					"Cumulative total uses":total_uses_cumul.tolist(),
+					"Senior debt drawdowns neg": (-1*injections['debt']).tolist(),
+					"Share capital injections neg": (-1*injections['share_capital']).tolist(),
+					"Shareholder loan injections neg": (-1*injections['SHL']).tolist(),
+					"Dividends paid pos":distribution_account['dividends_paid'].tolist(),
+					"Lease pos": lease.tolist(),
+					"Operating expenses pos":(opex+tfpb).tolist(),
+					"Senior debt repayments":senior_debt_repayments.tolist(),
+					"EBITDA margin": EBITDA_margin.tolist(),
+					"arr_construction_costs_cumul": construction_costs_cumul.tolist(),	
+					"Share capital injections and repayment":(-1*injections['share_capital']+share_capital_repayment).tolist(),
+					"Shareholder loan injections and repayment":(-1*injections['SHL']+distribution_account['SHL_repayments']).tolist(),
+					"Share capital repayment pos":share_capital_repayment.tolist(),
+					"Debt service":DS_effective.tolist(),
+					"IRR curve":irr_values,
+					"Gearing during financing plan":gearing_during_finplan.tolist(),
+					"Debt fees":debt_fees.tolist(),
+					"Local taxes":local_taxes.tolist(),
 
-				'Date Period start': format_date(date_series,'start_period'),
-				'Date Period end': format_date(date_series,'end_period'),
-
-				'FlagCons Construction': flags['construction'],
-				'FlagCons Construction start': flags['construction_start'],
-				'FlagCons Construction end': flags['construction_end'],
-				
-				'FlagMod Year': time_series['series_end_period_year'],
-				'FlagMod Days in period': days_series['period'],
-				'FlagMod Days in year': time_series['days_in_year'],
-				'FlagMod Years in period': time_series['years_in_period'],
-				'FlagMod Quarter': time_series['quarters'],
-				'FlagMod Start of calendar year': flags['start_calendar_year'],
-
-				'FlagOftk_t Contract period': flags['contract'],
-				'FlagOftk_t Contract start date': format_date(date_series,'start_contract'),
-				'FlagOftk_t Contract end date': format_date(date_series,'end_contract'),
-				'FlagOftk_t Days in contract period': days_series['contracted'],
-				'FlagOftk_t Percentage in contract period': time_series['pct_in_contract_period'],
-
-				'FlagOftk_i Indexation period': flags['contract_index_period'],
-				'FlagOftk_i Indexation start date': format_date(date_series,'start_contract_index'),
-				'FlagOftk_i Indexation end date': format_date(date_series,'end_contract_index'),
-				'FlagOftk_i Indexation (days)': days_series['contracted_index'] ,
-				'FlagOftk_i Indexation': index['contracted'],
-
-				'FlagOp Operations': flags['operations'],
-				'FlagOp Years from COD (BoP)': time_series['years_from_COD_bop'],
-				'FlagOp Years from COD (EoP)': time_series['years_from_COD_eop'],
-				'FlagOp Years from COD (avg.)': time_series['years_from_COD_avg'],
-				'FlagOp Years during operations': time_series['years_during_operations'],
-				'FlagOp Liquidation': flags['liquidation'] ,
-				'FlagOp Liquidation end': flags['liquidation_end'],
-				'FlagOp Seasonality':seasonality,
-
-				'FlagOp Days in operations':days_series['days_operations'],
-				'FlagOp Percentage in operations period': time_series['pct_in_operations_period'],
-
-				
-
-				'FlagFin Amortisation period': flags['debt_amo'],
-				'FlagFin Days during construction': days_series['debt_interest_construction'],
-				'FlagFin Days during operations': days_series['debt_interest_operations'],
-		
-				'IS Contracted revenues': revenues['contracted'],
-				'IS Uncontracted electricity revenues': revenues['merchant'],
-				'IS Total revenues': revenues['total'],
-				'IS Operating expenses': -opex,
-				'IS Lease': -lease,
-
-				'IS Property tax': -tfpb,
-
-
-				'IS EBITDA':EBITDA,
-				'IS Depreciation':-depreciation,
-				'IS EBIT':income_statement['EBIT'],
-				'IS Senior debt interests':-senior_debt['interests_operations'],
-				'IS Shareholder loan interests':-SHL_interests_operations,
-				'IS EBT':income_statement['EBT'], 
-				'IS Corporate income tax':-income_statement['corporate_income_tax'],
-				'IS Net income':income_statement['net_income'],
-			
-				'Mkt_i Indexation': index['merchant'],
-				'Mkt_i Indexation (days)': days_series['merchant_index'],
-				'Mkt_i Indexation end date': format_date(date_series,'end_elec_index'),
-				'Mkt_i Indexation period': flags['merchant_index_period'],
-				'Mkt_i Indexation start date': format_date(date_series,'start_elec_index'),
-				
-				'Opex Indexation': index['opex'],
-				'Opex Indexation (days)': days_series['opex_index'],
-				'Opex Indexation end date': format_date(date_series,'end_opex_index'),
-				'Opex Indexation period': flags['opex_index_period'],
-				'Opex Indexation start date': format_date(date_series,'start_opex_index'),
-				'Opex Years from indexation start date': years_from_base_dates['opex_index'],
-
-
-				'Lease Indexation': index['lease'],
-				'Lease Indexation (days)': days_series['lease_index'],
-				'Lease Indexation end date': format_date(date_series,'end_lease_index'),
-				'Lease Indexation period': flags['lease_index_period'],
-				'Lease Indexation start date': format_date(date_series,'start_lease_index'),
-				'Lease Years from indexation start date': years_from_base_dates['lease_index'],
-
-
-
-
-				'Price Contract price (unindexed)': prices['contracted_real'],
-				'Price Contract price (indexed)': prices['contracted_nom'],
-				'Price Electricity market price (unindexed)': prices['merchant_real'],
-				'Price Electricity market price (indexed)': prices['merchant_nom'],
-				
-				'Prod Capacity after degradation': capacity['after_degradation'],
-				'Prod Capacity before degradation': capacity['before_degradation'],
-				'Prod Capacity degradation factor': capacity['degradation_factor'],
-				'Prod Production': production,
-				
-				'EBITDA margin': EBITDA_margin,
-				'arr_construction_costs_cumul': construction_costs_cumul,							
-
-				'WCRec Accounts receivables (BoP)':working_cap['acc_receivables_bop'],
-				'WCRec Revenue accrued in period':revenues['total'],
-				'WCRec Payment received in period':-working_cap['revenues_paid']-working_cap['acc_receivables_bop'],
-				'WCRec Accounts receivables (EoP)':working_cap['acc_receivables_eop'],
-
-				'WCPay Accounts payables (BoP)':working_cap['acc_payables_bop'],
-				'WCPay Costs accrued in period':(opex+lease),
-				'WCPay Payment made in period':-working_cap['costs_paid']-working_cap['acc_payables_bop'],
-				'WCPay Accounts payables (EoP)':working_cap['acc_payables_eop'],
-
-				'WCMov Cash flow from (to) creditors':-working_cap['cashflows_from_creditors'],
-				'WCMov Cash flow from (to) debtors':working_cap['cashflows_from_debtors'],
-				'WCMov Net movement in working capital':working_cap['wc_variation'],
-				
-				'CF_op EBITDA':EBITDA,
-				'CF_op Net movement in working capital':working_cap['wc_variation'],
-				'CF_op Corporate income tax':-income_statement['corporate_income_tax'],
-				'CF_op Cash flows from operating activities':cf_statement['cash_flows_operating'],
-				
-				'CF_in Construction costs':-construction_costs,
-				'CF_in Development tax':-development_tax,
-				'CF_in Archeological tax':-archeological_tax,
-
-				'CF_in Development fee':-development_fee,
-				'CF_in Capitalised IDC':-senior_debt['senior_debt_idc'],
-				'CF_in Cash flows from investing activities':cf_statement['cash_flows_investing'],
-			
-				'CF_fi Arrangement fee (upfront)':-senior_debt['upfront_fee'],
-				'CF_fi Commitment fees':-senior_debt['commitment_fees'],				
-				'CF_fi Senior debt drawdowns':injections['debt'],
-				'CF_fi Equity injections':injections['equity'],
-				'CF_fi Cash flows from financing activities':cf_statement['cash_flows_financing'],
-				
-				'CFADS CFADS':CFADS,
-				'CFADS Senior debt interests':-senior_debt['interests_operations'],
-				'CFADS Senior debt principal':-senior_debt_repayments,
-
-				'CFDSRA Additions to DSRA':-DSRA['dsra_additions'],
-				'CFDSRA Release of excess funds':-DSRA['dsra_release'],
-
-				'CFDistr Cash available for distribution':cash_available_for_distribution,
-				'CFDistr Transfers to distribution account':-transfers_distribution_account,
-
-				'OpAccB Operating account balance (BoP)':operating_account_bop,
-
-				'OpAccE Operating account balance (EoP)':operating_account_eop,
-
-				'FP_u Construction costs': construction_costs,
-				'FP_u Development fee': development_fee,	
-				'FP_u Development tax': development_tax,	
-				'FP_u Archeological tax': archeological_tax,	
-
-
-
-				'FP_u Interests during construction':senior_debt['senior_debt_idc'],
-				'FP_u Arrangement fee (upfront)':senior_debt['upfront_fee'],
-				'FP_u Commitment fees':senior_debt['commitment_fees'],
-				'FP_u Initial DSRA funding':DSRA_initial_funding,
-
-				'FP_u Total uses':total_uses,
-
-				'FP_s Senior debt drawdowns': injections['debt'],
-				'FP_s Share capital injections': injections['share_capital'],
-				'FP_s Shareholder loan injections': injections['SHL'],
-				'FP_s Total sources': total_sources,
-
-				'Debt_a Amount available (BoP)':senior_debt['senior_debt_available_bop'],
-				'Debt_a Drawdowns':-injections['debt'],
-				'Debt_a Amount available (EoP)':senior_debt['senior_debt_available_eop'],
-			
-				'Debt_b Opening balance':senior_debt['balance_bop'],
-				'Debt_b Drawdowns':injections['debt'],
-				'Debt_b Scheduled repayments':-senior_debt_repayments,
-				'Debt_b Closing balance':senior_debt['balance_eop'],
-			
-				'Debt_i Arrangement fee (upfront)':senior_debt['upfront_fee'],
-				'Debt_i Commitment fees':senior_debt['commitment_fees'],
-				'Debt_i Debt interests':senior_debt['interests'],
-				
-				'Sizing CFADS':CFADS_amo,
-				'Sizing Target DSCR':debt_amount_DSCR['target_DSCR'],
-				'Sizing Target DS':debt_amount_DSCR['target_DS'],
-				'Sizing Average interest rate':discount_factor['avg_interest_rate'],
-				'Sizing Discount factor':discount_factor['discount_factor'],
-				'Sizing Cumulative discount factor':discount_factor['discount_factor_cumul'],
-				'Sizing Interests during operations':senior_debt['interests_operations'],
-				'Sizing Debt repayment target':senior_debt_repayments_target,
-
-				'DSRA Cash available for DSRA':DSRA['cash_available_for_dsra'],
-				'DSRA DSRA target liquidity':DSRA['dsra_target'],
-				'DSRA DSRA target additions':DSRA['dsra_additions_required'],
-				
-				'DSRA DSRA (BoP)':DSRA['dsra_bop'],
-				'DSRA Additions to DSRA':DSRA['dsra_additions'],
-				'DSRA Release of excess funds':DSRA['dsra_release'],
-				'DSRA DSRA (EoP)':DSRA['dsra_eop'],
-							
-				'DistrBOP Balance brought forward':distribution_account['distribution_account_bop'],
-				'DistrBOP Transfers to distribution account':transfers_distribution_account,
-
-				'DistrSHLi Cash available for interests':distribution_account['cash_available_for_SHL_interests'],
-				'DistrSHLi Shareholder loan interests paid':-distribution_account['SHL_interests_paid'],
-
-				'DistrDiv Cash available for dividends':distribution_account['cash_available_for_dividends'],
-				'DistrDiv Dividends paid':-distribution_account['dividends_paid'],
-
-				'DistrSHLp Cash available for repayment':distribution_account['cash_available_for_SHL_repayments'],
-				'DistrSHLp Shareholder loan repayment':-distribution_account['SHL_repayments'],
-
-				'DistrSC Cash available for reductions':distribution_account['cash_available_for_redemption'],
-				'DistrSC Share capital reductions':-share_capital_repayment,
-
-				'DistrEOP Distribution account balance':distribution_account_eop,
-
-
-				'DevTax Development tax':development_tax,
-				
-				'ArchTax Archeological tax':archeological_tax,
-
-
-				'PropTax Property value':gross_property_value,
-				'PropTax Land value':gross_land_value,
-				
-				'PropTax Property tax':tfpb,
-
-
-				'CFETaxBase Property value before deductions':gross_property_value,
-				'CFETaxBase Standard deduction':-cfe_std_deduction,
-				'CFETaxBase Tax base':cfe_tax_base,
-				'CFETaxDue Notional CFE due in period':cfe_due,
-				'CFETaxDue Local tax management fee due':cfe_mgt_fee,
-				'CFETaxDue Gross CFE due':cfe_total_due,
-
-
-
-				'SHL Opening balance':distribution_account['SHL_balance_bop'],
-				'SHL Drawdowns':injections['SHL'],
-				'SHL Capitalised interest':SHL_interests_construction,
-				'SHL Repayment':-distribution_account['SHL_repayments'],
-				'SHL Closing balance':distribution_account['SHL_balance_eop'],
-			
-				'iSHL Interests (construction)':SHL_interests_construction,
-				'iSHL Interests (operations)':SHL_interests_operations,
-
-				'RE_b Distributable profit':distribution_account['distributable_profit'],			
-				'RE_b Balance brought forward':distribution_account['retained_earnings_bop'],
-				'RE_b Net income': income_statement['net_income'],		
-				'RE_b Dividends declared': -distribution_account['dividends_paid'],
-				'RE_b Retained earnings':distribution_account['retained_earnings_eop'],
-
-				'Eqt Opening balance':share_capital_bop,			
-				'Eqt Contributions':injections['share_capital'],
-				'Eqt Capital reductions':-share_capital_repayment,
-				'Eqt Closing balance':share_capital_eop,
-
-				'BS_a Property, Plant, and Equipment': PPE,
-				'BS_a Accounts receivables': working_cap['acc_receivables_eop'],
-				'BS_a Cash or cash equivalents': total_cash,
-				'BS_a Operating account balance': operating_account_eop,
-				'BS_a DSRA balance': DSRA['dsra_eop'],
-
-				'BS_a Distribution account balance': distribution_account_eop,
-
-				'BS_a Total assets': total_assets,
-			
-				'BS_l Share capital (EoP)': share_capital_eop,
-				'BS_l Retained earnings': distribution_account['retained_earnings_eop'],
-				'BS_l Shareholder loan (EoP)': distribution_account['SHL_balance_eop'],
-				'BS_l Senior debt (EoP)': senior_debt['balance_eop'],
-				'BS_l Accounts payables (EoP)': working_cap['acc_payables_eop'],
-				'BS_l Total liabilities': total_liabilities,
-
-				'Cumulative total uses':total_uses_cumul,
-				'Senior debt drawdowns neg': -1 * injections['debt'],
-				'Share capital injections neg': -1 * injections['share_capital'],
-				'Shareholder loan injections neg': -1 * injections['SHL'],
-				'Dividends paid pos':distribution_account['dividends_paid'],
-			
-
-				'Lease pos': lease,
-
-				'Operating expenses pos':(opex+lease+tfpb),
-				'Senior debt repayments':senior_debt_repayments,
-				'Ratio DSCR':DSCR_effective,
-				'Ratio LLCR':LLCR,
-				'Ratio PLCR':PLCR,
-
-				'Share capital injections and repayment':-injections['share_capital']+share_capital_repayment,
-				'Shareholder loan injections and repayment':-injections['SHL']+distribution_account['SHL_repayments'],
-				'Share capital repayment pos':share_capital_repayment,
-				'Debt service':DS_effective,
-
-				'IRR curve':irr_values,
-
-				'Gearing during financing plan':gearing_during_finplan,
-				'Audit Balance sheet balanced': audit['balance_sheet'],
-				'Audit Financing plan balanced': audit['financing_plan'],
+				},
 			}
+	
+			dict_results = {
+				"Equity metrics": {
+					"Share capital IRR": share_capital_irr,
+					"Shareholder loan IRR": SHL_irr,
+					"Equity IRR": equity_irr,
+					"Payback date": payback_date, 
+					"Payback time": payback_time, 
+				},
+				"Sensi": {
+					"Min DSCR": DSCR_min,
+					"Avg. DSCR": DSCR_avg,
+					"Min LLCR": LLCR_min,
+					"Equity IRR": equity_irr,
+					"Audit": check_all,
+				},
+				"Project IRR": {
+					"Project IRR (pre-tax)": project_irr_pre_tax,
+					"Project IRR (post-tax)": project_irr_post_tax,
+				},
+				"Debt metrics": {
+					"Debt amount": debt_amount,
+					"Constraint": debt_constraint,
+					"Effective gearing": gearing_eff,
+					"Tenor (door-to-door)": tenor_debt,
+					"Average life": average_debt_life,
+					"Average DSCR": DSCR_avg,
+					"Debt IRR": debt_irr,
+				},
+				"Audit": {
+					"Financing plan": check['financing_plan'],
+					"Balance sheet": check['balance_sheet'],
+					"Debt maturity": check['debt_maturity'],
+				},
+				"Valuation": {
+					"Valuation1": valuation['less_1'],
+					"Valuation": valuation['normal'],					
+					"Valuation2": valuation['plus_1'],
 
-			df = pd.DataFrame(data_detailed)
+				},
 
-			df_annual = create_df_annual(data_detailed)
+
+				}
 			
-			dfs[key] = df
-			df_sum = df.apply(pd.to_numeric, errors='coerce').sum()	
-			
-
-			results_equity[key] = [share_capital_irr,SHL_irr,equity_irr,payback_date,payback_time]
-			results_sensi[key] = [DSCR_min,DSCR_avg,LLCR_min,equity_irr,check_all]
-			results_projectIRR[key] = [project_irr_pre_tax,project_irr_post_tax]
-			results_debt[key] = [debt_amount,debt_constraint,gearing_eff,tenor_debt,average_debt_life,DSCR_avg,debt_irr]
-			results_audit[key] = [check['financing_plan'],check['balance_sheet'],check['debt_maturity']]
-
-
+			computation_to_display[key] = dict_to_display
+			results_to_display[key] = dict_results
+	
+		dict_uses_sources = {
+			"Uses": {
+				"Construction costs": sum_construction_costs,
+				"Development fee": optimised_devfee,
+				"Debt interests & fees": sum(senior_debt_fees_constr.values()),
+				"Upfront fee": senior_debt_fees_constr['upfront_fee'],
+				"Commitment fees": senior_debt_fees_constr['commitment_fees'],
+				"IDC": senior_debt_fees_constr['idc'],
+				"Local taxes": development_tax_sum+archeological_tax_sum,
+				"Development tax": development_tax_sum,
+				"Archeological tax": archeological_tax_sum,
+				"Initial DSRA funding": DSRA_initial_funding_max,
+				"Total": total_costs,
+			},
+			"Sources": {
+				"Equity": sum(injections['share_capital'])+sum(injections['SHL']),
+				"Share capital": sum(injections['share_capital']),
+				"Shareholder loan": sum(injections['SHL']),
+				"Senior debt": debt_amount,
+				"Total": sum(injections['share_capital'])+sum(injections['SHL'])+debt_amount,
+			},
+		}
 
 		calculation_type_mapping = {
 			"sensi-p50": "Sponsor Case",
 			"sensi-opex": "Sensi Opex",
 			"sensi-inflation": "Sensi Inflation",
 			"sensi-production": "Sensi Production",
-
 		}
 
 		if calculation_type in calculation_type_mapping:
 			key = calculation_type_mapping[calculation_type]
 		else:
 			key = "Lender Case"
+		
+		computation_displayed = computation_to_display[key]
+		computation_displayed_sums = calc_sum_nested_dict(computation_displayed)
+		computation_displayed_sums_per_year = calc_sum_per_year_nested_dict(computation_displayed)
+		computation_displayed_end_year = extract_values_on_december_31(computation_displayed)
+		computation_construction = extract_values_construction(computation_displayed)
 
-		results_projectIRR_displayed = results_projectIRR[key]
-		results_equity_displayed = results_equity[key]
-		results_debt_displayed = results_debt[key]
-		results_audit_displayed = results_audit[key]
-		df_displayed = dfs[key]
-
-		table_sensi = create_table_sensi(results_sensi).to_dict()
-		table_uses = create_table_uses(sum_construction_costs,optimised_devfee,senior_debt_fees_constr,total_costs,DSRA_initial_funding_max,development_tax_sum,archeological_tax_sum)
-		table_sources = create_table_sources(injections,debt_amount)
-		table_projectIRR = create_table_projectIRR(results_projectIRR_displayed)
-		table_equity = create_table_equity(results_equity_displayed)
-		table_debt = create_table_debt(results_debt_displayed)
-		table_audit = create_table_audit(results_audit_displayed)
 		
 
 		api_results = np.array([
 			dev_tax_commune,
 			])
-
 	
 		tfpb_rates = {
-		    "Taux communal": tfpb_commune,
-		    "Taux intercommunal": tfpb_intercommunal,
-		    "Taxe spéciale d’équipement": tfpb_specific_eqpt,
+			"Taux communal": tfpb_commune,
+			"Taux intercommunal": tfpb_intercommunal,
+			"Taxe spéciale d’équipement": tfpb_specific_eqpt,
 		}
 
-
 		dev_tax_rates = {
-		    "Taux communal": dev_tax_commune,
+			"Taux communal": dev_tax_commune,
 		}
 
 		data_dump_sidebar = np.array([
@@ -784,57 +921,75 @@ def handle_post_request(request,id):
 		project_form.save()
 
 
+		computation_sponsor_case_sums_per_year = calc_sum_per_year_nested_dict(computation_to_display["Sponsor Case"])
+
+		if not inputs['financial_close_check']:
+			ComputationResult.objects.filter(project=project).delete()
+			SponsorCaseResult.objects.filter(project=project).delete()
+			lender_case_results_save, sponsor_case_results_save = 0, 0
+		else:
+			lender_case_results_save_obj, _ = ComputationResult.objects.get_or_create(
+				project=project,
+				defaults={'financial_close_result': computation_displayed_sums_per_year}
+			)
+			lender_case_results_save = lender_case_results_save_obj.financial_close_result
+
+			sponsor_case_results_save_obj, _ = SponsorCaseResult.objects.get_or_create(
+				project=project,
+				defaults={'sponsor_case_result': computation_sponsor_case_sums_per_year}
+			)
+			sponsor_case_results_save_obj.sponsor_case_result = computation_sponsor_case_sums_per_year
+			sponsor_case_results_save_obj.save()
+			sponsor_case_results_save = sponsor_case_results_save_obj.sponsor_case_result
 
 
+			
+
+		
+		if not inputs['financial_close_check']:
+			outcome = {"test":[0,0]}
+		else:
+			outcome = calc_outcome(lender_case_results_save,computation_displayed_sums_per_year)
 
 
-		annual = calculate_annual(date_series['end_period'],production,capacity['degradation_factor'],revenues,opex,lease,EBITDA,senior_debt['interests_operations'],senior_debt_repayments,CFADS_amo,injections['debt'],senior_debt['balance_eop'],DSRA['dsra_bop'],distribution_account['dividends_paid'],irr_values,injections,share_capital_repayment,distribution_account['SHL_repayments'],distribution_account['retained_earnings_bop'], distribution_account['distribution_account_eop'])
-		monthly = calculate_monthly(date_series['end_period'],construction_costs,total_uses_cumul,flags['construction'],injections,total_uses, gearing_during_finplan,development_fee,senior_debt['senior_debt_idc'],senior_debt['upfront_fee'],senior_debt['commitment_fees'],DSRA_initial_funding,local_taxes)
-		end_year = calculate_end_year(date_series['end_period'],capacity['degradation_factor'],senior_debt['balance_eop'],DSRA['dsra_bop'],irr_values,distribution_account['retained_earnings_bop'], distribution_account['distribution_account_eop'], LLCR, PLCR)
+		results_displayed = create_tables(dict_uses_sources, results_to_display, key, output_table_formats, outcome)
+
 
 
 		return JsonResponse({
-			"df":df_displayed.to_dict(),
-			"df_sum":df_sum.to_dict(),
-			"df_annual":df_annual.to_dict(),
-
-
-			"table_uses":table_uses.to_dict(),
-			"table_sources":table_sources.to_dict(),
-			"table_projectIRR":table_projectIRR,
-			"table_equity":table_equity,
-			"table_debt":table_debt,
-			"table_sensi":table_sensi,
-			"table_audit":table_audit,
-
 			"calculation_detail":inputs['calculation_detail'],
+
+			"df":computation_displayed,
+			"df_sum":computation_displayed_sums,
+			"df_sum_y":computation_displayed_sums_per_year,
+			"df_end_y":computation_displayed_end_year,
+			"df_construction":computation_construction,
+
+			"FC_results":lender_case_results_save,
+			"sponsor_results":sponsor_case_results_save,
+
+			"tables":results_displayed,
+			"outcome":outcome,
+			
 			"dic_price_elec_keys":dic_price_elec_keys.tolist(),
 			"data_dump_sidebar":data_dump_sidebar.tolist(),
 			"tfpb_rates":tfpb_rates,
 			"dev_tax_rates":dev_tax_rates,
-			"annual":annual,
-			"monthly":monthly,
-			"end_year":end_year,
+
+
 
 			},safe=False, status=200)
 
 	except Exception as e:
-		
+		traceback_info = traceback.extract_tb(e.__traceback__)
+		last_trace = traceback_info[-1]
 		error_data = {
 			'error_type': e.__class__.__name__,
-			'message': str(e)
+			'message': str(e),
+			'line_number': last_trace.lineno
 		}
 
 		return JsonResponse(error_data,safe=False, status=400)
-
-
-
-
-
-
-
-
-
 
 def handle_get_request(request, id):
 	project = get_object_or_404(Project, id=id)
@@ -844,6 +999,99 @@ def handle_get_request(request, id):
 		'project': project,
 	}
 	return render(request, "project_view.html", context)
+
+
+def calc_sum_nested_dict(computation_displayed):
+	all_sums = {}
+
+	# Iterate through keys in the outer dictionary
+	for dictkey, subkey_data in computation_displayed.items():
+		sums = {}
+
+		# Iterate through subkeys within each key
+		for subkey, series in subkey_data.items():
+			sum_val = sum([x for x in series if isinstance(x, (int, float))])
+			sums[subkey] = sum_val
+
+		# Store sums for the current key in the all_sums dictionary
+		all_sums[dictkey] = sums
+
+	return all_sums
+
+def calc_sum_per_year_nested_dict(computation_displayed):
+
+	year_sum = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+
+	dates = computation_displayed.get("Dates", {})
+	period_end_series = dates.get("Period end", [])
+
+	if not period_end_series:
+		return year_sum
+
+	for i in range(len(period_end_series)):
+		date_str = period_end_series[i]
+		# Extract the year from the date string
+		year = date_str.split("/")[-1]
+
+		for key, sub_dict in computation_displayed.items():
+			if key == "Dates":
+				for subkey, series in sub_dict.items():
+					year_sum[key][subkey][year] = year
+			else: 
+				for subkey, series in sub_dict.items():
+					if len(series) > i:
+						value = series[i]
+						# Convert the value to float if it's not already
+						value = float(value) if isinstance(value, (int, float)) else 0.0
+						# Accumulate the values for each year
+						year_sum[key][subkey][year] += value
+
+	return dict(year_sum)
+
+def extract_values_on_december_31(computation_displayed):
+	
+	values_on_december_31 = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+
+	dates = computation_displayed.get("Dates", {})
+	period_end_series = dates.get("Period end", [])
+
+	if not period_end_series:
+		return values_on_december_31
+
+	for i in range(len(period_end_series)):
+		end_date_str = period_end_series[i]
+		year = end_date_str.split("/")[-1]
+
+		for key, sub_dict in computation_displayed.items():
+			if key != "Dates":
+				for subkey, series in sub_dict.items():
+					if len(series) > i:
+						if end_date_str.startswith("31/12") or i == len(period_end_series) - 1:
+							value = series[i]
+							value = float(value) if isinstance(value, (int, float)) else 0.0
+							values_on_december_31[key][subkey][year] += value
+
+	return values_on_december_31
+
+def extract_values_construction(computation_displayed):
+	
+	values_in_construction = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+
+	flags = computation_displayed.get("FlagsC", {})
+	construction_period = flags.get("Construction", [])
+
+	for i in range(len(construction_period)):
+		construction = construction_period[i]
+
+		for key, sub_dict in computation_displayed.items():
+			for subkey, series in sub_dict.items():
+				if len(series) > i:
+					if construction == True: 
+						value = series[i]
+						values_in_construction[key][subkey][i] = value
+	return values_in_construction
+
+
 
 
 def get_inputs(request):
@@ -877,6 +1125,8 @@ def get_inputs(request):
 	liquidation = int(post_data['liquidation'])
 
 	liquidation_date = end_of_operations + relativedelta(months=liquidation)
+
+	financial_close_check = request.POST.get('financial_close_check', False)
 
 	# Create a dictionary to store the results
 	inputs = {
@@ -979,6 +1229,10 @@ def get_inputs(request):
 		'cfe_rate': (float(post_data['cfe_commune_tax'])+float(post_data['cfe_intercommunal_tax'])+float(post_data['cfe_specific_eqp_tax'])+float(post_data['cfe_localCCI_tax']))/100,
 		'cfe_mgt_fee': float(post_data['cfe_mgt_fee'])/100,
 		'cfe_discount_tax_base': float(post_data['cfe_discount_tax_base'])/100,
+
+		'financial_close_check': financial_close_check,
+
+		'valuation_df': float(post_data['discount_factor_valuation'])/100,
 
 	}
 
@@ -1176,9 +1430,6 @@ class DaysCalculator:
 			'days_operations': days_operations,
 			'lease_index': lease_index,
 
-
-
-			# ... other period days
 		}
 
 
@@ -1224,6 +1475,45 @@ def create_timeline_series(inputs):
 	
 	return series_start_period, series_end_period
 
+
+
+def calc_valuation(valuation_df, end_period, equity_cash_flows):
+
+	end_period = pd.to_datetime(end_period)
+	current_date = pd.Timestamp(datetime.datetime.now().date())
+	time_since_today = end_period.apply(lambda date: (current_date - date).days)
+	time_since_today = time_since_today.clip(lower=0)
+
+	discount_factor = valuation_df
+	discount_factor_less_1 = valuation_df-0.01
+	discount_factor_plus_1 = valuation_df+0.01
+
+	discount_factor_vector = np.where(time_since_today != 0, (1 / (1 + discount_factor)**(time_since_today/365)), 1)
+	discount_factor_less_1_vector = np.where(time_since_today != 0, (1 / (1 + discount_factor_less_1)**(time_since_today/365)), 1)
+	discount_factor_plus_1_vector = np.where(time_since_today != 0, (1 / (1 + discount_factor_plus_1)**(time_since_today/365)), 1)
+
+
+	valuation = np.sum(equity_cash_flows*discount_factor_vector)
+	valuation_less_1 = np.sum(equity_cash_flows*discount_factor_less_1_vector)
+	valuation_plus_1 = np.sum(equity_cash_flows*discount_factor_plus_1_vector)
+
+
+	valuation_results = {
+		'normal': {
+			'discount_factor': discount_factor,
+			'valuation': valuation
+		},
+		'less_1': {
+			'discount_factor': discount_factor_less_1,
+			'valuation': valuation_less_1
+		},
+		'plus_1': {
+			'discount_factor': discount_factor_plus_1,
+			'valuation': valuation_plus_1
+		},
+	}
+
+	return valuation_results
 
 def create_time_series(date_series, days_series, flags):
 	# Calculating days in year considering leap years
@@ -1274,206 +1564,13 @@ def create_time_series(date_series, days_series, flags):
 	return time_series_results
 
 
-def create_df_annual(data_detailed):
 
-	data_detailed = pd.DataFrame(data_detailed)
-
-	data_detailed['Year'] = pd.to_datetime(data_detailed['Date Period end']).dt.year
-	is_columns = [col for col in data_detailed.columns if col.startswith('IS')]
-	columns_to_sum = ['Year'] + is_columns
-	annual_sums = data_detailed[columns_to_sum].groupby('Year').sum().reset_index()
-
-	return annual_sums
 
 
 def get_elec_prices(request, construction_end, liquidation_date, dict_scenario, key):
 	dic_price_elec = create_price_elec_dict(request, construction_end, liquidation_date, dict_scenario, key)
 	dic_price_elec_keys = np.array(list(dic_price_elec.keys()))
 	return dic_price_elec, dic_price_elec_keys
-
-
-def calculate_monthly(series_end_period,construction_costs,total_uses_cumul,flag_construction,injections,total_uses, gearing_during_finplan,development_fee,senior_debt_idc,senior_debt_upfront_fee,senior_debt_commitment_fees,DSRA_initial_funding,local_taxes):
-
-	debt_fees = senior_debt_idc+senior_debt_upfront_fee+senior_debt_commitment_fees
-
-
-	df = pd.DataFrame({
-		'Date': series_end_period, 
-		'construction_costs':construction_costs,
-		'total_uses_cumul':total_uses_cumul,
-		'flag_construction':flag_construction,
-		'Share capital injections':-injections['share_capital'],
-		'SHL injections':-injections['SHL'],
-		'Debt injections':-injections['debt'],
-		'Total uses':total_uses,
-		'Gearing':gearing_during_finplan,
-		'Development fee':development_fee,
-		'Debt fees':debt_fees,
-		'DSRA initial funding':DSRA_initial_funding,
-		'Local taxes':local_taxes,
-
-		})
-
-	df_filtered = df[df['flag_construction'] == 1]
-	formatted_dates = [date.strftime('%d/%m/%Y') for date in df_filtered['Date']]
-
-
-	result_dict = {
-	'Date': df_filtered['Date'].tolist(),
-	'Construction costs': df_filtered['construction_costs'].tolist(),
-	'Construction costs cumul': df_filtered['total_uses_cumul'].tolist(),
-	'Share capital injections': df_filtered['Share capital injections'].tolist(),
-	'SHL injections': df_filtered['SHL injections'].tolist(),
-	'Debt injections': df_filtered['Debt injections'].tolist(),
-	'Total uses': df_filtered['Total uses'].tolist(),
-	'Gearing': df_filtered['Gearing'].tolist(),
-	'Development fee': df_filtered['Development fee'].tolist(),
-	'Debt fees': df_filtered['Debt fees'].tolist(),
-	'DSRA initial funding': df_filtered['DSRA initial funding'].tolist(),
-	'Local taxes': df_filtered['Local taxes'].tolist(),
-
-	}
-
-	result_dict['Date'] = [date.strftime('%m/%y') for date in df_filtered['Date']]
-
-	return result_dict
-
-
-
-
-def calculate_annual(series_end_period, production, degradation, revenues,opex,lease,EBITDA,senior_debt_interests_operations,senior_debt_repayments,CFADS, senior_debt_drawdowns,senior_debt_eop,DSRA_eop,dividends_paid,irr_values,injections,share_capital_repayment,SHL_repayment,retained_earnings_bop,distribution_account_eop):
-	df = pd.DataFrame({
-		'Date': series_end_period, 
-		'Production': production, 
-		'Degradation': degradation, 
-		'Contracted revenues':revenues['contracted'], 
-		'Merchant revenues': revenues['merchant'],
-		'Opex': opex,
-		'Lease': lease,
-		'EBITDA':EBITDA,
-		'Senior debt interests':senior_debt_interests_operations,
-		'Senior debt repayments':senior_debt_repayments,
-		'CFADS':CFADS,
-		'Senior debt drawdowns':senior_debt_drawdowns,
-		'Senior debt EOP':senior_debt_eop,
-		'DSRA EOP':DSRA_eop,
-		'Dividends':dividends_paid,
-		'IRR curve':irr_values,
-		'Share capital injections':-injections['share_capital'],
-		'SHL injections':-injections['SHL'],
-		'Share capital repayment':share_capital_repayment,
-		'SHL repayment':SHL_repayment,
-		'Retained earnings BOP':retained_earnings_bop,
-		'Distribution account EOP':distribution_account_eop,
-		})
-
-	# Convert the 'Date' column to datetime objects
-	df['Date'] = pd.to_datetime(df['Date'])
-	df['Year'] = df['Date'].dt.year
-
-	# Extract the year from the 'Date' column and group by year
-	yearly_production_sum = df.groupby('Year')['Production'].sum().reset_index()
-	yearly_contracted_revenues_sum = df.groupby('Year')['Contracted revenues'].sum().reset_index()
-	yearly_merchant_revenues_sum = df.groupby('Year')['Merchant revenues'].sum().reset_index()
-	opex_sum = df.groupby('Year')['Opex'].sum().reset_index()
-	lease_sum = df.groupby('Year')['Lease'].sum().reset_index()
-	EBITDA_sum = df.groupby('Year')['EBITDA'].sum().reset_index()
-	senior_debt_interests_operations_sum = df.groupby('Year')['Senior debt interests'].sum().reset_index()
-	senior_debt_repayments_sum = df.groupby('Year')['Senior debt repayments'].sum().reset_index()
-	CFADS_sum = df.groupby('Year')['CFADS'].sum().reset_index()
-	share_capital_injections_sum = df.groupby('Year')['Share capital injections'].sum().reset_index()
-	SHL_injections_sum = df.groupby('Year')['SHL injections'].sum().reset_index()
-	share_capital_repayment_sum = df.groupby('Year')['Share capital repayment'].sum().reset_index()
-	SHL_repayment_sum = df.groupby('Year')['SHL repayment'].sum().reset_index()
-	CFADS_sum = df.groupby('Year')['CFADS'].sum().reset_index()
-	dividends_paid_sum = df.groupby('Year')['Dividends'].sum().reset_index()
-	senior_debt_drawdowns_sum = df.groupby('Year')['Senior debt drawdowns'].sum().reset_index()
-
-
-	share_capital_flows = share_capital_injections_sum['Share capital injections']+share_capital_repayment_sum['Share capital repayment']
-	SHL_flows = SHL_injections_sum['SHL injections']+SHL_repayment_sum['SHL repayment']
-	debt_service=senior_debt_interests_operations_sum['Senior debt interests']+senior_debt_repayments_sum['Senior debt repayments']
-	total_revenues=yearly_contracted_revenues_sum['Contracted revenues']+yearly_merchant_revenues_sum['Merchant revenues']
-	
-	EBITDA_margin = np.divide(EBITDA_sum['EBITDA'], total_revenues, out=np.zeros_like(EBITDA_sum['EBITDA']), where=total_revenues > 0)
-
-
-	DSCR = np.divide(CFADS_sum['CFADS'], debt_service, out=np.zeros_like(CFADS_sum['CFADS']), where=debt_service > 0)
-
-
-
-
-	# Get the degradation value at 31/12/N of each year
-	degradation_values = df.groupby('Year')['Degradation'].last().reset_index()
-	senior_debt_eop = df.groupby('Year')['Senior debt EOP'].last().reset_index()
-	DSRA_eop = df.groupby('Year')['DSRA EOP'].last().reset_index()
-	IRR_curve = df.groupby('Year')['IRR curve'].last().reset_index()
-	Retained_earnings_BOP = df.groupby('Year')['Retained earnings BOP'].last().reset_index()
-	Distribution_account_EOP = df.groupby('Year')['Distribution account EOP'].last().reset_index()
-
-
-	annual_sum = {
-	'Year': degradation_values['Year'].tolist(),
-	'Production': yearly_production_sum['Production'].tolist(),
-	'Contracted revenues': yearly_contracted_revenues_sum['Contracted revenues'].tolist(),
-	'Merchant revenues': yearly_merchant_revenues_sum['Merchant revenues'].tolist(),
-	'Opex': opex_sum['Opex'].tolist(),
-	'Lease': lease_sum['Lease'].tolist(),
-	'EBITDA': EBITDA_sum['EBITDA'].tolist(),
-	'EBITDA margin': EBITDA_margin.tolist(),
-	'Senior debt interests': senior_debt_interests_operations_sum['Senior debt interests'].tolist(),
-	'Senior debt repayments': senior_debt_repayments_sum['Senior debt repayments'].tolist(),
-	'DSCR': DSCR.tolist(),
-	'Debt service': debt_service.tolist(),
-	'CFADS': CFADS_sum['CFADS'].tolist(),
-	'Senior debt drawdowns': senior_debt_drawdowns_sum['Senior debt drawdowns'].tolist(),
-	'Share capital flows': share_capital_flows.tolist(),
-	'SHL flows': SHL_flows.tolist(),
-	'Share capital repayment': share_capital_repayment_sum['Share capital repayment'].tolist(),
-	'Dividends': dividends_paid_sum['Dividends'].tolist(),
-
-
-	'Degradation': degradation_values['Degradation'].tolist(),
-	'IRR curve': IRR_curve['IRR curve'].tolist(),
-	'DSRA EOP': DSRA_eop['DSRA EOP'].tolist(),
-	'Retained earnings BOP': Retained_earnings_BOP['Retained earnings BOP'].tolist(),
-	'Distribution account EOP': Distribution_account_EOP['Distribution account EOP'].tolist(),
-	'Senior debt EOP': senior_debt_eop['Senior debt EOP'].tolist(),
-	}
-
-	return annual_sum
-
-def calculate_end_year(series_end_period, degradation, senior_debt_eop,DSRA_eop,irr_values,retained_earnings_bop,distribution_account_eop,LLCR,PLCR):
-	df = pd.DataFrame({
-		'Date': series_end_period, 
-		'Degradation': degradation, 
-		'Senior debt EOP':senior_debt_eop,
-		'DSRA EOP':DSRA_eop,
-		'IRR curve':irr_values,
-		'Retained earnings BOP':retained_earnings_bop,
-		'Distribution account EOP':distribution_account_eop,
-		'LLCR': LLCR, 
-		'PLCR': PLCR, 
-
-		})
-
-	df['Year'] = df['Date'].dt.year
-
-	end_of_year = df.groupby('Year').agg({
-		'Degradation': 'last',
-		'IRR curve': 'last',
-		'DSRA EOP': 'last',
-		'Retained earnings BOP': 'last',
-		'Distribution account EOP': 'last',
-		'Senior debt EOP': 'last',
-		'LLCR': 'last',
-		'PLCR': 'last',
-
-	}).to_dict(orient='list')
-
-	return end_of_year
-
-
 
 
 def calc_construction_costs(request, inputs, flags):
@@ -1502,7 +1599,7 @@ def calc_capacity(inputs, flags, time_series):
 	else: 
 
 		capacity_before_degradation = inputs['wind_turbine_installed']*1000*inputs['capacity_per_turbine']*flags['operations']
-		degradation_factor = 1
+		degradation_factor = 1*flags['operations']
 		capacity_after_degradation = capacity_before_degradation
 
 	capacity = {
@@ -2007,15 +2104,12 @@ def calc_dsra_funding(dsra_target):
 	
 	positive_sum = 0
 	count = 0
-
 	for num in dsra_target:
 		if num > 0:
 			positive_sum += num
 			count += 1
-
 		if count == 1:
 			break
-
 	return positive_sum
 
 
@@ -2135,8 +2229,6 @@ def import_dev_tax_commune(request,city_name):
 
 def calc_local_taxes(request,inputs,flags,dev_tax_commune):
 
-	
-
 	total_rate=dev_tax_commune/100+inputs['dev_tax_department_tax']
 	
 	if inputs['technology'].startswith('Solar'):
@@ -2170,133 +2262,195 @@ def calc_production(request,seasonality,capacity_after_degradation, dict_scenari
 
 
 def determine_debt_constraint(debt_amount,debt_amount_gearing):
-
 	if debt_amount>debt_amount_gearing:
 		constraint = "Gearing"
 	else: 
 		constraint = "DSCR"
-
 	return constraint
 
 
-def create_table_sensi(results_sensi):
-	metrics = ["Min DSCR", "Avg. DSCR", "Min LLCR", "Equity IRR", "Audit"]
-	percent_flags = [False, False, False, True, False]
-	
-	if len(metrics) != len(percent_flags):
-		raise ValueError("The length of 'metrics' and 'percent_flags' must be equal.")
-	
-	table_sensi = pd.DataFrame()
-	table_sensi[""] = metrics
-	
-	first_scenario_processed = False  # Flag to keep track of whether the first scenario has been processed
 
-	for scenario in results_sensi.keys():
+
+
+def calc_outcome(lender_case_results_save,computation_displayed_sums_per_year):
+	
+
+	total_uses_values_initial = lender_case_results_save['FP_u']['Total uses'].values()
+	total_uses_integers_initial = [int(value) for value in total_uses_values_initial]
+	sum_construction_costs_fc = sum(total_uses_integers_initial)
+
+	total_uses_values_now = computation_displayed_sums_per_year['FP_u']['Total uses'].values()
+	total_uses_integers_now = [int(value) for value in total_uses_values_now]
+	sum_construction_costs_now = sum(total_uses_integers_now)
+
+
+	diff_sum = sum_construction_costs_now-sum_construction_costs_fc
+	diff_sum_pct = diff_sum/sum_construction_costs_fc*100
+	
+	outcome = {
+	"Total Uses": [sum_construction_costs_fc, sum_construction_costs_now, diff_sum, diff_sum_pct],
+	"Total Sources": [sum_construction_costs_fc, sum_construction_costs_now, diff_sum, diff_sum_pct],
+
+	}	
+
+	return outcome
+
+
+
+
+def create_tables(dict_uses_sources, results_to_display, key, output_table_formats,outcome):
+	table_dict = {
+	"Uses": dict_uses_sources["Uses"],
+	"Sources": dict_uses_sources["Sources"],
+	"Project IRR": results_to_display[key]["Project IRR"],
+	"Equity metrics": results_to_display[key]["Equity metrics"],
+	"Debt metrics": results_to_display[key]["Debt metrics"],
+	"Audit": results_to_display[key]["Audit"],
+	"Sensi": results_to_display,
+	"Valuation": results_to_display[key]["Valuation"],
+	"Outcome": outcome,
+
+	}
+
+	tables = {}
+	for i, argument in table_dict.items():
+		if i == "Sensi":
+			tables[i] = create_table_sensi(argument)
+		elif i == "Valuation":
+			tables[i] = create_table_val(argument)
+		elif i == "Outcome":
+			tables[i] = create_table_outcome(argument)
+		else:
+			tables[i] = create_table(argument, output_table_formats)
+	return tables
+
+
+
+
+
+
+def create_table_outcome(results):
+	metrics = [("Metric", "{:.0f}"),("", None),("Initial", "{:.0f}"), ("Current", "{:.0f}"), 
+	("Diff.", "{:.0f}"), ("Variation", "{:.1%}"),]  # Specific format only for "Audit"
+
+	table_sensi = {"": [metric[0] for metric in metrics]}
+	table_sensi["Unit"] = ["kEUR","kEUR","kEUR","%"]
+
+	# Initialize an empty list to hold all rows
+	all_rows = []
+
+	for scenario, data in results.items():
 		scenario_data = []
-		for i in range(len(metrics)):
-			if metrics[i] == "Audit":  # Handling Audit metric separately
-				scenario_data.append(str(results_sensi[scenario][i]))
+		for j, value in enumerate(data):
+			format_string = metrics[j][1]
+			if format_string:  # Apply formatting if specified
+				formatted_value = format_string.format(value)
 			else:
-				scenario_data.append(format_sensi_data(results_sensi[scenario][i], percent_flags[i]))
-		table_sensi[scenario] = scenario_data
+				formatted_value = value  # No formatting
+			scenario_data.append(formatted_value)
 
-		if not first_scenario_processed:
-			table_sensi['Blank Row'] = [''] * len(metrics)  # Adding a blank row
-			first_scenario_processed = True  # Updating the flag
-			
+		all_rows.append((scenario, scenario_data))
+
+	# Add the processed rows to the table_sensi dictionary
+	for scenario, data in all_rows:
+		table_sensi[scenario] = data
+
 	return table_sensi
 
 
-def create_table_uses(sum_construction_costs,optimised_devfee,senior_debt_fees_constr,total_costs,DSRA_initial_funding_max,development_tax_sum,archeological_tax_sum):
 
-	senior_debt_i_and_fees =sum(senior_debt_fees_constr.values())
-	local_taxes = development_tax_sum+archeological_tax_sum
+def create_table_sensi(results):
+	metrics = [("Min DSCR", "{:.2f}x"), ("Avg. DSCR", "{:.2f}x"), 
+	("Min LLCR", "{:.2f}x"), ("Equity IRR", "{:.2%}"), 
+	("Audit", None)]  # Specific format only for "Audit"
 
-	table_table_uses = pd.DataFrame({
-				"Construction costs":["{:.1f}".format(sum_construction_costs)],
-				"Development fee":["{:.1f}".format(optimised_devfee)],
-				"Debt interests & fees":["{:.1f}".format(senior_debt_i_and_fees)],
-				"Upfront fee":["{:.1f}".format(senior_debt_fees_constr['upfront_fee'])],
-				"Commitment fees":["{:.1f}".format(senior_debt_fees_constr['commitment_fees'])],				
-				"IDC":["{:.1f}".format(senior_debt_fees_constr['idc'])],
-				"Local taxes":["{:.1f}".format(local_taxes)],
-				"Development tax":["{:.1f}".format(development_tax_sum)],
-				"Archeological tax":["{:.1f}".format(archeological_tax_sum)],
-				"Initial DSRA funding":["{:.1f}".format(DSRA_initial_funding_max)],
-				"Total":["{:.1f}".format(total_costs)],
-				})
-	return table_table_uses
+	table_sensi = {"": [metric[0] for metric in metrics]}
 
-def create_table_sources(injections,debt_amount):
+	# Initialize an empty list to hold all rows including the blank one
+	all_rows = []
 
-	share_capital_drawn = sum(injections['share_capital'])
-	shl_drawn = sum(injections['SHL'])
-	equity_drawn=share_capital_drawn+shl_drawn
+	for scenario, data in results.items():
+		sensi = data.get('Sensi')
+		scenario_data = []
+		for j, value in enumerate(sensi.values()):
+			format_string = metrics[j][1]
+			if format_string:  # Apply formatting if specified
+				formatted_value = format_string.format(value)
+			else:
+				formatted_value = value  # No formatting
+			scenario_data.append(formatted_value)
 
-	fp_sources = equity_drawn+debt_amount
+		all_rows.append((scenario, scenario_data))
 
-	table_sources = pd.DataFrame({
-				"Equity":["{:.1f}".format(equity_drawn)],				
-				"Share capital":["{:.1f}".format(share_capital_drawn)],
-				"Shareholder loan":["{:.1f}".format(shl_drawn)],
-				"Senior debt":["{:.1f}".format(debt_amount)],
-				"Total":["{:.1f}".format(fp_sources)],
-				})
-	return table_sources
+		# After the first scenario, append a blank row
+		if len(all_rows) == 1:
+			all_rows.append(('Blank Row', [''] * len(metrics)))
+
+	# Add the processed rows to the table_sensi dictionary
+	for scenario, data in all_rows:
+		table_sensi[scenario] = data
+
+	return table_sensi
 
 
 
+def create_table_val(valuation_results):
+    table_val = {}
 
-def create_table(results, metrics, formats={}):
+    discount_factors = []
+    valuations = []
+
+    for scenario, values in valuation_results.items():
+        discount_factors.append('{:.1f}%'.format(values['discount_factor'] * 100))
+        valuations.append(int(values['valuation']))
+
+    table_val['Discount factor'] = discount_factors
+    table_val['Valuation'] = valuations
+
+    return table_val
+
+
+def create_table(results, specific_formats=None):
 	table = {}
 
-	for metric, data in zip(metrics, results):
-		fmt = formats.get(metric, "{}")
-		formatted_val = fmt.format(data)
+	# Default format to be applied if no specific format is provided
+	default_format = "{:.1f}"
+
+	for metric, data in results.items():
+		# Determine the format to use for this metric
+		fmt = specific_formats.get(metric, default_format) if specific_formats else default_format
+
+		# Check if the format is None
+		if fmt is None:
+			formatted_val = data  # Keep the data as is
+		elif isinstance(data, str):
+			try:
+				# Convert string to float and format it, if possible
+				formatted_val = fmt.format(float(data))
+			except (ValueError, TypeError):
+				# If conversion fails, or format code is incompatible, keep the data as is
+				formatted_val = data
+		else:
+			# Apply the formatting to non-string data
+			formatted_val = fmt.format(data)
+
 		table[metric] = {0: formatted_val}
 
 	return table
 
-debt_metrics = ["Debt amount", "Constraint", "Effective gearing", "Tenor (door-to-door)", "Average life", "Average DSCR", "Debt IRR"]
-debt_formats = {
-    "Debt amount": "{:.0f}",
-    "Effective gearing": "{:.2%}",
-    "Tenor (door-to-door)": "{:.1f}",
-    "Average life": "{:.1f}",
-    "Average DSCR": "{:.2f}x",
-    "Debt IRR": "{:.2%}"
+output_table_formats = {
+"Effective gearing": "{:.2%}",
+"Average DSCR": "{:.2f}x",
+"Debt IRR": "{:.2%}",
+"Share capital IRR": "{:.2%}",
+"Shareholder loan IRR": "{:.2%}",
+"Equity IRR": "{:.2%}",
+"Project IRR (pre-tax)": "{:.2%}",
+"Project IRR (post-tax)": "{:.2%}",
+"Financing plan": None,
+"Balance sheet	": None,
+"Maturity": None,
 }
-
-equity_metrics = ["Share capital IRR", "Shareholder loan IRR", "Equity IRR", "Payback date", "Payback time"]
-equity_formats = {
-    "Share capital IRR": "{:.2%}",
-    "Shareholder loan IRR": "{:.2%}",
-    "Equity IRR": "{:.2%}"
-}
-
-project_irr_metrics = ["Project IRR (pre-tax)", "Project IRR (post-tax)"]
-project_irr_formats = {
-    "Project IRR (pre-tax)": "{:.2%}",
-    "Project IRR (post-tax)": "{:.2%}"
-}
-
-audit_metrics = ["Financing plan", "Balance sheet", "Debt maturity"]
-
-def create_table_debt(results_debt_displayed):
-    return create_table(results_debt_displayed, debt_metrics, debt_formats)
-
-def create_table_equity(results_equity_displayed):
-    return create_table(results_equity_displayed, equity_metrics, equity_formats)
-
-def create_table_projectIRR(results_projectIRR_displayed):
-    return create_table(results_projectIRR_displayed, project_irr_metrics, project_irr_formats)
-
-def create_table_audit(results_audit_displayed):
-    return create_table(results_audit_displayed, audit_metrics)
-
-
-
-
 
 def find_payback_date(series_end_period,equity_cash_flows_cumul):
 

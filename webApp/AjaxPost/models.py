@@ -314,3 +314,18 @@ class Project(models.Model):
 	cfe_intercommunal_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	cfe_specific_eqp_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	cfe_localCCI_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+
+	financial_close_check = models.BooleanField(default=False)
+	discount_factor_valuation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=7)
+
+
+class ComputationResult(models.Model):
+	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
+	financial_close_result = models.JSONField()
+	timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class SponsorCaseResult(models.Model):
+	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
+	sponsor_case_result = models.JSONField()
+	timestamp = models.DateTimeField(auto_now_add=True)

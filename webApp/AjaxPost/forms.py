@@ -61,6 +61,7 @@ DSRA_CHOICES= [
 class ProjectForm(forms.ModelForm):
 	calculation_type = forms.CharField(widget=forms.HiddenInput(), required=False)
 
+
 	class Meta:
 	 model = Project
 	 fields = '__all__'
@@ -92,6 +93,12 @@ class ProjectForm(forms.ModelForm):
 		'sensi_production': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-30', 'max': '30'}),
 		'sensi_inflation': forms.TextInput(attrs={'step': '1', 'type': 'range', 'value': '0', 'min': '-3', 'max': '3'}),
 		'sensi_opex': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
+
+
+		'financial_close_check': forms.CheckboxInput(attrs={'class': 'form-check-input', 'type': 'checkbox', 'role': 'switch', 'id': 'flexSwitchCheckDefault'}),
+
+
+
 		}
 	 
 	def __init__(self, *args, **kwargs):
@@ -102,6 +109,7 @@ class ProjectForm(forms.ModelForm):
 								   self.fields['injection_choice'],
 								   self.fields['calculation_detail'],
 								   self.fields['DSRA_choice'],
+								   self.fields['financial_close_check'],
 					
 			
 								   ]

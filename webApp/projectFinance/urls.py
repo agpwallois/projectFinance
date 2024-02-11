@@ -16,13 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from AjaxPost.views import project_list, project_view, test, testsimple
-from authentication.views import LoginPageView
+from authentication.views import LoginPageView, HomePageView
 from api_integration import views
 
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
-	path('', LoginPageView.as_view(), name='login'),
+	path('login/', LoginPageView.as_view(), name='login'),
+	path('', HomePageView.as_view(), name='home'),
 	path('projects/', project_list, name='project_list'),
 	path('project/<int:id>/', project_view, name='project_view'),
 	path('test/<int:id>/', test, name='test'),
