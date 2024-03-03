@@ -24,6 +24,14 @@ class Project(models.Model):
 	)
 
 
+	CONTRACT_CHOICES = (
+		('FiT', 'FiT'),
+		('CfD - E16', 'CfD - E16'),
+		('CfD - E17', 'CfD - E17'),
+		('CfD - AO', 'CfD - AO'),
+		('Corporate PPA', 'Corporate PPA'),
+	)
+
 	created_date = models.DateTimeField(auto_now_add=True)
 	updated_date = models.DateTimeField(auto_now=True)
 	
@@ -317,6 +325,11 @@ class Project(models.Model):
 
 	financial_close_check = models.BooleanField(default=False)
 	discount_factor_valuation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=7)
+
+
+
+	contract = models.fields.CharField(choices=CONTRACT_CHOICES,max_length=100,default="CfD - AO")
+	rotor_diameter = models.fields.DecimalField(max_digits=4, decimal_places=2, default=92)
 
 
 class ComputationResult(models.Model):

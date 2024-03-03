@@ -11,6 +11,8 @@ from dateutil import parser
 from dateutil.parser import ParserError
 from pyxirr import xirr
 import traceback
+import math
+
 
 # Django imports
 from django.http import JsonResponse
@@ -27,6 +29,7 @@ from .property_taxes import property_tax, tfpb_standard_reduction
 import requests
 from django.urls import reverse
 from api_integration.views import get_data
+from sofr.views import create_SOFRForwardCurve
 import json
 from .taxes import data
 
@@ -166,7 +169,7 @@ def project_list(request):
 	yearly_revenues_technology = json.dumps(technology_yearly_total_revenues_sum)
 	yearly_revenues_country = json.dumps(country_yearly_total_revenues_sum)
 
-
+	sofr = import_sofr(request)
 
 
 	context = {'projects': projects,
@@ -177,7 +180,7 @@ def project_list(request):
 				'project_data': project_data,
 				'yearly_revenues_technology': yearly_revenues_technology,
 				'yearly_revenues_country': yearly_revenues_country,
-				
+				'sofr':sofr,
 	}
 
 
@@ -259,6 +262,14 @@ def handle_post_request(request,id):
 		for key in dict_scenario:
 			
 			production = calc_production(request,seasonality,capacity['after_degradation'], dict_scenario, key)*(1+dict_scenario[key]["sensi_prod"]) 
+			capacity_factor = calc_capacity_factor(production,installed_capacity,days_series['days_operations'])
+
+
+			production_under_contract = production * time_series['pct_in_contract_period'] * time_series['pct_in_operations_period']
+			
+			production_under_contract_cumul = calc_production_cumul(production_under_contract,flags['start_calendar_year'])
+
+			contract_price = calc_contract_price(inputs['contract'],inputs['wind_turbine_installed'], inputs['rotor_diameter'],production_under_contract, production_under_contract_cumul, capacity_factor, days_series,time_series,flags)
 		
 			index = calc_index(inputs, years_from_base_dates, dict_scenario, key)
 
@@ -564,6 +575,8 @@ def handle_post_request(request,id):
 				},
 				"Price": {
 					"Contract price (unindexed)": prices["contracted_real"].tolist(),
+					"Contract price (unindexed) correct": contract_price.tolist(),
+
 					"Contract price (indexed)": prices["contracted_nom"].tolist(),
 					"Electricity market price (unindexed)": prices["merchant_real"],
 					"Electricity market price (indexed)": prices["merchant_nom"].tolist(),
@@ -573,6 +586,9 @@ def handle_post_request(request,id):
 					"Capacity before degradation": capacity["before_degradation"].tolist(),
 					"Capacity degradation factor": capacity["degradation_factor"].tolist(),
 					"Production": production.tolist(),
+					"Capacity factor": capacity_factor.tolist(),
+
+					"Contracted production in calendar year to date": production_under_contract_cumul.tolist(),
 				},
 				"WCRec": {
 					"Accounts receivables (BoP)": working_cap["acc_receivables_bop"].tolist(),
@@ -1192,8 +1208,9 @@ def get_inputs(request):
 
 		'calculation_detail': int(post_data['calculation_detail']),
 
+		'contract': post_data['contract'],
 
-
+		'rotor_diameter': float(post_data['rotor_diameter']),
 
 		'lease': float(post_data['lease']),
 		'index_rate_lease': float(post_data['lease_indexation']) / 100,		
@@ -1477,6 +1494,100 @@ def create_timeline_series(inputs):
 
 
 
+def calc_contract_price(contract_type, wind_turbine_installed, rotor_diameter,production_under_contract, production_under_contract_cumul,capacity_factor, days_series,time_series,flags):
+	if contract_type == 'FiT':
+		return calc_contract_E17_price(wind_turbine_installed,rotor_diameter,production_under_contract, production_under_contract_cumul)
+	elif contract_type == 'CfD - E16':
+		return calc_contract_E16_price(capacity_factor, days_series,time_series,flags)
+	elif contract_type == 'CfD - E17':
+		return calc_contract_E17_price(wind_turbine_installed,rotor_diameter,production_under_contract, production_under_contract_cumul)
+	elif contract_type == 'CfD - AO':
+		return calc_contract_E17_price(wind_turbine_installed,rotor_diameter,production_under_contract, production_under_contract_cumul)
+	elif contract_type == 'Corporate PPA':
+		return calc_contract_E17_price(wind_turbine_installed,rotor_diameter,production_under_contract, production_under_contract_cumul)
+	else:
+		raise ValueError("Invalid contract type")
+
+
+def calc_contract_E17_price(wind_turbine_installed,rotor_diameter,production_under_contract, production_under_contract_cumul):
+
+	# Constants for price calculation
+	coefficient_KI = 13/(rotor_diameter/110)
+	annual_production_ceiling = 1/20*coefficient_KI*math.pi*(rotor_diameter/2)**2*wind_turbine_installed
+
+	# Rotor diameter price adjustment thresholds
+	lower_rotor_diameter = 80
+	upper_rotor_diameter = 100
+	before_ceiling_lower_price = 74
+	before_ceiling_upper_price = 72
+	
+	# Calculate price before reaching the ceiling
+	before_ceiling_price = before_ceiling_lower_price + ((before_ceiling_upper_price - before_ceiling_lower_price) / (upper_rotor_diameter - lower_rotor_diameter)) * (rotor_diameter - lower_rotor_diameter)
+	
+	# Fixed price after exceeding the ceiling
+	after_ceiling_price = 40
+
+	# Determine production above the annual limit
+	production_above_ceiling = np.maximum(production_under_contract_cumul-annual_production_ceiling,0)
+
+	# Calculate contract price based on whether production is above or below the ceiling
+	contract_E17_price = np.where(production_under_contract > 0, (production_above_ceiling * after_ceiling_price + (production_under_contract - production_above_ceiling) * before_ceiling_price) / production_under_contract, 0)
+	
+	return contract_E17_price
+
+
+def calc_contract_E16_price(capacity_factor, days_series, time_series,flags):
+
+	avg_equiv_operating_hours_per_year_lower = 2400
+	avg_equiv_operating_hours_per_year_mid = 2800
+	avg_equiv_operating_hours_per_year_upper = 3600
+
+	TDCC_index_factor = 0.9875
+
+	price_lower = 82
+	price_mid = 68
+	price_upper = 28
+
+	equiv_operating_hours = sum(capacity_factor*days_series['contracted']*24)/sum(time_series['pct_in_contract_period'])
+	
+	contract_E16_price = interpolate_E16(equiv_operating_hours)*flags['contract']
+
+	return contract_E16_price
+
+def interpolate_E16(x):
+
+	points = np.array([[2400, 80.98], [2800, 67.15], [3600, 27.65]])
+	# If x is below the lowest x value in the points, return the corresponding y value
+	if x <= points[0][0]:
+		return points[0][1]
+	# If x is above the highest x value in the points, return the corresponding y value
+	elif x >= points[-1][0]:
+		return points[-1][1]
+	# Otherwise, interpolate between the appropriate points
+	else:
+		for i in range(len(points) - 1):
+			if points[i][0] <= x <= points[i + 1][0]:
+				x1, y1 = points[i]
+				x2, y2 = points[i + 1]
+				# Linear interpolation formula
+				y = y1 + (y2 - y1) * (x - x1) / (x2 - x1)
+				return y
+
+
+
+
+def calc_production_cumul(production, start_calendar_year):
+
+	cumulative_production = np.zeros_like(production)
+	for i in range(len(production)):
+		if start_calendar_year[i] == 1:
+			cumulative_production[i] = production[i]
+		else:
+			cumulative_production[i] = cumulative_production[i - 1] + production[i]
+
+	return cumulative_production
+
+
 def calc_valuation(valuation_df, end_period, equity_cash_flows):
 
 	end_period = pd.to_datetime(end_period)
@@ -1659,8 +1770,9 @@ def calc_prices(request, time_series, inputs, flags, index, dict_scenario, key):
 
 
 def calc_revenues(production, prices, time_series):
-	contracted_revenues = (production * prices['contracted_nom'] / 1000 * time_series['pct_in_contract_period'] * time_series['pct_in_operations_period'])
 	
+	contracted_revenues = (production * prices['contracted_nom'] / 1000 * time_series['pct_in_contract_period'] * time_series['pct_in_operations_period'])
+
 	market_revenues = (production * prices['merchant_nom'] / 1000 * (1-time_series['pct_in_contract_period']) * time_series['pct_in_operations_period'])
 	
 	total_revenues = contracted_revenues + market_revenues
@@ -2220,6 +2332,13 @@ def create_series(inputs):
 	return all_series
 
 
+
+def import_sofr(request):
+
+	sofr = create_SOFRForwardCurve(request)
+
+	return sofr
+
 def import_dev_tax_commune(request,city_name):
 
 	response = json.loads(get_data(request, city_name).content)
@@ -2259,6 +2378,19 @@ def calc_production(request,seasonality,capacity_after_degradation, dict_scenari
 		production = P50
 
 	return production
+
+
+
+
+
+def calc_capacity_factor(production,installed_capacity,days_operations):
+
+	capacity_factor = np.where(days_operations>0,production/((installed_capacity*days_operations*24)/1000),0)
+
+	return capacity_factor
+
+
+
 
 
 def determine_debt_constraint(debt_amount,debt_amount_gearing):
@@ -2395,19 +2527,19 @@ def create_table_sensi(results):
 
 
 def create_table_val(valuation_results):
-    table_val = {}
+	table_val = {}
 
-    discount_factors = []
-    valuations = []
+	discount_factors = []
+	valuations = []
 
-    for scenario, values in valuation_results.items():
-        discount_factors.append('{:.1f}%'.format(values['discount_factor'] * 100))
-        valuations.append(int(values['valuation']))
+	for scenario, values in valuation_results.items():
+		discount_factors.append('{:.1f}%'.format(values['discount_factor'] * 100))
+		valuations.append(int(values['valuation']))
 
-    table_val['Discount factor'] = discount_factors
-    table_val['Valuation'] = valuations
+	table_val['Discount factor'] = discount_factors
+	table_val['Valuation'] = valuations
 
-    return table_val
+	return table_val
 
 
 def create_table(results, specific_formats=None):

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'AjaxPost',
     'authentication',
     'api_integration',
+    'sofr',
 ]
 
 MIDDLEWARE = [
