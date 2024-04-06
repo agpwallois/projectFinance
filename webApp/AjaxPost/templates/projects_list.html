@@ -166,7 +166,9 @@
 
                         {% block jquery4 %}{% include 'charts_sofr.html' %}{% endblock %}
 
+
                     {{ sofr }}
+
 
        </div>
  
@@ -196,6 +198,14 @@
     chartSOFR.data.labels = labels;
     chartSOFR.data.datasets[0].data = data;
     chartSOFR.update();
+
+
+    var labelsh = Object.keys({{ historical_sofr|safe }});
+    var datah = Object.values({{ historical_sofr|safe }});
+    charthistoricalSOFR.data.labels = labelsh;
+    charthistoricalSOFR.data.datasets[0].data = datah;
+    charthistoricalSOFR.update();
+
 
 </script>
 

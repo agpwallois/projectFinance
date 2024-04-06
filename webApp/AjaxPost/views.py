@@ -30,6 +30,8 @@ import requests
 from django.urls import reverse
 from api_integration.views import get_data
 from sofr.views import create_SOFRForwardCurve
+from sofr.views import get_historical_sofr
+
 import json
 from .taxes import data
 
@@ -170,6 +172,7 @@ def project_list(request):
 	yearly_revenues_country = json.dumps(country_yearly_total_revenues_sum)
 
 	sofr = import_sofr(request)
+	historical_sofr = create_historical_sofr(request)
 
 
 	context = {'projects': projects,
@@ -181,6 +184,8 @@ def project_list(request):
 				'yearly_revenues_technology': yearly_revenues_technology,
 				'yearly_revenues_country': yearly_revenues_country,
 				'sofr':sofr,
+				'historical_sofr':historical_sofr,
+			
 	}
 
 
@@ -2338,6 +2343,14 @@ def import_sofr(request):
 	sofr = create_SOFRForwardCurve(request)
 
 	return sofr
+
+
+
+def create_historical_sofr(request):
+
+	historical_sofr = get_historical_sofr(request)
+
+	return historical_sofr
 
 def import_dev_tax_commune(request,city_name):
 

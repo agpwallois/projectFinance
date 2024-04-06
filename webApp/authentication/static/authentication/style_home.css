@@ -17,7 +17,7 @@ body {
 }
 
 header {
-    width: 70%;
+    width: 75%;
     height: 100%; /* Make the header take the full height of its parent */
     display: flex;
     align-items: center; /* Vertically align items */
@@ -28,33 +28,89 @@ header {
 
 
 
-
-
 content-wrapper { 
-    width: 70%;
+    width: 75%;
     margin: 0 auto;
     display: flex;
     flex-direction: column; 
 
 }
 
-
-
 #frontpage {
   position: relative;
+  text-align: center;
   margin-top: 50px;
 }
 
-#frontpage h1 {
+
+#frontpage .text-container {
   position: absolute;
-  margin: 30px;
-  z-index: 1; 
+    margin: 0 auto;
+    justify-content: center; 
+    align-items: center;
+    width: 100%;
+    margin-top: 30px;
 }
 
+
+.inner-div {
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+}
+
+
+.highlight-white {
+    background-color: white;
+    border-radius: 5px;
+    padding: 5px 7px;
+    color: black;
+
+
+}
+
+
 #frontpage img {
-  display: block;
   width: 100%;
+  display: block;
+  max-width: 100%; /* Adjust this value based on your preference */
   height: auto;
+}
+
+
+.with-separator {
+    margin-top: 20px;
+}
+
+
+.div2-content {
+    margin: 0 auto;
+    display: flex;
+    margin-top: ;
+}
+
+.checkbox-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding-left: 0; /* Remove default padding */
+    line-height: 2; 
+}
+
+
+.checkbox-list li::before {
+    content: "\2713"; /* Unicode character for a checkmark */
+    display: inline-block;
+    width: 1em; /* Adjust size of checkbox */
+    margin-right: 0.5em; /* Add space between checkbox and text */
+    font-weight: bold; /* Make the checkbox bold */
+}
+
+.div2-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align children to the left */
+    flex: 1;
+    min-width: 0; 
 }
 
 
@@ -66,9 +122,9 @@ content-wrapper {
 padding: 5px 10px; 
 text-decoration: none;
 color:white;
-border:1px solid #0f62fe;
+border:1px solid white;
 border-radius: 3px;
-background-color: #0f62fe; 
+background-color: none; 
 
 }
 #demo:hover {
@@ -78,10 +134,10 @@ background-color: #0f62fe;
   margin: 30px;
 padding: 5px 10px; 
 text-decoration: none;
-color:white;
-border:1px solid #0353E9;
+color:black;
+border:1px solid white;
 border-radius: 3px;
-background-color: #0353E9; 
+background-color: white; 
 
 }
 
@@ -95,7 +151,6 @@ background-color: #0353E9;
 
 content { 
     margin-top: 20px; 
-    margin-bottom: 20px; 
 }
 
 
@@ -168,7 +223,7 @@ nav {
 
 .list-group-item:hover{
     border: none;
-    border-left: solid 4px #C3C3C3;
+    border-left: solid 4px #0096BB;
     background-color: white;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -187,7 +242,7 @@ border-bottom-left-radius:0px;
 }
 
 .list-group-item.active {
-    border-left: solid 4px #4369C2;
+    border-left: solid 4px #0096BB;
     background-color: white; 
     color:black;  
     font-weight: bold; 
@@ -208,7 +263,7 @@ border-bottom-left-radius:0px;
 }
 
 .nav-item.active {
-    border-bottom: solid 2px #4369C2;
+    border-bottom: solid 2px #0096BB;
     margin-left: 2px;
     color:black;
     font-weight: bold;
@@ -218,15 +273,16 @@ border-bottom-left-radius:0px;
 footer {
     display: flex;
     justify-content: space-between;
-    padding-top: 40px;
-    background-color: #262626;
-    color:white;
-    padding-bottom:20px;
+    padding-top: 10px;
+    background-color: #F4F4F4;
+    color:black;
+    min-height: 50px;
+    border-radius: 10px 10px 0 0;
 
 }
 
 .footer-content {
-    width: 70%;
+    width: 75%;
     margin: 0 auto;
     display: flex;
 }
@@ -248,11 +304,11 @@ footer {
 
 
 .footer-column a {
-    color: #C6C6C6;   
+    color: black;   
 }
 
 .footer-column a:hover {
-    color: white;   
+    color: #696969;   
 }
 
 
@@ -270,13 +326,13 @@ font-size: 1.5rem;
 
 h3 {
 font-weight: 600;
-font-size: 1.5rem;
+font-size: 1.15rem;
 }
 
 
 
 h4 {
-color: white;
+color: black;
 font-size: 1rem;
 font-weight: bold;
 }
@@ -331,12 +387,6 @@ font-family: 'Alliance No.1', sans-serif;
 
 
 
-.with-separator {
-    border-top: 1px solid #cdcdcd; 
-    margin-top: 20px; 
-    padding-top: 20px;
-
-}
 
 
 
@@ -349,7 +399,7 @@ font-family: 'Alliance No.1', sans-serif;
 
 .column {
     flex: 1; /* Each column takes equal width */
-    padding: 20px; /* Padding around the content of each column */
+    padding: 0 20px 20px; /* Padding around the content of each column */
     gap: 10px; /* Space between title, text, and link */
 }
 
