@@ -335,6 +335,7 @@ class Project(models.Model):
 class ComputationResult(models.Model):
 	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
 	financial_close_result = models.JSONField()
+	dashboard_tables = models.JSONField(default=dict)
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 

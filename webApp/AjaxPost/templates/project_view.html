@@ -12,16 +12,10 @@
 	<div class="sidebar"><h1 id="project_name">{{ project_form.technology.value }}: {{ project.name }} ({{ project_form.country.value }})</h1>
 
 
-			<div id="FCToggle">	
-				<div id="FCToggleLabel">Save Financial Close assumptions</div>
-			<div class="form-check form-switch">
-				
-				<label class="form-check-label" for="flexSwitchCheckDefault"></label>
-		    	{{ project_form.financial_close_check }}
-		    </div>	
-		    </div>	
+
 
 			<div>{{ project_form.calculation_type }}</div>
+			<button class="button" type="submit">Submit</button>
 			
 			<div class="fieldWrapper" id="the_post">
 
@@ -2450,10 +2444,6 @@
 			$("#RadioScenario1").prop('checked', true);
 		});
 
-		$("#btn-form").on('click', function() {
-			setCalculationTypeAndSubmit('none');
-			$("#RadioScenario1").prop('checked', true);
-		});
 
 		// Mapping of radio button IDs to their corresponding values
 		var radioValueMap = {
@@ -2479,40 +2469,24 @@
 			$("#post-form").submit();
 		}
 
-		$(document).ready(function() {
-			$('#id_sensi_production').on('input', function() {
-			  $("#post-form").submit();
-			});
-		  });
+	$(document).ready(function() {
+	    // Select all the input fields that need to trigger the form submission
+	    var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
 
+	    // Function to submit the form
+	    function submitForm() {
+	        $("#post-form").submit();
+	    }
 
+	    // Loop through each input field
+	    inputFields.forEach(function(inputField) {
+	        // Add an event listener to the input field
+	        $(inputField).on('input change', submitForm);
+	    });
 
-		$(document).ready(function() {
-		    $('.assumption-input').on('change', function() {
-		        $("#post-form").submit();
-		    });
-		});
-
-		$(document).ready(function() {
-			$('#id_sensi_opex').on('input', function() {
-			  $("#post-form").submit();
-			});
-		  });
-
-
-		$(document).ready(function() {
-			$('#id_sensi_inflation').on('input', function() {
-			  $("#post-form").submit();
-			});
-		  });
-
-
-		$(document).ready(function() {
-			$('#flexSwitchCheckDefault').on('input', function() {
-			  $("#post-form").submit();
-			});
-		  });
-
+	    // Add an event listener to the submit button
+	    $('#submit-button').on('click', submitForm);
+	});
 
 	$(document).on('submit','#post-form', function(e){
 
@@ -2649,11 +2623,15 @@
 			url:"",
 			data: $(this).serialize(),
 			success:function(json){
-				console.log(json);
+				console.log(json.df['computation_displayed']);
+
+
+
+				console.log(json.execution_times);
 
 				// Create a dictionnary of key selectors based on df keys
 				var dict_full = {};
-				$.each(json.df, function(key, value) {
+				$.each(json.df['computation_displayed'], function(key, value) {
 				
 				  dict_full[key] = { selector: "#" + key };
 				});
@@ -2808,9 +2786,9 @@
 			  const { selector } = dict[key];
 			  let tableContent = "<table>";
 
-			  for (const subKey in json.df) {
+			  for (const subKey in json.df['computation_displayed']) {
 			    if (subKey.startsWith(key)) {
-			      const data = json.df[subKey];
+			      const data = json.df['computation_displayed'][subKey];
 
 			      tableContent += "<tr>";
 			      $.each(data, function (index, dataValue) {
@@ -2829,7 +2807,7 @@
 			        	tableContent += "<td></td>";
 			        } else {
 
-				          tableContent += "<td>" + formatOther(json.df_sum[subKey][index]) + "</td>";
+				          tableContent += "<td>" + formatOther(json.df['computation_displayed_sums'][subKey][index]) + "</td>";
 				    }    
 
 			        $.each(dataValue, function (i, datapoint) {
@@ -2904,8 +2882,7 @@
 				  { data: json.tables['Uses'], selector: "#summary_financing_plan_uses" },
 				  { data: json.tables['Sources'], selector: "#summary_financing_plan_sources" },
 				  { data: json.tables['Sensi'], selector: "#summary_sensi" },
-				  { data: json.tables['Valuation'], selector: "#summary_valuation" },
-				  { data: json.tables['Outcome'], selector: "#summary_outcome" },
+
 
 				];
 
@@ -2914,166 +2891,105 @@
 
 
 
-
-
-
-
-
-
-
-
-				$("#myTableAll").html();
-
-				for (var i = 0; i < 42; i++) {
-					$("#elecPriceLabel"+i).html(json.dic_price_elec_keys[i]);
-				}
-
-				var dict_sidebar = {
-				formatted_date_COD:"#dateCOD",
-				installed_capacity:"#installed_capacity",
-				end_of_operations_formatted:"#dateRetirement",
-				sum_seasonality:"#sumSeasonality",
-				sum_construction_costs:"#sumConstructionCosts",
-				liquidation_formatted:"#dateLiquidation",
-				date_debt_maturity:"#debtMaturity",
-
-				};
-
-				for (var i = 0; i < Object.keys(dict_sidebar).length; i++) {
-					$(Object.values(dict_sidebar)[i]).html(json.data_dump_sidebar[i]);
-				}
-
-
-
-		        function createTable(data) {
-		            var table = "<table>";
-		            
-		            for (var key in data) {
-		                var percentage = (data[key]).toFixed(2) + "%"; // Format as percentage with two decimal places
-		                table += "<tr><td>" + key + "</td><td>" + percentage + "</td></tr>";
-		            }
-		            
-		            table += "</table>";
-		            return table;
-		        }
-
-		        $("#tfpb_rates").html(createTable(json.tfpb_rates));
-				$("#api_dev_tax_commune").html(createTable(json.dev_tax_rates));
-
-
-
-				if ($("#flexSwitchCheckDefault").prop("checked")) {
-
-				$("#tab-archives").show();
-				$("#tab-valuation").show();
-
-				chartProduction.data.labels = Object.values(json.FC_results['Dates']['Period end']);
-				chartProduction.data.datasets[0].data = Object.values(json.df_sum_y['Prod']['Production']);
-				chartProduction.data.datasets[1].data = Object.values(json.FC_results['Prod']['Production']);
-				chartProduction.update();
-				}
-
-
-
-				chartProjectCosts.data.labels = Object.values(json.df_construction['Dates']['Period end']);
-				chartProjectCosts.data.datasets[0].data = Object.values(json.df_construction['FP_u']['Construction costs']);
-				chartProjectCosts.data.datasets[1].data = Object.values(json.df_construction['Graphs']['Cumulative total uses']);
-				chartProjectCosts.data.datasets[2].data = Object.values(json.df_construction['FP_u']['Development fee']);
-				chartProjectCosts.data.datasets[3].data = Object.values(json.df_construction['Graphs']['Debt fees']);
-				chartProjectCosts.data.datasets[4].data = Object.values(json.df_construction['FP_u']['Initial DSRA funding']);
-				chartProjectCosts.data.datasets[5].data = Object.values(json.df_construction['Graphs']['Local taxes']);
-
+				chartProjectCosts.data.labels = Object.values(json.df['computation_construction']['Dates']['Period end']);
+				chartProjectCosts.data.datasets[0].data = Object.values(json.df['computation_construction']['FP_u']['Construction costs']);
+				chartProjectCosts.data.datasets[1].data = Object.values(json.df['computation_construction']['Graphs']['Cumulative total uses']);
+				chartProjectCosts.data.datasets[2].data = Object.values(json.df['computation_construction']['FP_u']['Development fee']);
+				chartProjectCosts.data.datasets[3].data = Object.values(json.df['computation_construction']['Graphs']['Debt fees']);
+				chartProjectCosts.data.datasets[4].data = Object.values(json.df['computation_construction']['FP_u']['Initial DSRA funding']);
+				chartProjectCosts.data.datasets[5].data = Object.values(json.df['computation_construction']['Graphs']['Local taxes']);
 				chartProjectCosts.update();
 
-				chartFinPlan.data.labels = Object.values(json.df_construction['Dates']['Period end']);
-				chartFinPlan.data.datasets[0].data = Object.values(json.df_construction['Graphs']['Share capital injections neg']);
-				chartFinPlan.data.datasets[1].data = Object.values(json.df_construction['Graphs']['Shareholder loan injections neg']);
-				chartFinPlan.data.datasets[2].data = Object.values(json.df_construction['Graphs']['Senior debt drawdowns neg']);
-				chartFinPlan.data.datasets[3].data = Object.values(json.df_construction['FP_u']['Total uses']);
-				chartFinPlan.data.datasets[4].data = Object.values(json.df_construction['Graphs']['Gearing during financing plan']);
+		
+				chartFinPlan.data.labels = Object.values(json.df['computation_construction']['Dates']['Period end']);
+				chartFinPlan.data.datasets[0].data = Object.values(json.df['computation_construction']['Graphs']['Share capital injections neg']);
+				chartFinPlan.data.datasets[1].data = Object.values(json.df['computation_construction']['Graphs']['Shareholder loan injections neg']);
+				chartFinPlan.data.datasets[2].data = Object.values(json.df['computation_construction']['Graphs']['Senior debt drawdowns neg']);
+				chartFinPlan.data.datasets[3].data = Object.values(json.df['computation_construction']['FP_u']['Total uses']);
+				chartFinPlan.data.datasets[4].data = Object.values(json.df['computation_construction']['Graphs']['Gearing during financing plan']);
 				chartFinPlan.update();	
 
 
-				const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR, chartDSRA, chartCash];
+const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR, chartDSRA, chartCash];
 
 				const datasets = [
-				  [Object.values(json.df['Graphs']['Operating expenses pos']), 
-				  	Object.values(json.df['Graphs']['Lease pos']),
-				  	Object.values(json.df['IS']['Contracted revenues']), 
-				  	Object.values(json.df['IS']['Uncontracted electricity revenues']),
-				  	Object.values(json.df['Graphs']['Debt service'])],
+				  [Object.values(json.df['computation_displayed']['Graphs']['Operating expenses pos']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Lease pos']),
+				  	Object.values(json.df['computation_displayed']['IS']['Contract revenues']), 
+				  	Object.values(json.df['computation_displayed']['IS']['Merchant revenues']),
+				  	Object.values(json.df['computation_displayed']['Graphs']['Debt service'])],
 				
-				  [Object.values(json.df['Graphs']['Share capital injections and repayment']), 
-				  	Object.values(json.df['Graphs']['Shareholder loan injections and repayment']),
-				  	Object.values(json.df['Graphs']['Dividends paid pos']), 
-				  	Object.values(json.df['Graphs']['IRR curve'])],
+				  [Object.values(json.df['computation_displayed']['Graphs']['Share capital injections and repayment']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Shareholder loan injections and repayment']),
+				  	Object.values(json.df['computation_displayed']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['IRR curve'])],
 
-				  [Object.values(json.df['Sizing']['Interests during operations']), 
-				  	Object.values(json.df['Graphs']['Senior debt repayments']),
-				  	Object.values(json.df['Ratio']['DSCR'])],
-
-
-				  [Object.values(json.df['Debt_b']['Drawdowns']), 
-				  	Object.values(json.df['Graphs']['Senior debt repayments']),
-				  	Object.values(json.df['Debt_b']['Closing balance'])],
-
-				  [Object.values(json.df['Ratio']['DSCR']), 
-				  	Object.values(json.df['Ratio']['LLCR']),
-				  	Object.values(json.df['Ratio']['PLCR'])],
+				  [Object.values(json.df['computation_displayed']['Sizing']['Interests during operations']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed']['Ratio']['DSCR'])],
 
 
-				  [Object.values(json.df['Graphs']['Debt service']), 
-				  	Object.values(json.df['DSRA']['DSRA (BoP)'])],
+				  [Object.values(json.df['computation_displayed']['Debt_b']['Drawdowns']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed']['Debt_b']['Closing balance'])],
+
+				  [Object.values(json.df['computation_displayed']['Ratio']['DSCR']), 
+				  	Object.values(json.df['computation_displayed']['Ratio']['LLCR']),
+				  	Object.values(json.df['computation_displayed']['Ratio']['PLCR'])],
 
 
-				  [Object.values(json.df['RE_b']['Balance brought forward']), 
-				  	Object.values(json.df['Distrib_EOP']['Distribution account balance']),
-				  	Object.values(json.df['Graphs']['Dividends paid pos']), 
-				  	Object.values(json.df['Graphs']['Share capital repayment pos'])],
+				  [Object.values(json.df['computation_displayed']['Graphs']['Debt service']), 
+				  	Object.values(json.df['computation_displayed']['DSRA']['DSRA (BoP)'])],
+
+
+				  [Object.values(json.df['computation_displayed']['RE_b']['Balance brought forward']), 
+				  	Object.values(json.df['computation_displayed']['Distrib_EOP']['Distribution account balance']),
+				  	Object.values(json.df['computation_displayed']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Share capital repayment pos'])],
 
 
 				];
 
 				const datasets_annual = [
-				  [Object.values(json.df_sum_y['Graphs']['Operating expenses pos']), 
-				  	Object.values(json.df_sum_y['Graphs']['Lease pos']),
-				  	Object.values(json.df_sum_y['IS']['Contracted revenues']), 
-				  	Object.values(json.df_sum_y['IS']['Uncontracted electricity revenues']),
-				  	Object.values(json.df_sum_y['Graphs']['Debt service'])],
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Operating expenses pos']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Lease pos']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['IS']['Contract revenues']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['IS']['Merchant revenues']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Debt service'])],
 
 
-				  [Object.values(json.df_sum_y['Graphs']['Share capital injections and repayment']), 
-				  	Object.values(json.df_sum_y['Graphs']['Shareholder loan injections and repayment']),
-				  	Object.values(json.df_sum_y['Graphs']['Dividends paid pos']), 
-				  	Object.values(json.df_end_y['Graphs']['IRR curve'])],
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Share capital injections and repayment']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Shareholder loan injections and repayment']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed_end_year']['Graphs']['IRR curve'])],
 
 
-				  [Object.values(json.df_sum_y['Sizing']['Interests during operations']), 
-				  	Object.values(json.df_sum_y['Graphs']['Senior debt repayments']),
-				  	Object.values(json.df_end_y['Ratio']['DSCR'])],
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Sizing']['Interests during operations']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed_end_year']['Ratio']['DSCR'])],
 
 
-				  [Object.values(json.df_sum_y['Debt_b']['Drawdowns']), 
-				  	Object.values(json.df_sum_y['Graphs']['Senior debt repayments']),
-				  	Object.values(json.df_end_y['Debt_b']['Closing balance'])],
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Debt_b']['Drawdowns']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed_end_year']['Debt_b']['Closing balance'])],
 
-				  [Object.values(json.df_end_y['Ratio']['DSCR']), 
-				  	Object.values(json.df_end_y['Ratio']['LLCR']),
-				  	Object.values(json.df_end_y['Ratio']['PLCR'])],
+				  [Object.values(json.df['computation_displayed_end_year']['Ratio']['DSCR']), 
+				  	Object.values(json.df['computation_displayed_end_year']['Ratio']['LLCR']),
+				  	Object.values(json.df['computation_displayed_end_year']['Ratio']['PLCR'])],
 
-				  [Object.values(json.df_sum_y['Graphs']['Debt service']), 
-				  	Object.values(json.df_end_y['DSRA']['DSRA (BoP)'])],
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Debt service']), 
+				  	Object.values(json.df['computation_displayed_end_year']['DSRA']['DSRA (BoP)'])],
 
-				  [Object.values(json.df_end_y['RE_b']['Balance brought forward']), 
-				  	Object.values(json.df_end_y['Distrib_BOP']['Balance brought forward']),
-				  	Object.values(json.df_sum_y['Graphs']['Dividends paid pos']), 
-				  	Object.values(json.df_sum_y['Graphs']['Share capital repayment pos'])],
+				  [Object.values(json.df['computation_displayed_end_year']['RE_b']['Balance brought forward']), 
+				  	Object.values(json.df['computation_displayed_end_year']['Distrib_BOP']['Balance brought forward']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Share capital repayment pos'])],
 
 				];
 
 
 				function updateChartAnnual(chart, datasets) {
-					chart.data.labels = Object.values(json.df_sum_y['Dates']['Period end']);
+					chart.data.labels = Object.values(json.df['computation_displayed_sums_per_year']['Dates']['Period end']);
 					datasets.forEach((data, index) => {
 						chart.data.datasets[index].data = data;
 					});
@@ -3081,7 +2997,7 @@
 				}
 
 				function updateChart(chart, datasets) {
-					chart.data.labels = Object.values(json.df['Dates']['Period end']);
+					chart.data.labels = Object.values(json.df['computation_displayed']['Dates']['Period end']);
 					datasets.forEach((data, index) => {
 						chart.data.datasets[index].data = data;
 					});
@@ -3093,7 +3009,6 @@
 			 	 	updateChartAnnual(chart, datasets_annual[index]);
 
 				});
-
 
 
 
@@ -3158,50 +3073,24 @@
 <script>
 $(document).ready(function() {
 
-		var sensi_production_field = $('#id_sensi_production').val()+'%';
-		$('#sensi_production').text(sensi_production_field);
+    // Function to handle input change
+    function handleInputChange(inputId, outputId) {
+        var field = $('#' + inputId).val() + '%';
+        $('#' + outputId).text(field);
 
-		// Adding a listener to the input field
-		$('#id_sensi_production').on('input', function() {
-			var new_value = $(this).val();
-			$('#sensi_production').text(new_value+'%');
-		});
+        // Adding a listener to the input field
+        $('#' + inputId).on('input', function() {
+            var new_value = $(this).val();
+            $('#' + outputId).text(new_value + '%');
+        });
+    }
 
-});
-
-</script>
-
-
-<script>
-$(document).ready(function() {
-
-		var sensi_opex_field = $('#id_sensi_opex').val()+'%';
-		$('#sensi_opex').text(sensi_opex_field);
-
-		// Adding a listener to the input field
-		$('#id_sensi_opex').on('input', function() {
-			var new_value = $(this).val();
-			$('#sensi_opex').text(new_value+'%');
-		});
+    // Call the function for each input field
+    handleInputChange('id_sensi_production', 'sensi_production');
+    handleInputChange('id_sensi_opex', 'sensi_opex');
+    handleInputChange('id_sensi_inflation', 'sensi_inflation');
 
 });
-
-</script>
-
-<script>
-$(document).ready(function() {
-
-		var sensi_inflation_field = $('#id_sensi_inflation').val()+'%';
-		$('#sensi_inflation').text(sensi_inflation_field);
-
-		// Adding a listener to the input field
-		$('#id_sensi_inflation').on('input', function() {
-			var new_value = $(this).val();
-			$('#sensi_inflation').text(new_value+'%');
-		});
-
-});
-
 </script>
 
 

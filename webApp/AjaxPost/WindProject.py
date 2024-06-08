@@ -15,19 +15,26 @@ class WindProject(FinancialModel):
 		self.contract_price = float(request.POST['contract_price'])
 
 
-	def calc_capacity(self,flag_operations,years_from_COD_avg):
-		capacity = self.installed_capacity*flag_operations
-		capacity = {
-			'after_degradation': capacity.tolist(),
-		}
-		return capacity
+	def create_capacity_series(self):
 
-	def comp_development_tax(self,development_tax_rate,flag_construction_start):
-		development_tax = self.wind_turbine_installed*self.dev_tax_taxable_base_wind*development_tax_rate/1000*flag_construction_start
-		development_tax = {
-			'development_tax': development_tax.tolist(),
-		}
-		return development_tax
+		self.capacity = {}
+
+		self.capacity['before_degradation'] = self.installed_capacity*self.flags['operations']
+		self.capacity['degradation_factor'] = 1/(1+0)**self.time_series['years_from_COD_avg']
+		self.capacity['after_degradation'] = self.capacity['before_degradation']
+
+
+	def comp_local_taxes(self):
+
+		self.local_taxes = {}
+	
+		self.local_taxes['development_tax'] = self.wind_turbine_installed*self.dev_tax_taxable_base_wind*self.development_tax_rate/1000*self.flags['construction_start']
+		self.local_taxes['archeological_tax'] = 0*self.flags['construction_start']
+		self.local_taxes['total'] = self.local_taxes['development_tax'] + self.local_taxes['archeological_tax']
+
+
+
+
 
 	def comp_contract_price(self):
 		contract_price = self.contract_price

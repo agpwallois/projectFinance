@@ -19,11 +19,9 @@
                         <div class="vertical_line"></div>
                     </div>
                 </div>
-                <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Projects in development</button>
+                <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Project Pipeline</button>
 
-                <button class="nav-link" id="v-pills-org-tab" data-bs-toggle="pill" data-bs-target="#v-pills-org" type="button" role="tab" aria-controls="v-pills-org" aria-selected="false">Operational projects</button>
-
-                <button class="nav-link" id="v-pills-sofr-tab" data-bs-toggle="pill" data-bs-target="#v-pills-sofr" type="button" role="tab" aria-controls="v-pills-sofr" aria-selected="false">SOFR forward curves</button>
+                <button class="nav-link" id="v-pills-org-tab" data-bs-toggle="pill" data-bs-target="#v-pills-org" type="button" role="tab" aria-controls="v-pills-org" aria-selected="false">Operational Portfolio</button>
 
 
             </div>
@@ -158,22 +156,6 @@
 
 
 
-<div class="tab-pane fade" id="v-pills-sofr" role="tabpanel" aria-labelledby="v-pills-sofr-tab" tabindex="0"> 
-
-
-            <div class="box-wrapper">
-
-
-                        {% block jquery4 %}{% include 'charts_sofr.html' %}{% endblock %}
-
-
-                    {{ sofr }}
-
-
-       </div>
- 
-
-    </div>
 </div>
 
 </div>
@@ -193,18 +175,6 @@
     chartDevCountry.data.datasets[0].data = [{{ capacity_per_country.0.total_capacity }}, {{ capacity_per_country.1.total_capacity }}];
     chartDevCountry.update(); 
 
-    var labels = Object.keys({{ sofr|safe }});
-    var data = Object.values({{ sofr|safe }});
-    chartSOFR.data.labels = labels;
-    chartSOFR.data.datasets[0].data = data;
-    chartSOFR.update();
-
-
-    var labelsh = Object.keys({{ historical_sofr|safe }});
-    var datah = Object.values({{ historical_sofr|safe }});
-    charthistoricalSOFR.data.labels = labelsh;
-    charthistoricalSOFR.data.datasets[0].data = datah;
-    charthistoricalSOFR.update();
 
 
 </script>
