@@ -5,9 +5,13 @@ import pandas as pd
 class WindProject(FinancialModel): 
 
 	def __init__(self, request):
+		self.initialize_wind_project_attributes(request)
 		super().__init__(request)
-		self.wind_turbine_installed = int(request.POST['wind_turbine_installed'])
-		self.capacity_per_turbine = float(request.POST['capacity_per_turbine'])
+
+
+	def initialize_wind_project_attributes(self, request):
+		self.wind_turbine_installed = int(self.request.POST['wind_turbine_installed'])
+		self.capacity_per_turbine = float(self.request.POST['capacity_per_turbine'])
 		self.dev_tax_taxable_base_wind = float(request.POST['dev_tax_taxable_base_wind'])
 		self.rotor_diameter = request.POST['rotor_diameter']
 		self.installed_capacity = self.wind_turbine_installed*1000*self.capacity_per_turbine

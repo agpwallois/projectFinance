@@ -1,5 +1,6 @@
 
 {% extends "base.html" %}
+{% load static %}
 {% load custom_filters %}
 
 {% block content %}
@@ -2435,40 +2436,249 @@
 	</div>
 </div>
 
+<script type="text/javascript">
+	
+    $(document).ready(function() {
+        // Select all the input fields that need to trigger the form submission
+        var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
+
+        // Function to submit the form
+        function submitForm() {
+            $("#post-form").submit();
+        }
+
+        // Loop through each input field
+        inputFields.forEach(function(inputField) {
+            // Add an event listener to the input field
+            $(inputField).on('input change', submitForm);
+        });
+
+        // Add an event listener to the submit button
+        $('#submit-button').on('click', submitForm);
+    });
+
+
+</script>
+
+
 
 
 <script type="text/javascript">
 
-		$(document).ready(function(){
-			setCalculationTypeAndSubmit('none');
-			$("#RadioScenario1").prop('checked', true);
-		});
 
 
-		// Mapping of radio button IDs to their corresponding values
-		var radioValueMap = {
-			'RadioScenario1': 'none',
-			'RadioScenario2': 'sensi-p50',
-			'RadioScenario3': 'sensi-production',
-			'RadioScenario4': 'sensi-inflation',
-			'RadioScenario5': 'sensi-opex',
+	
+$(document).ready(function(){
+	setCalculationTypeAndSubmit('none');
+	$("#RadioScenario1").prop('checked', true);
+});
 
-		};
 
-		// Generic event handler for radio buttons
-		$("[id^='RadioScenario']").on('change', function() {
-			if ($(this).prop('checked')) {
-				var value = radioValueMap[this.id];
-				setCalculationTypeAndSubmit(value);
+// Mapping of radio button IDs to their corresponding values
+var radioValueMap = {
+	'RadioScenario1': 'none',
+	'RadioScenario2': 'sensi-p50',
+	'RadioScenario3': 'sensi-production',
+	'RadioScenario4': 'sensi-inflation',
+	'RadioScenario5': 'sensi-opex',
+
+};
+
+// Generic event handler for radio buttons
+$("[id^='RadioScenario']").on('change', function() {
+	if ($(this).prop('checked')) {
+		var value = radioValueMap[this.id];
+		setCalculationTypeAndSubmit(value);
+	}
+});
+
+// Helper function to set the value and submit the form
+function setCalculationTypeAndSubmit(value) {
+	$("#id_calculation_type").val(value);
+	$("#post-form").submit();
+}
+
+
+
+
+
+</script>
+
+<script type="text/javascript">
+
+document.addEventListener("DOMContentLoaded", function() {
+    const myField = document.getElementById("project_name");
+
+    // Grouping related elements by their IDs
+    const windElements = ['wind_turbine_capacity', 'wind_turbine_number', 'wind_project_capacity', 'wind_devtax_cost', 'rotor_diameter'];
+    const solarElements = ['solar_panels_capacity', 'solar_panels_degradation', 'solar_panels_surface', 'solar_devtax_cost', 'solar_arctax_base', 'solar_arctax_cost', 'solar_arctax_title'];
+
+    function toggleDivVisibility() {
+        // Helper function to change visibility
+        const setVisibility = (ids, visible) => ids.forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) { // Check if the element exists
+                if (visible) {
+                    elem.style.visibility = 'visible';
+                    elem.style.position = 'static';
+                } else {
+                    elem.style.visibility = 'hidden';
+                    elem.style.position = 'absolute';
+                }
+            }
+        });
+
+        const isSolar = myField.textContent.startsWith("Solar");
+        setVisibility(windElements, !isSolar);
+        setVisibility(solarElements, isSolar);
+    }
+
+    toggleDivVisibility();
+
+    myField.addEventListener('change', toggleDivVisibility);
+});
+
+
+</script>
+
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+	// Get the input fields by ID prefixes
+	var fields = {
+	  startDate: $('#id_start_construction'),
+	  endDate: $('#id_end_construction'),
+	  operatingLife: $('#id_operating_life'),
+	  liquidation: $('#id_liquidation'),
+	  yearLow: $('[id^="id_price_elec_low"]'),
+	  yearMed: $('[id^="id_price_elec_med"]'),
+	  yearHigh: $('[id^="id_price_elec_high"]'),
+	  yearLabel: $('[id^="elecPriceLabel"]')
+	};
+
+	updateYearFieldsVisibility();
+
+	// Attach change event handlers to all relevant fields
+	$.each(fields, function(key, field) {
+	  field.change(updateYearFieldsVisibility);
+	});
+
+	function updateYearFieldsVisibility() {
+	  var endDate = new Date(fields.endDate.val());
+	  var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
+	  var yearB = COD.getFullYear();
+
+	  var operating_life_val = parseInt(fields.operatingLife.val());
+	  var liquidationField_val = parseInt(fields.liquidation.val());
+	  var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
+	  var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
+	  var yearE = latest_date.getFullYear();
+
+	  // Calculate the number of years
+	  var numYears = yearE - yearB + 1;
+
+	  // Show or hide the year fields based on the number of years
+	  $.each(fields, function(key, field) {
+		if (key.startsWith('year')) {
+		  field.each(function(index) {
+			var yearIndex = index + 1;
+			if (yearIndex <= numYears) {
+			  $(this).show();
+			} else {
+			  $(this).hide();
 			}
-		});
-
-		// Helper function to set the value and submit the form
-		function setCalculationTypeAndSubmit(value) {
-			$("#id_calculation_type").val(value);
-			$("#post-form").submit();
+		  });
 		}
+	  });
+	}
+  });
 
+
+</script>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+	// Get the start and end date fields
+	var startDateField = $('#id_start_construction');
+	var endDateField = $('#id_end_construction');
+	// Get the form fields for each month (e.g., costs_m1, costs_m2, costs_m3, etc.)
+	var monthFields = $('div[id^="costs_m"]');
+
+	monthFields.hide();
+
+	updateMonthFieldsVisibility()
+   
+   // Show or hide the month fields based on the selected start and end dates
+	startDateField.change(function() {
+	  updateMonthFieldsVisibility();
+	});
+
+	endDateField.change(function() {
+	  updateMonthFieldsVisibility();
+	});
+
+	function updateMonthFieldsVisibility() {
+	  var startDate = new Date(startDateField.val());
+	  var endDate = new Date(endDateField.val());
+
+	  numMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+	  numMonths -= startDate.getMonth();
+	  numMonths += endDate.getMonth();
+
+
+	  // Show or hide the month fields based on the number of months
+	  monthFields.each(function(index) {
+		var monthIndex = index;
+		if (monthIndex <= numMonths) {
+		  $(this).show();
+		} else {
+		  $(this).hide();
+		}
+	  });
+	}
+
+  });
+
+
+
+
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    // Function to handle input change
+    function handleInputChange(inputId, outputId) {
+        var field = $('#' + inputId).val() + '%';
+        $('#' + outputId).text(field);
+
+        // Adding a listener to the input field
+        $('#' + inputId).on('input', function() {
+            var new_value = $(this).val();
+            $('#' + outputId).text(new_value + '%');
+        });
+    }
+
+    // Call the function for each input field
+    handleInputChange('id_sensi_production', 'sensi_production');
+    handleInputChange('id_sensi_opex', 'sensi_opex');
+    handleInputChange('id_sensi_inflation', 'sensi_inflation');
+
+});
+
+
+
+
+</script>
+
+<script type="text/javascript">
+
+
+</script>
+
+<script type="text/javascript">
 	$(document).ready(function() {
 	    // Select all the input fields that need to trigger the form submission
 	    var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
@@ -2559,10 +2769,10 @@
 
 		const columnKey_exclude = {
 			"Lender Case":"x",
-			"Sponsor Case":"x",
-			"Sensi Inflation":"x",	
-			"Sensi Opex":"x",
-			"Sensi Production":"x",
+			"sponsor_production_choice":"x",
+			"sensi_inflation":"x",	
+			"sensi_opex":"x",
+			"sensi_production":"x",
 			"Blank Row":"x",
 
 		};
@@ -2624,6 +2834,7 @@
 			data: $(this).serialize(),
 			success:function(json){
 				console.log(json.df['computation_displayed']);
+				console.log(json.see_lender_case_test);
 
 
 
@@ -2649,7 +2860,15 @@
 					CFDistr : { selector: "#CFDistr" },
 					BS_a: { selector: "#BS_a" },
 					BS_l: { selector: "#BS_l" },
-					Audit: { selector: "#Audit" }
+					Audit: { selector: "#Audit" },
+					DistrBOP: { selector: "#DistrBOP" },
+					DistrSHLi: { selector: "#DistrSHLi" },
+					DistrDiv: { selector: "#DistrDiv" },
+					DistrSHLp: { selector: "#DistrSHLp" },
+					DistrSC: { selector: "#DistrSC" },
+					DistrEOP: { selector: "#DistrEOP" },
+
+
 					};
 
 				// Select dictionary detail level based on user input
@@ -2888,6 +3107,28 @@
 
 				tables.forEach(table => build_table(table.data, table.selector));
 
+			
+				var dict_sidebar = {
+					COD:"#dateCOD",
+					installed_capacity:"#installed_capacity",
+					end_of_operations:"#dateRetirement",
+					sum_seasonality:"#sumSeasonality",
+					sum_construction_costs:"#sumConstructionCosts",
+					liquidation:"#dateLiquidation",
+					date_debt_maturity:"#debtMaturity",
+
+				};
+
+
+				for (var i = 0; i < 42; i++) {
+					$("#elecPriceLabel"+i).html(json.sidebar_data['price_elec_dict'][i]);
+				}
+
+
+				for (var i = 0; i < Object.keys(dict_sidebar).length; i++) {
+					var key = Object.keys(dict_sidebar)[i];
+					$(Object.values(dict_sidebar)[i]).html(json.sidebar_data[key]);
+				}
 
 
 
@@ -2910,7 +3151,7 @@
 				chartFinPlan.update();	
 
 
-const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR, chartDSRA, chartCash];
+				const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR, chartDSRA, chartCash];
 
 				const datasets = [
 				  [Object.values(json.df['computation_displayed']['Graphs']['Operating expenses pos']), 
@@ -2943,7 +3184,7 @@ const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR
 
 
 				  [Object.values(json.df['computation_displayed']['RE_b']['Balance brought forward']), 
-				  	Object.values(json.df['computation_displayed']['Distrib_EOP']['Distribution account balance']),
+				  	Object.values(json.df['computation_displayed']['DistrEOP']['Distribution account balance']),
 				  	Object.values(json.df['computation_displayed']['Graphs']['Dividends paid pos']), 
 				  	Object.values(json.df['computation_displayed']['Graphs']['Share capital repayment pos'])],
 
@@ -2981,7 +3222,7 @@ const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR
 				  	Object.values(json.df['computation_displayed_end_year']['DSRA']['DSRA (BoP)'])],
 
 				  [Object.values(json.df['computation_displayed_end_year']['RE_b']['Balance brought forward']), 
-				  	Object.values(json.df['computation_displayed_end_year']['Distrib_BOP']['Balance brought forward']),
+				  	Object.values(json.df['computation_displayed_end_year']['DistrBOP']['Balance brought forward']),
 				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Dividends paid pos']), 
 				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Share capital repayment pos'])],
 
@@ -3009,9 +3250,6 @@ const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR
 			 	 	updateChartAnnual(chart, datasets_annual[index]);
 
 				});
-
-
-
 
 
 
@@ -3067,175 +3305,6 @@ const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR
 
 </script>
 
-
-
-
-<script>
-$(document).ready(function() {
-
-    // Function to handle input change
-    function handleInputChange(inputId, outputId) {
-        var field = $('#' + inputId).val() + '%';
-        $('#' + outputId).text(field);
-
-        // Adding a listener to the input field
-        $('#' + inputId).on('input', function() {
-            var new_value = $(this).val();
-            $('#' + outputId).text(new_value + '%');
-        });
-    }
-
-    // Call the function for each input field
-    handleInputChange('id_sensi_production', 'sensi_production');
-    handleInputChange('id_sensi_opex', 'sensi_opex');
-    handleInputChange('id_sensi_inflation', 'sensi_inflation');
-
-});
-</script>
-
-
-
-
-<script>
-  $(document).ready(function() {
-	// Get the start and end date fields
-	var startDateField = $('#id_start_construction');
-	var endDateField = $('#id_end_construction');
-	// Get the form fields for each month (e.g., costs_m1, costs_m2, costs_m3, etc.)
-	var monthFields = $('div[id^="costs_m"]');
-
-	monthFields.hide();
-
-	updateMonthFieldsVisibility()
-   
-   // Show or hide the month fields based on the selected start and end dates
-	startDateField.change(function() {
-	  updateMonthFieldsVisibility();
-	});
-
-	endDateField.change(function() {
-	  updateMonthFieldsVisibility();
-	});
-
-	function updateMonthFieldsVisibility() {
-	  var startDate = new Date(startDateField.val());
-	  var endDate = new Date(endDateField.val());
-
-	  numMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12;
-	  numMonths -= startDate.getMonth();
-	  numMonths += endDate.getMonth();
-
-
-	  // Show or hide the month fields based on the number of months
-	  monthFields.each(function(index) {
-		var monthIndex = index;
-		if (monthIndex <= numMonths) {
-		  $(this).show();
-		} else {
-		  $(this).hide();
-		}
-	  });
-	}
-
-  });
-
-</script>
-
-
-
-
-<script>
-    const myField = document.getElementById("project_name");
-
-    // Grouping related elements by their IDs
-    const windElements = ['wind_turbine_capacity', 'wind_turbine_number', 'wind_project_capacity', 'wind_devtax_cost', 'rotor_diameter'];
-    const solarElements = ['solar_panels_capacity', 'solar_panels_degradation', 'solar_panels_surface', 'solar_devtax_cost', 'solar_arctax_base', 'solar_arctax_cost', 'solar_arctax_title'];
-
-    function toggleDivVisibility() {
-        // Helper function to change visibility
-        const setVisibility = (ids, visible) => ids.forEach(id => {
-            const elem = document.getElementById(id);
-            if (visible) {
-                elem.style.visibility = 'visible';
-                elem.style.position = 'static';
-            } else {
-                elem.style.visibility = 'hidden';
-                elem.style.position = 'absolute';
-            }
-        });
-
-        const isSolar = myField.textContent.startsWith("Solar");
-        setVisibility(windElements, !isSolar);
-        setVisibility(solarElements, isSolar);
-    }
-
-    toggleDivVisibility();
-
-    myField.addEventListener('change', toggleDivVisibility);
-</script>
-
-
-<script>
-  $(document).ready(function() {
-	// Get the input fields by ID prefixes
-	var fields = {
-	  startDate: $('#id_start_construction'),
-	  endDate: $('#id_end_construction'),
-	  operatingLife: $('#id_operating_life'),
-	  liquidation: $('#id_liquidation'),
-	  yearLow: $('[id^="id_price_elec_low"]'),
-	  yearMed: $('[id^="id_price_elec_med"]'),
-	  yearHigh: $('[id^="id_price_elec_high"]'),
-	  yearLabel: $('[id^="elecPriceLabel"]')
-	};
-
-	updateYearFieldsVisibility();
-
-	// Attach change event handlers to all relevant fields
-	$.each(fields, function(key, field) {
-	  field.change(updateYearFieldsVisibility);
-	});
-
-	function updateYearFieldsVisibility() {
-	  var endDate = new Date(fields.endDate.val());
-	  var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
-	  var yearB = COD.getFullYear();
-
-	  var operating_life_val = parseInt(fields.operatingLife.val());
-	  var liquidationField_val = parseInt(fields.liquidation.val());
-	  var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
-	  var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
-	  var yearE = latest_date.getFullYear();
-
-	  // Calculate the number of years
-	  var numYears = yearE - yearB + 1;
-
-	  // Show or hide the year fields based on the number of years
-	  $.each(fields, function(key, field) {
-		if (key.startsWith('year')) {
-		  field.each(function(index) {
-			var yearIndex = index + 1;
-			if (yearIndex <= numYears) {
-			  $(this).show();
-			} else {
-			  $(this).hide();
-			}
-		  });
-		}
-	  });
-	}
-  });
-</script>
-
-
-<script>
-
-
-
-
-
-
-</script>
 
 </form>  
 

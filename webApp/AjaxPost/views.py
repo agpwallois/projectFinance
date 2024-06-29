@@ -13,7 +13,8 @@ from pyxirr import xirr
 import traceback
 import math
 import copy
-
+from datetime import date
+from decimal import Decimal
 
 # Django imports
 from django.http import JsonResponse
@@ -25,7 +26,7 @@ from django.db.models import Sum, Case, When, Value, IntegerField, F
 
 # Application-specific imports
 from .forms import ProjectForm
-from .models import Project, ComputationResult, SponsorCaseResult
+from .models import Project, ComputationResult, SponsorCaseResult, LenderCase
 from .property_taxes import property_tax, tfpb_standard_reduction
 import requests
 from django.urls import reverse
@@ -35,9 +36,11 @@ from sofr.views import get_historical_sofr
 
 import json
 from .taxes import data
-from .FinancialModel import FinancialModel
+from .FinancialModel import FinancialModel, FinancialModelTEST
 from .WindProject import WindProject
 from .SolarProject import SolarProject
+from .SensitivityModel import SensitivityModel
+
 
 def testsimple(request):
 	# Call the get_data function to get the response
@@ -238,63 +241,143 @@ def process_project(request, project, project_form):
 		   extract the traceback information, and return a JSON response containing
 		   the error type, message, and line number.
 	"""
+
+
+	
 	try: 
+		project_form_hash = json.dumps(project_form.cleaned_data, cls=CustomEncoder)
+		try:
 
-		try: 
-			computation_result = ComputationResult.objects.get(project=project)
-			scenarios = computation_result.financial_close_result
-			dashboard_sensitivity_tables = computation_result.dashboard_tables
+			stored_scenarios_results = ComputationResult.objects.get(project=project)
+			stored_project_form_hash = stored_scenarios_results.form_data
 
+			# Check if the form data has changed
+			if stored_project_form_hash == project_form_hash:
+				scenarios = stored_scenarios_results.all_scenarios_results
+				dashboard_sensitivity_tables = stored_scenarios_results.all_dashboard_tables
+			else: 
+				raise ComputationResult.DoesNotExist
 
 		except ComputationResult.DoesNotExist:
 
-
 			lender_base_case = create_lender_base_case(request)
-			scenarios = {'Lender Case': lender_base_case.create_dict_result()}
 
-			dashboard_sensitivity_tables  = {'Lender Case': scenarios['Lender Case']['dict_results']['Sensi']}
-
-			SENSITIVITIES = ['Sensi Production', 'Sensi Inflation', 'Sensi Opex', 'Sponsor Case']
-
-			for sensitivity in SENSITIVITIES:
-				model_copy = copy.deepcopy(lender_base_case)
-				model_copy.apply_sensitivity(sensitivity_type=sensitivity)
-				model_copy.create_sensi()
-				sensitivity_key = f"{sensitivity}"
-
-				sensitivity_results  = model_copy.create_dict_result()
-
-				scenarios[sensitivity_key] = sensitivity_results 		
-				dashboard_sensitivity_tables[sensitivity_key] = sensitivity_results['dict_results']['Sensi']
-
-			scenarios = convert_numpy_types(scenarios)
-
-			# Save the computed scenario to the ComputationResult model
-			computation_result = ComputationResult.objects.update_or_create(
-					project=project,
-					defaults={'financial_close_result': scenarios, 'dashboard_tables': dashboard_sensitivity_tables}
+			financial_model_test = FinancialModelTEST(request)
+			
+			LenderCase.objects.update_or_create(
+				project=project,
+				defaults={
+					'lender_case': financial_model_test.to_json(),
+				}
 			)
 
-			project_form.save()
+			lender_case_test = LenderCase.objects.get(project=project)
+			see_lender_case_test = lender_case_test.lender_case	
 
-		computation_scn_displayed, dashboard_tables = select_scn_and_display(project_form, scenarios, dashboard_sensitivity_tables)
 
-		return JsonResponse({
-			"df":computation_scn_displayed,
-			"tables":dashboard_tables,
+			scenarios, dashboard_sensitivity_tables = calculate_scenarios(request,lender_base_case)
+			save_computation_result(project, project_form, scenarios, dashboard_sensitivity_tables)
 
-			},safe=False, status=200)
+		computation_scn_displayed, dashboard_tables = display_selected_scenario(project_form, scenarios, dashboard_sensitivity_tables)
 
+		return create_json_response(computation_scn_displayed, dashboard_tables, scenarios, see_lender_case_test)
 	except Exception as e:
-		traceback_info = traceback.extract_tb(e.__traceback__)
-		last_trace = traceback_info[-1]
-		error_data = {
-			'error_type': e.__class__.__name__,
-			'message': str(e),
-			'line_number': last_trace.lineno
-		}
+		return handle_exception(e)
 
-		return JsonResponse(error_data,safe=False, status=400)
+
+
+def save_computation_result(project, project_form, scenarios, dashboard_sensitivity_tables):
+	stored_form_data_hash = json.dumps(project_form.cleaned_data, cls=CustomEncoder)
+	ComputationResult.objects.update_or_create(
+		project=project,
+		defaults={
+			'all_scenarios_results': scenarios,
+			'all_dashboard_tables': dashboard_sensitivity_tables,
+			'form_data': stored_form_data_hash
+		}
+	)
+	project_form.save()
+
+
+
+
+def calculate_scenarios(request, lender_base_case):
+	"""
+	Calculate different financial scenarios based on sensitivities.
+
+	This function takes a request and a lender base case to calculate multiple
+	financial scenarios. It applies various sensitivity analyses to the base
+	case, recalculates the financial model for each sensitivity, and compiles
+	the results into a dictionary format.
+
+	Parameters:
+	request (RequestType): The request object containing necessary parameters for sensitivity analysis.
+	lender_base_case (LenderBaseCaseType): The base case object representing the lender's financial scenario.
+
+	Returns:
+	tuple: A tuple containing:
+		- scenarios (dict): A dictionary where keys are the scenario names (including the base case and sensitivities) 
+		  and values are the corresponding results as dictionaries.
+		- dashboard_sensitivity_tables (dict): A dictionary where keys are the scenario names and values are the 
+		  sensitivity analysis results.
+	"""
+	scenarios = {'Lender Case': lender_base_case.create_dict_result()}
+	dashboard_sensitivity_tables  = {'Lender Case': scenarios['Lender Case']['dict_results']['Sensi']}
+	SENSITIVITIES = ['sensi_production', 'sensi_opex', 'sensi_inflation', 'sponsor_production_choice']
+	for sensitivity in SENSITIVITIES:
+		model_copy = SensitivityModel(request, lender_base_case)
+		model_copy.apply_sensitivity(sensitivity_type=sensitivity)
+		model_copy.recalc_financial_model()
+		sensitivity_key = f"{sensitivity}"
+		sensitivity_results = model_copy.create_dict_result()
+		scenarios[sensitivity_key] = sensitivity_results
+		dashboard_sensitivity_tables[sensitivity_key] = sensitivity_results['dict_results']['Sensi']
+		scenarios = convert_numpy_types(scenarios)
+	return scenarios, dashboard_sensitivity_tables
+
+
+
+
+def create_json_response(computation_scn_displayed, dashboard_tables, scenarios, see_lender_case_test):
+	"""
+	Create a JSON response with computed scenario data, dashboard tables, and other relevant information.
+
+	This function generates a JSON response containing the displayed computation scenario,
+	dashboard tables, sidebar data from the lender case scenario, and the current form data hash.
+
+	Parameters:
+	computation_scn_displayed (DataFrameType): The displayed computation scenario data.
+	dashboard_tables (dict): A dictionary containing the dashboard tables.
+	scenarios (dict): A dictionary containing all scenarios, including the 'Lender Case'.
+	project_form_hash (str): A hash string representing the current form data.
+
+	Returns:
+	JsonResponse: A Django JsonResponse object containing the provided data.
+	"""
+	return JsonResponse({
+		"df": computation_scn_displayed,
+		"tables": dashboard_tables,
+		"sidebar_data": scenarios['Lender Case']['dict_sidebar_data'],
+		"see_lender_case_test": see_lender_case_test,
+
+
+
+	}, safe=False, status=200)
+
+
+def handle_exception(e):
+	traceback_info = traceback.extract_tb(e.__traceback__)
+	last_trace = traceback_info[-1]
+	error_data = {
+		'error_type': e.__class__.__name__,
+		'message': str(e),
+		'line_number': last_trace.lineno
+	}
+	return JsonResponse(error_data, safe=False, status=400)
+
+
+
+
 
 
 def format_computation(scenarios, scenario_to_display):
@@ -327,7 +410,7 @@ def convert_numpy_types(data):
 	else:
 		return data
 
-def select_scn_and_display(project_form, scenarios, dashboard_sensitivity_tables):
+def display_selected_scenario(project_form, scenarios, dashboard_sensitivity_tables):
 	
 	scenario_to_display = determine_scenario_to_display(project_form)
 	computation_scn_displayed = format_computation(scenarios, scenario_to_display)
@@ -339,6 +422,23 @@ def create_lender_base_case(request):
 	if request.POST['technology'].startswith('Solar'):
 		return SolarProject(request)
 	return WindProject(request)
+
+
+
+class DecimalEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if isinstance(obj, Decimal):
+			return float(obj)
+		return super().default(obj)
+
+class DateEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if isinstance(obj, date):
+			return obj.isoformat()
+		return super().default(obj)
+
+class CustomEncoder(DateEncoder, DecimalEncoder):
+	pass
 
 
 def calc_sum_nested_dict(computation_displayed):
@@ -464,6 +564,10 @@ def generate_dashboard_tables(scenario_to_display, scenarios, table_sensi):
 	return results_displayed
 
 
+def hash_form_data(form_data):
+	"""Generate a SHA-256 hash of the form data."""
+	form_data_str = json.dumps(form_data, sort_keys=True)
+	return hashlib.sha256(form_data_str.encode('utf-8')).hexdigest()
 
 
 def create_table(results, specific_formats=None):
@@ -537,10 +641,10 @@ def determine_scenario_to_display(project_form):
 	
 	calculation_type = project_form.cleaned_data.get('calculation_type')
 	calculation_type_mapping = {
-		"sensi-p50": "Sponsor Case",
-		"sensi-opex": "Sensi Opex",
-		"sensi-inflation": "Sensi Inflation",
-		"sensi-production": "Sensi Production",
+		"sensi-p50": "sponsor_production_choice",
+		"sensi-opex": "sensi_opex",
+		"sensi-inflation": "sensi_inflation",
+		"sensi-production": "sensi_production",
 	}
 
 	if calculation_type in calculation_type_mapping:

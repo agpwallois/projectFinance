@@ -9,6 +9,7 @@ from functools import wraps
 from dateutil import parser
 from dateutil.parser import ParserError
 from pyxirr import xirr
+from datetime import date
 
 
 
@@ -33,27 +34,33 @@ def timer_decorator(method):
 	return timed
 
 
-class InitCallerMeta(type):
-	# MetaClass to call all FinancialModel methods beginning with 'init_' at instanciation
-	def __call__(cls, *args, **kwargs):
-		# Create the instance normally
-		instance = super().__call__(*args, **kwargs)
-
-		# Iterate over all attributes of the instance
-		for attr_name in dir(instance):
-			# If the attribute name starts with 'init_' and is callable, call it
-			if attr_name.startswith('init_'):
-				attr = getattr(instance, attr_name)
-				if callable(attr):
-					attr()
-
-		return instance
 
 
-class FinancialModel(metaclass=InitCallerMeta): 
+class FinancialModelTEST(): 
+	def __init__(self, request):
+		self.iteration = 20
+		self.periodicity = int(request.POST['periodicity'])
+		self.construction_start = datetime.datetime.strptime(request.POST['start_construction'], "%Y-%m-%d").date()
+
+	def to_json(self):
+		data = vars(self)
+		for key, value in data.items():
+			if isinstance(value, datetime.date):
+				data[key] = value.isoformat()
+		return data
+
+class FinancialModel(): 
 
 	def __init__(self, request):
+		self.initialize_attributes(request)
+		self.initialize_variables()
+		self.calc_financial_model()
+		self.create_results()
 
+
+
+
+	def initialize_attributes(self, request):
 		self.iteration = 20
 		self.periodicity = int(request.POST['periodicity'])
 		
@@ -77,13 +84,13 @@ class FinancialModel(metaclass=InitCallerMeta):
 			'lease_indexation': {'start': request.POST['lease_indexation_start_date'], 'end': self.end_of_operations},
 			'opex_indexation': {'start': request.POST['opex_indexation_start_date'], 'end': self.end_of_operations},
 			'debt_interest_construction': {'start': request.POST['start_construction'], 'end': request.POST['end_construction']},
-			'debt_interest_operations': {'start': self.COD, 'end': self.debt_maturity_date},
+			'debt_interest_operations': {'start': self.COD, 'end': self.debt_maturity},
 			'operations': {'start': self.COD, 'end': self.end_of_operations},
 		}
 
-		self.seasonality = []
+		self.seasonality_inp = []
 		for i in range(1, 13):
-			self.seasonality.append(float(request.POST[f'seasonality_m{i}']))
+			self.seasonality_inp.append(float(request.POST[f'seasonality_m{i}']))
 
 		self.construction_costs_assumptions = []
 		delta = relativedelta(self.construction_end, self.construction_start)
@@ -102,6 +109,10 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.price_elec_low = create_elec_price_dict(request, 'price_elec_low_y', self.construction_end, self.liquidation_date)
 		self.price_elec_med = create_elec_price_dict(request, 'price_elec_med_y', self.construction_end, self.liquidation_date)
 		self.price_elec_high = create_elec_price_dict(request, 'price_elec_high_y', self.construction_end, self.liquidation_date)
+
+		self.price_elec_dict = create_elec_price_dict_keys(self.price_elec_low)
+
+
 
 		self.opex = float(request.POST['opex'])
 		self.lease = float(request.POST['lease'])
@@ -160,8 +171,57 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.cfe_discount_tax_base= float(request.POST['cfe_discount_tax_base'])/100
 
 
+	def initialize_variables(self):
+		self.initialize_dates_series()
+		self.initialize_flags()
+		self.initialize_days_series()
+		self.initialize_time_series()
+		self.initialize_seasonality_series()
+		self.initialize_production()
+		self.initialize_construction_costs_series()
+		self.initialize_indexation_series()
+		self.initialize_price_series()
+		self.initialize_revenues()
+		self.initialize_opex()
+		self.initialize_ebitda()
+		self.initialize_working_cap()
 
-	def init_001_dates_series(self):
+	@timer_decorator
+	def calc_financial_model(self):
+		self.converg_variables()
+		# Loop until convergence between the target debt amount / debt amount; target debt repayment schedule / debt repayment schedule
+		for _ in range(self.iteration):
+			self.update_senior_debt_amount_and_repayment()
+			self.perform_calculations()
+
+	def perform_calculations(self, with_debt_sizing_sculpting = True):
+			self.calc_injections()
+			self.calc_senior_debt()
+			self.calc_total_uses()
+			self.calc_depreciation()
+			self.calc_income_statement()
+			self.calc_CFS()
+			if with_debt_sizing_sculpting:
+				self.calc_senior_debt_size()
+				self.calc_senior_debt_repayments()
+			self.calc_DSRA()
+			self.calc_accounts()
+			self.calc_convergence_tests()
+
+	def create_results(self):
+		self.calc_balance_sheet()
+		self.calc_ratios()
+		self.calc_irr()
+		self.calc_valuation()
+		self.calc_audit()
+			
+
+	def update_senior_debt_amount_and_repayment(self):
+		self.senior_debt_amount = self.debt_sizing['target_debt_amount']
+		self.senior_debt['repayments'] = self.senior_debt['target_repayments']
+
+
+	def initialize_dates_series(self):
 
 		self.dates_series = {}
 		# Create a timeline for the model
@@ -177,7 +237,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 				'end': create_end_period_series(self.dates_series['model']['end'], period_dates['start'], period_dates['end']),
 			}
 
-	def init_002_flags(self):
+	def initialize_flags(self):
 
 		# Define a dictionary that maps period names to their start and end dates
 		self.flag_dict = {
@@ -203,7 +263,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 
 		self.flags['start_year'] = (pd.DatetimeIndex(self.dates_series['model']['start']).month == 1) * 1
 
-	def init_003_days_series(self):
+	def initialize_days_series(self):
 
 		self.days_series = {}
 
@@ -222,7 +282,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		for key, value in days_series_dict.items():
 			self.days_series[key] = ((value['end_dates'] - value['start_dates']).dt.days + 1) * value['flag']
 
-	def init_004_time_series(self):
+	def initialize_time_series(self):
 		
 		self.time_series = {}
 
@@ -239,12 +299,12 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.time_series['years_from_base_dates'] = calc_years_from_base_dates(self.days_series, self.time_series['days_in_year'])
 
 	
-	def init_005_seasonality_series(self):
-		self.seasonality = create_season_series(self.seasonality,self.dates_series)
+	def initialize_seasonality_series(self):
+		self.seasonality = create_season_series(self.seasonality_inp, self.dates_series)
 		self.create_capacity_series()
 
 
-	def init_006_production(self, sensi_production = 0):
+	def initialize_production(self, sensi_production = 0):
 
 		self.production = {}
 		self.production['total'] = self.P90  * pd.Series(self.seasonality) * self.capacity['after_degradation'] * (1 + sensi_production)
@@ -252,14 +312,14 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.production['contract_cumul_in_year'] = calc_production_cumul(self.production['contract'],self.flags['start_year'])
 		self.production['capacity_factor'] = np.where(self.days_series['operations']>0,self.production['total']/((self.installed_capacity*self.days_series['operations']*24)/1000),0)
 
-	def init_007_construction_costs_series(self):
+	def initialize_construction_costs_series(self):
 
 		self.construction_costs = {}
 		self.construction_costs['total'] = np.hstack([self.construction_costs_assumptions,np.zeros(len(self.flags['operations']) - len(self.construction_costs_assumptions))]) * self.flags['construction']
 		self.comp_local_taxes()
 
 
-	def init_008_indexation_series(self, sensi_inflation = 0):
+	def initialize_indexation_series(self, sensi_inflation = 0):
 
 		# Create a dictionary to store the mapping between the index names and their corresponding columns
 		index_columns = {
@@ -280,7 +340,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 			self.indexation_series[indice_name] = (1 + indexation_rate) ** indexation_year
 
 
-	def init_009_price_series(self):
+	def initialize_price_series(self):
 		
 		self.price_series = {}
 
@@ -290,7 +350,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.price_series['contract_real'] = self.contract_price * self.flags['contract']
 		self.price_series['contract_nom'] = self.price_series['contract_real'] * self.indexation_series['contract']
 
-	def init_010_revenues(self):
+	def initialize_revenues(self):
 
 		self.revenues_series = {}
 
@@ -299,7 +359,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.revenues_series['total'] = self.revenues_series['contract'] + self.revenues_series['merchant']
 
 		
-	def init_011_opex(self, sensi_opex = 0):
+	def initialize_opex(self, sensi_opex = 0):
 
 		self.opex_series = {}
 
@@ -308,7 +368,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.opex_series['total'] = self.opex_series['operating_costs'] + self.opex_series['lease_costs']
 		
 
-	def init_012_EBITDA(self):
+	def initialize_ebitda(self):
 
 		self.EBITDA = {}
 
@@ -316,7 +376,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.EBITDA['EBITDA_margin'] = np.where(self.revenues_series['total'] > 0, np.divide(self.EBITDA['EBITDA'], self.revenues_series['total']), 0)
 
 
-	def init_013_working_cap(self):
+	def initialize_working_cap(self):
 
 		self.working_cap = {}
 
@@ -334,69 +394,6 @@ class FinancialModel(metaclass=InitCallerMeta):
 		
 
 
-	@timer_decorator
-	def init_014_create_financial_model(self):
-		self.converg_variables()
-		# Loop until convergence between the target debt amount / debt amount; target debt repayment schedule / debt repayment schedule
-		for i in range(self.iteration):
-
-			self.senior_debt_amount = self.debt_sizing['target_debt_amount']
-			self.senior_debt['repayments'] = self.senior_debt['target_repayments']
-			self.calculations_req_loop(with_debt_sizing_sculpting=True)
-
-
-
-	def calculations_req_loop(self, with_debt_sizing_sculpting=False):
-		self.calc_injections()
-		self.calc_senior_debt()
-		self.calc_total_uses()
-		self.calc_depreciation()
-		self.calc_income_statement()
-		self.calc_CFS()
-		if with_debt_sizing_sculpting:
-			self.calc_senior_debt_size()
-			self.calc_senior_debt_repayments()
-		self.calc_DSRA()
-		self.calc_accounts()
-		self.calc_convergence_tests()
-
-
-	def init_015_create_results(self):
-		self.calc_balance_sheet()
-		self.calc_ratios()
-		self.calc_irr()
-		self.calc_valuation()
-		self.calc_audit()
-			
-		
-	def apply_sensitivity(self, sensitivity_type):
-		# Apply the sensitivity to the copy of the Base Case financial model
-		if sensitivity_type == 'Sensi Production':
-			self.init_006_production(sensi_production = self.sensi_production)
-		
-		elif sensitivity_type == 'Sensi Inflation':
-			self.init_008_indexation_series(sensi_inflation = self.sensi_inflation)
-		
-		elif sensitivity_type == 'Sensi Opex':
-			self.init_011_opex(sensi_opex = self.sensi_opex)
-		
-		elif sensitivity_type == 'Sponsor Case':
-			self.production['total'] = self.P50*pd.Series(self.seasonality)*self.capacity['after_degradation']
-		
-		else:
-			
-			pass
-
-	@timer_decorator
-	def create_sensi(self):
-		# Rerun the methods on which the sensititiy had an impact and recompute the financial model
-		self.init_009_price_series()
-		self.init_010_revenues()
-		self.init_012_EBITDA()
-		self.init_013_working_cap()
-		self.calculations_req_loop(with_debt_sizing_sculpting=False)
-		self.init_015_create_results()
-		return self
 
 
 	def create_dict_result(self):
@@ -451,7 +448,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.DSRA['dsra_bop'] = np.full(data_length, 0)
 		self.DSRA['initial_funding'] = np.full(data_length, 0)
 		self.DSRA['dsra_mov'] = np.full(data_length, 0)
-		self.DSRA_initial_funding_max = 0
+		self.initial_funding_max = 0
 
 
 
@@ -460,7 +457,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 
 
 
-	@timer_decorator
+	
 	def calc_injections(self):
 		
 		self.injections = {}
@@ -486,7 +483,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 			self.injections['total'] = self.injections['senior_debt'] + self.injections['equity']
 
 
-	@timer_decorator
+	
 	def calc_senior_debt(self):
 
 		
@@ -505,7 +502,6 @@ class FinancialModel(metaclass=InitCallerMeta):
 
 		self.senior_debt['commitment_fees'] = self.senior_debt['senior_debt_available_bop'] * self.senior_debt_commitment_fee * self.days_series['model']/360
 
-	@timer_decorator
 	def calc_total_uses(self):
 
 		"""
@@ -518,15 +514,14 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.uses['local_taxes'] = self.local_taxes['total']
 
 		self.uses['total']  = self.uses['construction'] + self.uses['development_fee'] + self.uses['senior_debt_idc_and_fees'] + self.uses['reserves'] + self.uses['local_taxes']
-
+		self.uses['total_depreciable'] = self.uses['construction'] + self.uses['development_fee'] + self.uses['senior_debt_idc_and_fees'] + self.uses['local_taxes'] + self.SHL['interests_construction']
 
 
 	def calc_depreciation(self):
 
-		self.IS['depreciation'] = self.uses['total'].sum() * self.time_series['years_during_operations'] / self.operating_life
+		self.IS['depreciation'] = self.uses['total_depreciable'].sum() * self.time_series['years_during_operations'] / self.operating_life
 
 
-	@timer_decorator	
 	def calc_income_statement(self):
 
 		self.IS['EBIT'] = self.EBITDA['EBITDA'] - self.IS['depreciation']
@@ -534,17 +529,15 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.IS['corporate_income_tax'] = np.clip(self.corporate_income_tax_rate * self.IS['EBT'], 0, None)
 		self.IS['net_income'] = self.IS['EBT'] - self.IS['corporate_income_tax']
 	
-	@timer_decorator
 	def calc_CFS(self):
 
 		self.CFS['cash_flows_operating'] = self.EBITDA['EBITDA'] + self.working_cap['working_cap_movement'] - self.IS['corporate_income_tax']
-		self.CFS['cash_flows_investing'] = - (self.uses['construction'] + self.uses['development_fee'] + self.uses['local_taxes'] + self.uses['reserves']) 
-		self.CFS['cash_flows_financing'] = - (self.senior_debt['upfront_fee'] + self.senior_debt['commitment_fees'] - self.injections['senior_debt'] - self.injections['equity']) 
+		self.CFS['cash_flows_investing'] = - (self.uses['construction'] + self.uses['development_fee'] + self.uses['local_taxes']) 
+		self.CFS['cash_flows_financing'] = - (self.senior_debt['upfront_fee'] + self.senior_debt['interests_construction'] + self.senior_debt['commitment_fees'] - self.injections['senior_debt'] - self.injections['equity']) 
 		self.CFS['CFADS'] = self.CFS['cash_flows_operating'] + self.CFS['cash_flows_investing'] + self.CFS['cash_flows_financing']
 		self.CFS['CFADS_amo'] = self.CFS['CFADS'] * self.flags['debt_amo']
 		self.CFS['CFADS_operations'] = self.CFS['CFADS'] * self.flags['operations']
 
-	@timer_decorator
 	def calc_senior_debt_size(self):
 		
 		self.discount_factor['avg_interest_rate'] = np.where(self.days_series['debt_interest_operations'] != 0,np.divide(self.senior_debt['interests_operations'], self.senior_debt['balance_bop'], out=np.zeros_like(self.senior_debt['interests_operations']), where=self.senior_debt['balance_bop'] != 0) / self.days_series['debt_interest_operations'] * 360,0)	
@@ -559,7 +552,6 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.debt_sizing['target_debt_gearing'] = self.uses['total'].sum() * self.target_gearing
 		self.debt_sizing['target_debt_amount'] = min(self.debt_sizing['target_debt_DSCR'] , self.debt_sizing['target_debt_gearing'])
 
-	@timer_decorator
 	def calc_senior_debt_repayments(self):
 
 		senior_debt_drawdowns_sum  = sum(self.injections['senior_debt'])				
@@ -571,27 +563,25 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.DS_effective = self.senior_debt['repayments'] + self.senior_debt['interests_operations']
 		
 
-	@timer_decorator
 	def calc_DSRA(self):
 
 		self.DSRA['cash_available_for_dsra'] = np.maximum(self.CFS['CFADS_amo'] - self.DS_effective, 0)
 		self.DSRA['dsra_target'] = calc_dsra_target(self.dsra, self.periodicity, self.DS_effective) * self.flags['debt_amo']
-		self.DSRA['DSRA_initial_funding'] = calc_dsra_funding(self.DSRA['dsra_target']) * self.flags['construction_end']
+		self.DSRA['initial_funding'] = calc_dsra_funding(self.DSRA['dsra_target']) * self.flags['construction_end']
 		self.DSRA['dsra_additions_available'] = np.minimum(self.DSRA['cash_available_for_dsra'], self.DSRA['dsra_target'])
 		self.DSRA['dsra_additions_required'] = np.maximum(self.DSRA['dsra_target'] - self.DSRA['dsra_bop'], 0)
 		self.DSRA['dsra_additions_required_available'] = np.minimum(self.DSRA['dsra_additions_available'], self.DSRA['dsra_additions_required'])
-		self.DSRA['dsra_target'] = self.DSRA['dsra_target'] + self.DSRA['DSRA_initial_funding']
-		self.DSRA['dsra_eop'] = np.clip((self.DSRA['DSRA_initial_funding'] + self.DSRA['dsra_additions_required_available']).cumsum(), 0, self.DSRA['dsra_target'])
+		self.DSRA['dsra_target'] = self.DSRA['dsra_target'] + self.DSRA['initial_funding']
+		self.DSRA['dsra_eop'] = np.clip((self.DSRA['initial_funding'] + self.DSRA['dsra_additions_required_available']).cumsum(), 0, self.DSRA['dsra_target'])
 		self.DSRA['dsra_eop_mov'] = np.ediff1d(self.DSRA['dsra_eop'], to_begin=self.DSRA['dsra_eop'][0])
 		self.DSRA['dsra_additions'] = np.maximum(self.DSRA['dsra_eop_mov'], 0)
 		self.DSRA['dsra_release'] = np.minimum(self.DSRA['dsra_eop_mov'], 0)
 		self.DSRA['dsra_bop'] = np.roll(self.DSRA['dsra_eop'], 1)
 		self.DSRA['dsra_mov'] =(self.DSRA['dsra_eop'] - self.DSRA['dsra_bop'])
 
-		self.DSRA_initial_funding_max = max(self.DSRA['DSRA_initial_funding'])
+		self.initial_funding_max = max(self.DSRA['initial_funding'])
 
 
-	@timer_decorator
 	def calc_accounts(self):
 
 		self.distr_account['cash_available_for_distribution'] = (self.CFS['CFADS'] - self.DS_effective - self.DSRA['dsra_mov'] - self.cash_min * self.flags['operations'])
@@ -600,7 +590,7 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.op_account['balance_eop'] = self.distr_account['cash_available_for_distribution']  - self.distr_account['transfers_distribution_account']
 
 		"""
-		+ DSRA_initial_funding 
+		+ initial_funding 
 		"""
 		
 		self.op_account['balance_eop'] = np.roll(self.op_account['balance_eop'], 1)
@@ -651,7 +641,9 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.BS['PPE'] = ( 
 			self.construction_costs['total'].cumsum() + 
 			self.uses['senior_debt_idc_and_fees'].cumsum() + 
-			self.local_taxes['total'].cumsum()
+			self.local_taxes['total'].cumsum() +
+			self.SHL['interests_construction'].cumsum()	-
+			self.IS['depreciation'].cumsum()
 		)
 
 		self.BS['total_assets'] = (
@@ -662,13 +654,10 @@ class FinancialModel(metaclass=InitCallerMeta):
 			self.op_account['balance_eop']
 		)
 
-		self.BS['total_equity'] = (
+		self.BS['total_liabilities'] = (
 			self.SHL['balance_eop'] + 
 			self.share_capital['balance_eop'] + 
-			self.IS['retained_earnings_eop'] 
-		)
-
-		self.BS['total_liabilities'] = (
+			self.IS['retained_earnings_eop'] + 
 			self.senior_debt['balance_eop'] + 
 			self.working_cap['accounts_payable_eop']
 		)
@@ -762,9 +751,9 @@ class FinancialModel(metaclass=InitCallerMeta):
 
 
 
-		self.audit['debt_maturity'] = (final_repayment_date_debt == self.debt_maturity_date)
+		self.audit['debt_maturity'] = (final_repayment_date_debt == self.debt_maturity)
 
-		self.check_all = 1
+		self.check_all = all([self.check_financing_plan, self.check_balance_sheet, self.audit['debt_maturity']]) 
 
 	def calc_valuation(self):
 
@@ -786,14 +775,6 @@ class FinancialModel(metaclass=InitCallerMeta):
 		self.valuation = np.sum(self.equity_cf*discount_factor_vector)
 		self.valuation_less_1 = np.sum(self.equity_cf*discount_factor_less_1_vector)
 		self.valuation_plus_1 = np.sum(self.equity_cf*discount_factor_plus_1_vector)
-
-
-
-
-
-
-
-
 
 
 
@@ -1186,6 +1167,9 @@ def create_elec_price_dict(request, prefix, construction_end, liquidation_date):
 
 
 
+def create_elec_price_dict_keys(dic_price_elec):
+	dic_price_elec_keys = np.array(list(dic_price_elec.keys()))
+	return dic_price_elec_keys
 	
 
 
@@ -1355,7 +1339,7 @@ def create_financial_model_dict(self):
 	        "Interests during construction": self.senior_debt['interests_construction'].tolist(),
 	        "Arrangement fee (upfront)": self.senior_debt['upfront_fee'].tolist(),
 	        "Commitment fees": self.senior_debt["commitment_fees"].tolist(),
-	        "Initial DSRA funding": self.DSRA['DSRA_initial_funding'].tolist(),
+	        "Initial DSRA funding": self.DSRA['initial_funding'].tolist(),
 	        "Total uses": self.uses['total'].tolist()
 	    },
 	    "FP_s": {
@@ -1399,26 +1383,26 @@ def create_financial_model_dict(self):
 	        "Release of excess funds": self.DSRA["dsra_release"].tolist(),
 	        "DSRA (EoP)": self.DSRA["dsra_eop"].tolist()
 	    },
-	    "Distrib_BOP": {
+	    "DistrBOP": {
 	        "Balance brought forward": self.distr_account["balance_bop"].tolist(),
 	        "Transfers to distribution account": self.distr_account["transfers_distribution_account"].tolist()
 	    },
-	    "Distrib_SHLi": {
+	    "DistrSHLi": {
 	        "Cash available for interests": self.distr_account["cash_available_for_distribution"].tolist(),
 	        "Shareholder loan interests paid": (-1 * self.SHL["interests_paid"]).tolist()
 	    },
-	    "Distrib_Div": {
+	    "DistrDiv": {
 	        "Cash available for dividends": self.distr_account["cash_available_for_dividends"].tolist(),
 	        "Dividends paid": (-1 * self.distr_account["dividends_paid"]).tolist()
 	    },
-	    "Distrib_SHLp": {
+	    "DistrSHLp": {
 	        "Cash available for repayment": self.distr_account["cash_available_for_SHL_repayments"].tolist(),
 	        "Shareholder loan repayment": (-1 * self.SHL["repayments"]).tolist()
 	    },
-	    "Distrib_SC": {
+	    "DistrSC": {
 	        "Cash available for reductions": self.distr_account["cash_available_for_redemption"].tolist(),
 	    },
-	    "Distrib_EOP": {
+	    "DistrEOP": {
 	        "Distribution account balance": self.distr_account["balance_eop"].tolist(),
 	    },
 	    "DevTax": {
@@ -1556,7 +1540,7 @@ def create_financial_model_dict(self):
 		"Audit": {
 			"Financing plan": self.check_financing_plan,
 			"Balance sheet": self.check_balance_sheet,
-			"Debt maturity": self.check_all,
+			"Debt maturity": self.audit['debt_maturity'],
 		},
 
 
@@ -1579,13 +1563,32 @@ def create_financial_model_dict(self):
 	}
 
 
+	dict_sidebar_data = {
+		'COD': date_converter(self.COD),
+		'installed_capacity': self.installed_capacity,
+		'end_of_operations': date_converter(self.end_of_operations),
+		'sum_seasonality': f"{round((sum(self.seasonality_inp) * 100), 2)}%",
+		'sum_construction_costs': sum(self.construction_costs_assumptions),
+		'liquidation': date_converter(self.liquidation_date),
+		'date_debt_maturity': date_converter(self.debt_maturity),
+		'price_elec_dict': self.price_elec_dict,
+	}
+
+
+
+
 	dict_total = {
 		'dict_computation': dict_computation,
 		'dict_uses_sources': dict_uses_sources,
 		'dict_results': dict_results,
 		'dict_valuation_results': dict_valuation_results,
+		'dict_sidebar_data': dict_sidebar_data,
 
 	}
+
+
+
+
 
 
 	return dict_total
@@ -1593,4 +1596,5 @@ def create_financial_model_dict(self):
 
 
 
-
+def date_converter(date_str):
+	return date_str.strftime("%d/%m/%Y")

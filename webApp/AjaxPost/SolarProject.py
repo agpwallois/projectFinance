@@ -1,10 +1,12 @@
 from .FinancialModel import FinancialModel
 
-
 class SolarProject(FinancialModel): 
 
 	def __init__(self, request):
+		self.initialize_solar_project_attributes(request)
 		super().__init__(request)
+
+	def initialize_solar_project_attributes(self, request):
 		self.panels_capacity = int(request.POST['panels_capacity'])
 		self.degradation = float(request.POST['annual_degradation'])/100
 		self.panels_surface = float(request.POST['panels_surface'])
@@ -14,7 +16,7 @@ class SolarProject(FinancialModel):
 		self.installed_capacity = self.panels_capacity
 		self.contract = request.POST['contract']
 		self.contract_price = float(request.POST['contract_price'])
-
+		
 	
 	def create_capacity_series(self):
 		

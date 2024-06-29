@@ -334,8 +334,9 @@ class Project(models.Model):
 
 class ComputationResult(models.Model):
 	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
-	financial_close_result = models.JSONField()
-	dashboard_tables = models.JSONField(default=dict)
+	all_scenarios_results = models.JSONField()
+	all_dashboard_tables = models.JSONField(default=dict)
+	form_data = models.JSONField(default=dict)
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 
@@ -343,3 +344,10 @@ class SponsorCaseResult(models.Model):
 	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
 	sponsor_case_result = models.JSONField()
 	timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class LenderCase(models.Model):
+	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
+	lender_case = models.JSONField()
+	timestamp = models.DateTimeField(auto_now_add=True)
+
