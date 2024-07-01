@@ -1,0 +1,83 @@
+
+
+<div class="charts-container-vertical">
+
+	<div class="graph-dev"><canvas id="chartDevCountry"></canvas></div>
+	<div class="graph-dev"><canvas id="chartDevTech"></canvas></div>
+
+</div>
+
+
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+
+<script>
+
+
+
+const ctxchartDevCountry = document.getElementById('chartDevTech');
+const chartDevTech = new Chart(ctxchartDevCountry, {
+    type: 'doughnut', // Use 'doughnut' type for a pie chart with a hole
+    data: {
+        labels: ['Solar - ground - mounted','Wind', 'Solar - rooftop'],
+        datasets: [{
+            data: [1,1,1], // Adjust the values to match your data
+            backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)','rgba(75, 192, 192, 0.2)'],
+            borderColor: ['rgba(54, 162, 235, 0.75)', 'rgba(255, 99, 132, 0.75)','rgba(75, 192, 192, 0.75)'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Projects Capacity by Type (kW)' // Set your chart title here
+            }
+        }
+    }
+});
+
+
+
+
+const ctxchartDevTech = document.getElementById('chartDevCountry');
+const chartDevCountry = new Chart(ctxchartDevTech, {
+    type: 'bar', // Use 'horizontalBar' type for a horizontal bar chart
+    data: {
+        labels: ['France', 'Spain'],
+        datasets: [{
+            label: 'kW',
+            data: [1, 1], // Adjust the values to match your data
+            backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+    	indexAxis: 'y',
+    	responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: 'Projects Capacity by Country (kW)'
+      }
+    }
+    }
+
+});
+
+</script>
+
+
+
+
+
+

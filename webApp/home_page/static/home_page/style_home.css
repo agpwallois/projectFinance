@@ -1,0 +1,549 @@
+body { 
+    padding: 0; /* resets default padding */
+    font-family: 'Alliance No.1', sans-serif;
+    min-height: 100vh; /* ensures the body takes at least the full viewport height */
+}
+
+#header-wrapper {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    height: 50px;
+    position: fixed;
+    width: 100%; /* Ensure the header takes the full width of the viewport */
+    display: flex;
+    justify-content: center; /* Horizontally center the header */
+    align-items: center; /* Vertically align items */
+    background-color: white;
+    z-index: 10;
+}
+
+header {
+    width: 75%;
+    height: 100%; /* Make the header take the full height of its parent */
+    display: flex;
+    align-items: center; /* Vertically align items */
+    background-color: white;
+
+}
+
+
+
+
+content-wrapper { 
+    width: 75%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column; 
+
+}
+
+#frontpage {
+  position: relative;
+  text-align: center;
+  margin-top: 50px;
+}
+
+
+#frontpage .text-container {
+  position: absolute;
+    margin: 0 auto;
+    justify-content: center; 
+    align-items: center;
+    width: 100%;
+    margin-top: 30px;
+}
+
+
+.inner-div {
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+}
+
+
+.highlight-white {
+    background-color: white;
+    border-radius: 5px;
+    padding: 5px 7px;
+    color: black;
+
+
+}
+
+
+#frontpage img {
+  width: 100%;
+  display: block;
+  max-width: 100%; /* Adjust this value based on your preference */
+  height: auto;
+}
+
+
+.with-separator {
+    margin-top: 20px;
+}
+
+
+.div2-content {
+    margin: 0 auto;
+    display: flex;
+    margin-top: ;
+}
+
+.checkbox-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding-left: 0; /* Remove default padding */
+    line-height: 2; 
+}
+
+
+.checkbox-list li::before {
+    content: "\2713"; /* Unicode character for a checkmark */
+    display: inline-block;
+    width: 1em; /* Adjust size of checkbox */
+    margin-right: 0.5em; /* Add space between checkbox and text */
+    font-weight: bold; /* Make the checkbox bold */
+}
+
+.div2-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align children to the left */
+    flex: 1;
+    min-width: 0; 
+}
+
+
+#demo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 30px;
+padding: 5px 10px; 
+text-decoration: none;
+color:white;
+border:1px solid white;
+border-radius: 3px;
+background-color: none; 
+
+}
+#demo:hover {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 30px;
+padding: 5px 10px; 
+text-decoration: none;
+color:black;
+border:1px solid white;
+border-radius: 3px;
+background-color: white; 
+
+}
+
+
+
+.test { 
+    width: 100%;
+    margin-top: 50px;
+
+}
+
+content { 
+    margin-top: 20px; 
+}
+
+
+menu-scroll {
+    flex: 0 0 30%;
+}
+
+main {
+    flex: 1;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#list-example {
+  position: sticky;
+  top: 70px;
+}
+
+
+
+
+.nav-left {
+    order: 1; /* Place the left div first */
+}
+
+.nav-middle {
+    order: 2; /* Place the middle div second */
+    margin-right: auto; /* Push the right div to the right side */
+}
+
+.nav-middle > * {
+    margin-left: 5px; /* Add 10px margin between each item */
+}
+
+.nav-right {
+    order: 3; /* Place the right div last */
+    margin-left: auto; /* Push the right div to the right side */
+}
+
+.nav-middle a {
+    padding: 5px 10px; 
+    color: black; /* Set the default color to grey */
+    text-decoration: none; /* Remove underline */
+    position: relative;
+}
+
+.nav-middle a:hover {
+    padding: 5px 10px; 
+    border-radius: 3px;
+    color: #4369C2; 
+    background-color: #CFE8FD;
+}
+
+.list-group {
+    border-radius: 0px;
+}
+
+.list-group-item {
+    border: none;
+    border-left: solid 4px #E0E0E0;
+    border-radius: none;
+    background-color: white;
+
+}
+
+.list-group-item:hover{
+    border: none;
+    border-left: solid 4px #0096BB;
+    background-color: white;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    color:black;
+}
+
+.list-group-item:first-child{
+border-top-left-radius:0px;
+border-top-right-radius:0px;
+
+}
+
+.list-group-item:last-child{
+border-bottom-left-radius:0px;
+
+}
+
+.list-group-item.active {
+    border-left: solid 4px #0096BB;
+    background-color: white; 
+    color:black;  
+    font-weight: bold; 
+}
+
+.nav-item {
+    border-bottom: solid 2px #E0E0E0;
+    margin-left: 2px;
+    color:black;
+}
+
+
+.nav-item:hover {
+    border-bottom: solid 2px #CACACA;
+    margin-left: 2px;
+    color:black;
+
+}
+
+.nav-item.active {
+    border-bottom: solid 2px #0096BB;
+    margin-left: 2px;
+    color:black;
+    font-weight: bold;
+}
+
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    background-color: #F4F4F4;
+    color:black;
+    min-height: 50px;
+    border-radius: 10px 10px 0 0;
+
+}
+
+.footer-content {
+    width: 75%;
+    margin: 0 auto;
+    display: flex;
+}
+
+
+.footer-column {
+    flex: 1; /* Allows columns to grow and take up equal space */
+    min-width: 0; /* Prevents flex items from growing beyond their content size */
+}
+
+.footer-column:first-child {
+    flex: 0 0 30%; /* Takes up 30% of the space, doesn't grow or shrink */
+}
+
+.footer-column ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+
+.footer-column a {
+    color: black;   
+}
+
+.footer-column a:hover {
+    color: #696969;   
+}
+
+
+
+h1 {
+font-weight: 600;
+font-size: 2.5rem;
+}
+
+
+h2 {
+font-weight: 600;
+font-size: 1.5rem;
+}
+
+h3 {
+font-weight: 600;
+font-size: 1.15rem;
+}
+
+
+
+h4 {
+color: black;
+font-size: 1rem;
+font-weight: bold;
+}
+
+h5 {
+font-size: 1rem;
+font-weight: bold;
+
+}
+
+.title-container {
+    position: relative; /* Make the container position relative */
+    overflow: hidden; /* Hide overflowing content */
+}
+
+.animated-title::before {
+    content: ''; /* Add content to the before pseudo-element */
+    position: absolute; /* Position it absolutely inside the container */
+    top: 0;
+    left: 0; /* Keep it starting from the left */
+    width: 0; /* Start with zero width */
+    height: 100%;
+    background-color: white; /* Match the background color of the container */
+    animation: 1s slidein; /* Apply the revealText animation */
+    z-index: 1; /* Ensure the pseudo-element is below the text */
+}
+
+@keyframes slidein {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+
+
+.word {
+    height: 4rem; /* Set a fixed height for the div */
+    overflow: hidden; /* Hide overflow text */
+}
+
+shango {
+font-weight: 800;
+font-size: 2rem;
+font-family: 'Alliance No.1', sans-serif;
+}
+
+.hero { text-align: center; padding: 50px 20px; }
+
+.section { margin: 20px 0; }
+
+.section h2 { text-align: center; }
+
+
+
+
+
+
+
+
+.columns-container {
+    display: flex;
+    justify-content: space-between; /* Adjusts the spacing between columns */
+    gap: 20px; /* Optional: Adds space between the columns */
+}
+
+.column {
+    flex: 1; /* Each column takes equal width */
+    padding: 0 20px 20px; /* Padding around the content of each column */
+    gap: 10px; /* Space between title, text, and link */
+}
+
+
+row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* Adjust margin as needed */
+}
+
+
+.column h3 {
+    margin: 0; /* Removes default margin from titles */
+}
+
+.column p {
+    margin: 0; /* Removes default margin from paragraphs */
+}
+
+.column a {
+    margin-top: auto; /* Pushes the link to the bottom of the column */
+    color:grey;
+    /* Additional styling for the link */
+}
+
+
+.tab-pane {
+    margin-top: 20px;
+
+}
+
+.nav-wrapper{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+
+
+
+
+.button {
+
+display: inline-block; 
+}
+
+#login { 
+display: inline-block; 
+padding: 5px 10px; 
+color: black; 
+text-decoration: none;
+border-radius: 3px;
+}
+
+#login:hover { 
+display: inline-block; 
+padding: 5px 10px; 
+text-decoration: underline;
+color: #696969; 
+}
+
+#sandbox { 
+display: inline-block; 
+padding: 5px 10px; 
+color: white; 
+border:1px solid black;
+text-decoration: none;
+border-radius: 3px;
+background-color: black; 
+
+}
+
+#sandbox:hover { 
+display: inline-block; 
+padding: 5px 10px; 
+background-color: #696969; 
+color: white; 
+text-decoration: none;
+border:1px solid #696969; 
+}
+
+
+.image {
+    width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#image-one {
+        width: 30%;
+        margin-left: 20px;
+
+}
+
+#image-two {
+        width: 20%;
+
+}
+
+#image-three {
+        width: 15%;
+        margin-left: 20px;
+
+}
+
+
+/* Style the form element */
+form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+/* Style the input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+/* Style the submit button */
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+button[type="submit"]:hover {
+    background: #0056b3;
+}
+
+
+
+

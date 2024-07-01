@@ -1,0 +1,549 @@
+body { 
+    padding: 0; /* resets default padding */
+    font-family: 'Alliance No.1', sans-serif;
+    min-height: 100vh; /* ensures the body takes at least the full viewport height */
+    display: flex;
+}
+
+#header-container {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    height: 50px;
+    position: fixed;
+    width: 100%; /* Ensure the header takes the full width of the viewport */
+    display: flex;
+    justify-content: center; /* Horizontally center the header */
+    align-items: center; /* Vertically align items */
+    background-color: white;
+    z-index: 10;
+}
+
+header {
+    width: 70%;
+    height: 100%; 
+    display: flex;
+    align-items: center;
+    background-color: white;
+}
+
+.content-wrapper { 
+    width: 100%;
+    margin-top: 50px;
+
+}
+
+
+.content-container {
+    padding-bottom: 20px;
+}
+
+
+.inner-div {
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+
+.inner-div-aligned-left {
+    margin-top: 40px;
+
+
+}
+
+.highlight-yellow {
+    background-color: #FBDA2C;
+    border-radius: 5px;
+    padding: 0px 7px;
+}
+
+
+.highlight-white {
+    background-color: white;
+    border-radius: 5px;
+    padding: 5px 7px;
+}
+
+
+#content-container-1 { 
+    background-color: #6BA292;
+}
+
+#content-container-2 { 
+    background-color: #303030;
+}
+
+#content-container-3 { 
+    background-color: #6BA292;
+}
+
+#content-container-4 { 
+    background-color: #303030;
+}
+
+.contact {
+    position: relative; /* Makes this a reference point for absolute positioning */
+    background-color: white;/* Other styling for the contact div */
+    width: 20%;
+    justify-content: center; /* This centers the content horizontally */
+    align-items: center; /* This centers the content vertically */
+    text-align: center; /* This centers the text horizontally within the box */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin: 0 auto;
+    border-radius: 5px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.cta_button-12__emoji {
+    position: absolute;
+    top: -20px; /* Half or full height of the emoji, adjust as needed */
+    left: 50%;
+    transform: translateX(-50%); /* Centers the emoji horizontally */
+    /* Adjust the size as necessary */
+    width: 40px; /* Example size, adjust as needed */
+    height: 40px; /* Example size, adjust as needed */
+}
+
+
+.div-wrapper {
+    display: flex;
+    width: 50%;
+    margin: 0 auto;
+    justify-content: center; 
+    align-items: center;
+    margin-top: 30px;
+}
+
+.rowtest {
+    width: 50%; /* Two divs per row */
+    box-sizing: border-box;
+    padding: 0px; /* Adjust as needed */
+}
+
+.columntest {
+    background-color: white; /* Just for visualization */
+    height: 150px; /* Adjust height as needed */
+    margin: 15px; /* Adjust margin as needed */
+    margin-top: 20px;
+    flex: 1;
+    border-radius: 10px;
+    padding: 10px;
+    border: 2px solid black;
+
+}
+
+
+#demo {
+    margin-bottom: 20px;
+}
+
+.yellow-button {
+padding: 10px 15px; 
+text-decoration: none;
+color:black;
+border-radius: 3px;
+background-color: #FBDA2C; 
+font-weight: bold;
+border: 2px solid black;
+}
+
+.yellow-button:hover {
+padding: 10px 15px; 
+text-decoration: none;
+color:black;
+border-radius: 3px;
+background-color: #FBDA2C; 
+font-weight: bold;
+text-decoration: underline;
+border: 2px solid black;
+
+
+}
+
+.yellow-button a {
+text-decoration: none;
+color:black;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+
+.nav-left {
+    order: 1; /* Place the left div first */
+}
+
+.nav-right {
+    order: 3; /* Place the right div last */
+    margin-left: auto; /* Push the right div to the right side */
+}
+
+
+
+.nav-item {
+    border-bottom: solid 2px #E0E0E0;
+    margin-left: 2px;
+    color:black;
+}
+
+
+.nav-item:hover {
+    border-bottom: solid 2px #CACACA;
+    margin-left: 2px;
+    color:black;
+
+}
+
+.nav-item.active {
+    border-bottom: solid 2px #0096BB;
+    margin-left: 2px;
+    color:black;
+    font-weight: bold;
+}
+
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 40px;
+
+}
+
+
+
+.div2-content {
+    margin: 0 auto;
+    display: flex;
+    width: 70%;
+    margin-top: 30px;
+}
+
+
+
+.div2-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align children to the left */
+    flex: 1;
+    min-width: 0; 
+}
+
+
+.checkbox-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding-left: 0; /* Remove default padding */
+    color: white;
+    line-height: 2; 
+}
+
+
+.footer-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding-left: 0; /* Remove default padding */
+    line-height: 2; 
+}
+
+
+
+.checkbox-list li::before {
+    content: "\2713"; /* Unicode character for a checkmark */
+    display: inline-block;
+    width: 1em; /* Adjust size of checkbox */
+    margin-right: 0.5em; /* Add space between checkbox and text */
+    color: yellow; /* Color of the checkbox */
+    font-weight: bold; /* Make the checkbox bold */
+}
+
+.footer-content {
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+}
+
+
+.footer-column {
+    flex: 1; /* Allows columns to grow and take up equal space */
+    min-width: 0; /* Prevents flex items from growing beyond their content size */
+}
+
+
+
+.footer-column ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+
+.footer-column a {
+    color: black;   
+}
+
+.footer-column a:hover {
+    color: #696969;   
+}
+
+
+
+h1 {
+font-weight: 900;
+font-size: 3rem;
+justify-content: center; 
+align-items: center;
+text-align: center;
+line-height: 1.2; 
+padding-top: 60px;
+padding-bottom: 60px;
+
+}
+
+
+h2 {
+font-weight: 700;
+font-size: 1.5rem;
+text-align: center;
+}
+
+h3 {
+font-weight: 600;
+font-size: 1.25rem;
+text-align: center;
+margin-bottom: 50px;
+line-height: 1.5; 
+
+}
+
+
+p {
+    margin-top: 10px;
+}
+
+h4 {
+font-weight: 700;
+font-size: 1.5rem;
+text-align: center;
+color: white;
+padding-top: 40px;
+}
+
+h5 {
+font-weight: 700;
+font-size: 1.2rem;
+text-align: center;
+color: white;
+}
+
+h6 {
+font-weight: 500;
+font-size: 1.25rem;
+text-align: center;
+color: white;
+line-height: 1.5; 
+
+}
+
+h7 {
+font-weight: 700;
+font-size: 1.2rem;
+text-align: center;
+color: black;
+}
+
+
+h8 {
+font-weight: 700;
+font-size: 1.5rem;
+text-align: center;
+color: black;
+padding-top: 40px;
+}
+
+h9 {
+font-weight: 900;
+font-size: 1.2rem;
+text-align: center;
+color: black;
+}
+
+
+h10 {
+font-weight: 900;
+font-size: 1.1rem;
+color: black;
+}
+
+
+
+shango {
+font-weight: 800;
+font-size: 2rem;
+font-family: 'Alliance No.1', sans-serif;
+}
+
+.hero { text-align: center; padding: 50px 20px; }
+
+.section { margin: 20px 0; }
+
+.section h2 { text-align: center; }
+
+
+
+
+.with-separator {
+    border-top: 2.5px solid;
+    border-image: linear-gradient(to right, #000 5%, transparent 5%) 100% 1;
+    padding-top: 10px;
+    margin-bottom: 80px;
+
+}
+
+.with-separator-no-bottom {
+    border-top: 2.5px solid;
+    border-image: linear-gradient(to right, #000 5%, transparent 5%) 100% 1;
+    padding-top: 10px;
+
+}
+
+
+.columns-container {
+    display: flex;
+    justify-content: space-between; /* Adjusts the spacing between columns */
+    gap: 20px; /* Optional: Adds space between the columns */
+}
+
+.column {
+    flex: 1; /* Each column takes equal width */
+    padding: 0 20px 20px;
+    gap: 10px; /* Space between title, text, and link */
+}
+
+
+row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* Adjust margin as needed */
+}
+
+
+.column h3 {
+    margin: 0; /* Removes default margin from titles */
+}
+
+.column p {
+    margin: 0; /* Removes default margin from paragraphs */
+}
+
+.column a {
+    margin-top: auto; /* Pushes the link to the bottom of the column */
+    color:grey;
+    /* Additional styling for the link */
+}
+
+
+.tab-pane {
+    margin-top: 20px;
+
+}
+
+.nav-wrapper{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+
+
+
+
+.button {
+
+display: inline-block; 
+}
+
+#login { 
+display: inline-block; 
+padding: 5px 10px; 
+color: black; 
+text-decoration: none;
+border-radius: 3px;
+}
+
+#login:hover { 
+display: inline-block; 
+padding: 5px 10px; 
+text-decoration: underline;
+color: #696969; 
+}
+
+#sandbox { 
+display: inline-block; 
+padding: 5px 10px; 
+color: white; 
+border:1px solid black;
+text-decoration: none;
+border-radius: 3px;
+background-color: black; 
+
+}
+
+#sandbox:hover { 
+display: inline-block; 
+padding: 5px 10px; 
+background-color: #696969; 
+color: white; 
+text-decoration: none;
+border:1px solid #696969; 
+}
+
+
+
+
+
+/* Style the form element */
+form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+/* Style the input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+/* Style the submit button */
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+button[type="submit"]:hover {
+    background: #0056b3;
+}
+
+
+
+

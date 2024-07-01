@@ -15,20 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from AjaxPost.views import project_list, project_view, test, testsimple
-from authentication.views import LoginPageView, HomePageView
-from api_integration import views
+from home_page.views import HomePageView
+from financial_model.views import project_financial_model
+from dashboard.views import projects_dashboard
+
 
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
-	path('login/', LoginPageView.as_view(), name='login'),
 	path('', HomePageView.as_view(), name='home'),
-	path('projects/', project_list, name='project_list'),
-	path('project/<int:id>/', project_view, name='project_view'),
-	path('test/<int:id>/', test, name='test'),
-	path('testsimple', testsimple, name='testsimple'),
-	path('api/', include('api_integration.urls', namespace='api')),
+	path('projects/', projects_dashboard, name='project_list'),
+	path('project/<int:id>/', project_financial_model, name='project_view'),
 
 ]
 

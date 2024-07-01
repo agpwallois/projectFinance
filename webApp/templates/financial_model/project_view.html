@@ -1,0 +1,3313 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+
+<form method="POST" id="post-form">{% csrf_token %}
+
+	<div id="sidebar-wrapper">
+<nav id="sidebar">
+
+	<div class="sidebar"><h1 id="project_name">{{ project_form.technology.value }}: {{ project.name }} ({{ project_form.country.value }})</h1>
+
+
+
+
+			<div>{{ project_form.calculation_type }}</div>
+			<button class="button" type="submit">Submit</button>
+			
+			<div class="fieldWrapper" id="the_post">
+
+
+
+
+				<div class="accordion" id="accordionSidebar">
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingOne">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+						Timeline
+					  </button>
+					</h2>
+					<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+					<h3>Construction schedule</h3>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>Notice to proceed</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
+									{{ project_form.start_construction }}
+							</div>
+						</div>
+
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>End of construction</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
+									{{ project_form.end_construction }}
+							</div>
+						</div>
+
+						<h3>Operating period</h3>
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>COD</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
+									<div id="dateCOD"></div>
+							</div>
+						</div>		
+
+						<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>Operating life</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>years</p>
+							</div>
+							<div class="row-inline-three">
+									{{ project_form.operating_life }}
+							</div>
+						</div>			
+
+					<div class="row-inline-wrapper">
+							<div class="row-inline-three-first">
+									<p>End of operations</p>
+							</div>
+							<div class="row-inline-three-second">
+									<p>date</p>
+							</div>
+							<div class="row-inline-three">
+									<div id="dateRetirement"></div>
+							</div>
+						</div>		
+						
+						<h3>Liquidation</h3>
+						<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+											<p>Delay to liquidation</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>months</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.liquidation }}
+									</div>
+								</div>	
+
+									
+						<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+											<p>Liquidation date</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="dateLiquidation"></div>
+									</div>
+								</div>	
+
+								
+					  </div>
+					</div>
+				  </div>
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingTwo">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						Capacity and Production
+					  </button>
+					</h2>
+					<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+						<h3>Capacity</h3>
+
+								
+								<div class="row-inline-wrapper" id="solar_panels_capacity">
+									<div class="row-inline-three-first">
+											<p>Installed capacity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kWp</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.panels_capacity }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper" id="solar_panels_degradation">
+									<div class="row-inline-three-first">
+											<p>Annual degradation</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.annual_degradation }}
+									</div>
+								</div>
+								
+								
+								<div class="row-inline-wrapper" id="wind_turbine_number">
+									<div class="row-inline-three-first">
+											<p>Wind turbines installed</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>#</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.wind_turbine_installed }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper" id="wind_turbine_capacity">
+									<div class="row-inline-three-first">
+											<p>Capacity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>MW/WTG</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.capacity_per_turbine }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper" id="wind_project_capacity">
+									<div class="row-inline-three-first">
+											<p>Installed capacity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kWp</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="installed_capacity"></div>
+									</div>
+								</div>
+								
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#PropertyTaxModal">
+											<h6>Production</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="PropertyTaxModal" tabindex="-1" role="dialog" aria-labelledby="PropertyTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="PropertyTaxModalLabel">Production</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									        La dette d'un projet dans les énergies renouvelables est généralement dimensionnée en fonction de l'hypothèse P90, ce qui signifie que l'on prend en compte une estimation prudente de la production énergétique avec une probabilité de 90 %. Cela permet de minimiser les risques pour les créanciers en tenant compte des fluctuations naturelles de la production. En revanche, le cas sponsor, souvent le promoteur du projet, peut utiliser l'hypothèse de P50, qui est plus optimiste, car il est prêt à assumer un certain niveau de risque pour le projet. Cette approche assure la sécurité financière des investisseurs tout en reflétant la confiance du promoteur dans le projet.
+								      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>P90</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.p90_10y }}
+									</div>
+								</div>
+								
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>P75</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.p75 }}
+									</div>
+								</div>
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>P50</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>hours p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.p50 }}
+									</div>
+								</div>
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Lender case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.production_choice }}
+								</div>
+							</div>
+
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Sponsor case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.sponsor_production_choice }}
+								</div>
+							</div>
+
+
+
+								<h3>Seasonality</h3>
+										
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>January</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m1 }}
+									</div>
+								</div>
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>February</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m2 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>March</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m3 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>April</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m4 }}
+									</div>
+								</div>
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>May</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m5 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>June</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m6 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>July</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m7 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>August</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m8 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>September</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m9 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>October</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m10 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>November</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m11 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>December</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.seasonality_m12 }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first-underlined">
+											<p>Total</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="sumSeasonality"></div>
+									</div>
+								</div>
+
+
+					  </div>
+					</div>
+				  </div>
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingThree">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+						Construction costs
+					  </button>
+					</h2>
+					<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+
+					
+
+					   <h3>Monthly construction schedule</h3>
+
+
+			
+							{% for field in project_form.visible_fields|slice:"27:51" %}
+							
+							<div id="costs_m{{ forloop.counter }}" class="row-inline-wrapper">
+										<div class="row-inline-three-first">
+											<p>Month {{ forloop.counter }}</p>
+										</div>
+										<div class="row-inline-three-second">
+											<p>kEUR</p>
+										</div>
+										<div class="row-inline-three">
+											{{ field }}
+										</div>
+									</div>
+
+							{% endfor %}
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first-underlined">
+											<p>Total</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="sumConstructionCosts"></div>
+									</div>
+								</div>	
+
+					   <h3>Development fee</h3>
+
+		
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Optimisation</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.devfee_choice }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Portion paid at FC</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.devfee_paid_FC }}
+									</div>
+								</div>	
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Portion paid at COD</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.devfee_paid_COD }}
+									</div>
+								</div>	
+
+
+
+
+								
+
+					  </div>
+					</div>
+				  </div>
+				  
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingFour">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+						Offtake and Market prices
+					  </button>
+					</h2>
+					<div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+					<h3>Offtake contract</h3>
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Contract type</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+
+									<div class="assumption-input">{{ project_form.contract }}</div>
+										
+								</div>
+							</div>	
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Rotor diameter</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>m</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.rotor_diameter }}
+								</div>
+							</div>						
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Start of contract</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>date</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.start_contract }}
+								</div>
+							</div>	
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>End of contract</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>date</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.end_contract }}
+								</div>
+							</div>	
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Reference price</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>EUR</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.contract_price }}
+								</div>
+							</div>
+
+														
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation base date</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>date</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.contract_indexation_start_date }}
+								</div>
+							</div>
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation rate</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>% p.a.</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.contract_indexation }}
+								</div>
+							</div>
+
+
+									<h3>Market prices</h3>
+
+								
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation base date</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>date</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.price_elec_indexation_start_date }}
+								</div>
+							</div>
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Indexation rate</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>% p.a.</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.price_elec_indexation }}
+								</div>
+							</div>
+
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Lender case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.price_elec_choice }}
+								</div>
+							</div>
+
+
+
+							<div class="row-inline-wrapper">
+								<div class="row-inline-three-first">
+										<p>Sponsor case</p>
+								</div>
+								<div class="row-inline-three-second">
+										<p>choice</p>
+								</div>
+								<div class="row-inline-three">
+										{{ project_form.sponsor_price_elec_choice }}
+								</div>
+							</div>
+
+
+			
+								<div class="row-inline-wrapper">
+
+									<div class="row-inline-four">
+											<p>Year</p>
+									</div>
+									<div class="row-inline-four">
+											<p>Low</p>
+									</div>
+
+									<div class="row-inline-four">
+											<p>Medium</p>
+									</div>
+
+									<div class="row-inline-four">
+											<p>High</p>
+									</div>
+								</div>
+
+							<div class="columns-container">
+
+								<div class ="column-input">
+									{% for field in project_form.visible_fields|slice:"59:101" %}
+												  <div class ="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
+									{% endfor %}
+								</div>
+									  
+								<div class ="column-input">
+
+									{% for field in project_form.visible_fields|slice:"59:101" %}						        
+												<p>{{ field }}</p>	
+									{% endfor %}
+
+								</div>
+
+								<div class ="column-input">
+
+									{% for field in project_form.visible_fields|slice:"101:143" %}						        
+												<p>{{ field }}</p>	
+									{% endfor %}
+
+								</div>
+								<div class ="column-input">
+
+									{% for field in project_form.visible_fields|slice:"143:185" %}						        
+												<p>{{ field }}</p>	
+									{% endfor %}
+
+								</div>
+
+							</div>
+
+
+
+							
+
+
+
+
+					  </div>
+					</div>
+				  </div>
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingFive">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+						Operating costs
+					  </button>
+					</h2>
+					<div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+							<h3>O&M</h3>
+	  	
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Operating costs</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.opex }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation base date</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.opex_indexation_start_date }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.opex_indexation }}
+									</div>
+								</div>	
+
+						<h3>Lease</h3>
+	  	
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Lease</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.lease }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation base date</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.lease_indexation_start_date }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Indexation rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.lease_indexation }}
+									</div>
+								</div>	
+		
+
+
+
+
+
+
+					  </div>
+					</div>
+				  </div>
+
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingSeven">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+						Senior Debt facilities
+					  </button>
+					</h2>
+					<div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+
+
+						<h3>Term loan timeline</h3>
+
+					
+
+								
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Door-to-door tenor</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>years</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_tenor }}
+									</div>
+								</div>	
+
+
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Maturity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>date</p>
+									</div>
+									<div class="row-inline-three">
+											<div id="debtMaturity"></div>
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Periodicity</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.periodicity }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Quarter/Semester-end rounding</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>boolean</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.timeline_quarters_ceiling }}
+									</div>
+								</div>	
+
+
+
+							<h3>Sizing constraints</h3>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Maximum gearing</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_gearing_max }}
+									</div>
+								</div>		
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Minimum ADSCR</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>x</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_target_DSCR }}
+									</div>
+								</div>		
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Negative tail</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>years</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_negative_tail }}
+									</div>
+								</div>				
+
+							<h3>Fees and margins</h3>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Arrangement fee</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_upfront_fee }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commitment fee</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_commitment_fee }}
+									</div>
+								</div>	
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Credit margin</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_margin }}
+									</div>
+								</div>						
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Swap rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_swap_rate }}
+									</div>
+								</div>		
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Reference rate buffer</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_reference_rate_buffer }}
+									</div>
+								</div>		
+					
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Swap margin</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.debt_swap_margin }}
+									</div>
+								</div>		
+						<h3>Debt service reserve account</h3>					
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>DSRA</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>months</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.DSRA_choice }}
+									</div>
+								</div>							
+
+
+
+				
+					  </div>
+					</div>
+				  </div>
+
+
+
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingEight">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+						Tax and Accounting
+					  </button>
+					</h2>
+					<div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+						<h3>Corporate income tax</h3>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Income tax rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.corporate_income_tax }}
+									</div>
+								</div>	
+
+
+
+			
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#DevTaxModal">
+											<h6>Development tax</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+
+									<div class="modal fade" id="DevTaxModal" tabindex="-1" role="dialog" aria-labelledby="DevTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="DevTaxModalLabel">Taxe d'Aménagement à {{ project_form.commune.value }}</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+											<div class="modal-body">
+
+											    <div id="api_dev_tax_commune"></div>
+											    <a href="https://data.economie.gouv.fr/explore/dataset/delta_deliberation_tam_17_01_23">Data Source</a>
+											</div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper" id="solar_panels_surface">
+									<div class="row-inline-three-first">
+											<p>Panels surface area</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>m2</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.panels_surface }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper" id="solar_devtax_cost">
+									<div class="row-inline-three-first">
+											<p>Tax base per m2</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>EUR/m2</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_taxable_base_solar }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper" id="wind_devtax_cost">
+									<div class="row-inline-three-first">
+											<p>Tax base per WTG</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>EUR/WTG</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_taxable_base_wind }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_commune_tax }}
+									</div>
+								</div>	
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Department tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.dev_tax_department_tax }}
+									</div>
+								</div>	
+			
+
+						<div class="row-inline-wrapper" id="solar_arctax_title">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#ArchTaxModal">
+											<h6>Archeological tax</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="ArchTaxModal" tabindex="-1" role="dialog" aria-labelledby="ArchTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="ArchTaxModalLabel">Taxe Archéologique Préventive</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									       Le montant de la taxe d'archéologie préventive est calculé en multipliant les 3 éléments suivants :
+											
+											<ul>	
+											<li>Surface taxable</li>
+											<li>Valeur forfaitaire</li>
+											<li>Taux</li>
+											</ul>
+
+											La formule de calcul est donc la suivante : Surface taxable x Valeur forfaitaire x Taux.
+
+											La surface taxable est multipliée par une valeur forfaitaire au mètre carré, actualisée chaque année.
+											Une valeur forfaitaire spécifique s'applique à certains aménagements.
+
+											<ul>	
+											<li>Éolienne de plus de 12 m : 3 000 € par éolienne</li>
+											<li>Panneau photovoltaïque fixé au sol: 10 € par m² de surface de panneau</li>
+											</ul>							
+										
+											Le taux de la taxe est égal à 0,40 % de la valeur forfaitaire de l'ensemble immobilier.
+
+									      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+
+
+							<div class="row-inline-wrapper" id="solar_arctax_base">
+									<div class="row-inline-three-first">
+											<p>Tax base per m2</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>EUR/m2</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.archeological_tax_base_solar }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper" id="solar_arctax_cost">
+									<div class="row-inline-three-first">
+											<p>Tax rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.archeological_tax }}
+									</div>
+								</div>	
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#PTaxModal">
+											<h6>Property tax</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="PTaxModal" tabindex="-1" role="dialog" aria-labelledby="PTaxModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="PTaxModalLabel">Taxe Foncière sur les Propriétés Bâties (TFPB) à {{ project_form.commune.value }}</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+							      	    
+									    <div id="tfpb_rates"></div>
+									    <a href="https://www.data.gouv.fr/fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-3/#/resources">Data Source</a>
+
+									      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+						
+
+
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_commune_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Department tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_department_tax }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Region tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_region_tax }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Equipment tax</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.tfpb_additional_tax }}
+									</div>
+								</div>	
+
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first" data-bs-toggle="modal" data-bs-target="#CFEModal">
+											<h6>Cotisation Foncière des Entreprises (CFE)</h6>
+									</div>
+									<div class="row-inline-three-second">
+
+									<div class="modal fade" id="CFEModal" tabindex="-1" role="dialog" aria-labelledby="CFEModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="CFEModalLabel">Cotisation Foncière des Entreprises (CFE)</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									        ...
+									      </div>
+									      <div class="modal-footer">
+									        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+									</div>
+									<div class="row-inline-three">
+									</div>
+								</div>	
+
+		
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Reduction in tax base in first year of application</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_discount_tax_base_y1 }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Standard reduction in land value for tax base</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_discount_tax_base }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Management fees</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_mgt_fee }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_commune_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Intercommunal rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_intercommunal_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Specific equipment rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_specific_eqp_tax }}
+									</div>
+								</div>	
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Local CCI rate</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_localCCI_tax }}
+									</div>
+								</div>	
+
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q1 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q1 }}
+									</div>
+								</div>	
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q2 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q2 }}
+									</div>
+								</div>	
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q3 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q3 }}
+									</div>
+								</div>	
+
+						<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Q4 instalment</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cfe_instal_q4 }}
+									</div>
+								</div>	
+
+					 </div>
+					</div>
+					</div>
+
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingNine">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+						Operations
+					  </button>
+					</h2>
+
+					<div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Revenue payment delay</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>days</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.payment_delay_revenues }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Operating costs payment delay</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>days</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.payment_delay_costs }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Minimum cash in operating account</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>kEUR</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.cash_min }}
+									</div>
+								</div>	
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Operating account initial funding</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>days of opex</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.initial_wc }}
+									</div>
+								</div>	
+
+					  </div>
+					</div>
+				  </div>
+
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingTen">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
+						Equity
+					  </button>
+					</h2>
+					<div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+					<h3>Share capital</h3>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Equity injections</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.injection_choice }}
+									</div>
+								</div>	
+
+					<h3>Shareholder loan</h3>
+
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Subgearing</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>%</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.subgearing }}
+									</div>
+								</div>	
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Shareholder loan margin</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.SHL_margin }}
+									</div>
+								</div>	
+
+
+					<h3>Valuation</h3>
+
+							<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Discount factor</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>% p.a.</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.discount_factor_valuation }}
+									</div>
+								</div>	
+
+
+					  </div>
+					</div>
+				  </div>				  
+
+			
+
+
+
+				  <div class="accordion-item">
+					<h2 class="accordion-header" id="headingTwelve">
+					  <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwelve" aria-expanded="false" aria-controls="collapseTwelve">
+						Project details
+					  </button>
+					</h2>
+					<div id="collapseTwelve" class="accordion-collapse collapse" aria-labelledby="headingTwelve" data-bs-parent="#accordionSidebar">
+					  <div class="accordion-body">
+
+								<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Project name</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>text</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.name }}
+									</div>
+								</div>	
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Project type</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.technology }}
+									</div>
+								</div>	
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Country</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.country }}
+									</div>
+								</div>	
+
+
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Commune</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											{{ project_form.commune }}
+									</div>
+								</div>	
+
+											
+					<div class="row-inline-wrapper">
+									<div class="row-inline-three-first">
+											<p>Calculation details</p>
+									</div>
+									<div class="row-inline-three-second">
+											<p>choice</p>
+									</div>
+									<div class="row-inline-three">
+											<div class="assumption-input">{{ project_form.calculation_detail }} </div>
+									</div>
+								</div>										
+
+					  </div>
+					</div>
+				  </div>	
+				</div>
+
+				</div>
+	
+
+
+			</div>
+
+	</div>
+
+</nav>
+</div>
+
+
+<div id="content">
+
+	<div id="content-box">
+		<nav>
+			<ul class="nav nav-tabs">
+			  <li class="nav-item">
+				<a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Dashboard</a>
+			  </li>
+			  
+			  <li class="nav-item">
+				<a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Computation</a>
+			  </li>
+
+			  <li class="nav-item" id="tab-archives" style="display: none">
+				<a class="nav-link" href="#nav-archives" data-bs-toggle="tab">Archives</a>
+			  </li>
+
+			  <li class="nav-item" id="tab-valuation" style="display: none">
+				<a class="nav-link" href="#nav-valuation" data-bs-toggle="tab">Valuation</a>
+			  </li>
+
+
+
+			</ul>
+		</nav>
+
+		<div class="tab-content">
+			<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
+				
+
+					<div class="box-wrapper">		
+				<div class="box" id="summary-sensitivities">
+	
+
+
+							<h2>Selected Scenario</h2>
+	
+
+
+		<div class="summary-container">
+								<div class="summary-scenario-left">
+								
+
+		<table class="table-sum" id="table-scenario-input">
+		<tbody>
+			<tr>
+				<th>Base Case</th>
+				<th></th>
+				<th></th>
+			</tr>	
+			<tr>
+				<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario1"></td>
+				<td>Lender Case</td>
+				<td></td>
+				<td></td>
+
+			</tr>
+
+
+		</tbody>
+
+	</table>
+
+		<table class="table-sum" id="table-scenario-input-2">
+		<tbody>
+			<tr>
+				<th>Sensitivities</th>
+				<th></th>
+				<th></th>
+			</tr>	
+
+
+
+
+
+			<tr>
+				<td>
+				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario3"></td>
+				<td>Production</td>
+				<td>{{ project_form.sensi_production}}</td>
+				<td><div id="sensi_production"></div></td>
+			</tr>
+
+
+			<tr>
+				<td>
+				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario4"></td>
+				<td>Inflation</td>
+				<td>{{ project_form.sensi_inflation}}</td>
+				<td><div id="sensi_inflation"></div></td>
+			</tr>
+
+
+
+			<tr>
+				<td>
+				  <input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario5"></td>
+				<td>Operating costs</td>
+				<td>{{ project_form.sensi_opex }}</td>
+				<td><div id="sensi_opex"></div></td>
+			</tr>
+
+
+			<tr>
+				<td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2"></td>
+				<td>Sponsor Case</td>
+				<td></td>
+				<td></td>
+
+			</tr>
+
+		</tbody>
+
+	</table>
+
+
+
+				</div>
+
+				<div class="summary-scenario-right">
+				
+					<table class="table-sum" id="table-scenario-output">
+								<tbody id="summary_sensi"></tbody>
+					</table>
+
+				</div>
+			</div>
+
+	
+				</div>
+			</div>
+
+
+
+				<div class="nav-summary">
+					<div class="summary-container-left">
+
+						<div class="box-wrapper">
+
+						<div class="box" id="summary-fp">
+							<h2>Financing Plan</h2>
+
+							<div class="summary-container-titles">
+								<div class="summary-titles">
+									<h4>Uses</h4>
+								</div>
+								<div class="summary-titles">
+									<h4>Sources</h4>
+								</div>								
+							</div>
+
+							<div class="summary-container">
+								<div class="summary">
+									<table id="table_sum_uses" class="table-sum">
+										<tbody id="summary_financing_plan_uses"></tbody>
+									</table>
+								</div>
+
+								<div class="summary">
+									<table id="table_sum_sources" class="table-sum">
+										<tbody id="summary_financing_plan_sources"></tbody>
+									</table>
+								</div>
+							</div>
+
+						</div>
+						</div>
+
+
+		
+
+
+
+
+
+					</div>
+
+					<div class="summary-container-right">
+					<div class="box-wrapper">	
+						<div class="box" id="summary-IRR">
+							<h2>Project and Shareholder Return</h2>
+									<h4>Project IRR</h4>
+										
+										<table class="table-sum">
+											<tbody id="summary_project"></tbody>
+										</table>  
+
+									<h4>Equity IRR</h4>
+										<table class="table-sum">
+											<tbody id="summary_equity"></tbody>
+										</table>  
+											
+					
+						</div>
+						</div>
+
+						<div class="box-wrapper">	
+						<div class="box" id="summary-debt">
+							<h2>Senior Debt metrics</h2>
+										<table class="table-sum">
+											<tbody id="summary_debt"></tbody>
+										</table>
+
+
+						</div>
+						</div>
+
+						<div class="box-wrapper">	
+						<div class="box" id="summary-audit">
+							<h2>Audit and Control</h2>
+									<table class="table-sum">
+										<tbody id="summary_audit"></tbody>
+									</table>
+						</div>
+						</div>
+
+					</div>
+				</div>
+
+			
+			<div class="box-wrapper">
+				<div class="box-wrapper-chart">
+		
+					<div class="left">
+			<h2>Charts</h2>
+			     </div>
+
+			     <div class="right">
+			    <select id="myDropdown">
+			        <option value="annual">Annual</option>
+			        <option value="debt_periodicity">Debt service periodicity</option>
+			    </select>
+			    </div>
+			   </div>
+				<div class="box" id="nav-summary-charts">
+					{% block jquery %}{% include 'financial_model/charts.html' %}{% endblock %}
+				</div>
+
+			</div>
+
+
+		</div>
+			
+		<div class="tab-pane" id="nav-fs" role="tabpanel" aria-labelledby="messages-tab">
+			
+			<div class="box-wrapper">	
+				<div class="box">
+
+			<h1-calc>Income statement</h1-calc>
+					<table class="table">
+						<tbody id="ISAnnual"></tbody>
+					</table>
+
+			</div>
+		</div>
+		</div>
+
+			<div class="tab-pane" id="nav-calculation" role="tabpanel" aria-labelledby="messages-tab">
+			
+			<div class="box-wrapper">	
+
+
+				<div class="box-calc">
+
+				<h1-calc>Timeline, Counters and Flags</h1-calc>
+				
+				<div class="dates-wrapper">
+					<table class="table">
+						<tbody id="Dates"></tbody>
+					</table>
+				</div>
+
+				<title-wrapper class="detailed">	
+				<h2-calc>Project timeline</h2-calc>
+				<h3-calc>Model timeline</h3-calc>
+				</title-wrapper>
+					
+					<table class="table detailed">
+						<tbody id="FlagsM"></tbody>
+					</table>
+
+
+				<h3-calc class="detailed">Construction</h3-calc>
+
+					<table class="table detailed">
+						<tbody id="FlagsC"></tbody>
+					</table>
+
+				<h3-calc class="detailed">Operating period</h3-calc>
+
+
+					<table class="table detailed">
+						<tbody id="FlagOp"></tbody>
+					</table>
+
+
+				<h3-calc class="detailed">Offtake contract</h3-calc>
+					
+					<table class="table detailed">
+						<tbody id="FlagOftk_t"></tbody>
+					</table>
+
+
+				<title-wrapper class="detailed">	
+				<h2-calc>Financing timeline</h2-calc>
+				<h3-calc>Debt</h3-calc>
+				</title-wrapper>
+
+				<table class="table detailed">
+						<tbody id="FlagFin"></tbody>
+					</table>
+
+				<title-wrapper class="detailed">	
+				<h1-calc>Indexation</h1-calc>
+
+				<h3-calc>Offtake contract</h3-calc>
+
+				</title-wrapper>
+
+					<table class="table detailed">
+						<tbody id="FlagOftk_i"></tbody>
+					</table>
+
+				<h3-calc class="detailed">Electricity market price</h3-calc>
+
+					<table class="table detailed">
+						<tbody id="Mkt_i"></tbody>
+					</table>
+
+				<h3-calc class="detailed">Operating expenses</h3-calc>
+
+					<table class="table detailed">
+						<tbody id="Opex"></tbody>
+					</table>
+
+				<h3-calc class="detailed">Lease</h3-calc>
+
+					<table class="table detailed">
+						<tbody id="Lease"></tbody>
+					</table>
+
+
+					<title-wrapper class="detailed">	
+				<h1-calc>Production</h1-calc>
+					<h3-calc>Production</h3-calc>
+				</title-wrapper>
+
+					<table class="table detailed">
+						<tbody id="Prod"></tbody>
+					</table>
+
+					<h3-calc class="detailed">Prices</h3-calc>
+
+					<table class="table detailed">
+						<tbody id="Price"></tbody>
+					</table>
+
+
+
+				<h1-calc>Income statement</h1-calc>
+					<table class="table">
+						<tbody id="IS"></tbody>
+					</table>
+
+					<h3-calc>Retained earnings</h3-calc>
+
+					<table class="table">
+						<tbody id="RE_b"></tbody>
+					</table> 		
+
+
+
+				<title-wrapper class="detailed">	
+				<h1-calc>Network and local taxes</h1-calc>
+					<h3-calc>Development tax</h3-calc>
+
+				</title-wrapper>			
+
+					<table class="table">
+						<tbody id="DevTax"></tbody>
+					</table> 		
+
+					<h3-calc>Archeological tax</h3-calc>
+
+					<table class="table">
+						<tbody id="ArchTax"></tbody>
+					</table> 		
+
+					<h3-calc>Network tax</h3-calc>
+
+					<table class="table">
+						<tbody id="myTableNetwTax"></tbody>
+					</table> 	
+
+
+					</table> 		
+
+					<h3-calc>Property tax</h3-calc>
+
+					<table class="table">
+						<tbody id="PropTax"></tbody>
+					</table> 	
+
+
+					<title-wrapper class="detailed">	
+				<h1-calc>CFE</h1-calc>
+					<h3-calc>CFE tax base</h3-calc>
+				</title-wrapper>
+
+					<table class="table">
+						<tbody id="CFETaxBase"></tbody>
+					</table> 	
+
+					<h3-calc>Gross CFE due</h3-calc>
+
+					<table class="table">
+						<tbody id="CFETaxDue"></tbody>
+					</table> 	
+
+					<h3-calc>CFE payments</h3-calc>
+
+					<table class="table">
+						<tbody id="CFETaxPay"></tbody>
+					</table> 	
+
+
+
+					<title-wrapper class="detailed">	
+				<h1-calc>Working capital</h1-calc>
+					<h3-calc>Accounts receivable</h3-calc>
+
+				</title-wrapper>
+
+				<table class="table detailed">
+						<tbody id="WCRec"></tbody>
+					</table>
+
+
+					<h3-calc class="detailed">Accounts payables</h3-calc>
+
+				<table class="table detailed">
+						<tbody id="WCPay"></tbody>
+					</table>
+					
+					<h3-calc class="detailed">Working capital</h3-calc>
+
+				<table class="table detailed">
+						<tbody id="WCMov"></tbody>
+					</table>
+
+
+
+
+
+					<title-wrapper >	
+				<h1-calc>Operating account</h1-calc>
+				</title-wrapper>
+
+
+					<table class="table">
+						<tbody id="OpAccB"></tbody>
+					</table>
+
+					<h3-calc>Cash flow from operating activities</h3-calc>
+
+
+					<table class="table">
+						<tbody id="CF_op"></tbody>
+					</table>
+
+					<h3-calc>Cash flow from investing activities</h3-calc>
+				
+					<table class="table">
+						<tbody id="CF_in"></tbody>
+					</table>
+
+					<h3-calc>Cash flow from financing activities</h3-calc>
+
+					<table class="table">
+						<tbody id="CF_fi"></tbody>
+					</table>
+					
+					<h3-calc>Cash available for senior debt service</h3-calc>
+
+					<table class="table">
+						<tbody id="CFADS"></tbody>
+					</table>
+
+					<h3-calc>Senior DSRA</h3-calc>
+
+					<table class="table">
+						<tbody id="CFDSRA"></tbody>
+					</table>
+
+					<h3-calc>Cash available for distribution</h3-calc>
+
+					<table class="table">
+						<tbody id="CFDistr"></tbody>
+					</table>
+
+
+				<table class="table">
+						<tbody id="OpAccE"></tbody>
+					</table>
+
+
+				<h1-calc class="detailed">Distribution account</h1-calc>
+
+
+				<table class="table detailed">
+						<tbody id="DistrBOP"></tbody>
+				</table>
+
+					<h3-calc class="detailed">Shareholder loan interest</h3-calc>
+
+				<table class="table detailed">
+						<tbody id="DistrSHLi"></tbody>
+				</table>
+
+					<h3-calc class="detailed">Dividends</h3-calc>
+
+				<table class="table detailed">
+						<tbody id="DistrDiv"></tbody>
+				</table>
+
+					<h3-calc class="detailed">Shareholder loan repayment</h3-calc>
+
+				<table class="table detailed">
+						<tbody id="DistrSHLp"></tbody>
+				</table>
+
+					<h3-calc class="detailed">Share capital reduction</h3-calc>
+
+			<table class="table detailed">
+						<tbody id="DistrSC"></tbody>
+				</table>
+
+				<h3-calc class="detailed">Distribution account balance</h3-calc>
+
+				<table class="table detailed">
+						<tbody id="DistrEOP"></tbody>
+				</table>
+
+
+				<title-wrapper class="detailed">	
+				<h1-calc>Financing plan</h1-calc>
+					<h3-calc>Uses</h3-calc>
+
+				</title-wrapper>
+
+						<table class="table detailed">
+							<tbody id="FP_u"></tbody>
+						</table>
+
+					<h3-calc class="detailed">Sources</h3-calc>
+					<table class="table detailed">
+						<tbody id="FP_s"></tbody>
+					</table>
+
+				<title-wrapper class="detailed">	
+				<h1-calc>Shareholders' equity</h1-calc>
+				<h3-calc> Share capital </h3-calc>
+
+				</title-wrapper>
+
+				<table class="table detailed">
+					<tbody id="Eqt"></tbody>
+				</table>
+				<h3-calc class="detailed">Shareholder loan</h3-calc>
+				<table class="table detailed">
+					<tbody id="SHL"></tbody>
+				</table>
+
+				<table class="table detailed">
+					<tbody id="iSHL"></tbody>
+				</table>
+
+				<title-wrapper class="detailed">	
+
+				<h1-calc>Senior debt</h1-calc>
+				<h3-calc>Availability</h3-calc>
+				</title-wrapper>
+
+				<table class="table detailed">
+					<tbody id="Debt_a"></tbody>
+				</table>
+
+				<h3-calc class="detailed">Drawdowns, repayments and balance</h3-calc>
+				<table class="table detailed">
+					<tbody id="Debt_b"></tbody>
+				</table>
+
+				<h3-calc class="detailed">Interest and fees</h3-calc>
+				<table class="table detailed">
+					<tbody id="Debt_i"></tbody>
+				</table>
+
+				<h3-calc class="detailed">Sizing and sculpting</h3-calc>
+				<table class="table detailed">
+					<tbody id="Sizing"></tbody>
+				</table>
+
+
+				<h3-calc class="detailed">Debt service reserve account</h3-calc>
+				<table class="table detailed">
+					<tbody id="DSRA"></tbody>
+				</table>
+
+				<title-wrapper>	
+				<h1-calc>Balance sheet</h1-calc>
+					<h3-calc>Assets</h3-calc>
+				</title-wrapper>
+
+						<table class="table">
+							<tbody id="BS_a"></tbody>
+						</table>
+
+					<h3-calc class="detailed">Liabilities</h3-calc>
+						<table class="table">
+							<tbody id="BS_l"></tbody>
+						</table>
+
+				<h1-calc >Audit</h1-calc>
+					<table class="table">
+						<tbody id="Audit"></tbody>
+					</table>
+
+				<table class="table">
+						<tbody id="myTableAll"></tbody>
+				</table>
+
+				</div>
+			</div>
+		</div>
+
+
+			<div class="tab-pane" id="nav-archives" role="tabpanel" aria-labelledby="messages-tab">
+
+
+
+						<div class="box-wrapper" >
+
+						<div class="box">
+							<h2>Overview</h2>
+
+
+					 	<table class="table-sum">
+								<tbody id="summary_outcome"></tbody>
+							</table>  
+
+
+
+					</div>
+					</div>
+
+
+
+			<div class="box-wrapper">
+		
+			<h2>Charts</h2>
+
+				<div class="box" id="nav-summary-charts">
+						 {% block test %}{% include 'financial_model/charts_operations.html' %}{% endblock %}
+				</div>
+
+			</div>
+
+
+
+
+		</div>
+
+			<div class="tab-pane" id="nav-valuation" role="tabpanel" aria-labelledby="messages-tab">
+
+
+					<div class="box-wrapper">	
+						<div class="box">
+							<h2>Valuation <script>
+							var options = { year: 'numeric', month: 'long', day: 'numeric' };
+							var formattedDate = new Date().toLocaleDateString(undefined, options);
+							document.write(formattedDate);
+							</script></h2>						
+
+						<table class="table-sum">
+											<tbody id="summary_valuation"></tbody>
+										</table>  
+		
+						</div>
+						</div>
+
+		</div>
+
+
+
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+    $(document).ready(function() {
+        // Select all the input fields that need to trigger the form submission
+        var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
+
+        // Function to submit the form
+        function submitForm() {
+            $("#post-form").submit();
+        }
+
+        // Loop through each input field
+        inputFields.forEach(function(inputField) {
+            // Add an event listener to the input field
+            $(inputField).on('input change', submitForm);
+        });
+
+        // Add an event listener to the submit button
+        $('#submit-button').on('click', submitForm);
+    });
+
+
+</script>
+
+
+
+
+<script type="text/javascript">
+
+
+
+	
+$(document).ready(function(){
+	setCalculationTypeAndSubmit('none');
+	$("#RadioScenario1").prop('checked', true);
+});
+
+
+// Mapping of radio button IDs to their corresponding values
+var radioValueMap = {
+	'RadioScenario1': 'none',
+	'RadioScenario2': 'sensi-p50',
+	'RadioScenario3': 'sensi-production',
+	'RadioScenario4': 'sensi-inflation',
+	'RadioScenario5': 'sensi-opex',
+
+};
+
+// Generic event handler for radio buttons
+$("[id^='RadioScenario']").on('change', function() {
+	if ($(this).prop('checked')) {
+		var value = radioValueMap[this.id];
+		setCalculationTypeAndSubmit(value);
+	}
+});
+
+// Helper function to set the value and submit the form
+function setCalculationTypeAndSubmit(value) {
+	$("#id_calculation_type").val(value);
+	$("#post-form").submit();
+}
+
+
+
+
+
+</script>
+
+<script type="text/javascript">
+
+document.addEventListener("DOMContentLoaded", function() {
+    const myField = document.getElementById("project_name");
+
+    // Grouping related elements by their IDs
+    const windElements = ['wind_turbine_capacity', 'wind_turbine_number', 'wind_project_capacity', 'wind_devtax_cost', 'rotor_diameter'];
+    const solarElements = ['solar_panels_capacity', 'solar_panels_degradation', 'solar_panels_surface', 'solar_devtax_cost', 'solar_arctax_base', 'solar_arctax_cost', 'solar_arctax_title'];
+
+    function toggleDivVisibility() {
+        // Helper function to change visibility
+        const setVisibility = (ids, visible) => ids.forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) { // Check if the element exists
+                if (visible) {
+                    elem.style.visibility = 'visible';
+                    elem.style.position = 'static';
+                } else {
+                    elem.style.visibility = 'hidden';
+                    elem.style.position = 'absolute';
+                }
+            }
+        });
+
+        const isSolar = myField.textContent.startsWith("Solar");
+        setVisibility(windElements, !isSolar);
+        setVisibility(solarElements, isSolar);
+    }
+
+    toggleDivVisibility();
+
+    myField.addEventListener('change', toggleDivVisibility);
+});
+
+
+</script>
+
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+	// Get the input fields by ID prefixes
+	var fields = {
+	  startDate: $('#id_start_construction'),
+	  endDate: $('#id_end_construction'),
+	  operatingLife: $('#id_operating_life'),
+	  liquidation: $('#id_liquidation'),
+	  yearLow: $('[id^="id_price_elec_low"]'),
+	  yearMed: $('[id^="id_price_elec_med"]'),
+	  yearHigh: $('[id^="id_price_elec_high"]'),
+	  yearLabel: $('[id^="elecPriceLabel"]')
+	};
+
+	updateYearFieldsVisibility();
+
+	// Attach change event handlers to all relevant fields
+	$.each(fields, function(key, field) {
+	  field.change(updateYearFieldsVisibility);
+	});
+
+	function updateYearFieldsVisibility() {
+	  var endDate = new Date(fields.endDate.val());
+	  var COD = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
+	  var yearB = COD.getFullYear();
+
+	  var operating_life_val = parseInt(fields.operatingLife.val());
+	  var liquidationField_val = parseInt(fields.liquidation.val());
+	  var liquidationField_val_y = Math.ceil(liquidationField_val / 12);
+	  var latest_date = new Date(COD.getFullYear() + operating_life_val + liquidationField_val_y, COD.getMonth(), COD.getDate());
+	  var yearE = latest_date.getFullYear();
+
+	  // Calculate the number of years
+	  var numYears = yearE - yearB + 1;
+
+	  // Show or hide the year fields based on the number of years
+	  $.each(fields, function(key, field) {
+		if (key.startsWith('year')) {
+		  field.each(function(index) {
+			var yearIndex = index + 1;
+			if (yearIndex <= numYears) {
+			  $(this).show();
+			} else {
+			  $(this).hide();
+			}
+		  });
+		}
+	  });
+	}
+  });
+
+
+</script>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+	// Get the start and end date fields
+	var startDateField = $('#id_start_construction');
+	var endDateField = $('#id_end_construction');
+	// Get the form fields for each month (e.g., costs_m1, costs_m2, costs_m3, etc.)
+	var monthFields = $('div[id^="costs_m"]');
+
+	monthFields.hide();
+
+	updateMonthFieldsVisibility()
+   
+   // Show or hide the month fields based on the selected start and end dates
+	startDateField.change(function() {
+	  updateMonthFieldsVisibility();
+	});
+
+	endDateField.change(function() {
+	  updateMonthFieldsVisibility();
+	});
+
+	function updateMonthFieldsVisibility() {
+	  var startDate = new Date(startDateField.val());
+	  var endDate = new Date(endDateField.val());
+
+	  numMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+	  numMonths -= startDate.getMonth();
+	  numMonths += endDate.getMonth();
+
+
+	  // Show or hide the month fields based on the number of months
+	  monthFields.each(function(index) {
+		var monthIndex = index;
+		if (monthIndex <= numMonths) {
+		  $(this).show();
+		} else {
+		  $(this).hide();
+		}
+	  });
+	}
+
+  });
+
+
+
+
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    // Function to handle input change
+    function handleInputChange(inputId, outputId) {
+        var field = $('#' + inputId).val() + '%';
+        $('#' + outputId).text(field);
+
+        // Adding a listener to the input field
+        $('#' + inputId).on('input', function() {
+            var new_value = $(this).val();
+            $('#' + outputId).text(new_value + '%');
+        });
+    }
+
+    // Call the function for each input field
+    handleInputChange('id_sensi_production', 'sensi_production');
+    handleInputChange('id_sensi_opex', 'sensi_opex');
+    handleInputChange('id_sensi_inflation', 'sensi_inflation');
+
+});
+
+
+
+
+</script>
+
+<script type="text/javascript">
+
+
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+	    // Select all the input fields that need to trigger the form submission
+	    var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
+
+	    // Function to submit the form
+	    function submitForm() {
+	        $("#post-form").submit();
+	    }
+
+	    // Loop through each input field
+	    inputFields.forEach(function(inputField) {
+	        // Add an event listener to the input field
+	        $(inputField).on('input change', submitForm);
+	    });
+
+	    // Add an event listener to the submit button
+	    $('#submit-button').on('click', submitForm);
+	});
+
+	$(document).on('submit','#post-form', function(e){
+
+
+		const numberFormat = new Intl.NumberFormat();
+		const currencyFormat = new Intl.NumberFormat('fr-FR', {
+													  style: 'currency',
+													  currency: 'EUR',
+													  currencySign: 'accounting',
+													});
+
+		var stringFromat = new String();
+
+		function formatAsPercent(num) {
+			return new Intl.NumberFormat('default', {
+			style: 'percent',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		  }).format(num);
+		}
+
+		var option = {
+		   style: 'percent',
+		   minimumFractionDigits: 2,
+		   maximumFractionDigits: 2
+		};
+
+		var percFormat = new Intl.NumberFormat("en-US",option);
+
+		const columnLabel_summary = {
+
+			"Project IRR (pre-tax)": "%",
+			"Project IRR (post-tax)": "%",
+			"Share capital IRR": "%",
+			"Shareholder loan IRR": "%",
+			"Equity IRR": "%",
+
+			
+			"Payback date": "date",
+			"Payback time": "years from FC",
+
+
+			"Constraint": "text",
+			"Average life": "years from FC",
+			"Average DSCR": "x",
+			"Average DSCR": "x",
+			"Balance sheet": "true/false",
+			"Financing plan": "true/false",
+
+			"":"",
+			"Date of final repayment":"date",
+			"Tenor (door-to-door)":"years",
+			"Average life (from Financial Close)":"years",
+			"Maximum gearing":"%",
+			"Minimum DSCR":"x",
+			"Equity injection":"text",
+			"Subgearing":"%",
+			"Debt IRR": "%",
+			"Production":"x",
+			"Operating costs":"x",			
+			"Debt maturity":"true/false",
+			"Discount factor":"%",
+			"Unit":"",
+			"Total Uses":"",
+			"Total Sources":"",
+
+
+			};
+
+
+		const columnKey_exclude = {
+			"Lender Case":"x",
+			"sponsor_production_choice":"x",
+			"sensi_inflation":"x",	
+			"sensi_opex":"x",
+			"sensi_production":"x",
+			"Blank Row":"x",
+
+		};
+
+			function build_table(json_input, div_output) {
+				var table_result = "";
+
+				var table_result = "<tr>";
+				var headers = json_input[""];
+
+				$.each(headers, function (_, header) {
+					table_result += "<th>" + header + "</th>";
+				});
+				table_result += "</tr>";
+
+				delete json_input[""];
+
+				$.each(json_input, function(key, data) {
+			 
+					table_result += "<tr>";
+
+					if (columnKey_exclude.hasOwnProperty(key)) {
+					} else {
+						table_result += "<td>" + key + "</td>";
+					}
+					
+					
+					if (columnKey_exclude.hasOwnProperty(key)) {
+					} else if (columnLabel_summary.hasOwnProperty(key)) {
+						table_result += "<td>" + columnLabel_summary[key] + "</td>";
+					} else {
+						table_result += "<td>" + "kEUR" + "</td>";
+					}
+
+					$.each(data, function(index, data) {
+							if (data =="False") {
+								table_result += "<td class='red-cell'>" + data + "</td>";
+							} else {
+								table_result += "<td>" + data + "</td>";
+							}
+					});
+					table_result += "</tr>";
+				
+				});
+			
+				$(div_output).html(table_result);
+			
+			}
+
+
+
+
+
+
+		e.preventDefault(),
+		$.ajax({
+			type:'POST',
+			url:"",
+			data: $(this).serialize(),
+			success:function(json){
+				console.log(json.df['computation_displayed']);
+				console.log(json.see_lender_case_test);
+
+
+
+				console.log(json.execution_times);
+
+				// Create a dictionnary of key selectors based on df keys
+				var dict_full = {};
+				$.each(json.df['computation_displayed'], function(key, value) {
+				
+				  dict_full[key] = { selector: "#" + key };
+				});
+
+				// Initialize a simplified dictionary 
+				const dict_simplified = {
+					Dates: { selector: "#Dates" },
+					IS: { selector: "#IS" },
+					RE_b: { selector: "#RE_b" },
+					CF_op: { selector: "#CF_op" },
+					CF_in: { selector: "#CF_in" },
+					CF_fi: { selector: "#CF_fi" },
+					CFADS: { selector: "#CFADS" },
+					CFDSRA : { selector: "#CFDSRA" },
+					CFDistr : { selector: "#CFDistr" },
+					BS_a: { selector: "#BS_a" },
+					BS_l: { selector: "#BS_l" },
+					Audit: { selector: "#Audit" },
+					DistrBOP: { selector: "#DistrBOP" },
+					DistrSHLi: { selector: "#DistrSHLi" },
+					DistrDiv: { selector: "#DistrDiv" },
+					DistrSHLp: { selector: "#DistrSHLp" },
+					DistrSC: { selector: "#DistrSC" },
+					DistrEOP: { selector: "#DistrEOP" },
+
+
+					};
+
+				// Select dictionary detail level based on user input
+				var dict = {};
+				if (json.calculation_detail === 1) {
+				  dict = dict_simplified;
+				  $('.detailed').hide();
+				} else {
+				  dict = dict_full;
+				  $('.detailed').show();
+				}
+
+				const columnFormatting = {
+				"Target DSCR": formatDSCR,
+				"Average interest rate": formatAsPercent,
+				"Seasonality": formatAsPercent,
+				"Year": formatAsInt,
+				"Days in period": formatAsInt,
+				"Days in year": formatAsInt,
+				"Years in period": formatAsPercent,
+				"Construction": formatAsInt,
+				"Percentage in contract period": formatAsPercent,
+				"Percentage in operations period": formatAsPercent,
+				"Indexation": formatAsPercent,
+				"Discount factor": formatAsPercent,
+				"Cumulative discount factor": formatAsPercent,
+				"Capacity degradation factor": formatAsPercent,
+				"Capacity factor": formatAsPercent,
+
+				"Years from indexation start date": formatAsFloat,
+				"Cash available for dividends": formatOther,
+				"Dividends declared": formatOther,
+				"Dividends paid": formatOther,
+
+				  // Add more column names and corresponding formatting functions here
+				};
+
+
+
+
+				const columnLabel = {
+				"Period start": "date",
+				"Period end": "date",
+				"Year": "year",
+				"Days in period": "days",
+				"Days in year": "days",
+				"Years in period": "years",
+				"Construction start": "#",
+				"Construction": "#",
+				"Construction end": "#",
+				"Operations": "true/false",
+				"Years during operations": "year",
+				"Years from COD (BoP)": "years",
+				"Years from COD (EoP)": "years",
+				"Years from COD (avg.)": "years",
+				"Seasonality": "%",
+				"Liquidation": "true/false",
+				"Liquidation end": "true/false",
+				"Contract period": "true/false",
+				"Contract start date": "date",
+				"Contract end date": "date",
+				"Days in contract period": "days",
+				"Days during construction": "days",
+				"Days during operations": "days",
+				"Quarter": "true/false",
+				"Start of calendar year": "true/false",
+				"Percentage in contract period": "%",
+				"Percentage in operations period": "%",
+				"Indexation period": "true/false",
+				"Indexation start date": "date",
+				"Indexation end date": "date",
+				"Indexation (days)": "days",
+				"Years from indexation start date": "years",
+				"Indexation": "%",
+				"Capacity before degradation": "MW",
+				"Capacity degradation factor": "%",
+				"Capacity after degradation": "MW",
+				"Production": "MWh",
+				"Electricity market price (unindexed)": "EUR",
+				"Electricity market price (indexed)": "EUR",
+				"Contract price (unindexed)": "EUR",
+				"Contract price (indexed)": "EUR",
+				"Amortisation period": "true/false",
+				"Target DSCR": "x",
+				"Average interest rate": "%",
+				"Discount factor": "%",
+				"Cumulative discount factor": "%",
+				"Capacity factor": "%",
+
+				"Financing plan balanced": "test",
+				"Balance sheet balanced": "test",
+
+
+				  // Add more column names and corresponding formatting functions here
+				};
+
+
+				const excludedColumns = [
+				  "Period",
+				  "Year",
+				  "year",
+
+				  "Days",
+				  "Seasonality",
+				  
+				  "Percentage",
+				  "Distributable profit",
+				  "Discount factor",
+				  "Cumulative discount factor",
+				  "Assets",
+				  "Total assets",
+				  "Retained earnings",
+				  "Total liabilities",
+				  
+				  "balance",
+				  "Balance",
+				  "Cash",
+
+				  "price",
+				  "capacity",
+				  "date",
+				  "DSCR", 
+				  "BoP",
+				  "EoP",
+				  "Cash available",
+				  "indexation",
+				  "Property, Plant",
+				  "liquidity",
+				  "Accounts",
+				];
+
+
+			for (const key in dict) {
+			  const { selector } = dict[key];
+			  let tableContent = "<table>";
+
+			  for (const subKey in json.df['computation_displayed']) {
+			    if (subKey.startsWith(key)) {
+			      const data = json.df['computation_displayed'][subKey];
+
+			      tableContent += "<tr>";
+			      $.each(data, function (index, dataValue) {
+			        tableContent += "<td>";
+			        tableContent += index;
+			        tableContent += "</td>";
+
+			        if (columnLabel.hasOwnProperty(index)) {
+			          tableContent += "<td>" + columnLabel[index] + "</td>";
+			        } else {
+			          tableContent += "<td>" + "kEUR" + "</td>";
+			        }
+
+			        if (excludedColumns.includes(index)) {
+
+			        	tableContent += "<td></td>";
+			        } else {
+
+				          tableContent += "<td>" + formatOther(json.df['computation_displayed_sums'][subKey][index]) + "</td>";
+				    }    
+
+			        $.each(dataValue, function (i, datapoint) {
+			          if (columnFormatting.hasOwnProperty(index)) {
+			            const formattedValue = columnFormatting[index](datapoint);
+			            tableContent += "<td>" + formattedValue + "</td>";
+			          } else if (!containsExcludedWords(index)) {
+			            const formattedValue = formatOther(datapoint);
+			            tableContent += "<td>" + formattedValue + "</td>";
+			          } else {
+			            tableContent += "<td>" + datapoint + "</td>";
+			          }
+			        });
+
+			        tableContent += "</tr>";
+			      });
+			    }
+			  }
+
+			  tableContent += "</table>";
+			  $(selector).html(tableContent);
+			}
+
+
+
+
+				function formatDSCR(dataValue) {
+					
+					const formattedValue = dataValue.toFixed(2) + "x";
+
+				return formattedValue;
+				}
+
+				function formatOther(dataValue) {
+					
+				  const roundedValue = Math.round(Math.abs(dataValue) * 10) / 10;
+				  const formattedValue = roundedValue.toLocaleString("fr-FR", {
+					minimumFractionDigits: 1,
+					maximumFractionDigits: 1
+				  });
+				  return dataValue < 0 ? `(${formattedValue})` : formattedValue;
+				}
+
+				function formatAsInt(dataValue) {
+				return Math.floor(dataValue).toString();					
+		
+				}
+
+				function formatAsFloat(dataValue) {
+				  const formattedValue = dataValue.toLocaleString("fr-FR", {
+					minimumFractionDigits: 1,
+					maximumFractionDigits: 1
+				  });
+				  return formattedValue;
+}
+
+				function containsExcludedWords(pd_column_name) {
+				  const excludedWords = ["date", "end", "start"];
+				  for (const word of excludedWords) {
+					if (pd_column_name.toLowerCase().includes(word)) {
+					  return true;
+					}
+				  }
+				  return false;
+}
+
+				const tables = [
+				  { data: json.tables['Debt metrics'], selector: "#summary_debt" },
+				  { data: json.tables['Project IRR'], selector: "#summary_project" },
+				  { data: json.tables['Equity metrics'], selector: "#summary_equity" },
+				  { data: json.tables['Audit'], selector: "#summary_audit" },
+				  { data: json.tables['Uses'], selector: "#summary_financing_plan_uses" },
+				  { data: json.tables['Sources'], selector: "#summary_financing_plan_sources" },
+				  { data: json.tables['Sensi'], selector: "#summary_sensi" },
+
+
+				];
+
+				tables.forEach(table => build_table(table.data, table.selector));
+
+			
+				var dict_sidebar = {
+					COD:"#dateCOD",
+					installed_capacity:"#installed_capacity",
+					end_of_operations:"#dateRetirement",
+					sum_seasonality:"#sumSeasonality",
+					sum_construction_costs:"#sumConstructionCosts",
+					liquidation:"#dateLiquidation",
+					date_debt_maturity:"#debtMaturity",
+
+				};
+
+
+				for (var i = 0; i < 42; i++) {
+					$("#elecPriceLabel"+i).html(json.sidebar_data['price_elec_dict'][i]);
+				}
+
+
+				for (var i = 0; i < Object.keys(dict_sidebar).length; i++) {
+					var key = Object.keys(dict_sidebar)[i];
+					$(Object.values(dict_sidebar)[i]).html(json.sidebar_data[key]);
+				}
+
+
+
+				chartProjectCosts.data.labels = Object.values(json.df['computation_construction']['Dates']['Period end']);
+				chartProjectCosts.data.datasets[0].data = Object.values(json.df['computation_construction']['FP_u']['Construction costs']);
+				chartProjectCosts.data.datasets[1].data = Object.values(json.df['computation_construction']['Graphs']['Cumulative total uses']);
+				chartProjectCosts.data.datasets[2].data = Object.values(json.df['computation_construction']['FP_u']['Development fee']);
+				chartProjectCosts.data.datasets[3].data = Object.values(json.df['computation_construction']['Graphs']['Debt fees']);
+				chartProjectCosts.data.datasets[4].data = Object.values(json.df['computation_construction']['FP_u']['Initial DSRA funding']);
+				chartProjectCosts.data.datasets[5].data = Object.values(json.df['computation_construction']['Graphs']['Local taxes']);
+				chartProjectCosts.update();
+
+		
+				chartFinPlan.data.labels = Object.values(json.df['computation_construction']['Dates']['Period end']);
+				chartFinPlan.data.datasets[0].data = Object.values(json.df['computation_construction']['Graphs']['Share capital injections neg']);
+				chartFinPlan.data.datasets[1].data = Object.values(json.df['computation_construction']['Graphs']['Shareholder loan injections neg']);
+				chartFinPlan.data.datasets[2].data = Object.values(json.df['computation_construction']['Graphs']['Senior debt drawdowns neg']);
+				chartFinPlan.data.datasets[3].data = Object.values(json.df['computation_construction']['FP_u']['Total uses']);
+				chartFinPlan.data.datasets[4].data = Object.values(json.df['computation_construction']['Graphs']['Gearing during financing plan']);
+				chartFinPlan.update();	
+
+
+				const charts = [chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, chartDSCR, chartDSRA, chartCash];
+
+				const datasets = [
+				  [Object.values(json.df['computation_displayed']['Graphs']['Operating expenses pos']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Lease pos']),
+				  	Object.values(json.df['computation_displayed']['IS']['Contract revenues']), 
+				  	Object.values(json.df['computation_displayed']['IS']['Merchant revenues']),
+				  	Object.values(json.df['computation_displayed']['Graphs']['Debt service'])],
+				
+				  [Object.values(json.df['computation_displayed']['Graphs']['Share capital injections and repayment']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Shareholder loan injections and repayment']),
+				  	Object.values(json.df['computation_displayed']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['IRR curve'])],
+
+				  [Object.values(json.df['computation_displayed']['Sizing']['Interests during operations']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed']['Ratio']['DSCR'])],
+
+
+				  [Object.values(json.df['computation_displayed']['Debt_b']['Drawdowns']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed']['Debt_b']['Closing balance'])],
+
+				  [Object.values(json.df['computation_displayed']['Ratio']['DSCR']), 
+				  	Object.values(json.df['computation_displayed']['Ratio']['LLCR']),
+				  	Object.values(json.df['computation_displayed']['Ratio']['PLCR'])],
+
+
+				  [Object.values(json.df['computation_displayed']['Graphs']['Debt service']), 
+				  	Object.values(json.df['computation_displayed']['DSRA']['DSRA (BoP)'])],
+
+
+				  [Object.values(json.df['computation_displayed']['RE_b']['Balance brought forward']), 
+				  	Object.values(json.df['computation_displayed']['DistrEOP']['Distribution account balance']),
+				  	Object.values(json.df['computation_displayed']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed']['Graphs']['Share capital repayment pos'])],
+
+
+				];
+
+				const datasets_annual = [
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Operating expenses pos']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Lease pos']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['IS']['Contract revenues']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['IS']['Merchant revenues']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Debt service'])],
+
+
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Share capital injections and repayment']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Shareholder loan injections and repayment']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed_end_year']['Graphs']['IRR curve'])],
+
+
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Sizing']['Interests during operations']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed_end_year']['Ratio']['DSCR'])],
+
+
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Debt_b']['Drawdowns']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Senior debt repayments']),
+				  	Object.values(json.df['computation_displayed_end_year']['Debt_b']['Closing balance'])],
+
+				  [Object.values(json.df['computation_displayed_end_year']['Ratio']['DSCR']), 
+				  	Object.values(json.df['computation_displayed_end_year']['Ratio']['LLCR']),
+				  	Object.values(json.df['computation_displayed_end_year']['Ratio']['PLCR'])],
+
+				  [Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Debt service']), 
+				  	Object.values(json.df['computation_displayed_end_year']['DSRA']['DSRA (BoP)'])],
+
+				  [Object.values(json.df['computation_displayed_end_year']['RE_b']['Balance brought forward']), 
+				  	Object.values(json.df['computation_displayed_end_year']['DistrBOP']['Balance brought forward']),
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Dividends paid pos']), 
+				  	Object.values(json.df['computation_displayed_sums_per_year']['Graphs']['Share capital repayment pos'])],
+
+				];
+
+
+				function updateChartAnnual(chart, datasets) {
+					chart.data.labels = Object.values(json.df['computation_displayed_sums_per_year']['Dates']['Period end']);
+					datasets.forEach((data, index) => {
+						chart.data.datasets[index].data = data;
+					});
+					chart.update();
+				}
+
+				function updateChart(chart, datasets) {
+					chart.data.labels = Object.values(json.df['computation_displayed']['Dates']['Period end']);
+					datasets.forEach((data, index) => {
+						chart.data.datasets[index].data = data;
+					});
+					chart.update();
+				}
+
+
+		     	charts.forEach((chart, index) => {
+			 	 	updateChartAnnual(chart, datasets_annual[index]);
+
+				});
+
+
+
+
+	        $(document).ready(function () {
+	            $("#myDropdown").change(function () {
+	                var selectedOption = $(this).val();
+	                if (selectedOption === "annual") {
+		            
+		            charts.forEach((chart, index) => {
+				 	 updateChartAnnual(chart, datasets_annual[index]);
+
+					});
+
+	                } else if (selectedOption === "debt_periodicity") {
+	                    // Perform actions for Quarterly selection
+		            charts.forEach((chart, index) => {
+				 	 updateChart(chart, datasets[index]);
+
+					});
+	                }
+	            });
+	        });
+
+
+
+
+
+			},
+
+			error: function(json){
+
+
+				try {
+					const obj = JSON.parse(json.responseJSON.error);
+					const array = Object.values(obj)[0];
+					const firstElement = array[0];
+					alert(firstElement.message);
+					console.log(obj);
+				} catch (e) {
+					alert(json.responseJSON.error_type+" "+json.responseJSON.line_number+" "+json.responseJSON.message);
+					console.log(json);
+				}
+
+
+
+				
+
+			}
+		});
+		return false;
+	});
+
+</script>
+
+
+</form>  
+
+{% endblock %}
+
+

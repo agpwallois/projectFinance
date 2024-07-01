@@ -38,10 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AjaxPost',
-    'authentication',
-    'api_integration',
-    'sofr',
+    'financial_model',
+    'home_page',
 ]
 
 MIDDLEWARE = [
@@ -62,10 +60,7 @@ LOGIN_URL = 'login'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR.joinpath('templates'),
-
-        ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,4 +130,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'authentication.User'
+AUTH_USER_MODEL = 'home_page.User'
