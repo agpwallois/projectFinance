@@ -36,7 +36,127 @@ from .WindProject import WindProject
 from .SolarProject import SolarProject
 from .SensitivityModel import SensitivityModel
 
+from django.views import View
 
+
+class FinancialModelView(View):
+	def get(self, request, id):
+		project = get_object_or_404(Project, id=id)
+		project_form = ProjectForm(instance=project)
+		context = {
+			'project_form': project_form,
+			'project': project,
+		}
+		return render(request, "financial_model/project_view.html", context)
+
+	def post(self, request, id):
+		project = get_object_or_404(Project, id=id)
+		project_form = ProjectForm(request.POST, instance=project)
+
+		if not project_form.is_valid():
+			return JsonResponse({'error': project_form.errors.as_json()}, status=400)
+
+		return self.process_project(request, project, project_form)
+
+	def process_project(self, request, project, project_form):
+
+		try:
+
+			lender_base_case = self.create_lender_base_case(request) 
+			scenarios, dashboard_sensitivity_tables = self.calculate_scenarios(request, lender_base_case)
+			computation_scn_displayed, dashboard_tables = self.display_selected_scenario(project_form, scenarios, dashboard_sensitivity_tables)
+
+		except Exception as e:
+			return self.handle_exception(e)
+		
+		return self.create_json_response(computation_scn_displayed, dashboard_tables, scenarios)
+	
+	def create_lender_base_case(self, request):
+		if request.POST['technology'].startswith('Solar'):
+			return SolarProject(request)
+		else:
+			return WindProject(request)
+
+	def calculate_scenarios(self, request, lender_base_case):
+		"""
+		Calculate different financial scenarios based on sensitivities.
+		"""
+		scenarios = {'Lender Case': lender_base_case.create_dict_result()}
+		dashboard_sensitivity_tables = {'Lender Case': scenarios['Lender Case']['dict_results']['Sensi']}
+		SENSITIVITIES = ['sensi_production', 'sensi_opex', 'sensi_inflation', 'sponsor_production_choice']
+		for sensitivity in SENSITIVITIES:
+			model_copy = SensitivityModel(request, lender_base_case)
+			model_copy.apply_sensitivity(sensitivity_type=sensitivity)
+			model_copy.recalc_financial_model()
+			sensitivity_key = f"{sensitivity}"
+			sensitivity_results = model_copy.create_dict_result()
+			scenarios[sensitivity_key] = sensitivity_results
+			dashboard_sensitivity_tables[sensitivity_key] = sensitivity_results['dict_results']['Sensi']
+			scenarios = self.convert_numpy_types(scenarios)
+		return scenarios, dashboard_sensitivity_tables
+
+	def display_selected_scenario(self, project_form, scenarios, dashboard_sensitivity_tables):
+		
+		scenario_to_display = determine_scenario_to_display(project_form)
+		computation_scn_displayed = format_computation(scenarios, scenario_to_display)
+		dashboard_tables = generate_dashboard_tables(scenario_to_display, scenarios, dashboard_sensitivity_tables)
+
+		return computation_scn_displayed, dashboard_tables
+
+	def convert_numpy_types(self, data):
+		if isinstance(data, dict):
+			return {key: convert_numpy_types(value) for key, value in data.items()}
+		elif isinstance(data, list):
+			return [convert_numpy_types(element) for element in data]
+		elif isinstance(data, np.integer):
+			return int(data)
+		elif isinstance(data, np.floating):
+			return float(data)
+		elif isinstance(data, np.ndarray):
+			return data.tolist()
+		else:
+			return data
+
+	def create_json_response(self, computation_scn_displayed, dashboard_tables, scenarios):
+		"""
+		Create a JSON response with computed scenario data, dashboard tables, and other relevant information.
+
+		This function generates a JSON response containing the displayed computation scenario,
+		dashboard tables, sidebar data from the lender case scenario, and the current form data hash.
+
+		Returns:
+		JsonResponse: A Django JsonResponse object containing the provided data.
+		"""
+		return JsonResponse({
+			"df": computation_scn_displayed,
+			"tables": dashboard_tables,
+			"sidebar_data": scenarios['Lender Case']['dict_sidebar_data'],
+
+		}, safe=False, status=200)
+
+	def handle_exception(self, e):
+		traceback_info = traceback.extract_tb(e.__traceback__)
+		last_trace = traceback_info[-1]
+		error_data = {
+			'error_type': e.__class__.__name__,
+			'message': str(e),
+			'line_number': last_trace.lineno
+		}
+		return JsonResponse(error_data, safe=False, status=400)
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""legacy code avant le class based view"""
 
 
 def project_financial_model(request, id):

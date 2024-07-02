@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from home_page.views import HomePageView
+from financial_model.views import FinancialModelView
+
 from financial_model.views import project_financial_model
 from dashboard.views import projects_dashboard
 
@@ -25,7 +27,7 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', HomePageView.as_view(), name='home'),
 	path('projects/', projects_dashboard, name='project_list'),
-	path('project/<int:id>/', project_financial_model, name='project_view'),
+	path('project/<int:id>/', FinancialModelView.as_view(), name='project_view'),
 
 ]
 
