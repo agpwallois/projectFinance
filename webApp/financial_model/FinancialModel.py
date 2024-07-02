@@ -49,6 +49,9 @@ class FinancialModelTEST():
 				data[key] = value.isoformat()
 		return data
 
+
+
+
 class FinancialModel(): 
 
 	def __init__(self, request):
