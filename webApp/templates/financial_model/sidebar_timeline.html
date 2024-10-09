@@ -1,0 +1,82 @@
+<!-- timeline.html -->
+
+            <h3>Construction schedule</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Notice to proceed</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.start_construction }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>End of construction</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.end_construction }}
+                </div>
+            </div>
+            <h3>Operating period</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>COD</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="dateCOD"></div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Operating life</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>years</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.operating_life }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>End of operations</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="dateRetirement"></div>
+                </div>
+            </div>
+            <h3>Liquidation</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Delay to liquidation</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>months</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.liquidation }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Liquidation date</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="dateLiquidation"></div>
+                </div>
+            </div>

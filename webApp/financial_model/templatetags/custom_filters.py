@@ -2,16 +2,10 @@ from django import template
 
 register = template.Library()
 
-@register.filter
-def range_inclusive(value):
-	return range(value + 1)
-
-
 @register.simple_tag
-def define(val=None):
-  return val+1
-
-
-@register.filter
-def add_value(value, arg):
-    return str(value) + str(arg+1)
+def get_financial_model(financial_models, project_id):
+		# Loop through financial models and return the one that matches the project_id and has the correct identifier
+		for fm in financial_models:
+				if fm.project_id == project_id and fm.identifier == "sponsor_production_choice":
+						return fm
+		return None

@@ -17,8 +17,6 @@ from django.contrib import admin
 from django.urls import path, include
 from home_page.views import HomePageView
 from financial_model.views import FinancialModelView
-
-from financial_model.views import project_financial_model
 from dashboard.views import projects_dashboard
 
 

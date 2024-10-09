@@ -1,9 +1,9 @@
 
 
-<div class="charts-container-vertical">
+<div class="charts-container">
 
-	<div class="graph-dev"><canvas id="chartDevCountry"></canvas></div>
-	<div class="graph-dev"><canvas id="chartDevTech"></canvas></div>
+	<div class="graph"><canvas id="chartDevCountry"></canvas></div>
+	<div class="graph"><canvas id="chartDevTech"></canvas></div>
 
 </div>
 
@@ -17,11 +17,11 @@
 
 const ctxchartDevCountry = document.getElementById('chartDevTech');
 const chartDevTech = new Chart(ctxchartDevCountry, {
-    type: 'doughnut', // Use 'doughnut' type for a pie chart with a hole
+    type: 'doughnut',
     data: {
         labels: ['Solar - ground - mounted','Wind', 'Solar - rooftop'],
         datasets: [{
-            data: [1,1,1], // Adjust the values to match your data
+            data: [1,1,1],
             backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)','rgba(75, 192, 192, 0.2)'],
             borderColor: ['rgba(54, 162, 235, 0.75)', 'rgba(255, 99, 132, 0.75)','rgba(75, 192, 192, 0.75)'],
             borderWidth: 1
@@ -29,49 +29,46 @@ const chartDevTech = new Chart(ctxchartDevCountry, {
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: false, // Ensures the chart uses full container space
         plugins: {
             legend: {
                 position: 'top',
             },
             title: {
                 display: true,
-                text: 'Projects Capacity by Type (kW)' // Set your chart title here
+                text: 'Projects Capacity by Type (kW)'
             }
         }
     }
 });
 
-
-
-
 const ctxchartDevTech = document.getElementById('chartDevCountry');
 const chartDevCountry = new Chart(ctxchartDevTech, {
-    type: 'bar', // Use 'horizontalBar' type for a horizontal bar chart
+    type: 'bar',
     data: {
         labels: ['France', 'Spain'],
         datasets: [{
             label: 'kW',
-            data: [1, 1], // Adjust the values to match your data
+            data: [1, 1],
             backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'],
             borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
             borderWidth: 1
         }]
     },
     options: {
-    	indexAxis: 'y',
-    	responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: true,
-        text: 'Projects Capacity by Country (kW)'
-      }
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false, // Allow full usage of container space
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: true,
+                text: 'Projects Capacity by Country (kW)'
+            }
+        }
     }
-    }
-
 });
 
 </script>

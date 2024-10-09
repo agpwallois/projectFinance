@@ -1,0 +1,71 @@
+<!-- operating_costs.html -->
+
+            <h3>O&M</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Operating costs</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>kEUR p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.opex }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation base date</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.opex_indexation_start_date }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.index_rate_opex }}
+                </div>
+            </div>
+            <h3>Lease</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Lease</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>kEUR p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.lease }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation base date</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.lease_indexation_start_date }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.index_rate_lease }}
+                </div>
+            </div>
+

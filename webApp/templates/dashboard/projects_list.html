@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% load static %}
 
 {% block landingcss %}
@@ -64,24 +64,28 @@
                     <thead>
                         <th>NAME</th>
                         <th>TYPE</th>
-                        <th>CAPACITY</th>
                         <th>COUNTRY</th>
+                        <th>CAPACITY</th>
                         <th>CREATED ON</th>
                         <th>UPDATED ON</th>
-                        <th>PROGRESS</th>
+                        <th>SPONSOR IRR</th>
 
 
                     </thead>
 
                 {% for project in projects %}
-                    {% if not project.financial_close_check %}
+                    {% if project.project_status == "Development" %}
+                        {% get_financial_model financial_models project.id as project_financial_model %}
                         <tr class="hoverable clickable-row" data-href="{% url 'project_view' project.id %}">
                             <td>{{ project.name }}</td>
                             <td>{{ project.technology }}</td>
-                            <td>{{ project.calculated_value }}</td>
                             <td>{{ project.country }}</td>
+                            <td>{{ project.calculated_value }}</td>
                             <td>{{ project.created_date }}</td>
                             <td>{{ project.updated_date }}</td>
+                            {% if project_financial_model %}
+                                <td>{{ project_financial_model.IRR|floatformat:2 }}%</td>
+                            {% endif %}
                             <td></td>
                         </tr>
                     {% endif %}
@@ -125,25 +129,31 @@
                     <thead>
                         <th>NAME</th>
                         <th>TYPE</th>
-                        <th>CAPACITY</th>
                         <th>COUNTRY</th>
+                        <th>CAPACITY</th>
                         <th>CREATED ON</th>
                         <th>UPDATED ON</th>
-
+                        <th>SPONSOR IRR</th>
+                        <th>VALUATION</th>
 
                     </thead>
 
                 {% for project in projects %}
-                    {% if project.financial_close_check %}
+                    {% if project.project_status == "Operational" %}
+                        {% get_financial_model financial_models project.id as project_financial_model %}
                         <tr class="hoverable clickable-row" data-href="{% url 'project_view' project.id %}">
                             <td>{{ project.name }}</td>
                             <td>{{ project.technology }}</td>
-                            <td>{{ project.calculated_value }}</td>
                             <td>{{ project.country }}</td>
+                            <td>{{ project.calculated_value }}</td>
                             <td>{{ project.created_date }}</td>
                             <td>{{ project.updated_date }}</td>
-                            <td></td>
-                        </tr>
+                            {% if project_financial_model %}
+                               <td>{{ project_financial_model.IRR|floatformat:2 }}%</td>
+                               <td>{{ project_financial_model.valuation|floatformat:0 }}</td>
+
+                            {% endif %}
+
                     {% endif %}
                 {% endfor %}
 

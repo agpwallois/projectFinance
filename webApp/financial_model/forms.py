@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project
+from .model_project import Project
 from dateutil.relativedelta import relativedelta
 import math
 from datetime import datetime
@@ -95,7 +95,6 @@ class ProjectForm(forms.ModelForm):
 		'sensi_opex': forms.TextInput(attrs={'step': '5', 'type': 'range', 'value': '0', 'min': '-100', 'max': '100'}),
 
 
-		'financial_close_check': forms.CheckboxInput(attrs={'class': 'form-check-input', 'type': 'checkbox', 'role': 'switch', 'id': 'flexSwitchCheckDefault'}),
 
 
 
@@ -109,8 +108,8 @@ class ProjectForm(forms.ModelForm):
 								   self.fields['injection_choice'],
 								   self.fields['calculation_detail'],
 								   self.fields['DSRA_choice'],
-								   self.fields['financial_close_check'],
-					
+								   self.fields['project_status'],
+				
 			
 								   ]
 

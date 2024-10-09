@@ -1,11 +1,6 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
-import datetime
-from django.core.exceptions import ValidationError
-
-from django import forms
 from datetime import date
-from .commune_choices import COMMUNE_CHOICES
+
 
 class Project(models.Model):
 
@@ -30,6 +25,11 @@ class Project(models.Model):
 		('CfD - E17', 'CfD - E17'),
 		('CfD - AO', 'CfD - AO'),
 		('Corporate PPA', 'Corporate PPA'),
+	)
+
+	PROJECT_STATUS = (
+		('Development', 'Development'),
+		('Operational', 'Operational'),
 	)
 
 	created_date = models.DateTimeField(auto_now_add=True)
@@ -102,10 +102,10 @@ class Project(models.Model):
 	end_contract = models.fields.DateField(default=date(2042, 12, 31), blank=True, null=True)
 	contract_price = models.fields.DecimalField(max_digits=6, decimal_places=2, default=130)
 	contract_indexation_start_date = models.fields.DateField(default=date(2023, 1, 1), blank=True, null=True)
-	contract_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
+	index_rate_contract = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 	price_elec_indexation_start_date = models.fields.DateField(default=date(2022, 1, 1), blank=True, null=True)
-	price_elec_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
+	index_rate_merchant = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 	price_elec_choice = models.fields.IntegerField(default="1")
 
 
@@ -241,7 +241,7 @@ class Project(models.Model):
 
 	opex = models.fields.IntegerField(default="50")
 	opex_indexation_start_date = models.fields.DateField(default=date(2024, 1, 1), blank=True, null=True)
-	opex_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
+	index_rate_opex = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 	debt_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
 	debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
@@ -295,7 +295,6 @@ class Project(models.Model):
 	dev_tax_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	dev_tax_department_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	
-	commune = models.fields.CharField(choices=COMMUNE_CHOICES,max_length=100,default="Apremont")
 
 	archeological_tax_base_solar = models.fields.DecimalField(max_digits=8, decimal_places=2, default=10)
 	archeological_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.4)
@@ -303,7 +302,7 @@ class Project(models.Model):
 
 	lease = models.fields.IntegerField(default="50")
 	lease_indexation_start_date = models.fields.DateField(default=date(2024, 1, 1), blank=True, null=True)
-	lease_indexation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
+	index_rate_lease = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 
 	tfpb_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
@@ -323,31 +322,10 @@ class Project(models.Model):
 	cfe_specific_eqp_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	cfe_localCCI_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 
-	financial_close_check = models.BooleanField(default=False)
+	project_status = models.fields.CharField(choices=PROJECT_STATUS,max_length=100,default="Development")
 	discount_factor_valuation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=7)
-
-
 
 	contract = models.fields.CharField(choices=CONTRACT_CHOICES,max_length=100,default="CfD - AO")
 	rotor_diameter = models.fields.DecimalField(max_digits=4, decimal_places=2, default=92)
 
-
-class ComputationResult(models.Model):
-	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
-	all_scenarios_results = models.JSONField()
-	all_dashboard_tables = models.JSONField(default=dict)
-	form_data = models.JSONField(default=dict)
-	timestamp = models.DateTimeField(auto_now_add=True)
-
-
-class SponsorCaseResult(models.Model):
-	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
-	sponsor_case_result = models.JSONField()
-	timestamp = models.DateTimeField(auto_now_add=True)
-
-
-class LenderCase(models.Model):
-	project = models.OneToOneField('Project', null=True, on_delete=models.CASCADE)
-	lender_case = models.JSONField()
-	timestamp = models.DateTimeField(auto_now_add=True)
 

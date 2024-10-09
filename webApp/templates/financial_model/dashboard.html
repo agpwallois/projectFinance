@@ -1,0 +1,199 @@
+<!-- dashboard.html -->
+
+<div class="tab-pane active" id="nav-summary" role="tabpanel" aria-labelledby="home-tab">
+    <div class="box-wrapper">
+        <div class="box" id="summary-sensitivities">
+            <h2>Selected Scenario</h2>
+
+            <div class="summary-container">
+                <div class="summary-scenario-left">
+                    <table class="table-sum" id="table-scenario-input">
+                        <tbody>
+                            <tr>
+                                <th>Base Case</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario1" value="RadioScenario1"></td>
+                                <td>Lender Case</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table-sum" id="table-scenario-input-2">
+                        <tbody>
+                            <tr>
+                                <th>Sensitivities</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario2" value="RadioScenario2"></td>
+                                <td>Production</td>
+                                <td>{{ project_form.sensi_production }}</td>
+                                <td><div id="sensi_production"></div></td>
+                            </tr>
+                            <tr>
+                                <td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario3" value="RadioScenario3"></td>
+                                <td>Inflation</td>
+                                <td>{{ project_form.sensi_inflation }}</td>
+                                <td><div id="sensi_inflation"></div></td>
+                            </tr>
+                            <tr>
+                                <td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario4" value="RadioScenario4"></td>
+                                <td>Operating costs</td>
+                                <td>{{ project_form.sensi_opex }}</td>
+                                <td><div id="sensi_opex"></div></td>
+                            </tr>
+                            <tr>
+                                <td><input class="form-check-input" type="radio" name="flexRadioDefault" id="RadioScenario5" value="RadioScenario5"></td>
+                                <td>Sponsor Case</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="summary-scenario-right">
+                    <table class="table-sum" id="table-scenario-output">
+                        <tbody id="summary_sensi"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-summary">
+        <div class="summary-container-left">
+            <div class="box-wrapper">
+                <div class="box" id="summary-fp">
+                    <h2>Financing Plan</h2>
+
+                    <div class="summary-container-titles">
+                        <div class="summary-titles">
+                            <h4>Uses</h4>
+                        </div>
+                        <div class="summary-titles">
+                            <h4>Sources</h4>
+                        </div>
+                    </div>
+
+                    <div class="summary-container">
+                        <div class="summary">
+                            <table id="table_sum_uses" class="table-sum">
+                                <tbody id="summary_financing_plan_uses"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="summary">
+                            <table id="table_sum_sources" class="table-sum">
+                                <tbody id="summary_financing_plan_sources"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if project.project_status == "Operational" %}
+            <div class="operational_tabs">
+                <nav>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#nav-changelog" data-bs-toggle="tab">Changelog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#nav-valuation" data-bs-toggle="tab">Valuation</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="box-wrapper">
+                    <div class="tab-content">
+                        <!-- Valuation Tab Content -->
+                        <div class="tab-pane fade show active" id="nav-changelog">
+                            <div class="box">
+                                <h2>Changelog</h2>
+                            </div>
+                        </div>
+
+                        <!-- Changelog Tab Content -->
+                        <div class="tab-pane fade" id="nav-valuation">
+                            <div class="box">
+                                <h2>Valuation</h2>
+
+                                <script>
+                                    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+                                    var formattedDate = new Date().toLocaleDateString(undefined, options);
+                                    document.write(formattedDate);
+                                </script>
+
+                                <table class="table-sum">
+                                    <tbody id="summary_valuation"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="summary-container-right">
+            <div class="box-wrapper">
+                <div class="box" id="summary-IRR">
+                    <h2>Project and Shareholder Return</h2>
+                    <h4>Project IRR</h4>
+                    <table class="table-sum">
+                        <tbody id="summary_project"></tbody>
+                    </table>
+
+                    <h4>Equity IRR</h4>
+                    <table class="table-sum">
+                        <tbody id="summary_equity"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="box-wrapper">
+                <div class="box" id="summary-debt">
+                    <h2>Senior Debt metrics</h2>
+                    <table class="table-sum">
+                        <tbody id="summary_debt"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="box-wrapper">
+                <div class="box" id="summary-audit">
+                    <h2>Audit and Control</h2>
+                    <table class="table-sum">
+                        <tbody id="summary_audit"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box-wrapper">
+        <div class="box-wrapper-chart">
+            <div class="left">
+                <h2>Charts</h2>
+            </div>
+
+            <div class="right">
+                <select id="myDropdown">
+                    <option value="annual">Annual</option>
+                    <option value="debt_periodicity">Model periodicity</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="box" id="nav-summary-charts">
+            {% block jquery %}{% include 'financial_model/charts.html' %}{% endblock %}
+        </div>
+    </div>
+</div>
