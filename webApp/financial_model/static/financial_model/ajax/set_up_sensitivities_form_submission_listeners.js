@@ -1,12 +1,13 @@
 function set_up_sensitivities_form_submission_listeners() {
   
     // Select all the input fields that need to trigger the form submission
-    var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
 
     // Function to submit the form
     function submitForm() {
         $("#post-form").submit();
     }
+    
+    var inputFields = ['#id_sensi_production', '#id_sensi_opex', '#id_sensi_inflation'];
 
     // Loop through each input field
     inputFields.forEach(function(inputField) {

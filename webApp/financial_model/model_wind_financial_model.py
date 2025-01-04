@@ -3,11 +3,10 @@ from .model_financial_model import FinancialModel
 
 class WindFinancialModel(FinancialModel): 
 
-	def set_capacity(self):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 
 		self.installed_capacity = self.project.wind_turbine_installed*1000*self.project.capacity_per_turbine
-
-		return self.installed_capacity
 
 	def create_capacity_series(self):
 

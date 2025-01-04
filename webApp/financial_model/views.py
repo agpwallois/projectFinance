@@ -29,6 +29,8 @@ from .model_wind_financial_model import WindFinancialModel
 from .property_taxes import property_tax, tfpb_standard_reduction
 import requests
 from django.urls import reverse
+import logging
+
 
 from .views_helpers import (
 	build_dashboard_table,
@@ -42,7 +44,7 @@ from django.views import View
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
 
-
+logger = logging.getLogger(__name__)
 
 def timer_decorator(method):
 	@wraps(method)
@@ -102,10 +104,8 @@ class FinancialModelView(View):
 				financial_models
 			)
 			
-			charts_data_constr = fm_selected.extract_construction_values_for_charts()
-			charts_data_sum_year = fm_selected.calc_annual_sum_for_charts()
-			charts_data_eoy = fm_selected.extract_EoY_values_for_charts()
-
+			charts_data_constr, charts_data_eoy, charts_data_sum_year = fm_selected.extract_values_for_charts()
+			
 			# Return JSON response for AJAX
 			return self.prepare_json_response(fm_selected, dashboard_tables, charts_data_constr, charts_data_sum_year, charts_data_eoy)
 
@@ -142,6 +142,7 @@ class FinancialModelView(View):
 
 		# Check if sensitivity_type is in the set of changed fields
 		if sensitivity_type in changed_fields:
+			
 			return True
 		return False
 
@@ -149,9 +150,11 @@ class FinancialModelView(View):
 		# Step 1: Get or create the lender base case financial model
 		fm_lender_case, created = self.get_or_create_lender_case(project)
 		
+
+		
 		# Step 2: Update the lender base case if there are changes of assumptions and save new assumptions
 		if self.project_form_changed(project_form):
-			fm_lender_case.update_model()
+			fm_lender_case.create_or_update_lender_financial_model()
 			project_form.save()
 
 		# Step 3: Get and update or create sensitivity financial models
@@ -178,11 +181,7 @@ class FinancialModelView(View):
 		dashboard_tables = self.build_dashboard(fm_selected, financial_models)
 
 		# Step 6: Format data for charts
-		charts_data_constr = fm_selected.extract_construction_values_for_charts()
-		charts_data_sum_year = fm_selected.calc_annual_sum_for_charts()
-		charts_data_eoy = fm_selected.extract_EoY_values_for_charts()
-
-
+		charts_data_constr, charts_data_eoy, charts_data_sum_year = fm_selected.extract_values_for_charts()
 
 
 		# Step 7: Prepare and return the JSON response
@@ -216,8 +215,7 @@ class FinancialModelView(View):
 		# Copy an instance of SolarFinancialModel and modify its identifier.
 		if created :
 			financial_model_sensi = copy.deepcopy(fm_lender_case)
-			financial_model_sensi.apply_sensitivity(sensitivity_type)
-			financial_model_sensi.recalc_financial_model()
+			financial_model_sensi.apply_sensitivity_and_rerun_financial_model(sensitivity_type)
 
 			# Set a new identifier for the copied instance
 			financial_model_sensi.identifier = sensitivity_type
@@ -238,8 +236,7 @@ class FinancialModelView(View):
 							identifier=sensitivity_type,
 							)
 
-			financial_model_sensi.apply_sensitivity(sensitivity_type)
-			financial_model_sensi.recalc_financial_model()
+			financial_model_sensi.apply_sensitivity_and_rerun_financial_model(sensitivity_type)
 			financial_model_sensi.save()
 
 		else:
