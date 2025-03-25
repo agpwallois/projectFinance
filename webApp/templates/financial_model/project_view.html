@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<form method="POST" id="post-form">{% csrf_token %}
+
+    <!-- Project Header - Positioned right after header but before sidebar and content -->
+    <div class="project-header">
+        <h1 id="project_name">Project: {{ project.name }}</h1>
+    </div>
+    
+    <!-- Navigation Container - Below project header, containing nav tabs and toggle -->
+    <div class="navigation-container">
+        <!-- Combined Nav Bar with Toggle -->
+        <div class="nav-container">
+            <nav>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Computation</a>
+                    </li>
+                </ul>
+            </nav>
+            
+
+        </div>
+    </div>
+
+    <!-- Include Sidebar -->
+    {% include 'financial_model/sidebar.html' %}
+
+    <div id="content">
+        <div id="content-box">
+            <div class="tab-content">
+
+                <div class="tab-pane fade show active" id="nav-summary" role="tabpanel">
+                    {% include 'financial_model/dashboard.html' %}
+                </div>
+
+                <!-- Calculation Tab Content -->
+                <div class="tab-pane fade" id="nav-calculation" role="tabpanel">
+                    {% include 'financial_model/calculation.html' %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

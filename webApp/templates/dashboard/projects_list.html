@@ -1,0 +1,680 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block landingcss %}
+    <link rel="stylesheet" href="{% static 'financial_model/style_landing.css' %}" />
+    <style>
+        /* Dashboard Layout Improvements */
+
+        #dashboard_container {
+            display: flex;
+            min-height: 100vh;
+            background-color: rgb(244, 244, 244);
+            padding-top: 50px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        #dashboard_sidebar {
+            width: 250px;
+            background-color: #fff;
+            border-right: 1px solid #e9ecef;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+        
+        .nav-link {
+            color: rgb(92, 105, 117);
+            padding: 12px 20px;
+            border-radius: 0;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+            color: #0d6efd;
+        }
+        
+        .nav-link.active {
+            color: #0d6efd;
+            background-color: transparent;
+            border-left: 3px solid #0d6efd;
+        }
+        
+        .dashboard_sidebar_separator {
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .section_title {
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .vertical_line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: #ccc;
+        }
+        
+        #v-pills-tabContent {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            width: calc(100% - 250px);
+        }
+        
+        .box-wrapper {
+            background-color: #fff;
+            border-radius: 3px;
+            border: solid 1px rgb(221,221,221);
+            padding: 25px;
+            margin-bottom: 10px; /* Modified Margin */
+            height: 100%;
+        }
+        
+        .box-wrapper h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #212529;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .nav-dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .button-container {
+            width: 70%;
+        }
+        
+        .search-container {
+            width: 30%;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        #searchInput, #searchInput2 {
+            padding: 10px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            width: 100%;
+        }
+        
+        #button_new_project {
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        #button_new_project:hover {
+            background-color: #0b5ed7;
+        }
+        
+        .table-dashboard {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            line-height: 1rem;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        
+        .table-dashboard thead th {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 1rem;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .table-dashboard tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #212529;
+        }
+        
+        /* Row styling without hover effect */
+        .table-dashboard .hoverable {
+            background-color: transparent;
+        }
+        
+        /* Dashboard metrics cards */
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px; /* Modified Gap */
+            margin-bottom: 10px; /* Modified Margin */
+        }
+        
+        .metric-card {
+            background-color: #fff;
+            border-radius: 3px;
+            border: solid 1px rgb(221,221,221);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        /* Removed hover effect */
+        
+        .metric-title {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #212529;
+        }
+        
+        .metric-change {
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+        
+        .metric-positive {
+            color: #198754;
+        }
+        
+        .metric-negative {
+            color: #dc3545;
+        }
+        
+        /* Main content layout for side-by-side sections */
+        .main-content-row {
+            display: flex;
+            gap: 10px; /* Modified gap here */
+            width: 100%;
+            margin-bottom: 10px; /* Modified Margin */
+            align-items: flex-start;
+        }
+
+        .main-content-row-charts {
+            display: flex;
+            gap: 10px; /* Modified gap here */
+            width: 100%;
+            align-items: flex-start;
+        }
+        
+        .main-content-column-projects {
+            width: 100%; /* Takes 100% of the space now */
+        }
+        
+        .main-content-column-analytics {
+            flex: 1;
+            width: 50%; /*Takes 50% of parent container*/
+        }
+        
+        .charts-column {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .chart-container {
+            background-color: #fff;
+            border-radius: 3px;
+            border: solid 1px rgb(221,221,221);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            width: 100%;
+            position: relative;
+            margin-bottom: 10px; /* Modified Margin */
+        }
+        
+        .chart-title {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content-row {
+                flex-direction: column;
+            }
+
+            .main-content-row-charts {
+                flex-direction: column;
+            }
+            
+            .main-content-column-projects,
+            .main-content-column-analytics {
+                flex: 1 1 100%;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            #dashboard_container {
+                flex-direction: column;
+            }
+            
+            #dashboard_sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            #v-pills-tabContent {
+                width: 100%;
+            }
+            
+            .nav-dashboard {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .button-container, .search-container {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Content -->
+<div id="dashboard_container">
+    <!-- Sidebar -->
+    <div id="dashboard_sidebar">
+        <div class="dashboard_sidebar_separator">
+            <div class="divider">
+                <div class="section_title">Dashboard</div>
+                <div class="vertical_line"></div>
+            </div>
+        </div>
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">
+                <i class="fas fa-project-diagram me-2"></i> Project Pipeline
+            </button>
+            <button class="nav-link" id="v-pills-org-tab" data-bs-toggle="pill" data-bs-target="#v-pills-org" type="button" role="tab" aria-controls="v-pills-org" aria-selected="false">
+                <i class="fas fa-solar-panel me-2"></i> Operational Portfolio
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="tab-content" id="v-pills-tabContent">
+        <!-- Project Pipeline Tab -->
+        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab" tabindex="0">
+            <!-- KPI Summary Cards -->
+            <div class="metrics-container">
+                <div class="metric-card">
+                    <div class="metric-title">Total Projects</div>
+                    <div class="metric-value">{{ projects|length }}</div>
+                    <div class="metric-change metric-positive">+3 this month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Total Capacity</div>
+                    <div class="metric-value">{{ total_capacity|floatformat:1 }} MW</div>
+                    <div class="metric-change metric-positive">+120 MW this quarter</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Avg. IRR</div>
+                    <div class="metric-value">{{ avg_irr|floatformat:2 }}%</div>
+                    <div class="metric-change metric-positive">+0.4% from last quarter</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Projects in Pipeline</div>
+                    <div class="metric-value">{{ development_projects|length }}</div>
+                    <div class="metric-change metric-positive">2 nearing completion</div>
+                </div>
+            </div>
+
+            <!-- Charts Section - Above Projects Table -->
+            <div class="main-content-row-charts">
+                <div class="main-content-column-analytics">
+                    <div class="chart-container">
+                        <div class="chart-title">Capacity by Technology</div>
+                        <div style="position: relative; height: 175px; width: 100%; overflow: hidden;">
+                            <canvas id="chartDevTech" width="100%" height="175"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-content-column-analytics">
+                    <div class="chart-container">
+                        <div class="chart-title">Capacity by Country</div>
+                        <div style="position: relative; height: 175px; width: 100%; overflow: hidden;">
+                            <canvas id="chartDevCountry" width="100%" height="175"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Table - Takes Full Width -->
+            <div class="main-content-row">
+                <!-- Projects Table - Left Column (100%) -->
+                <div class="main-content-column-projects">
+                    <div class="box-wrapper">
+                        <h1>Development Projects</h1>
+                        <div class="nav-dashboard">
+                            <div class="button-container">
+                                <a href="{% url 'admin:index' %}">
+                                    <div id="button_new_project">
+                                        <i class="fas fa-plus me-2"></i> Create New Project
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="search-container">
+                                <input type="text" id="searchInput" placeholder="Search projects...">
+                            </div>
+                        </div>
+
+                        <table class="table-dashboard" id="dataTable">
+                            <thead>
+                                <th>NAME</th>
+                                <th>TYPE</th>
+                                <th>COUNTRY</th>
+                                <th>CAPACITY</th>
+                                <th>CREATED ON</th>
+                                <th>UPDATED ON</th>
+                                <th>SPONSOR IRR</th>
+                            </thead>
+                            <tbody>
+                            {% for project in projects %}
+                                {% if project.project_status == "Development" %}
+                                    {% get_financial_model financial_models project.id as project_financial_model %}
+                                    <tr class="hoverable clickable-row" data-href="{% url 'project_view' project.id %}">
+                                        <td>{{ project.name }}</td>
+                                        <td>{{ project.technology }}</td>
+                                        <td>{{ project.country }}</td>
+                                        <td>{{ project.calculated_value }}</td>
+                                        <td>{{ project.created_date }}</td>
+                                        <td>{{ project.updated_date }}</td>
+                                        {% if project_financial_model %}
+                                            <td>{{ project_financial_model.IRR|floatformat:2 }}%</td>
+                                        {% else %}
+                                            <td>-</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% block jquery3 %}{% include 'dashboard/charts_dashboard.html' %}{% endblock %}
+        </div>
+
+<!-- Operational Portfolio Tab -->
+<div class="tab-pane fade" id="v-pills-org" role="tabpanel" aria-labelledby="v-pills-org-tab" tabindex="0">
+    <!-- KPI Summary Cards -->
+    <div class="metrics-container">
+        <div class="metric-card">
+            <div class="metric-title">Operational Projects</div>
+            <div class="metric-value">{{ operational_projects|length }}</div>
+            <div class="metric-change metric-positive">+1 this quarter</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Total Operational Capacity</div>
+            <div class="metric-value">{{ operational_capacity|floatformat:1 }} MW</div>
+            <div class="metric-change metric-positive">+85 MW this year</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Portfolio Valuation</div>
+            <div class="metric-value">${{ total_valuation|floatformat:0 }}M</div>
+            <div class="metric-change metric-positive">+$12M from last quarter</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Avg. Operational IRR</div>
+            <div class="metric-value">{{ op_avg_irr|floatformat:2 }}%</div>
+            <div class="metric-change metric-negative">-0.1% from last quarter</div>
+        </div>
+    </div>
+
+    <!-- Charts Section - Side by Side Above Projects Table -->
+    <div class="main-content-row-charts">
+        <div class="main-content-column-analytics">
+            <div class="chart-container">
+                <div class="chart-title">Revenue by Technology</div>
+                <div style="position: relative; height: 175px; width: 100%; overflow: hidden;">
+                    <canvas id="chartOpRevenuesbyTech" width="100%" height="175"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="main-content-column-analytics">
+            <div class="chart-container">
+                <div class="chart-title">Revenue by Country</div>
+                <div style="position: relative; height: 175px; width: 100%; overflow: hidden;">
+                    <canvas id="chartOpRevenuesbyCountry" width="100%" height="175"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational Projects Table - Full Width -->
+    <div class="main-content-row">
+        <div class="main-content-column-projects">
+            <div class="box-wrapper">
+                <h1>Operational Projects</h1>
+                <div class="nav-dashboard">
+                    <div class="search-container">
+                        <input type="text" id="searchInput2" placeholder="Search operational projects...">
+                    </div>
+                </div>
+
+                <table class="table-dashboard" id="dataTable2">
+                    <thead>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>COUNTRY</th>
+                        <th>CAPACITY</th>
+                        <th>CREATED ON</th>
+                        <th>UPDATED ON</th>
+                        <th>SPONSOR IRR</th>
+                        <th>VALUATION</th>
+                    </thead>
+                    <tbody>
+                    {% for project in projects %}
+                        {% if project.project_status == "Operational" %}
+                            {% get_financial_model financial_models project.id as project_financial_model %}
+                            <tr class="hoverable clickable-row" data-href="{% url 'project_view' project.id %}">
+                                <td>{{ project.name }}</td>
+                                <td>{{ project.technology }}</td>
+                                <td>{{ project.country }}</td>
+                                <td>{{ project.calculated_value }}</td>
+                                <td>{{ project.created_date }}</td>
+                                <td>{{ project.updated_date }}</td>
+                                {% if project_financial_model %}
+                                    <td>{{ project_financial_model.IRR|floatformat:2 }}%</td>
+                                    <td>${{ project_financial_model.valuation|floatformat:0 }}M</td>
+                                {% else %}
+                                    <td>-</td>
+                                    <td>-</td>
+                                {% endif %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% block jquery2 %}{% include 'dashboard/charts_dashboard_operating.html' %}{% endblock %}
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Simple click handler without hover effects
+        $(".clickable-row").on('click', function() {
+            window.location = $(this).data("href");
+        });
+        
+        // Search functionality for development projects
+        $('#searchInput').on('keyup', function() {
+            var searchText = $(this).val().toLowerCase();
+            $('#dataTable tbody tr').each(function() {
+                var rowData = $(this).text().toLowerCase();
+                if (rowData.indexOf(searchText) === -1) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+        
+        // Search functionality for operational projects
+        $('#searchInput2').on('keyup', function() {
+            var searchText = $(this).val().toLowerCase();
+            $('#dataTable2 tbody tr').each(function() {
+                var rowData = $(this).text().toLowerCase();
+                if (rowData.indexOf(searchText) === -1) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+        
+        // Chart configuration with proper size settings
+        var chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10,
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                title: {
+                    display: false
+                },
+                tooltip: {
+                    titleFont: {
+                        size: 10
+                    },
+                    bodyFont: {
+                        size: 10
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            }
+        };
+        
+
+    });
+
+    // Parse and process revenue data
+    function parseAndProcessData(data, chart, chartName, labelPrefix) {
+        var revenues = JSON.parse(data);
+
+        var allYears = new Set();
+        for (var item in revenues) {
+            Object.keys(revenues[item]).forEach(year => allYears.add(year));
+        }
+
+        var years = Array.from(allYears).sort();
+        console.log("All Years for " + chartName + ": ", years);
+
+        var datasets = [];
+
+        for (var item in revenues) {
+            var dataForItem = [];
+            years.forEach(year => {
+                var revenue = revenues[item][year] || 0;
+                dataForItem.push(revenue);
+            });
+
+            var dataset = {
+                label: labelPrefix + item,
+                data: dataForItem,
+                // Add other properties like backgroundColor, borderColor, etc.
+            };
+
+            datasets.push(dataset);
+        }
+
+        var sumData = new Array(years.length).fill(0);
+        for (var i = 0; i < datasets.length - 1; i++) {
+            datasets[i].data.forEach((revenue, index) => {
+                sumData[index] += revenue;
+            });
+        }
+
+        var sumDataset = {
+            label: "Sum of " + chartName,
+            data: sumData,
+            // Add other properties like backgroundColor, borderColor, etc.
+        };
+
+        datasets.push(sumDataset);
+
+        console.log("Datasets for " + chartName + ": ", datasets);
+
+        chart.data.labels = years;
+
+        for (var i = 0; i < datasets.length; i++) {
+            chart.data.datasets[i].data = datasets[i].data;
+        }
+
+        chart.update();
+    }
+
+    parseAndProcessData('{{ yearly_revenues_technology|safe }}', chartOpRevenuesbyTech, "Technologies", "");
+    parseAndProcessData('{{ yearly_revenues_country|safe }}', chartOpRevenuesbyCountry, "Countries", "");
+</script>
+{% endblock %}

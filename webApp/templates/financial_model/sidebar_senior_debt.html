@@ -1,0 +1,161 @@
+<!-- senior_debt_facilities.html -->
+
+            <h3>Term loan timeline</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Door-to-door tenor</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>years</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_tenor }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Maturity</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="debtMaturity"></div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Periodicity</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.periodicity }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Quarter/Semester-end rounding</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>boolean</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.timeline_quarters_ceiling }}
+                </div>
+            </div>
+            <h3>Sizing constraints</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Maximum gearing</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_gearing_max }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Minimum ADSCR</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>x</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_target_DSCR }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Negative tail</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>years</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_negative_tail }}
+                </div>
+            </div>
+            <h3>Fees and margins</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Arrangement fee</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_upfront_fee }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Commitment fee</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_commitment_fee }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Credit margin</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_margin }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Swap rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_swap_rate }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Reference rate buffer</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_reference_rate_buffer }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Swap margin</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.debt_swap_margin }}
+                </div>
+            </div>
+            <h3>Debt service reserve account</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>DSRA</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>months</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.DSRA_choice }}
+                </div>
+            </div>
+

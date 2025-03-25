@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block landingcss %}
+    <link rel="stylesheet" href="{% static 'financial_model/style_landing.css' %}" />
+{% endblock %}
+
+
+    {% block content %}
+
+        <!-- Page Content  -->
+    <div id="dashboard_container">
+        <div id="dashboard_sidebar">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="dashboard_sidebar_separator">
+                    <div class="divider">
+                        <div class="section_title">Dashboard</div>
+                        <div class="vertical_line"></div>
+                    </div>
+                </div>
+                <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Project Pipeline</button>
+
+                <button class="nav-link" id="v-pills-org-tab" data-bs-toggle="pill" data-bs-target="#v-pills-org" type="button" role="tab" aria-controls="v-pills-org" aria-selected="false">Operational Portfolio</button>
+
+
+            </div>
+        </div>
+
+        <div class="tab-content" id="v-pills-tabContent">
+
+            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab" tabindex="0">
+
+
+            <div class="box-wrapper">
+
+                       <h1>Overview</h1>
+
+                        {% block jquery3 %}{% include 'dashboard/charts_dashboard.html' %}{% endblock %}
+                    </div>
+
+
+
+
+            <div class="box-wrapper">
+                <h1>Projects</h1>
+
+            <div class="nav-dashboard">
+                <div class="button-container">
+                <a href="{% url 'admin:index' %}">
+                    <div id="button_new_project">
+                        Create New Project
+                    </div>
+                </a>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search...">
+                </div>
+
+            </div>
+
+
+                <table class="table-dashboard" id="dataTable">
+                    <thead>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>COUNTRY</th>
+                        <th>CAPACITY</th>
+                        <th>CREATED ON</th>
+                        <th>UPDATED ON</th>
+                        <th>SPONSOR IRR</th>
+
+
+                    </thead>
+
+                {% for project in projects %}
+                    {% if project.project_status == "Development" %}
+                        {% get_financial_model financial_models project.id as project_financial_model %}
+                        <tr class="hoverable clickable-row" data-href="{% url 'project_view' project.id %}">
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.technology }}</td>
+                            <td>{{ project.country }}</td>
+                            <td>{{ project.calculated_value }}</td>
+                            <td>{{ project.created_date }}</td>
+                            <td>{{ project.updated_date }}</td>
+                            {% if project_financial_model %}
+                                <td>{{ project_financial_model.IRR|floatformat:2 }}%</td>
+                            {% endif %}
+                            <td></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+
+                </table> 
+            </div>
+        </div>
+
+
+
+
+    <div class="tab-pane fade" id="v-pills-org" role="tabpanel" aria-labelledby="v-pills-org-tab" tabindex="0"> 
+
+
+            <div class="box-wrapper">
+
+            <h1>Overview</h1>
+             {% block jquery2 %}{% include 'dashboard/charts_dashboard_operating.html' %}{% endblock %}
+   
+            </div>
+
+
+
+            <div class="box-wrapper">
+                <h1>Projects</h1>
+
+            <div class="nav-dashboard">
+                <div class="button-container">
+
+                </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput2" placeholder="Search...">
+                </div>
+
+            </div>
+
+
+                <table class="table-dashboard" id="dataTable2">
+                    <thead>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>COUNTRY</th>
+                        <th>CAPACITY</th>
+                        <th>CREATED ON</th>
+                        <th>UPDATED ON</th>
+                        <th>SPONSOR IRR</th>
+                        <th>VALUATION</th>
+
+                    </thead>
+
+                {% for project in projects %}
+                    {% if project.project_status == "Operational" %}
+                        {% get_financial_model financial_models project.id as project_financial_model %}
+                        <tr class="hoverable clickable-row" data-href="{% url 'project_view' project.id %}">
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.technology }}</td>
+                            <td>{{ project.country }}</td>
+                            <td>{{ project.calculated_value }}</td>
+                            <td>{{ project.created_date }}</td>
+                            <td>{{ project.updated_date }}</td>
+                            {% if project_financial_model %}
+                               <td>{{ project_financial_model.IRR|floatformat:2 }}%</td>
+                               <td>{{ project_financial_model.valuation|floatformat:0 }}</td>
+
+                            {% endif %}
+
+                    {% endif %}
+                {% endfor %}
+
+
+                </table> 
+            </div>
+
+
+    </div>
+
+
+
+</div>
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+    });
+
+
+
+    chartDevTech.data.datasets[0].data = [{{ capacity_per_tech.0.total_capacity }}, {{ capacity_per_tech.1.total_capacity }}, {{ capacity_per_tech.2.total_capacity }}];
+    chartDevTech.update();  
+
+    chartDevCountry.data.datasets[0].data = [{{ capacity_per_country.0.total_capacity }}, {{ capacity_per_country.1.total_capacity }}];
+    chartDevCountry.update(); 
+
+
+
+</script>
+
+<script>
+function parseAndProcessData(data, chart, chartName, labelPrefix) {
+    var revenues = JSON.parse(data);
+
+    var allYears = new Set();
+    for (var item in revenues) {
+        Object.keys(revenues[item]).forEach(year => allYears.add(year));
+    }
+
+    var years = Array.from(allYears).sort();
+    console.log("All Years for " + chartName + ": ", years);
+
+    var datasets = [];
+
+    for (var item in revenues) {
+        var dataForItem = [];
+        years.forEach(year => {
+            var revenue = revenues[item][year] || 0;
+            dataForItem.push(revenue);
+        });
+
+        var dataset = {
+            label: labelPrefix + item,
+            data: dataForItem,
+            // Add other properties like backgroundColor, borderColor, etc.
+        };
+
+        datasets.push(dataset);
+    }
+
+    var sumData = new Array(years.length).fill(0);
+    for (var i = 0; i < datasets.length - 1; i++) {
+        datasets[i].data.forEach((revenue, index) => {
+            sumData[index] += revenue;
+        });
+    }
+
+    var sumDataset = {
+        label: "Sum of " + chartName,
+        data: sumData,
+        // Add other properties like backgroundColor, borderColor, etc.
+    };
+
+    datasets.push(sumDataset);
+
+    console.log("Datasets for " + chartName + ": ", datasets);
+
+    chart.data.labels = years;
+
+    for (var i = 0; i < datasets.length; i++) {
+        chart.data.datasets[i].data = datasets[i].data;
+    }
+
+    chart.update();
+}
+
+parseAndProcessData('{{ yearly_revenues_technology|safe }}', chartOpRevenuesbyTech, "Technologies", "");
+parseAndProcessData('{{ yearly_revenues_country|safe }}', chartOpRevenuesbyCountry, "Countries", "");
+
+</script>
+
+
+
+<script>
+$(document).ready(function() {
+    $('#searchInput').on('keyup', function() {
+        var searchText = $(this).val().toLowerCase();
+        $('#dataTable tbody tr').each(function() {
+            var rowData = $(this).text().toLowerCase();
+            if (rowData.indexOf(searchText) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+});
+
+
+$(document).ready(function() {
+    $('#searchInput2').on('keyup', function() {
+        var searchText = $(this).val().toLowerCase();
+        $('#dataTable2 tbody tr').each(function() {
+            var rowData = $(this).text().toLowerCase();
+            if (rowData.indexOf(searchText) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+});
+
+</script>
+
+
+{% endblock %}
+

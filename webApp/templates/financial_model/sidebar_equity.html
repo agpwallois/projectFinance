@@ -1,0 +1,49 @@
+
+            <h3>Share capital</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Equity injections</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.injection_choice }}
+                </div>
+            </div>
+            <h3>Shareholder loan</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Subgearing</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.subgearing }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Shareholder loan margin</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.SHL_margin }}
+                </div>
+            </div>
+            <h3>Valuation</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Discount factor</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.discount_factor_valuation }}
+                </div>
+            </div>
+

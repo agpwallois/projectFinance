@@ -1,0 +1,258 @@
+<!-- capacity_and_production.html -->
+
+            <h3>Capacity</h3>
+            <div class="row-inline-wrapper" id="solar_panels_capacity">
+                <div class="row-inline-three-first">
+                    <p>Installed capacity</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>kWp</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.panels_capacity }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="solar_panels_degradation">
+                <div class="row-inline-three-first">
+                    <p>Annual degradation</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.annual_degradation }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="wind_turbine_number">
+                <div class="row-inline-three-first">
+                    <p>Wind turbines installed</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>#</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.wind_turbine_installed }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="wind_turbine_capacity">
+                <div class="row-inline-three-first">
+                    <p>Capacity</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>MW/WTG</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.capacity_per_turbine }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="wind_project_capacity">
+                <div class="row-inline-three-first">
+                    <p>Installed capacity</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>kWp</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="installed_capacity"></div>
+                </div>
+            </div>
+            <h3>Production</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>P90</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>hours p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.p90_10y }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>P75</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>hours p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.p75 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>P50</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>hours p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.p50 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Lender case</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.production_choice }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Sponsor case</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.sponsor_production_choice }}
+                </div>
+            </div>
+            <h3>Seasonality</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>January</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m1 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>February</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m2 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>March</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m3 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>April</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m4 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>May</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m5 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>June</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m6 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>July</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m7 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>August</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m8 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>September</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m9 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>October</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m10 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>November</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m11 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>December</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.seasonality_m12 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first-underlined">
+                    <p>Total</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="sumSeasonality"></div>
+                </div>
+            </div>

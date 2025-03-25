@@ -1,0 +1,161 @@
+<!-- offtake_market_prices.html -->
+
+            <h3>Offtake contract</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Contract type</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    <div class="assumption-input">{{ project_form.contract }}</div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Rotor diameter</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>m</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.rotor_diameter }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Start of contract</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.start_contract }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>End of contract</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.end_contract }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Reference price</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>EUR</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.contract_price }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation base date</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.contract_indexation_start_date }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.index_rate_contract }}
+                </div>
+            </div>
+            <h3>Market prices</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation base date</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>date</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.price_elec_indexation_start_date }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Indexation rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>% p.a.</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.index_rate_merchant }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Lender case</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.price_elec_choice }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Sponsor case</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.sponsor_price_elec_choice }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-four">
+                    <p>Year</p>
+                </div>
+                <div class="row-inline-four">
+                    <p>Low</p>
+                </div>
+                <div class="row-inline-four">
+                    <p>Medium</p>
+                </div>
+                <div class="row-inline-four">
+                    <p>High</p>
+                </div>
+            </div>
+            <div class="columns-container">
+                <div class="column-input">
+                    {% for field in project_form.visible_fields|slice:"58:100" %}
+                    <div class="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
+                    {% endfor %}
+                </div>
+                <div class="column-input">
+                    {% for field in project_form.visible_fields|slice:"58:100" %}
+                    <p>{{ field }}</p>
+                    {% endfor %}
+                </div>
+                <div class="column-input">
+                    {% for field in project_form.visible_fields|slice:"100:142" %}
+                    <p>{{ field }}</p>
+                    {% endfor %}
+                </div>
+                <div class="column-input">
+                    {% for field in project_form.visible_fields|slice:"142:184" %}
+                    <p>{{ field }}</p>
+                    {% endfor %}
+                </div>
+            </div>

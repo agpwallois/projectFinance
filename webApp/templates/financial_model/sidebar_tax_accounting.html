@@ -1,0 +1,334 @@
+<!-- tax_and_accounting.html -->
+
+
+            <h3>Corporate income tax</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Income tax rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.corporate_income_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" data-bs-toggle="modal" data-bs-target="#DevTaxModal">
+                <h6>Development tax</h6>
+            </div>
+            <div class="modal fade" id="DevTaxModal" tabindex="-1" role="dialog" aria-labelledby="DevTaxModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="DevTaxModalLabel">Taxe d'Aménagement</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="api_dev_tax_commune"></div>
+                            <a href="https://data.economie.gouv.fr/explore/dataset/delta_deliberation_tam_17_01_23">Data Source</a>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="solar_panels_surface">
+                <div class="row-inline-three-first">
+                    <p>Panels surface area</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>m2</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.panels_surface }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="solar_devtax_cost">
+                <div class="row-inline-three-first">
+                    <p>Tax base per m2</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>EUR/m2</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.dev_tax_taxable_base_solar }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="wind_devtax_cost">
+                <div class="row-inline-three-first">
+                    <p>Tax base per WTG</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>EUR/WTG</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.dev_tax_taxable_base_wind }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Commune tax</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.dev_tax_commune_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Department tax</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.dev_tax_department_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" data-bs-toggle="modal" data-bs-target="#ArchTaxModal">
+                <h6>Archeological tax</h6>
+            </div>
+            <div class="modal fade" id="ArchTaxModal" tabindex="-1" role="dialog" aria-labelledby="ArchTaxModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ArchTaxModalLabel">Taxe Archéologique Préventive</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Explanation about the archeological tax.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="solar_arctax_base">
+                <div class="row-inline-three-first">
+                    <p>Tax base per m2</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>EUR/m2</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.archeological_tax_base_solar }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" id="solar_arctax_cost">
+                <div class="row-inline-three-first">
+                    <p>Tax rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.archeological_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" data-bs-toggle="modal" data-bs-target="#PTaxModal">
+                <h6>Property tax</h6>
+            </div>
+            <div class="modal fade" id="PTaxModal" tabindex="-1" role="dialog" aria-labelledby="PTaxModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="PTaxModalLabel">Taxe Foncière sur les Propriétés Bâties (TFPB)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Explanation about property tax.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Commune tax</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.tfpb_commune_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Department tax</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.tfpb_department_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Region tax</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.tfpb_region_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Equipment tax</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.tfpb_additional_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper" data-bs-toggle="modal" data-bs-target="#CFEModal">
+                <h6>Cotisation Foncière des Entreprises (CFE)</h6>
+            </div>
+            <div class="modal fade" id="CFEModal" tabindex="-1" role="dialog" aria-labelledby="CFEModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="CFEModalLabel">Cotisation Foncière des Entreprises (CFE)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Explanation about the CFE.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Reduction in tax base in first year of application</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_discount_tax_base_y1 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Standard reduction in land value for tax base</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_discount_tax_base }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Management fees</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_mgt_fee }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Commune rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_commune_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Intercommunal rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_intercommunal_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Specific equipment rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_specific_eqp_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Local CCI rate</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_localCCI_tax }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Q1 instalment</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_instal_q1 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Q2 instalment</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_instal_q2 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Q3 instalment</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_instal_q3 }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Q4 instalment</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.cfe_instal_q4 }}
+                </div>
+            </div>

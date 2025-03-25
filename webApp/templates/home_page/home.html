@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shango | Advanced Financial Modeling for Renewable Energy</title>
+    <link rel="stylesheet" href="{% static 'home_page/style_home.css' %}">
+    <!-- Font Awesome Pro icons (upgraded from standard) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Using premium font pairings -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Spectral:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'home_page/favicon.svg' %}">
+    <!-- Meta tags for better SEO -->
+    <meta name="description" content="Shango provides enterprise-grade financial modeling software for renewable energy projects. Optimize returns on wind and solar investments with data-driven insights.">
+    <meta name="keywords" content="renewable energy finance, solar investment, wind investment, financial modeling, project finance">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <h1><span class="logo-icon"><i class="fas fa-bolt"></i></span>Shango</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#solutions">Solutions</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="/projects/" class="btn btn-outline">Log In</a>
+                <a href="/projects/" class="btn btn-primary">Get Started</a>
+            </div>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="backdrop-gradient"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="tag">Enterprise-Grade Solution</div>
+                <h1>Transform Renewable Project Finance with Precision Analytics</h1>
+                <p>Sophisticated modeling platform for development and finance teams to optimize renewable investment returns through advanced financial analytics.</p>
+                <div class="hero-buttons">
+                    <a href="/projects/" class="btn btn-primary">Start Free Trial <i class="fas fa-arrow-right"></i></a>
+                    <a href="/projects/" class="btn btn-outline">Schedule Demo</a>
+                </div>
+                <div class="trust-badges">
+                    <span>Trusted by industry leaders in renewable energy</span>
+                    <div class="badges">
+                        <div class="badge-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Enterprise-grade security</span>
+                        </div>
+                        <div class="badge-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>ISO 27001 certified</span>
+                        </div>
+                        <div class="badge-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>99.9% uptime SLA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <div class="hero-image-glow"></div>
+                <img src="{% static 'home_page/landing_picture.png' %}" alt="Shango Dashboard - Renewable Energy Finance Platform">
+                <div class="floating-stat stat-1">
+                    <div class="stat-number">0.7%</div>
+                    <div class="stat-desc">Average IRR increase</div>
+                </div>
+                <div class="floating-stat stat-2">
+                    <div class="stat-number">10x</div>
+                    <div class="stat-desc">Faster scenarios</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-wave">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 140">
+                <path fill="#ffffff" fill-opacity="1" d="M0,96L80,106.7C160,117,320,139,480,128C640,117,800,75,960,64C1120,53,1280,75,1360,85.3L1440,96L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Partners Brand Bar -->
+    <section class="partners">
+        <div class="container">
+            <div class="partners-text">Partnering with industry leaders</div>
+            <div class="partners-logos">
+                <div class="partner-logo"><i class="fas fa-sun"></i> SolarTech</div>
+                <div class="partner-logo"><i class="fas fa-wind"></i> WindVentures</div>
+                <div class="partner-logo"><i class="fas fa-industry"></i> EnergyCore</div>
+                <div class="partner-logo"><i class="fas fa-building"></i> InfraTrust</div>
+                <div class="partner-logo"><i class="fas fa-leaf"></i> GreenInvest</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Advanced Capabilities</div>
+                <h2>Enterprise-Grade Financial Modeling</h2>
+                <p>Our platform delivers precise financial analysis designed specifically for the complexities of renewable energy investments</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Precision Financial Forecasting</h3>
+                    <p>Generate accurate cash flow projections and ROI analysis based on historical data and market trends.</p>
+                    <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <h3>Solar Performance Modeling</h3>
+                    <p>Incorporate solar irradiance data, panel degradation, and maintenance costs for realistic modeling.</p>
+                    <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3>Wind Project Analysis</h3>
+                    <p>Factor in wind patterns, turbine efficiency, and site-specific variables for accurate predictions.</p>
+                    <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Tax Incentive Optimization</h3>
+                    <p>Automatically incorporate available tax credits, incentives, and depreciation benefits.</p>
+                    <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-arrows-alt"></i>
+                    </div>
+                    <h3>Scenario Analysis</h3>
+                    <p>Compare multiple investment scenarios with different variables to identify optimal strategies.</p>
+                    <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Risk Assessment</h3>
+                    <p>Comprehensive risk analysis tools to identify potential pitfalls and mitigation strategies.</p>
+                    <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Streamlined Process</div>
+                <h2>The Shango Methodology</h2>
+                <p>Our systematic approach transforms complex data into actionable investment insights</p>
+            </div>
+            <div class="steps-wrapper">
+                <div class="steps-timeline">
+                    <div class="timeline-line"></div>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Input Project Parameters</h3>
+                            <p>Enter your project specifics including location, equipment specs, and financial goals, or import from your existing data.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Generate Financial Models</h3>
+                            <p>Our system processes your inputs along with market data to create comprehensive financial projections.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Analyze Multiple Scenarios</h3>
+                            <p>Compare different scenarios and see how changes in variables affect project outcomes.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Optimize & Implement</h3>
+                            <p>Use our recommendations to optimize your investment strategy and implement with confidence.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Demo request card -->
+            <div class="demo-card">
+                <div class="demo-content">
+                    <h3>See Shango in action</h3>
+                    <p>Schedule a personalized demo with our team to explore how Shango can transform your renewable energy financial modeling.</p>
+                </div>
+                <a href="/projects/" class="btn btn-primary">Request Demo</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solutions Section -->
+    <section id="solutions" class="solutions">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Tailored Approaches</div>
+                <h2>Solutions for Every Stakeholder</h2>
+                <p>Shango serves the unique needs of different players in the renewable energy sector</p>
+            </div>
+            <div class="solutions-wrapper">
+                <div class="solution-tabs">
+                    <button class="tab-btn active" data-target="developers">Developers</button>
+                    <button class="tab-btn" data-target="investors">Investors</button>
+                    <button class="tab-btn" data-target="utilities">Utilities</button>
+                    <button class="tab-btn" data-target="consultants">Consultants</button>
+                </div>
+                <div class="solution-content">
+                    <div class="solution-panel active" id="developers">
+                        <div class="solution-info">
+                            <div class="solution-tag">For Developers</div>
+                            <h3>Renewable Energy Project Development</h3>
+                            <p>Streamline project planning with accurate financial projections that account for all development, construction, and operational costs. Identify optimal project structures and financing options.</p>
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> Project feasibility analysis</li>
+                                <li><i class="fas fa-check-circle"></i> Construction financing optimization</li>
+                                <li><i class="fas fa-check-circle"></i> PPA pricing models</li>
+                                <li><i class="fas fa-check-circle"></i> Portfolio management tools</li>
+                            </ul>
+                            <a href="#" class="btn btn-secondary">Explore Developer Solutions</a>
+                        </div>
+                        <div class="solution-image">
+                            <img src="/api/placeholder/500/350" alt="Renewable Energy Development Solutions">
+                            <div class="solution-image-overlay"></div>
+                        </div>
+                    </div>
+                    <div class="solution-panel" id="investors">
+                        <div class="solution-info">
+                            <div class="solution-tag">For Investors</div>
+                            <h3>Investment Analysis & Portfolio Optimization</h3>
+                            <p>Assess investment opportunities with precise financial models and risk analysis. Maximize returns through structured financing and data-driven decision-making.</p>
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> Risk-adjusted return analysis</li>
+                                <li><i class="fas fa-check-circle"></i> Debt and equity structuring</li>
+                                <li><i class="fas fa-check-circle"></i> Market trend insights</li>
+                                <li><i class="fas fa-check-circle"></i> Portfolio performance monitoring</li>
+                            </ul>
+                            <a href="#" class="btn btn-secondary">Explore Investor Solutions</a>
+                        </div>
+                        <div class="solution-image">
+                            <img src="/api/placeholder/500/350" alt="Renewable Energy Investment Solutions">
+                            <div class="solution-image-overlay"></div>
+                        </div>
+                    </div>
+                    <div class="solution-panel" id="utilities">
+                        <div class="solution-info">
+                            <div class="solution-tag">For Utilities</div>
+                            <h3>Energy Procurement & Grid Integration</h3>
+                            <p>Optimize energy procurement strategies with robust forecasting and pricing models. Ensure regulatory compliance and grid stability.</p>
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> Energy market forecasting</li>
+                                <li><i class="fas fa-check-circle"></i> Grid integration planning</li>
+                                <li><i class="fas fa-check-circle"></i> Regulatory and compliance tools</li>
+                                <li><i class="fas fa-check-circle"></i> Contract optimization</li>
+                            </ul>
+                            <a href="#" class="btn btn-secondary">Explore Utility Solutions</a>
+                        </div>
+                        <div class="solution-image">
+                            <img src="/api/placeholder/500/350" alt="Utility and Grid Solutions">
+                            <div class="solution-image-overlay"></div>
+                        </div>
+                    </div>
+                    <div class="solution-panel" id="consultants">
+                        <div class="solution-info">
+                            <div class="solution-tag">For Consultants</div>
+                            <h3>Client Advisory & Strategic Services</h3>
+                            <p>Provide clients with accurate financial models, feasibility studies, and strategic insights to enhance project success.</p>
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> Custom financial modeling</li>
+                                <li><i class="fas fa-check-circle"></i> Policy and regulatory advisory</li>
+                                <li><i class="fas fa-check-circle"></i> Project risk assessments</li>
+                                <li><i class="fas fa-check-circle"></i> Market research and benchmarking</li>
+                            </ul>
+                            <a href="#" class="btn btn-secondary">Explore Consultant Solutions</a>
+                        </div>
+                        <div class="solution-image">
+                            <img src="/api/placeholder/500/350" alt="Consulting and Advisory Solutions">
+                            <div class="solution-image-overlay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">€1B+</div>
+                    <div class="stat-label">Renewable Projects Modeled</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Forecast Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3.5x</div>
+                    <div class="stat-label">Faster Decision-Making</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0.7%</div>
+                    <div class="stat-label">Average Yield Improvement</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Client Success</div>
+                <h2>What Industry Leaders Say</h2>
+                <p>Learn how Shango has transformed financial planning for renewable energy projects</p>
+            </div>
+            <div class="testimonial-slider">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote"><i class="fas fa-quote-left"></i></div>
+                        <p>Shango has revolutionized how we approach financial modeling for our solar projects. The accuracy of their forecasts has helped us secure funding for three major installations in the past year alone.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="/api/placeholder/80/80" alt="Sarah Johnson, CFO at SunPower Developments">
+                        <div class="author-info">
+                            <h4>Sarah Johnson</h4>
+                            <p>CFO, SunPower Developments</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote"><i class="fas fa-quote-left"></i></div>
+                        <p>The scenario analysis feature in Shango has been a game-changer for our wind farm investments. We can now quickly assess the potential impact of changing market conditions.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="/api/placeholder/80/80" alt="Michael Brown, Investment Manager at GreenTech Ventures">
+                        <div class="author-info">
+                            <h4>Michael Brown</h4>
+                            <p>Investment Manager, GreenTech Ventures</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote"><i class="fas fa-quote-left"></i></div>
+                        <p>Shango's comprehensive financial modeling tools have helped us to optimize our energy procurement strategies and ensure regulatory compliance. It's a must-have for any utility company.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="/api/placeholder/80/80" alt="Emily Wilson, Energy Analyst at Pacific Power">
+                        <div class="author-info">
+                            <h4>Emily Wilson</h4>
+                            <p>Energy Analyst, Pacific Power</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote"><i class="fas fa-quote-left"></i></div>
+                        <p>As a consultant, Shango has enabled me to provide my clients with more accurate financial models and strategic insights to enhance their project success.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="/api/placeholder/80/80" alt="David Lee, Senior Consultant at EcoSolutions Group">
+                        <div class="author-info">
+                            <h4>David Lee</h4>
+                            <p>Senior Consultant, EcoSolutions Group</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-navigation">
+                    <button class="prev-btn"><i class="fas fa-arrow-left"></i></button>
+                    <div class="testimonial-dots">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <button class="next-btn"><i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Flexible Options</div>
+                <h2>Enterprise Solutions & Pricing</h2>
+                <p>Tailored plans for renewable energy investment needs at any scale</p>
+            </div>
+            <div class="pricing-toggle">
+                <span class="toggle-label active">Monthly</span>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="pricing-toggle">
+                    <label for="pricing-toggle"></label>
+                </div>
+                <span class="toggle-label">Annual <span class="discount">Save 20%</span></span>
+            </div>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Starter</h3>
+                        <div class="price">
+                            <span class="amount">€3000</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p>For small-scale projects and individual investors</p>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Basic financial modeling</li>
+                            <li><i class="fas fa-check"></i> Up to 50 projects</li>
+                            <li><i class="fas fa-check"></i> Standard reports</li>
+                            <li><i class="fas fa-check"></i> Email support</li>
+                            <li class="feature-muted"><i class="fas fa-times"></i> Custom reports</li>
+                            <li class="feature-muted"><i class="fas fa-times"></i> API access</li>
+                        </ul>
+                    </div>
+                    <a href="/projects/" class="btn btn-outline btn-full">Get Started</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="popular-tag">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Professional</h3>
+                        <div class="price">
+                            <span class="amount">€7000</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p>For growing development firms and investment groups</p>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Advanced financial modeling</li>
+                            <li><i class="fas fa-check"></i> Up to 100 projects</li>
+                            <li><i class="fas fa-check"></i> Custom reports</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                            <li><i class="fas fa-check"></i> Market data integration</li>
+                            <li class="feature-muted"><i class="fas fa-times"></i> Custom integrations</li>
+                        </ul>
+                    </div>
+                    <a href="/projects/" class="btn btn-primary btn-full">Get Started</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Enterprise</h3>
+                        <div class="price">
+                            <span class="amount">Custom</span>
+                        </div>
+                        <p>For large portfolios and institutional investors</p>
+                    </div>
+                    <div class="pricing-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Premium modeling features</li>
+                            <li><i class="fas fa-check"></i> Unlimited projects</li>
+                            <li><i class="fas fa-check"></i> API access</li>
+                            <li><i class="fas fa-check"></i> Dedicated account manager</li>
+                            <li><i class="fas fa-check"></i> Custom integrations</li>
+                            <li><i class="fas fa-check"></i> On-premises deployment option</li>
+                        </ul>
+                    </div>
+                    <a href="#" class="btn btn-outline btn-full">Contact Sales</a>
+                </div>
+            </div>
+            <div class="price-guarantee">
+                <i class="fas fa-shield-alt"></i>
+                <p>All plans include our 30-day money-back guarantee and enterprise-grade security</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <div class="section-tag">Get Started</div>
+                <h2>Transform Your Renewable Energy Investments</h2>
+                <p>Join tens of leading organizations making data-driven decisions with Shango</p>
+                <div class="cta-buttons">
+                    <a href="/projects/" class="btn btn-primary">Start Free Trial</a>
+                    <a href="/projects/" class="btn btn-outline">Schedule Demo</a>
+                </div>
+            </div>
+            <div class="cta-illustration">
+                <img src="/api/placeholder/400/300" alt="Renewable energy financial modeling illustration">
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column brand">
+                    <h2><i class="fas fa-bolt"></i> Shango</h2>
+                    <p>Advanced financial modeling platform for renewable energy projects. Making clean energy investments more profitable and predictable.</p>
+                    <div class="social-icons">
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Solutions</h3>
+                    <ul>
+                        <li><a href="#">Solar Modeling</a></li>
+                        <li><a href="#">Wind Analysis</a></li>
+                        <li><a href="#">Hybrid Projects</a></li>
+                        <li><a href="#">Portfolio Management</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Knowledge Base</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Webinars</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column contact" id="contact">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-envelope"></i> info@shango.com</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Renewable Way, San Francisco, CA</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Shango. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Solution tabs functionality
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Hide all panels
+                    const panels = document.querySelectorAll('.solution-panel');
+                    panels.forEach(panel => panel.classList.remove('active'));
+                    
+                    // Show the target panel
+                    const targetPanel = document.getElementById(this.dataset.target);
+                    if (targetPanel) targetPanel.classList.add('active');
+                });
+            });
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    navLinks.classList.toggle('show');
+                    this.innerHTML = navLinks.classList.contains('show') 
+                        ? '<i class="fas fa-times"></i>' 
+                        : '<i class="fas fa-bars"></i>';
+                });
+            }
+
+            // Testimonial slider functionality
+            const testimonials = document.querySelectorAll('.testimonial');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            const dots = document.querySelectorAll('.dot');
+            let currentTestimonial = 0;
+
+            function showTestimonial(index) {
+                testimonials.forEach((testimonial, i) => {
+                    testimonial.style.display = i === index ? 'block' : 'none';
+                    testimonial.classList.toggle('active', i === index);
+                });
+
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+            }
+
+            function goToNextTestimonial() {
+                currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+                showTestimonial(currentTestimonial);
+            }
+
+            function goToPrevTestimonial() {
+                currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
+                showTestimonial(currentTestimonial);
+            }
+
+            // Event listeners for navigation buttons
+            if (prevBtn) prevBtn.addEventListener('click', goToPrevTestimonial);
+            if (nextBtn) nextBtn.addEventListener('click', goToNextTestimonial);
+
+            // Event listeners for dots
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentTestimonial = index;
+                    showTestimonial(currentTestimonial);
+                });
+            });
+
+            // Initialize: Show the first testimonial
+            showTestimonial(currentTestimonial);
+
+            // Pricing toggle
+            const pricingToggle = document.getElementById('pricing-toggle');
+            const priceElements = document.querySelectorAll('.price .amount');
+            const periodElements = document.querySelectorAll('.price .period');
+            
+            // Store original prices
+            const originalPrices = Array.from(priceElements).map(el => {
+                // Skip if text is "Custom"
+                if (el.textContent === 'Custom') return 'Custom';
+                return el.textContent.replace('€', '');
+            });
+            
+            if (pricingToggle) {
+                pricingToggle.addEventListener('change', function() {
+                    const isAnnual = this.checked;
+                    const toggleLabels = document.querySelectorAll('.toggle-label');
+                    
+                    toggleLabels.forEach((label, index) => {
+                        label.classList.toggle('active', index === (isAnnual ? 1 : 0));
+                    });
+                    
+                    priceElements.forEach((el, index) => {
+                        if (originalPrices[index] === 'Custom') return;
+                        
+                        const basePrice = parseInt(originalPrices[index]);
+                        
+                        if (isAnnual) {
+                            // Apply 20% discount and show annual price
+                            const annualPrice = basePrice * 0.8 * 12;
+                            el.textContent = '€' + annualPrice.toLocaleString();
+                            periodElements[index].textContent = '/year';
+                        } else {
+                            // Show monthly price
+                            el.textContent = '€' + basePrice.toLocaleString();
+                            periodElements[index].textContent = '/month';
+                        }
+                    });
+                });
+            }
+
+            // Smooth scroll for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80, // Account for fixed header
+                            behavior: 'smooth'
+                        });
+                        
+                        // Close mobile menu if open
+                        if (navLinks.classList.contains('show')) {
+                            navLinks.classList.remove('show');
+                            mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                        }
+                    }
+                });
+            });
+
+            // Add scroll class to header when scrolling
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('scrolled', window.scrollY > 50);
+            });
+        });
+    </script>
+</body>
+</html>

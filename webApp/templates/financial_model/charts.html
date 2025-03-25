@@ -1,0 +1,569 @@
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartProjectCosts"></canvas></div>
+	<div class="graph"><canvas id="chartFinPlan"></canvas></div>
+
+</div>
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartCashFlow"></canvas></div>
+	<div class="graph"><canvas id="chartEqtFlow"></canvas></div>
+
+</div>
+
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartDebtS"></canvas></div>
+	<div class="graph"><canvas id="chartDebtOut"></canvas></div>
+
+</div>
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartDSCR"></canvas></div>
+	<div class="graph"><canvas id="chartDSRA"></canvas></div>
+
+</div>
+
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartCash"></canvas></div>
+
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+
+<script>
+
+const ctx = document.getElementById('chartProjectCosts');
+const chartProjectCosts = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ["1", "2", "3", "4", "5", "6"],
+        datasets: [{
+            label: 'Construction costs',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#3b82f6', // blue-500
+            borderWidth: 1
+        }, {
+            label: 'Cumulative construction costs',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#f43f5e', // orange-500
+            borderColor: '#f43f5e', // orange-500
+            type: 'line', // Use a line chart for this dataset
+            borderWidth: 1
+
+        }, {
+            label: 'Development fee',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#10b981', // emerald-500 (was rgb(16, 185, 129))
+            borderWidth: 1
+        }, {
+            label: 'Debt IDC and fees',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#fbbf24', // amber-500 (was rgb(251, 191, 36))
+            borderWidth: 1
+        }, {
+            label: 'DSRA initial funding',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#8b5cf6', // purple-500 (was rgb(139, 92, 246))
+            borderWidth: 1
+        }, {
+            label: 'Local taxes',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#60a5fa', // teal-500
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            }, title: {
+			display: true,
+			text: 'Project costs (kEUR)'
+			}
+        },
+        scales: {
+            x: {
+                stacked: 'normal',
+            },
+            y: {
+                stacked: 'normal',
+            },
+
+        },
+        title: {
+            display: true,
+            text: 'Construction costs (kEUR)'
+        }
+    }
+});
+
+const ctx2 = document.getElementById('chartFinPlan');
+const chartFinPlan = new Chart(ctx2, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Share capital contributions',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#8b5cf6', // rose-500 (was rgb(139, 92, 246))
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Shareholder loan drawdowns',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#10b981', // emerald-500 (was rgb(16, 185, 129))
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Debt drawdowns',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#fbbf24', // amber-500 (was rgb(251, 191, 36))
+			borderWidth: 1
+		}
+		,{
+			type: 'bar',
+			label: 'Total project costs',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // sky-500
+			borderWidth: 1
+		},{
+			type: 'line',
+			yAxisID: 'z',
+			label: 'Gearing during construction',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1
+		}
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Financing plan (kEUR)'
+		}},
+
+		scales: {
+			x: {
+				stacked: true,
+			},
+			y: {
+				stacked: true,
+			},
+				z: {
+				position: 'right',
+				min:0,
+				max:1,
+				ticks: {
+                callback: function (value) {
+                    return (value*100).toString() + '%';
+                }
+            },
+	
+			},
+		}
+	}
+});
+
+
+const ctx3 = document.getElementById('chartCashFlow');
+const chartCashFlow = new Chart(ctx3, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Operating costs',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // sky-500
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Lease',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#8b5cf6', // amber-500 (was rgb(139, 92, 246))
+			borderWidth: 1
+		},{
+			type: 'line',
+			label: 'Contracted revenues',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#10b981', // orange-500 (was rgb(16, 185, 129))
+			borderColor: '#10b981', // orange-500 (was rgb(16, 185, 129))
+			borderWidth: 1
+		},{
+			type: 'line',
+			label: 'Merchant revenues',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Debt service',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#fbbf24', // purple-500 (was rgb(251, 191, 36))
+			borderWidth: 1
+		},
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Cash flows (kEUR)'
+		}},
+
+		scales: {
+			x: {
+				stacked: true,
+			},
+			y: {
+				stacked: true,
+			},
+		}
+	}
+});
+
+const ctx7 = document.getElementById('chartDebtS');
+const chartDebtS = new Chart(ctx7, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Interests',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#10b981', // emerald-500 (was rgb(16, 185, 129))
+			borderWidth: 1,
+			order: 2
+		},{
+			type: 'bar',
+			label: 'Repayments',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // amber-500
+			borderWidth: 1,
+			order: 3
+		},{
+			type: 'line',
+			yAxisID: 'z',
+			label: 'DSCR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1,
+			order: 1
+		}
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Debt service (kEUR) and DSCR (x)'
+		}},
+
+		scales: {
+			x: {
+				stacked: true,
+				position: 'left',
+			},
+			y: {
+				stacked: true,
+				position: 'left',
+			},
+			z: {
+				position: 'right',
+				ticks: {
+                    callback: function (value) {
+                        return value.toString() + 'x';
+                    }
+                }			
+			},
+		}
+	}
+});
+
+const ctx9 = document.getElementById('chartDebtOut');
+const chartDebtOut = new Chart(ctx9, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Drawdowns',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#fbbf24', // amber-500 (was rgb(251, 191, 36))
+			borderWidth: 1,
+			order: 2
+		},{
+			type: 'bar',
+			label: 'Repayments',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // sky-500
+			borderWidth: 1,
+			order: 3
+		},{
+			type: 'line',
+			label: 'Debt outstanding',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1,
+			order: 1
+		}
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+		 title: {
+			display: true,
+			text: 'Debt outstanding and repayments (kEUR)'
+		}},
+	}
+});
+
+const ctx10= document.getElementById('chartDSCR');
+const chartDSCR = new Chart(ctx10, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'line',
+			label: 'DSCR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1
+		},{
+			type: 'line',
+			label: 'LLCR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // orange-500
+			borderColor: '#3b82f6', // orange-500
+			borderWidth: 1
+		},{
+			type: 'line',
+			label: 'PLCR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#10b981', // orange-500 (was rgb(16, 185, 129))
+			borderColor: '#10b981', // orange-500 (was rgb(16, 185, 129))
+			borderWidth: 1
+		}
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Debt ratios (x)'
+		}},
+
+		scales: {
+			y: {
+				ticks: {
+                    callback: function (value) {
+                        return value.toString() + 'x';
+                    }
+                }
+			},
+		}
+	}
+});
+
+const ctx11 = document.getElementById('chartDSRA');
+const chartDSRA = new Chart(ctx11, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Debt service',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // sky-500
+			borderWidth: 1,
+			order: 1 // Lower order value, will be drawn first (behind)
+		},{
+			type: 'line',
+			label: 'DSRA balance (BoP)',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1,
+			order: 0 // Higher order value, will be drawn last (on top)
+		}
+		]
+	},
+	options: {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: {
+			legend: {
+				position: 'top',
+			},
+			title: {
+				display: true,
+				text: 'Debt service reserve account (kEUR)'
+			}
+		},
+	}
+});
+
+const ctx12 = document.getElementById('chartEqtFlow');
+const chartEqtFlow = new Chart(ctx12, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'bar',
+			label: 'Share capital contributions and reductions',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#8b5cf6', // rose-500 (was rgb(139, 92, 246))
+			borderWidth: 1,
+			order: 2
+		},{
+			type: 'bar',
+			label: 'Shareholder loan drawdowns and repayments',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#10b981', // emerald-500 (was rgb(16, 185, 129))
+			borderWidth: 1,
+			order: 3
+		},{
+			type: 'bar',
+			label: 'Dividends paid',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // sky-500
+			borderWidth: 1,
+			order: 4
+		},{
+			type: 'line',
+			yAxisID: 'z',
+			label: 'Equity IRR',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			borderWidth: 1,
+			order: 1
+		}
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+		 title: {
+			display: true,
+			text: 'Shareholders cash flows (kEUR) and Equity IRR (%)'
+		}},
+		scales: {
+			x: {
+				stacked: true,
+				position: 'left',
+			},
+			y: {
+				stacked: true,
+				position: 'left',
+			},
+			z: {
+				position: 'right',
+				ticks: {
+                    callback: function (value) {
+                        return value.toString() + '%';
+                    }
+                },
+			},
+		}
+	}
+});
+
+const ctx13 = document.getElementById('chartCash');
+const chartCash = new Chart(ctx13, {
+	data: {
+		labels: ["1","2","3","4","5","6"],
+		datasets: [{
+			type: 'line',
+			label: 'Retained earnings (BoP)',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#3b82f6', // orange-500
+			borderColor: '#3b82f6', // orange-500
+			borderWidth: 1
+		},{
+			type: 'line',
+			label: 'Distribution account balance (BoP)',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#f43f5e', // orange-500
+			borderColor: '#f43f5e', // orange-500
+			fill: 'origin',
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Dividends paid',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#10b981', // emerald-500 (was rgb(16, 185, 129))
+			fill: 'origin',
+			borderWidth: 1
+		},{
+			type: 'bar',
+			label: 'Share capital reductions',
+			data: [1,2,3,4,5,6],
+			backgroundColor: '#8b5cf6', // amber-500 (was rgb(139, 92, 246))
+			fill: 'origin',
+			borderWidth: 1
+		}
+		]
+	},
+	options: {
+		responsive:true,
+		maintainAspectRatio: false,
+
+	  plugins:{
+		legend: {
+			position: 'top',
+		},
+
+		 title: {
+			display: true,
+			text: 'Cash trap (kEUR)'
+		}},
+	}
+});
+</script>

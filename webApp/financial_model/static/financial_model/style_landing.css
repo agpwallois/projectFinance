@@ -1,0 +1,164 @@
+
+#dashboard_container {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    right: 0;
+    display: flex;
+    background: rgb(244, 244, 244);
+    padding-top: 50px;
+}
+
+
+#dashboard_sidebar {
+    width: 320px;
+    border-right: 1px solid rgb(221, 221, 221);
+    left: 0;
+    z-index: 1;
+    background: rgb(244, 244, 244);
+    transition: all 0.3s;
+    padding-bottom: 50px;
+    padding-left: 15px;
+    padding-top: 10px;
+    padding-right: 15px;
+    font-size: 1rem;
+}
+
+#v-pills-tabContent {
+    width: calc(100% - 320px);
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    }
+
+
+.table-dashboard{
+    width:100%;
+    line-height: 2rem;
+    font-size: 1rem;
+    margin-top: 10px;
+    }
+
+td  {
+    border-bottom: 1px solid rgb(221, 221, 221);
+}
+
+tr.hoverable:hover {
+  background-color: rgb(244, 244, 244);
+  cursor: pointer;
+}
+
+thead {
+    font-size: 1rem;
+    border-bottom: 1px solid rgb(221, 221, 221);
+}
+
+h1 {
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+}
+
+
+p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.7em;
+    color: rgb(51, 51, 51);
+}
+
+
+.nav-dashboard {
+    display: flex;
+}
+
+
+.button-container {
+    width: 75%;
+}
+
+
+
+#content-box {
+    margin-top: 5px;
+    background-color: red;
+    }
+
+
+#button_new_project {
+    text-align: center;
+    border: 1px solid rgb(221, 221, 221);
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px; /* Adjust spacing between button and search box */
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px;
+}
+
+#button_new_project:hover{
+    border: 1px solid #0d6efd;
+    color: #0d6efd;
+    }
+
+
+.search-container {
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden; 
+    width: 25%;
+}
+
+#searchInput, #searchInput2 {
+    padding: 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+
+.tab-content {
+
+    width: 100%;
+}
+
+
+
+
+.nav-link {
+
+    color: rgb(92, 105, 117);
+    font-size: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #0d6efd;
+    background-color: transparent;
+}
+
+
+.dashboard_sidebar_separator {
+    font-size: 1rem;
+}
+
+.divider {
+    display: flex;
+    align-items: center; /* Vertically center content */
+    margin-top: 10px;
+}
+
+.section_title {
+    margin-right: 10px; /* Adjust the spacing between title and line */
+}
+
+.vertical_line {
+    flex-grow: 1; /* Grow to fill available space */
+    height: 1px;
+    background-color: #ccc; /* Line color */
+}

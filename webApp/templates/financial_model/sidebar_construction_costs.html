@@ -1,0 +1,61 @@
+<!-- construction_costs.html -->
+
+            <h3>Monthly construction schedule</h3>
+            {% for field in project_form.visible_fields|slice:"26:50" %}
+            <div id="costs_m{{ forloop.counter }}" class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Month {{ forloop.counter }}</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>kEUR</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ field }}
+                </div>
+            </div>
+            {% endfor %}
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first-underlined">
+                    <p>Total</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>kEUR</p>
+                </div>
+                <div class="row-inline-three">
+                    <div id="sumConstructionCosts"></div>
+                </div>
+            </div>
+            <h3>Development fee</h3>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Optimisation</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>choice</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.devfee_choice }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Portion paid at FC</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.devfee_paid_FC }}
+                </div>
+            </div>
+            <div class="row-inline-wrapper">
+                <div class="row-inline-three-first">
+                    <p>Portion paid at COD</p>
+                </div>
+                <div class="row-inline-three-second">
+                    <p>%</p>
+                </div>
+                <div class="row-inline-three">
+                    {{ project_form.devfee_paid_COD }}
+                </div>
+            </div>

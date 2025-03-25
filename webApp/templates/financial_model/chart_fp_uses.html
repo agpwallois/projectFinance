@@ -1,0 +1,106 @@
+<div class="charts-container">
+    <div class="graph"><canvas id="chartUses" style="height: 300px;"></canvas></div>
+</div>
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+<!-- Chart.js DataLabels plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
+<script>
+const ctxchartUses = document.getElementById('chartUses');
+// Initial data setup - will be replaced by uploaded data
+let labels = ['1', '2', '3', '4'];
+let dataValues = [1, 1, 1, 1];
+let maxValue = 10; // Initial max value, will be calculated from actual data
+// Function to calculate the maximum value with some padding
+function calculateMaxValue(values) {
+    const max = Math.max(...values);
+    return max * 1.2; // Add 20% padding
+}
+// Calculate initial background data
+let backgroundData = dataValues.map(value => maxValue - value);
+const chartUses = new Chart(ctxchartUses, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                // Actual data values (should be first to appear on top)
+                label: 'Capacity (MW)',
+                data: dataValues,
+                backgroundColor: ['#CE65FF', '#FF6630', '#FECD32', '#34CB98'],
+                borderWidth: 0,
+                hoverBackgroundColor: ['#CE65FF', '#FF6630', '#FECD32', '#34CB98'], // Same as regular color to prevent hover effect
+                // DataLabels configuration for this dataset
+                datalabels: {
+                    color: '#000',
+                    font: {
+                        size: 14
+                    },
+                    formatter: function(value) {
+                        return value.toLocaleString(undefined, {maximumFractionDigits: 0});
+                    },
+                    anchor: 'end',
+                    align: 'end'
+                }
+            },
+            {
+                // Background portion (difference) - should be second to appear behind
+                label: 'Background',
+                data: backgroundData,
+                backgroundColor: '#e5e7eb', // Light gray
+                borderWidth: 0,
+                hoverBackgroundColor: '#e5e7eb', // Same as regular color to prevent hover effect
+                datalabels: {
+                    display: false
+                }
+            }
+        ]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        hover: {
+            mode: null // Disable hover mode completely
+        },
+        plugins: {
+            legend: {
+                display: false,
+            },
+            tooltip: {
+                enabled: false  // Disable tooltips
+            },
+            title: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                display: false,
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    display: false
+                },
+                stacked: true,
+                max: maxValue
+            },
+            y: {
+                display: true,
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    display: true,
+                    font: {
+                        size: 14
+                    }
+                },
+                stacked: true
+            }
+        }
+    },
+    plugins: [ChartDataLabels]
+});
+</script>

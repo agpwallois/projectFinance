@@ -1,0 +1,140 @@
+<div class="charts-container">
+    <div class="graph"><canvas id="chartSources" style="height: 300px;"></canvas></div>
+</div>
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
+<!-- Chart.js DataLabels plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
+<script>
+   const ctxchartSources = document.getElementById('chartSources');
+   
+   // Initial placeholder data - this will be replaced when actual data is loaded
+   let chartData = [70, 30];
+   let chartLabels = ['Label 1', 'Label 2'];
+   
+   // Create pie chart with initial data
+   const chartSources = new Chart(ctxchartSources, {
+       type: 'pie',
+       data: {
+           labels: chartLabels,
+           datasets: [{
+               label: 'Amount',
+               data: chartData,
+               backgroundColor: ['#FE9900', '#00CC65', '#3b82f6', '#f43f5e', '#8b5cf6', '#ec4899'],
+               hoverBackgroundColor: ['#FE9900', '#00CC65', '#3b82f6', '#f43f5e', '#8b5cf6', '#ec4899'], // Same as regular color to prevent hover effect
+               borderWidth: 1,
+               hoverBorderWidth: 1 // Keep border width the same on hover
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           hover: {
+               mode: null // Disable hover mode completely
+           },
+           plugins: {
+               legend: {
+                   display: true,
+                   position: 'right',
+                   labels: {
+                       font: { size: 14 },
+                       generateLabels: function(chart) {
+                           const datasets = chart.data.datasets;
+                           const labels = chart.data.labels;
+                           if (labels.length && datasets.length) {
+                               return labels.map(function(label, i) {
+                                   const meta = chart.getDatasetMeta(0);
+                                   const style = meta.controller.getStyle(i);
+                                   
+                                   // Display the label and raw value in the legend
+                                   return {
+                                       text: label + ': ' + Math.round(datasets[0].data[i]),
+                                       fillStyle: style.backgroundColor,
+                                       strokeStyle: style.borderColor,
+                                       lineWidth: style.borderWidth,
+                                       hidden: !chart.getDataVisibility(i),
+                                       index: i
+                                   };
+                               });
+                           }
+                           return [];
+                       }
+                   }
+               },
+               title: {
+                   display: false
+               },
+               tooltip: {
+                   enabled: false // Disable tooltips
+               },
+               datalabels: {
+                   color: '#fff',
+                   font: {
+                       size: 14,
+                   },
+                   formatter: function(value, context) {
+                       // Calculate percentage dynamically
+                       const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                       const percentage = Math.round((value / total) * 100);
+                       return percentage + '%';
+                   },
+                   anchor: 'center',
+                   align: 'center',
+                   display: true
+               }
+           }
+       },
+       plugins: [ChartDataLabels]
+   });
+
+   // This function handles updating the chart with new data
+   function updateSourcesChart(sourcesData) {
+       const excludedKeys = ['Total', 'Equity'];
+       const sourcesLabels = Object.keys(sourcesData).filter(key => !excludedKeys.includes(key));
+       const sourcesValues = sourcesLabels.map(key => parseFloat(sourcesData[key][0]));
+       
+       // Update chart data
+       chartSources.data.labels = sourcesLabels;
+       chartSources.data.datasets[0].data = sourcesValues;
+       
+       // Ensure we have enough colors if there are many data points
+       if (sourcesLabels.length > chartSources.data.datasets[0].backgroundColor.length) {
+           // Generate more colors as needed
+           const defaultColors = ['#FE9900', '#00CC65', '#3b82f6', '#f43f5e', '#8b5cf6', '#ec4899'];
+           while (chartSources.data.datasets[0].backgroundColor.length < sourcesLabels.length) {
+               chartSources.data.datasets[0].backgroundColor.push(
+                   defaultColors[chartSources.data.datasets[0].backgroundColor.length % defaultColors.length]
+               );
+           }
+           
+           // Also update hoverBackgroundColor to match backgroundColor
+           chartSources.data.datasets[0].hoverBackgroundColor = [...chartSources.data.datasets[0].backgroundColor];
+       }
+       
+       // Update the chart
+       chartSources.update();
+   }
+
+   // Sample usage - this would be replaced with your actual data loading code
+   // For example: 
+   /*
+   fetch('your-data-url')
+       .then(response => response.json())
+       .then(json => {
+           if (json.tables && json.tables['Sources']) {
+               updateSourcesChart(json.tables['Sources']);
+           }
+       });
+   */
+   
+   // Sample data for demonstration
+   const sampleData = {
+       'Debt': [45],
+       'Assets': [65],
+       'Cash': [22]
+   };
+   
+   // Update chart with sample data (for demonstration)
+   // Replace this with your actual data loading
+   updateSourcesChart(sampleData);
+</script>
