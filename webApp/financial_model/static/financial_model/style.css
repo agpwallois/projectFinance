@@ -338,7 +338,6 @@ h4 {
     right: 0;
     top: 150px; /* Changed from 160px to remove the gap */
     height: calc(100vh - 150px);
-    z-index: 100;
     background: rgb(244, 244, 244);
     overflow-y: auto;
 }

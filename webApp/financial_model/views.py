@@ -70,17 +70,46 @@ def timer_decorator(method):
 
 class FinancialModelView(View):
 
-	SCENARIO_MAP = {
-		'Lender_base_case': "Lender Base Case",
-		'Lender_sensi_prod': "sensi_production",
-		'Lender_sensi_inf': "sensi_inflation", 
-		'Lender_sensi_opex': "sensi_opex",
-		'Sponsor_base_case': "sponsor",
-		'Sponsor_sensi_prod': "sensi_production_sponsor",
-		'Sponsor_sensi_inf': "sensi_inflation_sponsor",
-		'Sponsor_sensi_opex': "sensi_opex_sponsor",
 
+
+
+	# settings.py or configuration file
+
+	FINANCIAL_MODEL_SCENARIOS = {
+		'lender_base_case': {
+			'model_type': 'lender',
+			'sensitivities': {},
+		},
+		'lender_sensi_prod': {
+			'model_type': 'lender',
+			'sensitivities': {'production': 'sensi_production'}, 
+		},
+		'lender_sensi_inf': {
+			'model_type': 'lender',
+			'sensitivities': {'inflation': 'sensi_inflation'},
+		},
+		'lender_sensi_opex': {
+			'model_type': 'lender',
+			'sensitivities': {'opex': 'sensi_opex'},
+		},
+		'sponsor_base_case': {
+			'model_type': 'sponsor',
+			'sensitivities': {},
+		},
+		'sponsor_sensi_prod': {
+			'model_type': 'sponsor',
+			'sensitivities': {'production': 'sensi_production_sponsor'},
+		},
+		'sponsor_sensi_inf': {
+			'model_type': 'sponsor',
+			'sensitivities': {'inflation': 'sensi_inflation_sponsor'},
+		},
+		'sponsor_sensi_opex': {
+			'model_type': 'sponsor',
+			'sensitivities': {'opex': 'sensi_opex_sponsor'},
+		},
 	}
+
 
 	""" GET METHOD """
 
@@ -90,16 +119,17 @@ class FinancialModelView(View):
 		context = {'project_form': ProjectForm(instance=project), 'project': project}
 	
 		if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-			return self._handle_ajax_request(request, project)
+			return self._process_get_request(request, project)
 			
 		return render(request, "financial_model/project_view.html", context)
 
-	def _handle_ajax_request(self, request, project: Project) -> JsonResponse:
+	def _process_get_request(self, request, project: Project) -> JsonResponse:
 		"""Process AJAX requests for financial model data"""
 		"""scenario = request.GET.get('scenario')"""
-		scenario = "Lender_base_case"
+		scenario = "lender_base_case"
 		financial_models = self._get_financial_models(project)
 		selected_model = financial_models.get(scenario)
+		logger.error(financial_models.items())
 		
 		if not selected_model:
 			return JsonResponse({'error': 'Invalid scenario'}, status=400)
@@ -109,23 +139,27 @@ class FinancialModelView(View):
 		table_sensi_diff_IRR = self._compute_differences(dashboard_data['Sensi_IRR'])
 
 		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
+
+		displayed_metrics = self._collect_displayed_metrics(financial_models)
 		
-		return self._prepare_json_response(selected_model, dashboard_data, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
+		return self._prepare_json_response(selected_model, financial_models, displayed_metrics, dashboard_data, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
 
 	def _get_financial_models(self, project: Project) -> Dict[str, SolarFinancialModel]:
 		"""Retrieve all financial models for a project"""
 		financial_models = {}
 		
-		for scenario_id, model_type in self.SCENARIO_MAP.items():
+		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
 			try:
 				model = SolarFinancialModel.objects.get(
 					project=project, 
-					identifier=model_type
+					identifier=scenario_id
 				)
 				financial_models[scenario_id] = model
+				logger.error("Retrieved")
 			except SolarFinancialModel.DoesNotExist:
 				# Create missing models on demand
-				model = self._create_model(project, model_type)
+				logger.error("Missing")
+				model = self._create_model(project, scenario_id, scenario_config)
 				financial_models[scenario_id] = model
 				
 		return financial_models
@@ -142,115 +176,143 @@ class FinancialModelView(View):
 
 		project_form.save()
 		"""scenario = request.POST.get('scenario')"""
-		scenario = "Lender_base_case"
+		scenario = "lender_base_case"
 		return self._create_financial_models(request, project, project_form, scenario)
 
-	def _create_financial_models(self, request, project, project_form, scenario):
-		# First create lender base model as it's required for others
-		base_lender_model = self._create_model(project, "lender_case")
 		
-		# Now create sponsor base model which depends on lender model
-		base_sponsor_model = self._create_model(project, "sponsor_case")
-		
-		# Initialize financial models dictionary with base cases
-		financial_models = {
-			'Lender_base_case': base_lender_model,
-			'Sponsor_base_case': base_sponsor_model
-		}
-		
-		# Create all sensitivity models
-		for scenario_key, model_type in self.SCENARIO_MAP.items():
-			# Skip base cases which we've already created
-			if model_type in ["lender_case", "sponsor_case"]:
-				continue
-			model = self._create_model(project, model_type)
-			financial_models[scenario_key] = model
 
-		logger.error(financial_models.items())
+	def _create_financial_models(self, request, project, project_form, selected_scenario):
+			"""
+			Create or update financial models based on the scenario and project form data.
+			"""
 
-		# Get selected model
-		selected_model = financial_models.get(scenario, base_lender_model)
-		
-		# Generate Dashboard Tables
-		dashboard_tables = self._build_dashboard(selected_model, financial_models)
-		table_sensi_diff = self._compute_differences(dashboard_tables['Sensi'])
-		table_sensi_diff_IRR = self._compute_differences(dashboard_tables['Sensi_IRR'])
-	
+			# Create or retrieve models for all scenarios
+			financial_models = {}
+			for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
+				model = self._create_model(project, scenario_id, scenario_config)
+				financial_models[scenario_id] = model
+				logger.error("Created")
 
-		# Format Data for Charts
-		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
-		
-		# Prepare and return JSON response
-		return self._prepare_json_response(selected_model, dashboard_tables, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
-		
-	def _create_model(self, project: Project, model_type: str) -> SolarFinancialModel:
-		"""Create or update a financial model of the specified type"""
-		# First, ensure lender base case exists as it's needed for dependency
-		if model_type != "lender_case":
-			lender_base, _ = SolarFinancialModel.objects.get_or_create(
+			logger.error(financial_models.items())
+
+			# Retrieve the selected model
+			selected_model = financial_models.get(selected_scenario, financial_models['lender_base_case'])
+
+			# Generate Dashboard Tables
+			dashboard_tables = self._build_dashboard(selected_model, financial_models)
+			table_sensi_diff = self._compute_differences(dashboard_tables['Sensi'])
+			table_sensi_diff_IRR = self._compute_differences(dashboard_tables['Sensi_IRR'])
+
+			# Format Data for Charts
+			charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
+
+			displayed_metrics = self._collect_displayed_metrics(financial_models)
+
+			# Prepare and return JSON response
+			return self._prepare_json_response(selected_model, financial_models, displayed_metrics, dashboard_tables, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
+
+
+	def _create_model(self, project: Project, scenario_id: str, scenario_config: dict) -> SolarFinancialModel:
+		"""
+		Create or update a financial model based on the given scenario configuration.
+		All models except Lender_base_case depend on Lender_base_case.
+		"""
+		# First ensure Lender_base_case exists as it's needed for dependency
+		if scenario_id != 'lender_base_case':
+			lender_base_case, lender_created = SolarFinancialModel.objects.get_or_create(
 				project=project,
-				identifier="lender_case",
+				identifier='lender_base_case',
 				defaults={'financial_model': {}}
 			)
-			if not lender_base.financial_model:
-				lender_base.create_financial_model(
-					model_type='lender_case',
+			
+			# Create the base case model if it's new or empty
+			if lender_created or not lender_base_case.financial_model:
+				lender_base_case.create_financial_model(
+					model_type='lender',
 					debt_sizing_sculpting=True
 				)
-		
-		# Now create or get the requested model
+				
+			# Set dependency to Lender_base_case for all other models
+			depends_on = lender_base_case
+		else:
+			# Lender_base_case has no dependency
+			depends_on = None
+
+		# Get or create the model instance
 		model, created = SolarFinancialModel.objects.get_or_create(
 			project=project,
-			identifier=model_type,
+			identifier=scenario_id,  # Use the mapping to get the identifier
 			defaults={'financial_model': {}}
 		)
 		
-		# Determine model parameters
-		is_lender_case = model_type.startswith('lender_case') or model_type.startswith('sensi_') and not model_type.endswith('_sponsor')
-		is_sponsor_case = model_type.startswith('sponsor_case') or model_type.endswith('_sponsor')
-		is_base_case = model_type in ['lender_case', 'sponsor_case']
-		
-		# Set sensitivity parameters
+		# Update the dependency
+		model.depends_on = depends_on
+		model.save()
+
+				# Apply sensitivities based on the scenario configuration
+		# Apply sensitivities based on the scenario configuration
 		sensi_params = {}
-		if not is_base_case:
-			# Handle sponsor case sensitivities differently
-			if is_sponsor_case:
-				if 'sensi_production' in model_type:
-					sensi_params['sensi_production'] = project.sensi_production_sponsor
-				elif 'sensi_inflation' in model_type:
-					sensi_params['sensi_inflation'] = project.sensi_inflation_sponsor
-				elif 'sensi_opex' in model_type:
-					sensi_params['sensi_opex'] = project.sensi_opex_sponsor
+		for param_name, project_field in scenario_config.get('sensitivities', {}).items():
+			model_type = scenario_config['model_type']
+			logger.error(model_type)
+			
+			# Determine proper parameter names based on model type
+			if model_type == 'sponsor':
+				# For sponsor models, use _sponsor suffix
+				if param_name == 'production':
+					sensi_params['sensi_production_sponsor'] = getattr(project, project_field)
+					logger.error(sensi_params['sensi_production_sponsor'] )
+				elif param_name == 'inflation':
+					sensi_params['sensi_inflation_sponsor'] = getattr(project, project_field)
+				elif param_name == 'opex':
+					sensi_params['sensi_opex_sponsor'] = getattr(project, project_field)
+				else:
+					sensi_params[param_name] = getattr(project, project_field)
 			else:
-				# Handle lender case sensitivities
-				if 'sensi_production' in model_type:
-					sensi_params['sensi_production'] = project.sensi_production
-				elif 'sensi_inflation' in model_type:
-					sensi_params['sensi_inflation'] = project.sensi_inflation
-				elif 'sensi_opex' in model_type:
-					sensi_params['sensi_opex'] = project.sensi_opex
-		
-		# Set dependency for non-lender base cases
-		if model_type != "lender_case":
-			lender_base = SolarFinancialModel.objects.get(project=project, identifier="lender_case")
-			model.depends_on = lender_base
-			model.save()
-		
-		# Create the financial model
-		base_model_type = 'lender_case' if is_lender_case else 'sponsor_case'
+				# For lender models, use standard names
+				if param_name == 'production':
+					sensi_params['sensi_production'] = getattr(project, project_field)
+				elif param_name == 'inflation':
+					sensi_params['sensi_inflation'] = getattr(project, project_field)
+				elif param_name == 'opex':
+					sensi_params['sensi_opex'] = getattr(project, project_field)
+				else:
+					sensi_params[param_name] = getattr(project, project_field)
+
+
+
+		# Debt sizing is only enabled for Lender_base_case
+		debt_sizing_sculpting = (scenario_id == 'lender_base_case')
+
+		# Create financial model
 		model.create_financial_model(
-			model_type=base_model_type,
-			debt_sizing_sculpting=(is_lender_case),
+			model_type=scenario_config['model_type'],
+			debt_sizing_sculpting=debt_sizing_sculpting,
 			**sensi_params
 		)
-		
+
 		return model
 
 	""" COMMON GET POST METHODS """
 
+	def _collect_displayed_metrics(self, financial_models):
+
+		displayed_metrics = {
+			"sponsor_IRR": f"{financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100:.1f}%",  # Percentage with 1 decimal
+			"lender_DSCR": f"{financial_models['lender_base_case'].financial_model['dict_results']['Sensi']['Min DSCR']:.2f}x",  # 2 decimals + "x"
+			"total_uses": f"{financial_models['lender_base_case'].financial_model['dict_uses_sources']['Uses']['Total']:,.1f}",  # Thousands separator + 1 decimal
+		}
+		sidebar_data = financial_models['sponsor_base_case'].financial_model['dict_sidebar']
+		displayed_metrics.update(sidebar_data)
+
+		return displayed_metrics
+
+
 	def _prepare_json_response(
 		self, 
 		model: SolarFinancialModel, 
+		financial_models: Dict,
+		displayed_metrics: Dict, 
 		dashboard_tables: Dict, 
 		table_sensi_diff: Dict,
 		table_sensi_diff_IRR: Dict,
@@ -269,10 +331,15 @@ class FinancialModelView(View):
 				"charts_data_constr": charts_data_constr,
 				"df_annual": charts_data_sum_year,
 				"df_eoy": charts_data_eoy,
-				"sidebar_data": model.financial_model['dict_sidebar']
+				
+				"sidebar_data": displayed_metrics, 
 			}, safe=False)
 		except Exception as e:
+			"""sidebar_data": model.financial_model['dict_sidebar'],"""
 			return self._handle_exception(e)
+
+
+
 
 	def _handle_exception(self, e: Exception) -> JsonResponse:
 		traceback_info = traceback.extract_tb(e.__traceback__)
@@ -295,14 +362,14 @@ class FinancialModelView(View):
 		table_sensi = {
 			key: model.financial_model['dict_results']['Sensi']
 			for key, model in financial_models.items()
-			if key.startswith("Lender")
+			if key.startswith("lender")
 		}
 
 
 		table_sensi_IRR = {
 			key: model.financial_model['dict_results']['Sensi_IRR']
 			for key, model in financial_models.items()
-			if key.startswith("Sponsor")
+			if key.startswith("sponsor")
 		}
 		
 		data = selected_model.financial_model
@@ -488,3 +555,125 @@ class FinancialModelView(View):
 		logger.error(f"Sensitivity {sensitivity_type} changed: {result}")
 		
 		return result
+
+
+
+
+
+
+	"""def _create_financial_models(self, request, project, project_form, scenario):
+		# First create lender base model as it's required for others
+		base_lender_model = self._create_model(project, "lender_case")
+		
+		# Now create sponsor base model which depends on lender model
+		base_sponsor_model = self._create_model(project, "sponsor_case")
+		
+		# Initialize financial models dictionary with base cases
+		financial_models = {
+			'Lender_base_case': base_lender_model,
+			'Sponsor_base_case': base_sponsor_model
+		}
+		
+		# Create all sensitivity models
+		for scenario_key, model_type in self.SCENARIO_MAP.items():
+			# Skip base cases which we've already created
+			if model_type in ["lender_case", "sponsor_case"]:
+				continue
+			model = self._create_model(project, model_type)
+			financial_models[scenario_key] = model
+
+		logger.error(financial_models.items())
+
+		# Get selected model
+		selected_model = financial_models.get(scenario, base_lender_model)
+		
+		# Generate Dashboard Tables
+		dashboard_tables = self._build_dashboard(selected_model, financial_models)
+		table_sensi_diff = self._compute_differences(dashboard_tables['Sensi'])
+		table_sensi_diff_IRR = self._compute_differences(dashboard_tables['Sensi_IRR'])
+	
+
+		# Format Data for Charts
+		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
+		
+		# Prepare and return JSON response
+		return self._prepare_json_response(selected_model, dashboard_tables, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)"""
+
+
+
+				
+	"""def _create_model(self, project: Project, model_type: str) -> SolarFinancialModel:
+		# Create or update a financial model of the specified type
+		# First, ensure lender base case exists as it's needed for dependency
+		if model_type != "lender_case":
+			lender_base, _ = SolarFinancialModel.objects.get_or_create(
+				project=project,
+				identifier="lender_case",
+				defaults={'financial_model': {}}
+			)
+			if not lender_base.financial_model:
+				lender_base.create_financial_model(
+					model_type='lender_case',
+					debt_sizing_sculpting=True
+				)
+		
+		# Now create or get the requested model
+		model, created = SolarFinancialModel.objects.get_or_create(
+			project=project,
+			identifier=model_type,
+			defaults={'financial_model': {}}
+		)
+		
+		# Determine model parameters
+		is_lender_case = model_type.startswith('lender_case') or model_type.startswith('sensi_') and not model_type.endswith('_sponsor')
+		is_sponsor_case = model_type.startswith('sponsor_case') or model_type.endswith('_sponsor')
+		is_base_case = model_type in ['lender_case', 'sponsor_case']
+		
+		# Set sensitivity parameters
+		sensi_params = {}
+		if not is_base_case:
+			# Handle sponsor case sensitivities differently
+			if is_sponsor_case:
+				if 'sensi_production' in model_type:
+					sensi_params['sensi_production'] = project.sensi_production_sponsor
+				elif 'sensi_inflation' in model_type:
+					sensi_params['sensi_inflation'] = project.sensi_inflation_sponsor
+				elif 'sensi_opex' in model_type:
+					sensi_params['sensi_opex'] = project.sensi_opex_sponsor
+			else:
+				# Handle lender case sensitivities
+				if 'sensi_production' in model_type:
+					sensi_params['sensi_production'] = project.sensi_production
+				elif 'sensi_inflation' in model_type:
+					sensi_params['sensi_inflation'] = project.sensi_inflation
+				elif 'sensi_opex' in model_type:
+					sensi_params['sensi_opex'] = project.sensi_opex
+		
+		# Set dependency for non-lender base cases
+		if model_type != "lender_case":
+			lender_base = SolarFinancialModel.objects.get(project=project, identifier="lender_case")
+			model.depends_on = lender_base
+			model.save()
+		
+		# Create the financial model
+		base_model_type = 'lender_case' if is_lender_case else 'sponsor_case'
+		model.create_financial_model(
+			model_type=base_model_type,
+			debt_sizing_sculpting=(is_lender_case),
+			**sensi_params
+		)
+		
+		return model"""
+
+
+	"""	SCENARIO_MAP = {
+		'Lender_base_case': "Lender Base Case",
+		'Lender_sensi_prod': "sensi_production",
+		'Lender_sensi_inf': "sensi_inflation", 
+		'Lender_sensi_opex': "sensi_opex",
+		'Sponsor_base_case': "sponsor",
+		'Sponsor_sensi_prod': "sensi_production_sponsor",
+		'Sponsor_sensi_inf': "sensi_inflation_sponsor",
+		'Sponsor_sensi_opex': "sensi_opex_sponsor",
+
+		}"""

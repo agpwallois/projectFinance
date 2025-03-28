@@ -8,6 +8,9 @@ function update_sidebar_data(json) {
                 sum_construction_costs:"#sumConstructionCosts",
                 liquidation:"#dateLiquidation",
                 date_debt_maturity:"#debtMaturity",
+                sponsor_IRR:"#sponsor_IRR", 
+                lender_DSCR:"#lender_DSCR",
+                total_uses:"#total_uses",
 
         };
 

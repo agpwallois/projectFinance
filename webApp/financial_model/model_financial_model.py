@@ -66,13 +66,13 @@ from django.db import models
 class FinancialModelParameters:
 	"""Container for financial model initialization parameters."""
 	model_type: str = 'lender'
+	debt_sizing_sculpting: bool = True
 	sensi_production: float = 0
 	sensi_opex: float = 0
 	sensi_inflation: float = 0
 	sensi_production_sponsor: float = 0
 	sensi_opex_sponsor: float = 0
 	sensi_inflation_sponsor: float = 0
-	debt_sizing_sculpting: bool = True
 
 class FinancialModel(models.Model):
 	"""
@@ -80,6 +80,8 @@ class FinancialModel(models.Model):
 	"""
 	project = models.ForeignKey('Project', null=False, on_delete=models.CASCADE)
 	financial_model = models.JSONField(default=dict, encoder=CustomJSONEncoder)
+	model_type = models.CharField(max_length=255, default='default-identifier')
+	sensitivity = models.CharField(max_length=255, default='default-identifier')
 	senior_debt_amount = models.FloatField(default=1000.0)
 	IRR = models.FloatField(default=10.0)
 	identifier = models.CharField(max_length=255, default='default-identifier')
@@ -127,16 +129,13 @@ class FinancialModel(models.Model):
 		FinancialModelAudit,
 	]
 
-	def create_financial_model(self, **kwargs):
-		"""
-		Main entry point to build the financial model.
-		"""
-		params = FinancialModelParameters(**kwargs)
-		self._build_financial_model(params)
 
-	def _build_financial_model(self, params: FinancialModelParameters):
+	def create_financial_model(self, **kwargs):
 		"""Orchestrates the financial model building process."""
+
+		params = FinancialModelParameters(**kwargs)
 		self._initialize_components(params)
+		
 		FinancialModelDeclareVariables(self).declare_variables()
 		
 		if params.debt_sizing_sculpting:
@@ -152,16 +151,35 @@ class FinancialModel(models.Model):
 			component = component_class(self)
 			
 			if component_class == FinancialModelProduction:
-				component.initialize(
-					params.model_type, 
-					sensi_production=params.sensi_production/100
-				)
+				# Use the proper sensitivity parameter based on model type
+				if params.model_type == 'sponsor':
+					component.initialize(
+						params.model_type, 
+						sensi_production=params.sensi_production_sponsor/100
+					)
+				else:
+					component.initialize(
+						params.model_type, 
+						sensi_production=params.sensi_production/100
+					)
+					
 			elif component_class == FinancialModelIndexation:
-				component.initialize(sensi_inflation=params.sensi_inflation)
+				# Use the proper inflation sensitivity based on model type
+				if params.model_type == 'sponsor':
+					component.initialize(sensi_inflation=params.sensi_inflation_sponsor)
+				else:
+					component.initialize(sensi_inflation=params.sensi_inflation)
+					
 			elif component_class == FinancialModelPrices:
 				component.initialize(params.model_type)
+				
 			elif component_class == FinancialModelOpex:
-				component.initialize(sensi_opex=params.sensi_opex/100)
+				# Use the proper opex sensitivity based on model type
+				if params.model_type == 'sponsor':
+					component.initialize(sensi_opex=params.sensi_opex_sponsor/100)
+				else:
+					component.initialize(sensi_opex=params.sensi_opex/100)
+					
 			else:
 				component.initialize()
 
@@ -307,90 +325,6 @@ class FinancialModel(models.Model):
 		self.financial_model = convert_to_list(self.financial_model)
 		super().save(*args, **kwargs)
 
-	def create_batch_scenarios(self, base_scenario_params: FinancialModelParameters, scenario_variations: List[dict], use_parallel=False):
-		"""
-		Efficiently process multiple scenarios based on a base case.
-		
-		Args:
-			base_scenario_params: Parameters for the base lender case
-			scenario_variations: List of dictionaries containing parameter variations for each scenario
-			use_parallel: Whether to use parallel processing for scenario computation
-		"""
-		# First, compute the base case to get debt structure
-		self._build_financial_model(base_scenario_params)
-		base_debt_amount = self.senior_debt_amount
-		base_debt_schedule = self.financial_model['senior_debt']['repayments']
-
-		# Prepare scenarios with base case debt structure
-		scenarios = []
-		for variation in scenario_variations:
-			scenario_params = copy.deepcopy(base_scenario_params)
-			scenario_params.debt_sizing_sculpting = False  # Use base case debt
-			for param, value in variation.items():
-				setattr(scenario_params, param, value)
-			scenarios.append(scenario_params)
-
-		if use_parallel and len(scenarios) > 1:
-			# Use parallel processing for multiple scenarios
-			with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
-				futures = []
-				for scenario_params in scenarios:
-					future = executor.submit(
-						self._compute_scenario,
-						scenario_params,
-						base_debt_amount,
-						base_debt_schedule
-					)
-					futures.append(future)
-				results = [future.result() for future in futures]
-		else:
-			# Compute scenarios sequentially with vectorization
-			results = []
-			for scenario_params in scenarios:
-				result = self._compute_scenario(
-					scenario_params,
-					base_debt_amount,
-					base_debt_schedule
-				)
-				results.append(result)
-
-		return results
-
-	def _compute_scenario(self, scenario_params: FinancialModelParameters, debt_amount: float, debt_schedule: list):
-		"""
-		Compute a single scenario using vectorized operations where possible.
-		"""
-		# Store original values
-		original_debt_amount = self.senior_debt_amount
-		original_debt_schedule = self.financial_model['senior_debt']['repayments']
-
-		# Set the debt structure from base case
-		self.senior_debt_amount = debt_amount
-		self.financial_model['senior_debt']['repayments'] = debt_schedule
-
-		# Build the model with vectorized operations
-		self._initialize_components(scenario_params)
-		FinancialModelDeclareVariables(self).declare_variables()
-		
-		# Run calculations without debt sizing
-		self._run_calculations(debt_sizing_sculpting=False)
-		
-		# Capture results
-		results = {
-			'parameters': scenario_params.__dict__,
-			'metrics': {
-				'IRR': self.IRR,
-				'valuation': self.valuation,
-				# Add other relevant metrics here
-			},
-			'financial_model': copy.deepcopy(self.financial_model)
-		}
-
-		# Restore original values
-		self.senior_debt_amount = original_debt_amount
-		self.financial_model['senior_debt']['repayments'] = original_debt_schedule
-
-		return results
 
 
 class DebtData(models.Model):

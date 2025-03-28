@@ -1,7 +1,7 @@
 $(document).ready(function() {
     // Initialize the application
     initializeApplication();
-    makeGetRequest('Lender_base_case');  // Always use RadioScenario1
+    makeGetRequest('lender_base_case');  // Always use RadioScenario1
 
 });
 
@@ -41,7 +41,6 @@ function makeGetRequest(value) {
             'scenario': value  // Always pass 'RadioScenario1'
         },
         success: function(json) {
-            console.log(value);
 
             handleSuccess(json);
         },
@@ -53,7 +52,7 @@ function makeGetRequest(value) {
 function handleSuccess(json) {
     console.log(json.df);
     console.log(json.tables);
-    console.log(json.table_sensi_diff);
+    console.log(json.sidebar_data);
 
 
     build_computation_table(json);
