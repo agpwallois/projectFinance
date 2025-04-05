@@ -1,51 +1,244 @@
+/* 
+ * Dashboard CSS - Reorganized
+ * - Layout & Structure
+ * - Sidebar Styling
+ * - Navigation & Links
+ * - Cards & Containers
+ * - Tables
+ * - Metrics & Charts
+ * - Buttons & Interactive Elements
+ * - Media Queries
+ */
 
+/* ===== Layout & Structure ===== */
 #dashboard_container {
+    display: flex;
     width: 100%;
     min-height: 100vh;
+    background-color: rgb(244, 244, 244);
+    padding-top: 50px;
     transition: all 0.3s;
     right: 0;
-    display: flex;
-    background: rgb(244, 244, 244);
-    padding-top: 50px;
 }
-
 
 #dashboard_sidebar {
     width: 320px;
+    background-color: white;
     border-right: 1px solid rgb(221, 221, 221);
+    position: sticky;
+    top: 0;
     left: 0;
     z-index: 1;
-    background: rgb(244, 244, 244);
+    height: 100vh;
+    padding: 10px 15px 50px 15px;
     transition: all 0.3s;
-    padding-bottom: 50px;
-    padding-left: 15px;
-    padding-top: 10px;
-    padding-right: 15px;
     font-size: 1rem;
 }
 
 #v-pills-tabContent {
+    flex: 1;
     width: calc(100% - 320px);
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 20px;
-    }
+    padding: 20px 20px 20px 20px;
+    overflow-y: auto;
+}
 
+.tab-content {
+    width: 100%;
+}
 
-.table-dashboard{
-    width:100%;
+/* Main content layouts */
+.main-content-row,
+.main-content-row-charts {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    align-items: flex-start;
+}
+
+.main-content-column-projects {
+    width: 100%;
+}
+
+.main-content-column-analytics {
+    flex: 1;
+    width: 50%;
+}
+
+.charts-column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* ===== Sidebar Styling ===== */
+.dashboard_sidebar_separator {
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.section_title {
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.vertical_line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: #ccc;
+}
+
+/* ===== Navigation & Links ===== */
+.nav-link {
+    color: rgb(92, 105, 117);
+    padding: 0 20px;
+    border-radius: 0;
+    transition: all 0.3s;
+    border-left: 3px solid transparent;
+    margin-bottom: 5px;
+    font-size: 1rem;
+    text-align: left;
+    font-weight: 600;
+    height: 50px;
+    line-height: 50px;
+    display: block;
+    text-align: left;
+    width: 100%;
+}
+
+.nav-link:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+    color: #0d6efd;
+}
+
+.nav-link.active {
+    color: #0d6efd;
+    background-color: transparent;
+    border-left: 3px solid #0d6efd;
+}
+
+.nav-pills .nav-link.active, 
+.nav-pills .show > .nav-link {
+    color: #0d6efd;
+    background-color: transparent;
+}
+
+.nav-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* ===== Cards & Containers ===== */
+.box-wrapper {
+    background-color: #fff;
+    border-radius: 3px;
+    border: solid 1px rgb(221, 221, 221);
+    padding: 25px;
+    margin-bottom: 10px;
+    height: 100%;
+}
+
+.box-wrapper h1 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #212529;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.button-container {
+    width: 70%;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 300px;
+    height: 46px; /* Match the effective height of the button */
+    max-width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+}
+
+.search-container:focus-within {
+    border-color: #4d90fe;
+    box-shadow: 0 2px 8px rgba(77, 144, 254, 0.2);
+}
+
+.search-container::before {
+    content: "🔍";
+    display: flex;
+    padding: 0 12px 0 16px;
+    font-size: 16px;
+    opacity: 0.6;
+}
+
+#searchInput, 
+#searchInput2 {
+    width: 100%;
+    height: 100%;
+    padding: 0 16px 0 0; /* Adjusted padding to maintain height */
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #333;
+    background: transparent;
+    font-family: inherit;
+    box-shadow: none;
+}
+
+#searchInput::placeholder, 
+#searchInput2::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+/* ===== Tables ===== */
+.table-dashboard {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
     line-height: 2rem;
     font-size: 1rem;
     margin-top: 10px;
-    }
+}
 
-td  {
+.table-dashboard thead th {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 1rem;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table-dashboard tbody td {
+    padding: 15px;
     border-bottom: 1px solid rgb(221, 221, 221);
+    color: #212529;
 }
 
 tr.hoverable:hover {
-  background-color: rgb(244, 244, 244);
-  cursor: pointer;
+    background-color: rgb(244, 244, 244);
+    cursor: pointer;
 }
 
 thead {
@@ -53,12 +246,92 @@ thead {
     border-bottom: 1px solid rgb(221, 221, 221);
 }
 
+/* ===== Metrics & Charts ===== */
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.metric-card {
+    background-color: #fff;
+    border-radius: 3px;
+    border: solid 1px rgb(221, 221, 221);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.metric-title {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.metric-change {
+    font-size: 0.75rem;
+    margin-top: 5px;
+}
+
+.metric-positive {
+    color: #198754;
+}
+
+.metric-negative {
+    color: #dc3545;
+}
+
+.chart-container {
+    background-color: #fff;
+    border-radius: 3px;
+    border: solid 1px rgb(221, 221, 221);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    width: 100%;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.chart-title {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+/* ===== Buttons & Interactive Elements ===== */
+#button_new_project {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius, 5px);
+    font-size: var(--font-size-sm, 1rem);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed, 0.3s);
+    height: 46px; /* Explicitly set the height */
+}
+
+#button_new_project:hover {
+    background-color: #0b5ed7;
+}
+
+/* ===== Typography ===== */
 h1 {
     font-size: 14px;
     font-weight: bold;
     color: black;
 }
-
 
 p {
     font-family: 'Poppins', sans-serif;
@@ -66,99 +339,4 @@ p {
     font-weight: 300;
     line-height: 1.7em;
     color: rgb(51, 51, 51);
-}
-
-
-.nav-dashboard {
-    display: flex;
-}
-
-
-.button-container {
-    width: 75%;
-}
-
-
-
-#content-box {
-    margin-top: 5px;
-    background-color: red;
-    }
-
-
-#button_new_project {
-    text-align: center;
-    border: 1px solid rgb(221, 221, 221);
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px; /* Adjust spacing between button and search box */
-    font-size: 14px;
-    font-weight: 500;
-    padding: 10px;
-}
-
-#button_new_project:hover{
-    border: 1px solid #0d6efd;
-    color: #0d6efd;
-    }
-
-
-.search-container {
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden; 
-    width: 25%;
-}
-
-#searchInput, #searchInput2 {
-    padding: 10px;
-    border: none;
-    outline: none;
-    font-size: 14px;
-}
-
-
-.tab-content {
-
-    width: 100%;
-}
-
-
-
-
-.nav-link {
-
-    color: rgb(92, 105, 117);
-    font-size: 1rem;
-    text-align: left;
-    font-weight: 600;
-}
-
-
-
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-    color: #0d6efd;
-    background-color: transparent;
-}
-
-
-.dashboard_sidebar_separator {
-    font-size: 1rem;
-}
-
-.divider {
-    display: flex;
-    align-items: center; /* Vertically center content */
-    margin-top: 10px;
-}
-
-.section_title {
-    margin-right: 10px; /* Adjust the spacing between title and line */
-}
-
-.vertical_line {
-    flex-grow: 1; /* Grow to fill available space */
-    height: 1px;
-    background-color: #ccc; /* Line color */
 }

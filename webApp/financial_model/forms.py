@@ -105,6 +105,12 @@ class ProjectForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(ProjectForm, self).__init__(*args, **kwargs)
 
+		self.fields['sponsor_irr'].required = False
+		self.fields['valuation'].required = False
+
+
+
+
 		exclude_from_formatting = [self.fields['periodicity'],
 								   self.fields['devfee_choice'],
 								   self.fields['injection_choice'],

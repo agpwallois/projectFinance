@@ -19,25 +19,27 @@ function build_charts(json) {
 
 
 
-// Extract data from json
+    // Extract data from json
     const usesData = json.tables['Uses'];
     const labels = Object.keys(usesData).filter(key => key !== 'Total');  // Exclude "Total"
     const dataValues = labels.map(key => parseFloat(usesData[key][0]));
-    
+
     // Calculate max value with padding for better visualization
-    const maxValue = Math.max(...dataValues) * 1.1; // Add 20% padding
-    
+    const maxValue = Math.max(...dataValues) * 1.1; // Add 10% padding (ajusté de 20% pour moins d'espace vide)
+
     // Calculate background data (difference between max and each value)
     const backgroundData = dataValues.map(value => maxValue - value);
-    
+
     // Update chart data
     chartUses.data.labels = labels;
     chartUses.data.datasets[0].data = dataValues;      // Actual data bars (now dataset 0)
     chartUses.data.datasets[1].data = backgroundData;  // Background (gray) bars (now dataset 1)
-    
+
+
+
     // Update max scale to ensure bars fill the right amount of space
     chartUses.options.scales.x.max = maxValue;
-    
+
     // Make sure we have enough colors if there are many data points
     if (labels.length > chartUses.data.datasets[0].backgroundColor.length) {
         const defaultColors = ['#CE65FF', '#FF6630', '#FECD32', '#34CB98'];
@@ -47,6 +49,7 @@ function build_charts(json) {
             );
         }
     }
+
     
     // Update the chart
     chartUses.update();

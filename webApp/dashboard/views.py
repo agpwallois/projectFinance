@@ -8,6 +8,9 @@ from financial_model.model_project import Project
 from financial_model.model_financial_model import FinancialModel
 from financial_model.model_solar_financial_model import SolarFinancialModel
 from financial_model.model_wind_financial_model import WindFinancialModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def projects_dashboard(request):
@@ -25,8 +28,23 @@ def projects_dashboard(request):
 
 	yearly_revenues_technology, yearly_revenues_country = calculate_yearly_revenues(projects)
 
+	projects_in_development =	projects.filter(project_status="Development")
+	projects_in_operations = projects.filter(project_status="Operational")
+
+	logger.error(capacity_per_tech)
+
+	total_capacity_sum = capacity_per_tech.aggregate(Sum('total_capacity'))['total_capacity__sum']
+
+
+
 	context = {
 		'projects': projects,
+
+		'projects_in_development': projects_in_development,
+		'projects_in_operations': projects_in_operations,
+		'total_capacity_sum': total_capacity_sum,
+
+
 		'financial_models': financial_models,
 
 		'project_counts_tech': project_counts_tech,

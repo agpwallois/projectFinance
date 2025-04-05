@@ -208,6 +208,17 @@ class FinancialModelView(View):
 
 			displayed_metrics = self._collect_displayed_metrics(financial_models)
 
+
+
+			project.sponsor_irr = financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100
+
+			valuation_keys = list(financial_models['sponsor_base_case'].financial_model['dict_results']['Valuation'].keys())
+			valuation_value = financial_models['sponsor_base_case'].financial_model['dict_results']['Valuation'][valuation_keys[1]]
+			rounded_value = 1000
+
+			project.valuation = rounded_value
+			project.save()
+
 			# Prepare and return JSON response
 			return self._prepare_json_response(selected_model, financial_models, displayed_metrics, dashboard_tables, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
 
