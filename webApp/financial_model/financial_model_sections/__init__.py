@@ -1,33 +1,35 @@
-from .assumptions import FinancialModelAssumptions
+from .assumptions import Assumptions
 
-from .dates import FinancialModelDates
-from .flags import FinancialModelFlags
-from .days import FinancialModelDays
-from .times import FinancialModelTimes
-from .prices import FinancialModelPrices
-from .production import FinancialModelProduction
+from .dates import Dates
+from .flags import Flags
+from .days import Days
+from .times import Times
+from .prices import Prices
+from .production import Production
 
-from .construction_costs import FinancialModelConstructionCosts
-from .revenues import FinancialModelRevenues
-from .opex import FinancialModelOpex
-from .indexation import FinancialModelIndexation
-from .EBITDA import FinancialModelEBITDA
-from .working_capital import FinancialModelWorkingCapital
-from .financing_plan import FinancialModelFinancingPlan
-from .senior_debt import FinancialModelSeniorDebt
+from .construction_costs import ConstructionCosts
+from .revenues import Revenues
+from .opex import Opex
+from .indexation import Indexation
+from .working_capital import WorkingCapital
+from .financing_plan import FinancingPlan
+from .senior_debt import SeniorDebt
 
-from .uses import FinancialModelUses
-from .depreciation import FinancialModelDepreciation
-from .income_statement import FinancialModelIncomeStatement
-from .cash_flow_statement import FinancialModelCashFlowStatement
-from .debt_sizing import FinancialModelSeniorDebtSizing
+from .uses import Uses
+from .depreciation import Depreciation
+from .income_statement import IncomeStatement
+from .debt_sizing import SeniorDebtSizing
+from .cash_flow_statement import CashFlowStatement
+
+from .financial_model_calculator import FinancialModelCalculator
+
 
 from .dsra import FinancialModelDSRA
-from .balance_sheet import FinancialModelBalanceSheet
-from .ratios import FinancialModelRatios
+from .balance_sheet import BalanceSheet
+from .ratios import Ratios
 from .irr import FinancialModelIRR
 
-from .audit import FinancialModelAudit
-from .accounts import FinancialModelAccounts
-from .variables_declaration import FinancialModelDeclareVariables
+from .audit import Audit
+from .accounts import Accounts
+from .variables_declaration import DeclareVariables
 

@@ -20,16 +20,55 @@ from .financial_model_sections import *
 from .model_financial_model_helpers_charts import (
 	extract_construction_values_for_charts,
 	extract_EoY_values_for_charts,
-	calc_annual_sum_for_charts,   
+	calc_annual_sum_for_charts,  
 )
 from .model_financial_model_helpers_dashboard import (
 	create_dashboard_results,
 )
+
+from .model_financial_model_helpers_fs_financing_plan import (
+	extract_fs_financing_plan_data, 
+)
+
+
+from .model_financial_model_helpers_financial_statements import (
+	calc_annual_financial_statements, 
+)
+
+
+
+
+
 import logging
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
 
+
+from functools import wraps
+import time
+
+
 logger = logging.getLogger(__name__)
+
+
+def timer_decorator(method):
+	@wraps(method)
+	def timed(*args, **kwargs):
+		start_time = time.time()
+		result = method(*args, **kwargs)
+		end_time = time.time()
+		elapsed_time = end_time - start_time
+
+		# Store the result in a class attribute
+		cls = args[0].__class__
+		if not hasattr(cls, 'execution_times'):
+			cls.execution_times = {}
+		cls.execution_times[method.__name__] = elapsed_time
+
+		print(f"Execution time of {method.__name__}: {elapsed_time:.4f} seconds")
+		return result
+
+	return timed
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -96,39 +135,37 @@ class FinancialModel(models.Model):
 
 	# Component initialization order
 	STATIC_COMPONENTS = [
-		FinancialModelAssumptions,
-		FinancialModelDates,
-		FinancialModelFlags,
-		FinancialModelDays,
-		FinancialModelTimes,
-		FinancialModelProduction,
-		FinancialModelConstructionCosts,
-		FinancialModelIndexation,
-		FinancialModelPrices,
-		FinancialModelRevenues,
-		FinancialModelOpex,
-		FinancialModelEBITDA,
-		FinancialModelWorkingCapital,
+		Assumptions,
+		Dates,
+		Flags,
+		Days,
+		Times,
+		Production,
+		ConstructionCosts,
+		Indexation,
+		Prices,
+		Revenues,
+		Opex,
+		WorkingCapital,
 	]
 
 	CALCULATIONS_BEFORE_DEBT = [
-		FinancialModelFinancingPlan,
-		FinancialModelSeniorDebt,
-		FinancialModelUses,
-		FinancialModelDepreciation,
-		FinancialModelIncomeStatement,
-		FinancialModelCashFlowStatement,
+		FinancingPlan,
+		SeniorDebt,
+		Uses,
+		Depreciation,
 	]
 
-	CALCULATIONS_AFTER_DEBT = [
-		FinancialModelDSRA,
-		FinancialModelAccounts,
-		FinancialModelBalanceSheet,
-		FinancialModelRatios,
+	CALCULATIONS_SENSI = [
+		FinancialModelCalculator,
+	]
+
+	CALCULATIONS_FM_OUTPUTS = [
+		BalanceSheet,
+		Ratios,
 		FinancialModelIRR,
-		FinancialModelAudit,
+		Audit,
 	]
-
 
 	def create_financial_model(self, **kwargs):
 		"""Orchestrates the financial model building process."""
@@ -136,7 +173,7 @@ class FinancialModel(models.Model):
 		params = FinancialModelParameters(**kwargs)
 		self._initialize_components(params)
 		
-		FinancialModelDeclareVariables(self).declare_variables()
+		DeclareVariables(self).declare_variables()
 		
 		if params.debt_sizing_sculpting:
 			self._execute_debt_sizing_sculpting()
@@ -145,12 +182,13 @@ class FinancialModel(models.Model):
 			
 		self._finalize_model()
 
+	"""@timer_decorator"""
 	def _initialize_components(self, params: FinancialModelParameters):
 		"""Initialize all static components of the financial model."""
 		for component_class in self.STATIC_COMPONENTS:
 			component = component_class(self)
 			
-			if component_class == FinancialModelProduction:
+			if component_class == Production:
 				# Use the proper sensitivity parameter based on model type
 				if params.model_type == 'sponsor':
 					component.initialize(
@@ -163,17 +201,17 @@ class FinancialModel(models.Model):
 						sensi_production=params.sensi_production/100
 					)
 					
-			elif component_class == FinancialModelIndexation:
+			elif component_class == Indexation:
 				# Use the proper inflation sensitivity based on model type
 				if params.model_type == 'sponsor':
 					component.initialize(sensi_inflation=params.sensi_inflation_sponsor)
 				else:
 					component.initialize(sensi_inflation=params.sensi_inflation)
 					
-			elif component_class == FinancialModelPrices:
+			elif component_class == Prices:
 				component.initialize(params.model_type)
 				
-			elif component_class == FinancialModelOpex:
+			elif component_class == Opex:
 				# Use the proper opex sensitivity based on model type
 				if params.model_type == 'sponsor':
 					component.initialize(sensi_opex=params.sensi_opex_sponsor/100)
@@ -191,12 +229,20 @@ class FinancialModel(models.Model):
 			self.financial_model['senior_debt']['repayments'] = self.financial_model['senior_debt']['target_repayments']
 
 			"""Execute iterative debt sizing and sculpting process."""
-			self._run_calculations(debt_sizing_sculpting=True)
+	
+			self._run_component_list(self.CALCULATIONS_BEFORE_DEBT)
 			
-			if self._has_converged():
+			self._run_component_list(self.CALCULATIONS_SENSI)
+			self._calculate_senior_debt()
+			self._run_component_list(self.CALCULATIONS_FM_OUTPUTS)
+
+
+			"""self._run_calculations(debt_sizing_sculpting=True)"""
+			
+			if self._structuring_case_has_converged():
 				break
 				
-		self._persist_debt_data()
+		"""self._persist_debt_data()"""
 
 	def _apply_debt_from_dependency(self):
 		"""
@@ -205,27 +251,90 @@ class FinancialModel(models.Model):
 		if not self.depends_on:
 			raise ValueError("No dependent model found for debt values")
 		
-		if not self.depends_on.recorded_results:
-			raise ValueError("No recorded results found in dependent model")
-		
-		# Copy debt values from the dependent model
-		self.senior_debt_amount = self.depends_on.recorded_results.debt_amount
+		# Copy debt values directly from the dependent model
+		self.senior_debt_amount = self.depends_on.senior_debt_amount
 		self.financial_model['senior_debt']['repayments'] = (
-			self.depends_on.recorded_results.debt_schedule
+			self.depends_on.financial_model['senior_debt']['repayments'].copy()
 		)
-		
-		# Run the necessary calculations
-		for _ in range(self.iteration):
-			self._run_calculations(debt_sizing_sculpting=False)
 
-	def _run_calculations(self, debt_sizing_sculpting: bool):
-		"""Execute all calculation components in order."""
-		self._run_component_list(self.CALCULATIONS_BEFORE_DEBT)
+
+		self._copy_base_case_data_for_sensitivity()
 		
-		if debt_sizing_sculpting:
-			self._calculate_senior_debt()
-			
-		self._run_component_list(self.CALCULATIONS_AFTER_DEBT)
+		# Run only the components that need to be recalculated for sensitivity
+		# Skip Uses since we copied it, but run the rest
+		calculations_before_debt = [comp for comp in self.CALCULATIONS_BEFORE_DEBT
+								if comp.__name__ not in ['Uses']]
+		self._run_component_list(calculations_before_debt)
+		self._run_component_list(self.CALCULATIONS_SENSI)
+		self._run_component_list(self.CALCULATIONS_FM_OUTPUTS)		
+		
+		
+
+
+	def _copy_base_case_data_for_sensitivity(self):
+		"""Copy all necessary data from base case to ensure consistency in sensitivity models."""
+		if not self.depends_on:
+			return
+		
+		import pandas as pd
+		import copy
+		
+		# Copy the entire uses data structure
+		self._copy_uses_data_from_dependency()
+		
+		# Also copy any other data that should remain consistent with base case
+		# This might include certain senior debt calculations that Uses depends on
+		if 'senior_debt' in self.depends_on.financial_model:
+			if 'senior_debt' not in self.financial_model:
+				self.financial_model['senior_debt'] = {}
+				
+			# Copy specific senior debt items that should match base case
+			base_senior_debt = self.depends_on.financial_model['senior_debt']
+			for key in ['interests_construction', 'fees_construction', 'total_interests_fees']:
+				if key in base_senior_debt:
+					value = base_senior_debt[key]
+					if isinstance(value, list):
+						# Convert lists back to pandas Series
+						self.financial_model['senior_debt'][key] = pd.Series(value)
+					elif hasattr(value, 'copy'):
+						self.financial_model['senior_debt'][key] = value.copy()
+					else:
+						self.financial_model['senior_debt'][key] = value
+		
+		logger.info("Copied base case data for sensitivity analysis")
+
+	def _copy_senior_debt_data_for_uses(self):
+		"""Copy senior debt data needed by Uses component from dependency."""
+		# This method is no longer needed, functionality moved to _copy_base_case_data_for_sensitivity
+		pass
+
+	def _copy_uses_data_from_dependency(self):
+		"""Copy all uses data from dependent model to ensure consistent project costs."""
+		if not self.depends_on:
+			return
+		
+		import pandas as pd
+		import numpy as np
+		import copy
+		
+		# Copy the entire uses dictionary to maintain complete consistency
+		self.financial_model['uses'] = {}
+		for key, value in self.depends_on.financial_model['uses'].items():
+			if isinstance(value, list):
+				# Convert lists back to pandas Series to preserve methods like .cumsum()
+				self.financial_model['uses'][key] = pd.Series(value)
+			elif hasattr(value, 'copy'):
+				# For pandas Series, numpy arrays with copy method
+				self.financial_model['uses'][key] = value.copy()
+			elif isinstance(value, dict):
+				# For dictionaries, use deepcopy to ensure independence
+				self.financial_model['uses'][key] = copy.deepcopy(value)
+			else:
+				# For scalar values or immutable types
+				self.financial_model['uses'][key] = value
+		
+		"""logger.info(f"Copied all uses data from dependent model. Total project costs: {pd.Series(self.financial_model['uses']['total']).sum():,.0f}")
+		logger.debug(f"Copied uses keys: {list(self.financial_model['uses'].keys())}")"""
 
 	def _run_component_list(self, component_list: List[Type]):
 		"""Initialize a list of components."""
@@ -234,48 +343,57 @@ class FinancialModel(models.Model):
 
 	def _calculate_senior_debt(self):
 		"""Calculate senior debt size and repayments."""
-		senior_debt_sizing = FinancialModelSeniorDebtSizing(self)
+		senior_debt_sizing = SeniorDebtSizing(self)
 		senior_debt_sizing.calculate_senior_debt_amount()
 		senior_debt_sizing.calculate_senior_debt_repayments()
 
-	def _has_converged(self) -> bool:
+	def _structuring_case_has_converged(self) -> bool:
 		"""Check if debt calculations have converged."""
 		debt_amount_delta = abs(
 			self.senior_debt_amount - 
 			self.financial_model['debt_sizing']['target_debt_amount']
 		)
 
-		if debt_amount_delta > 0.1:
+		"""logger.error(debt_amount_delta)"""
+
+		if debt_amount_delta > 0.01:
 			return False
 
 		current = np.array(self.financial_model['senior_debt']['repayments'])
 		target = np.array(self.financial_model['senior_debt']['target_repayments'])
-		return np.allclose(current, target, atol=0.001)
 
+		return np.allclose(current, target, rtol=1e-5, atol=0.001)
+
+	def _sensitivity_case_has_converged(self) -> bool:
+		"""Check if debt calculations have converged."""
+
+		
+		return True
+	
 	def _finalize_model(self):
 		"""Prepare final outputs and save the model."""
 		self._create_model_outputs()
 		self._create_charts_data()
 		self.save()
-
+	
 	def _create_model_outputs(self):
 		"""Create all final model outputs."""
 		self._create_dashboard_results()
 		self._create_dynamic_sidebar_data()
 		self._create_charts_data()
-
+	
 	def _create_charts_data(self):
 		"""Format and store chart data."""
 		self.financial_model['charts'] = {
-			'senior_debt_draw_neg': -self.financial_model['injections']['senior_debt'],
-			'share_capital_inj_neg': -self.financial_model['injections']['share_capital'],
-			'shl_draw_neg': -self.financial_model['injections']['SHL'],
+			'senior_debt_draw_neg': -self.financial_model['sources']['senior_debt'],
+			'share_capital_inj_neg': -self.financial_model['sources']['share_capital'],
+			'shl_draw_neg': -self.financial_model['sources']['SHL'],
 			'share_capital_inj_and_repay': (
-				-self.financial_model['injections']['share_capital'] + 
+				-self.financial_model['sources']['share_capital'] + 
 				self.financial_model['share_capital']['repayments']
 			),
 			'shl_inj_and_repay': (
-				-self.financial_model['injections']['SHL'] + 
+				-self.financial_model['sources']['SHL'] + 
 				self.financial_model['SHL']['repayments']
 			)
 		}
@@ -287,9 +405,11 @@ class FinancialModel(models.Model):
 			senior_debt_amount=self.senior_debt_amount,
 			gearing_eff=self.gearing_eff
 		)
-
+	
 	def _create_dynamic_sidebar_data(self):
 		"""Create sidebar display data."""
+
+		
 		self.financial_model['dict_sidebar'] = {
 			'COD': date_converter(self.COD),
 			'installed_capacity': self.installed_capacity,
@@ -299,7 +419,13 @@ class FinancialModel(models.Model):
 			'liquidation': date_converter(self.liquidation_date),
 			'date_debt_maturity': date_converter(self.debt_maturity),
 			'price_elec_dict': self.price_elec_dict,
+			'lender_prod_choice': self.lender_production_text,
+			'sponsor_prod_choice': self.sponsor_production_text,
+			'lender_mkt_price_choice': self.lender_mkt_price_choice_text,
+			'sponsor_mkt_price_choice': self.sponsor_mkt_price_choice_text,
+
 		}
+		
 
 	def extract_values_for_charts(self):
 		"""Extract all required chart values."""
@@ -309,15 +435,17 @@ class FinancialModel(models.Model):
 			calc_annual_sum_for_charts(self.financial_model)
 		)
 
+	def extract_fs_data(self):
+		"""Extract all required table values."""
+		return extract_fs_financing_plan_data(self.financial_model)
 
-	def _persist_debt_data(self):
-		"""Save the final debt values to the database."""
-		debt_data, created = DebtData.objects.get_or_create(financial_model=self)
-		debt_data.debt_amount = self.senior_debt_amount
-		debt_data.debt_schedule = convert_to_list(
-			self.financial_model['senior_debt']['repayments']
-		)
-		debt_data.save()
+
+	def calc_annual_financial_statements(self):
+		"""Extract all required table values."""
+		return calc_annual_financial_statements(self.financial_model)
+
+
+
 
 
 	def save(self, *args, **kwargs):
@@ -325,15 +453,6 @@ class FinancialModel(models.Model):
 		self.financial_model = convert_to_list(self.financial_model)
 		super().save(*args, **kwargs)
 
-
-
-class DebtData(models.Model):
-	"""
-	DebtData model to store debt amount and schedule.
-	"""
-	financial_model = models.OneToOneField(FinancialModel, null=True, blank=True, on_delete=models.CASCADE, related_name='recorded_results')
-	debt_amount = models.FloatField(null=True, blank=True)
-	debt_schedule = models.JSONField(null=True, blank=True)  # Store schedule as a JSON list
 
 
 

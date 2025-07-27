@@ -35,6 +35,9 @@ def extract_construction_values_for_charts(financial_model):
 
 
 
+
+
+
 def extract_EoY_values_for_charts(financial_model):
 	"""
 	Extracts end-of-year (EoY) values from the financial_model dict
@@ -48,6 +51,8 @@ def extract_EoY_values_for_charts(financial_model):
 		'ratios': ['DSCR_effective', 'LLCR', 'PLCR'],
 		'IS': ['retained_earnings_bop'],
 		'DSRA': ['dsra_bop'],
+		'capacity': ['degradation_factor'],
+
 	}
 
 	def process_series(series, end_dates):
@@ -97,8 +102,10 @@ def calc_annual_sum_for_charts(financial_model):
         'distr_account': ['dividends_paid'],
         'IRR': ['irr_curve'],
         'ratios': ['DSCR_effective', 'LLCR', 'PLCR'],
-        'injections': ['senior_debt'],
+        'sources': ['senior_debt'],
         'share_capital': ['repayments'],
+        'production': ['total'],
+
     }
 
     def process_series(series, end_dates):

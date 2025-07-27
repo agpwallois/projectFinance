@@ -32,6 +32,10 @@ class Project(models.Model):
 		('Operational', 'Operational'),
 	)
 
+
+
+
+
 	created_date = models.DateTimeField(auto_now_add=True)
 	updated_date = models.DateTimeField(auto_now=True)
 	
@@ -328,7 +332,8 @@ class Project(models.Model):
 	contract = models.fields.CharField(choices=CONTRACT_CHOICES,max_length=100,default="CfD - AO")
 	rotor_diameter = models.fields.DecimalField(max_digits=4, decimal_places=2, default=92)
 
-	sponsor_irr = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	sponsor_irr = models.fields.DecimalField(max_digits=10, decimal_places=2, default=0)
 	valuation = models.fields.DecimalField(max_digits=4, decimal_places=0, default=0)
+
 
 

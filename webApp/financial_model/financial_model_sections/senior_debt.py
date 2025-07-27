@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-class FinancialModelSeniorDebt:
+class SeniorDebt:
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model
@@ -18,12 +18,12 @@ class FinancialModelSeniorDebt:
 	def _calculate_balance_eop_and_bop(self):
 		"""Calculate balance at the end and beginning of the period."""
 		senior_debt = self.financial_model['senior_debt']
-		injections = self.financial_model['injections']['senior_debt']
+		sources = self.financial_model['sources']['senior_debt']
 		repayments = senior_debt['repayments']
 
-		senior_debt['balance_eop'] = (injections - repayments).cumsum()
+		senior_debt['balance_eop'] = (sources - repayments).cumsum()
 		senior_debt['balance_bop'] = (
-			senior_debt['balance_eop'] + repayments - injections
+			senior_debt['balance_eop'] + repayments - sources
 		)
 
 	def _calculate_interests(self):
@@ -55,14 +55,14 @@ class FinancialModelSeniorDebt:
 		"""Calculate senior debt availability at EOP and BOP."""
 		senior_debt = self.financial_model['senior_debt']
 		flags = self.financial_model['flags']
-		injections = self.financial_model['injections']['senior_debt']
+		sources = self.financial_model['sources']['senior_debt']
 
 		senior_debt['senior_debt_available_eop'] = (
 			(self.instance.senior_debt_amount - senior_debt['balance_bop']) *
 			flags['construction']
 		)
 		senior_debt['senior_debt_available_bop'] = (
-			senior_debt['senior_debt_available_eop'] + injections
+			senior_debt['senior_debt_available_eop'] + sources
 		)
 
 	def _calculate_commitment_fees(self):

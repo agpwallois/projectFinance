@@ -21,11 +21,11 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 			"Total": sum(financial_model['uses']['total']),
 		},
 		"Sources": {
-			"Equity": sum(financial_model['injections']['equity']),
-			"Share capital": sum(financial_model['injections']['share_capital']),
-			"Shareholder loan": sum(financial_model['injections']['SHL']),
-			"Senior debt": sum(financial_model['injections']['senior_debt']),
-			"Total": sum(financial_model['injections']['total']),
+			"Equity": sum(financial_model['sources']['equity']),
+			"Share capital": sum(financial_model['sources']['share_capital']),
+			"Shareholder loan": sum(financial_model['sources']['SHL']),
+			"Senior debt": sum(financial_model['sources']['senior_debt']),
+			"Total": sum(financial_model['sources']['total']),
 		},
 	}
 
@@ -46,9 +46,6 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 		},
 		"Sensi_IRR": {
 			"Equity IRR": financial_model['IRR']['equity'],
-			"Project IRR (pre-tax)": financial_model['IRR']['project_pre_tax'],
-			"Project IRR (post-tax)": financial_model['IRR']['project_post_tax'],
-			"Debt IRR": financial_model['IRR']['senior_debt'],
 			"Audit": financial_model['audit']['check_all'],
 		},
 		"Project IRR": {
@@ -60,12 +57,12 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 			"Effective gearing": gearing_eff,
 			"Tenor (door-to-door)": financial_model['audit']['tenor_debt'],
 			"Average DSCR": financial_model['ratios']['DSCR_avg'],
-			"Debt IRR": financial_model['IRR']['senior_debt'],
+			"Senior Debt IRR": financial_model['IRR']['senior_debt'],
 		},
 		"Audit": {
-			"Financing plan": financial_model['audit']['check_financing_plan'],
-			"Balance sheet": financial_model['audit']['check_balance_sheet'],
-			"Debt maturity": financial_model['audit']['debt_maturity'],
+			"Financing plan": "true" if financial_model['audit']['check_financing_plan'] else "false",
+			"Balance sheet": "true" if financial_model['audit']['check_balance_sheet'] else "false",
+			"Debt maturity": "true" if financial_model['audit']['debt_maturity'] else "false",
 		},
 		"Valuation": {
 			f"{financial_model['IRR']['eqt_discount_factor_less_1'] * 100:.2f}%":

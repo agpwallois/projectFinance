@@ -91,8 +91,7 @@ def build_dashboard_table_sensi(results):
 
 
 def build_dashboard_table_sensi_sponsor(results):
-    metrics = [("Equity IRR", "{:.1f}%"), ("Project IRR (pre-tax)", "{:.1f}%"), 
-               ("Project IRR (post-tax)", "{:.1f}%"), ("Debt IRR", "{:.1f}%"), ("Audit", None)]  # Specific format only for "Audit"
+    metrics = [("Equity IRR", "{:.1f}%"), ("Audit", None)]  # Specific format only for "Audit"
     
     # Create headers for the table
     dashboard_sensitivity_tables = {"": [metric[0] for metric in metrics]}

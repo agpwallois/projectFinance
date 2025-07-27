@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class FinancialModelFlags:
+class Flags:
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model

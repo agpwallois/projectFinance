@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class FinancialModelBalanceSheet:
+class BalanceSheet:
     def __init__(self, instance):
         self.instance = instance
         self.financial_model = instance.financial_model
@@ -17,37 +17,46 @@ class FinancialModelBalanceSheet:
         interests_construction = self.financial_model['SHL']['interests_construction'].cumsum()
         depreciation = self.financial_model['IS']['depreciation'].cumsum()
 
-        self.financial_model['BS']['PPE'] = (
+        self.financial_model['assets']['PPE'] = (
             construction_costs + senior_debt_idc_and_fees + interests_construction - depreciation
         )
 
     def _compute_total_assets(self):
-        bs = self.financial_model['BS']
-        working_cap = self.financial_model['working_cap']
-        dsra = self.financial_model['DSRA']
-        distr_account = self.financial_model['distr_account']
-        op_account = self.financial_model['op_account']
+        bs_assets = self.financial_model['assets']
 
-        bs['total_assets'] = (
-            bs['PPE'] +
-            working_cap['accounts_receivable_eop'] +
-            dsra['dsra_eop'] +
-            distr_account['balance_eop'] +
-            op_account['balance_eop']
+        bs_assets['accounts_receivable'] = self.financial_model['working_cap']['accounts_receivable_eop']
+        bs_assets['operating_account'] = self.financial_model['op_account']['balance_eop']
+        bs_assets['DSRA'] = self.financial_model['DSRA']['dsra_eop']
+        bs_assets['distribution_account'] = self.financial_model['distr_account']['balance_eop']
+
+        bs_assets['total_assets'] = (
+            bs_assets['PPE'] +
+            bs_assets['accounts_receivable'] +
+            bs_assets['DSRA'] +
+            bs_assets['distribution_account'] +
+            bs_assets['operating_account']
         )
 
     def _compute_total_liabilities(self):
-        bs = self.financial_model['BS']
-        shl = self.financial_model['SHL']
-        share_capital = self.financial_model['share_capital']
-        income_statement = self.financial_model['IS']
-        senior_debt = self.financial_model['senior_debt']
-        working_cap = self.financial_model['working_cap']
+        bs_liabilities = self.financial_model['liabilities']
 
-        bs['total_liabilities'] = (
-            shl['balance_eop'] +
-            share_capital['balance_eop'] +
-            income_statement['retained_earnings_eop'] +
-            senior_debt['balance_eop'] +
-            working_cap['accounts_payable_eop']
+        bs_liabilities['share_capital'] = self.financial_model['share_capital']['balance_eop']
+        bs_liabilities['shareholder_loan'] = self.financial_model['SHL']['balance_eop']
+
+        bs_liabilities['retained_earnings'] = self.financial_model['IS']['retained_earnings_eop']
+
+
+        bs_liabilities['senior_debt'] = self.financial_model['senior_debt']['balance_eop']
+        bs_liabilities['accounts_payable'] = self.financial_model['working_cap']['accounts_payable_eop']
+
+
+        bs_liabilities['total_liabilities'] = (
+            bs_liabilities['accounts_payable'] +
+            bs_liabilities['senior_debt'] +
+            bs_liabilities['shareholder_loan'] +
+            bs_liabilities['share_capital'] +
+            bs_liabilities['retained_earnings'] 
+
+
+
         )

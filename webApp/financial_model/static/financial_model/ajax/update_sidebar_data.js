@@ -11,6 +11,12 @@ function update_sidebar_data(json) {
                 sponsor_IRR:"#sponsor_IRR", 
                 lender_DSCR:"#lender_DSCR",
                 total_uses:"#total_uses",
+                sponsor_prod_choice:"#sponsor_prod_choice",
+                lender_prod_choice:"#lender_prod_choice",
+                lender_mkt_price_choice:"#lender_mkt_price_choice",
+                sponsor_mkt_price_choice:"#sponsor_mkt_price_choice",
+                gearing:"#gearing",
+                installed_capacity:"#capacity",
 
         };
 

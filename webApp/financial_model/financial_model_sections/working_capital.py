@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-class FinancialModelWorkingCapital:
+class WorkingCapital:
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model

@@ -31,6 +31,7 @@
 <div class="charts-container">
 
 	<div class="graph"><canvas id="chartCash"></canvas></div>
+	<div class="graph"><canvas id="chartProduction"></canvas></div>
 
 </div>
 
@@ -566,4 +567,60 @@ const chartCash = new Chart(ctx13, {
 		}},
 	}
 });
+
+
+const ctx14 = document.getElementById('chartProduction');
+const chartProduction = new Chart(ctx14, {
+    data: {
+        labels: ["1", "2", "3", "4", "5", "6"],
+        datasets: [{
+            type: 'bar',
+            label: 'Production',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#3b82f6', // sky-500
+            borderWidth: 1,
+            order: 1, // Lower order value, will be drawn first (behind)
+            yAxisID: 'y', // This dataset will use the default y-axis
+        }, {
+            type: 'line',
+            label: 'Degradation',
+            data: [1, 2, 3, 4, 5, 6],
+            backgroundColor: '#f43f5e', // rose-500
+            borderColor: '#f43f5e', // rose-500
+            borderWidth: 1,
+            order: 0, // Higher order value, will be drawn last (on top)
+            yAxisID: 'y1', // This dataset will use the secondary y-axis
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                    drawOnChartArea: false, // Only want the grid lines for the primary axis to show up
+                },
+            },
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Production (MWh)'
+            }
+        }
+    }
+});
+
+
 </script>

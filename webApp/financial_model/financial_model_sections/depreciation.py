@@ -2,7 +2,7 @@ import numpy as np
 from typing import Any
 
 
-class FinancialModelDepreciation:
+class Depreciation:
 	"""
 	A class responsible for calculating and populating the depreciation
 	line item in a financial model’s Income Statement.

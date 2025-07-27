@@ -6,7 +6,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-class FinancialModelDeclareVariables:
+class DeclareVariables:
 	"""
 	A class that initializes and declares essential variables within the financial model,
 	ensuring that all necessary structures (e.g., dictionaries and placeholder arrays)
@@ -46,9 +46,11 @@ class FinancialModelDeclareVariables:
 		fm["op_account"] = {}
 		fm["senior_debt"] = {}
 		fm["discount_factor"] = {}
-		fm["BS"] = {}
+		fm["assets"] = {}
+		fm["liabilities"] = {}
+
 		fm["distr_account"] = {}
-		fm["debt_sizing"] = {}
+		
 		fm["share_capital"] = {}
 		fm["audit"] = {}
 
@@ -70,9 +72,16 @@ class FinancialModelDeclareVariables:
 		# Debt Service Reserve Account (DSRA)
 		fm["DSRA"] = {
 			"dsra_bop": np.full(data_length, 0),
+			"dsra_eop": np.full(data_length, 0),
+
 			"initial_funding": np.full(data_length, 0),
 			"dsra_mov": np.full(data_length, 0),
+			"dsra_additions": np.full(data_length, 0),
+			"dsra_release": np.full(data_length, 0),
+
 		}
+
+
 
 		# Track maximum initial funding requirement
 		self.instance.initial_funding_max = 0

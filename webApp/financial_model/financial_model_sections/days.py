@@ -2,7 +2,7 @@ import pandas as pd
 from typing import Any, Dict
 
 
-class FinancialModelDays:
+class Days:
 	"""
 	A class responsible for calculating the number of days in various
 	periods (model, contracts, etc.) by using start and end dates
@@ -11,7 +11,7 @@ class FinancialModelDays:
 
 	def __init__(self, instance: Any) -> None:
 		"""
-		Initialize the FinancialModelDays with the main project instance.
+		Initialize the Days with the main project instance.
 
 		Args:
 			instance: Main object containing the financial_model dictionary

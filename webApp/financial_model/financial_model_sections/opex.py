@@ -8,7 +8,7 @@ class OperatingExpenses:
 	lease_costs: np.ndarray
 	total: np.ndarray
 
-class FinancialModelOpex:
+class Opex:
 	"""Handles the calculation of operating expenses in a financial model."""
 	
 	def __init__(self, instance):

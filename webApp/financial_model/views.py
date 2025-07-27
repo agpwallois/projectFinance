@@ -15,6 +15,8 @@ import copy
 from datetime import date
 from decimal import Decimal
 
+from functools import wraps
+
 # Django imports
 from django.http import JsonResponse
 from django.views.generic import ListView
@@ -70,9 +72,6 @@ def timer_decorator(method):
 
 class FinancialModelView(View):
 
-
-
-
 	# settings.py or configuration file
 
 	FINANCIAL_MODEL_SCENARIOS = {
@@ -112,12 +111,11 @@ class FinancialModelView(View):
 
 
 	""" GET METHOD """
-
 	def get(self, request, id: int):
 		"""Handle GET requests for financial model data"""    
 		project = get_object_or_404(Project, id=id)
 		context = {'project_form': ProjectForm(instance=project), 'project': project}
-	
+
 		if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
 			return self._process_get_request(request, project)
 			
@@ -125,24 +123,94 @@ class FinancialModelView(View):
 
 	def _process_get_request(self, request, project: Project) -> JsonResponse:
 		"""Process AJAX requests for financial model data"""
-		"""scenario = request.GET.get('scenario')"""
-		scenario = "lender_base_case"
-		financial_models = self._get_financial_models(project)
-		selected_model = financial_models.get(scenario)
-		logger.error(financial_models.items())
 		
-		if not selected_model:
+		# Get all the financial models
+		financial_models = self._get_financial_models(project)
+
+		# Get the selected financial model
+		scenario = request.GET.get('scenario')
+		selected_fm = financial_models.get(scenario)
+		"""logger.error(financial_models.items())"""
+		
+		if not selected_fm:
 			return JsonResponse({'error': 'Invalid scenario'}, status=400)
 			
-		dashboard_data = self._build_dashboard(selected_model, financial_models)
-		table_sensi_diff = self._compute_differences(dashboard_data['Sensi'])
-		table_sensi_diff_IRR = self._compute_differences(dashboard_data['Sensi_IRR'])
+		return self._build_response_data(selected_fm, financial_models)
 
-		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
+	""" POST METHOD """
+	def post(self, request, id):
+		"""Handle POST requests for financial model updates"""
 
-		displayed_metrics = self._collect_displayed_metrics(financial_models)
+		project = get_object_or_404(Project, id=id)
+		project_form = ProjectForm(request.POST, instance=project)
+
+		if not project_form.is_valid():
+			return JsonResponse({'error': project_form.errors.as_json()}, status=400)
+
+		project_form.save()
+				
+		return self._create_financial_models(request, project, project_form)
 		
-		return self._prepare_json_response(selected_model, financial_models, displayed_metrics, dashboard_data, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
+	@timer_decorator
+	def _create_financial_models(self, request, project, project_form):
+		"""Create or update financial models based on the scenario and project form data."""
+
+		# Check what type of changes to the form occurred
+		non_sensi_changed = self._project_form_changed(project_form)
+		if non_sensi_changed:
+			# Create or update all financial models
+			"""logger.error("About to create all models")"""
+			financial_models = self._create_all_financial_models(project)
+			"""logger.error(f"Finished creating all models, got {len(financial_models)} models")"""
+			
+		else: 
+			# Only sensitivity fields changed - update models selectively
+			financial_models = self._update_selective_financial_models(project, project_form)
+		
+		# Get the selected financial model
+		scenario = request.POST.get('scenario')
+		selected_fm = self._get_selected_fm(scenario, financial_models)
+		
+		# Update project financials
+		self._update_project_financials(project, financial_models)
+		
+		return self._build_response_data(selected_fm, financial_models)
+
+	def _update_selective_financial_models(self, project, project_form):
+		"""Update only the financial models affected by sensitivity changes."""
+		
+		logger.error("Updating")
+		# Get existing models (without creating missing ones since we'll recreate them anyway)
+		financial_models = self._get_financial_models(project)
+		
+		# Define sensitivity field mappings
+		sensitivity_mappings = {
+			'sensi_production': ['lender_sensi_prod'],
+			'sensi_inflation': ['lender_sensi_inf'], 
+			'sensi_opex': ['lender_sensi_opex'],
+			'sensi_production_sponsor': ['sponsor_sensi_prod'],
+			'sensi_inflation_sponsor': ['sponsor_sensi_inf'],
+			'sensi_opex_sponsor': ['sponsor_sensi_opex']
+		}
+		
+		# Track which models need updating
+		models_to_update = set()
+		
+		# Check each sensitivity field for changes
+		for sensi_field, affected_scenarios in sensitivity_mappings.items():
+			if self._project_form_sensi_changed(project_form, sensi_field):
+				logger.info(f"Sensitivity field {sensi_field} changed - updating scenarios: {affected_scenarios}")
+				models_to_update.update(affected_scenarios)
+		
+		# Update only the affected models
+		for scenario_id in models_to_update:
+			if scenario_id in self.FINANCIAL_MODEL_SCENARIOS:
+				scenario_config = self.FINANCIAL_MODEL_SCENARIOS[scenario_id]
+				logger.info(f"Updating financial model for scenario: {scenario_id}")
+				financial_models[scenario_id] = self._create_fm(project, scenario_id, scenario_config)
+		
+		return financial_models
+
 
 	def _get_financial_models(self, project: Project) -> Dict[str, SolarFinancialModel]:
 		"""Retrieve all financial models for a project"""
@@ -155,75 +223,143 @@ class FinancialModelView(View):
 					identifier=scenario_id
 				)
 				financial_models[scenario_id] = model
-				logger.error("Retrieved")
+
 			except SolarFinancialModel.DoesNotExist:
 				# Create missing models on demand
-				logger.error("Missing")
-				model = self._create_model(project, scenario_id, scenario_config)
+				model = self._create_fm(project, scenario_id, scenario_config)
 				financial_models[scenario_id] = model
 				
 		return financial_models
 
-	""" POST METHOD """
+	def _build_response_data(self, selected_fm: SolarFinancialModel, financial_models: Dict[str, SolarFinancialModel]) -> JsonResponse:
+		"""Build the JSON response data for both GET and POST requests"""
+		# Generate dashboard data
+		dashboard_data = self._generate_dashboard_data(selected_fm, financial_models)
 
-	def post(self, request, id):
-		"""Handle POST requests for financial model updates"""
-		project = get_object_or_404(Project, id=id)
-		project_form = ProjectForm(request.POST, instance=project)
+		# Collect displayed metrics
+		displayed_metrics = self._collect_displayed_metrics(financial_models)
 
-		if not project_form.is_valid():
-			return JsonResponse({'error': project_form.errors.as_json()}, status=400)
+		# Extract chart data
+		charts_data = self._extract_charts_data(selected_fm)
+		fs_financing_plan_data = self._extract_fs_data(selected_fm)
 
-		project_form.save()
-		"""scenario = request.POST.get('scenario')"""
-		scenario = "lender_base_case"
-		return self._create_financial_models(request, project, project_form, scenario)
-
+		annual_financial_statements = selected_fm.calc_annual_financial_statements()
 		
 
-	def _create_financial_models(self, request, project, project_form, selected_scenario):
-			"""
-			Create or update financial models based on the scenario and project form data.
-			"""
+		return self._prepare_json_response(
+			selected_fm, 
+			financial_models, 
+			displayed_metrics, 
+			dashboard_data, 
+			charts_data, 
+			fs_financing_plan_data,
+			annual_financial_statements
+		)
 
-			# Create or retrieve models for all scenarios
-			financial_models = {}
-			for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
-				model = self._create_model(project, scenario_id, scenario_config)
-				financial_models[scenario_id] = model
-				logger.error("Created")
+	def _create_all_financial_models(self, project):
+		"""
+		Create financial models for all scenarios.
 
-			logger.error(financial_models.items())
+		Returns:
+		dict: Dictionary mapping scenario IDs to their financial models
+		"""
+		financial_models = {}
 
-			# Retrieve the selected model
-			selected_model = financial_models.get(selected_scenario, financial_models['lender_base_case'])
+		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
+			model = self._create_fm(project, scenario_id, scenario_config)
+			financial_models[scenario_id] = model
+			logger.debug(f"Created financial model for scenario: {scenario_id}")
 
-			# Generate Dashboard Tables
-			dashboard_tables = self._build_dashboard(selected_model, financial_models)
-			table_sensi_diff = self._compute_differences(dashboard_tables['Sensi'])
-			table_sensi_diff_IRR = self._compute_differences(dashboard_tables['Sensi_IRR'])
-
-			# Format Data for Charts
-			charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
-
-			displayed_metrics = self._collect_displayed_metrics(financial_models)
-
+		return financial_models
 
 
-			project.sponsor_irr = financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100
+	def _get_selected_fm(self, scenario, financial_models):
+		"""
+		Retrieve the selected financial model or fall back to default.
 
-			valuation_keys = list(financial_models['sponsor_base_case'].financial_model['dict_results']['Valuation'].keys())
-			valuation_value = financial_models['sponsor_base_case'].financial_model['dict_results']['Valuation'][valuation_keys[1]]
-			rounded_value = 1000
+		Args:
+			financial_models (dict): All available financial models
+			scenario (str): The scenario ID to select
+			
+		Returns:
+			FinancialModel: The selected financial model
+		"""
+		return financial_models.get(scenario, financial_models['lender_base_case'])
 
-			project.valuation = rounded_value
-			project.save()
 
-			# Prepare and return JSON response
-			return self._prepare_json_response(selected_model, financial_models, displayed_metrics, dashboard_tables, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)
+	def _update_project_financials(self, project, financial_models):
+		"""
+		Update project with calculated financial metrics.
+
+		Args:
+			project: The project instance to update
+			financial_models (dict): All financial models
+		"""
+		sponsor_model = financial_models['sponsor_base_case']
+
+		# Update sponsor IRR
+		sponsor_irr = sponsor_model.financial_model['dict_results']['Sensi_IRR']['Equity IRR']
+		project.sponsor_irr = sponsor_irr * 100
+
+		# Update valuation
+		project.valuation = self._calculate_project_valuation(sponsor_model)
+
+		project.save()
 
 
-	def _create_model(self, project: Project, scenario_id: str, scenario_config: dict) -> SolarFinancialModel:
+	def _extract_charts_data(self, selected_fm):
+		"""
+		Extract and format data needed for chart generation.
+
+		Returns:
+			dict: Chart data organized by type
+		"""
+		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_fm.extract_values_for_charts()
+
+		return {
+			'construction': charts_data_constr,
+			'end_of_year': charts_data_eoy,
+			'sum_year': charts_data_sum_year,
+		}
+
+
+	def _extract_fs_data(self, selected_fm):
+		"""
+		Extract and format data needed for chart generation.
+
+		Returns:
+			dict: Chart data organized by type
+		"""
+		fs_financing_plan_data = selected_fm.extract_fs_data()
+
+		return fs_financing_plan_data
+
+
+	def _calculate_project_valuation(self, sponsor_model):
+		"""
+		Calculate and return the project valuation.
+
+		Args:
+			sponsor_model: The sponsor base case financial model
+			
+		Returns:
+			float: Calculated project valuation
+		"""
+		valuation_data = sponsor_model.financial_model['dict_results']['Valuation']
+		valuation_keys = list(valuation_data.keys())
+
+		# Get the second valuation key's value
+		valuation_value = valuation_data[valuation_keys[1]]
+
+		# Apply rounding logic (placeholder for actual calculation)
+		rounded_value = 1000  # TODO: Implement actual valuation calculation
+
+		return rounded_value
+
+
+
+	@timer_decorator
+	def _create_fm(self, project: Project, scenario_id: str, scenario_config: dict) -> SolarFinancialModel:
 		"""
 		Create or update a financial model based on the given scenario configuration.
 		All models except Lender_base_case depend on Lender_base_case.
@@ -260,19 +396,18 @@ class FinancialModelView(View):
 		model.depends_on = depends_on
 		model.save()
 
-				# Apply sensitivities based on the scenario configuration
 		# Apply sensitivities based on the scenario configuration
 		sensi_params = {}
 		for param_name, project_field in scenario_config.get('sensitivities', {}).items():
 			model_type = scenario_config['model_type']
-			logger.error(model_type)
+			"""logger.error(model_type)"""
 			
 			# Determine proper parameter names based on model type
 			if model_type == 'sponsor':
 				# For sponsor models, use _sponsor suffix
 				if param_name == 'production':
 					sensi_params['sensi_production_sponsor'] = getattr(project, project_field)
-					logger.error(sensi_params['sensi_production_sponsor'] )
+					"""logger.error(sensi_params['sensi_production_sponsor'] )"""
 				elif param_name == 'inflation':
 					sensi_params['sensi_inflation_sponsor'] = getattr(project, project_field)
 				elif param_name == 'opex':
@@ -304,53 +439,51 @@ class FinancialModelView(View):
 
 		return model
 
-	""" COMMON GET POST METHODS """
-
 	def _collect_displayed_metrics(self, financial_models):
 
 		displayed_metrics = {
 			"sponsor_IRR": f"{financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100:.1f}%",  # Percentage with 1 decimal
 			"lender_DSCR": f"{financial_models['lender_base_case'].financial_model['dict_results']['Sensi']['Min DSCR']:.2f}x",  # 2 decimals + "x"
 			"total_uses": f"{financial_models['lender_base_case'].financial_model['dict_uses_sources']['Uses']['Total']:,.1f}",  # Thousands separator + 1 decimal
+			"gearing": f"{financial_models['lender_base_case'].financial_model['dict_results']['Debt metrics']['Effective gearing'] * 100:.1f}%",  # Gearing as percentage
+		
 		}
 		sidebar_data = financial_models['sponsor_base_case'].financial_model['dict_sidebar']
+		
 		displayed_metrics.update(sidebar_data)
-
+		
 		return displayed_metrics
-
 
 	def _prepare_json_response(
 		self, 
-		model: SolarFinancialModel, 
+		selected_fm: SolarFinancialModel, 
 		financial_models: Dict,
 		displayed_metrics: Dict, 
-		dashboard_tables: Dict, 
-		table_sensi_diff: Dict,
-		table_sensi_diff_IRR: Dict,
-		charts_data_constr: Dict, 
-		charts_data_eoy: Dict,
-		charts_data_sum_year: Dict, 
+		dashboard_data: Dict, 
+		charts_data: Dict, 
+		fs_financing_plan_data:Dict,
+		annual_financial_statements: Dict,
 
 	) -> JsonResponse:
 		"""Prepare JSON response with all financial model data"""
 		try:
 			return JsonResponse({
-				"df": model.financial_model,
-				"tables": dashboard_tables,
-				"table_sensi_diff": table_sensi_diff,
-				"table_sensi_diff_IRR": table_sensi_diff_IRR, 
-				"charts_data_constr": charts_data_constr,
-				"df_annual": charts_data_sum_year,
-				"df_eoy": charts_data_eoy,
-				
+				"df": selected_fm.financial_model,
+				"tables": dashboard_data['tables'],
+				"table_sensi_diff": dashboard_data['sensi_diff'],
+				"table_sensi_diff_IRR": dashboard_data['sensi_diff_irr'], 
+				"charts_data_constr": charts_data['construction'],
+				"df_annual": charts_data['sum_year'],
+				"df_eoy": charts_data['end_of_year'],
+				"fs_financing_plan_data": fs_financing_plan_data,
+
+				"annual_financial_statements": annual_financial_statements,
+			
 				"sidebar_data": displayed_metrics, 
 			}, safe=False)
 		except Exception as e:
 			"""sidebar_data": model.financial_model['dict_sidebar'],"""
 			return self._handle_exception(e)
-
-
-
 
 	def _handle_exception(self, e: Exception) -> JsonResponse:
 		traceback_info = traceback.extract_tb(e.__traceback__)
@@ -362,9 +495,26 @@ class FinancialModelView(View):
 		}
 		return JsonResponse(error_data, safe=False, status=400)
 
+
+	def _generate_dashboard_data(self, selected_fm, financial_models):
+		"""
+		Generate all dashboard tables and their difference calculations.
+
+		Returns:
+		dict: Contains dashboard tables and computed differences
+		"""
+		dashboard_data = self._build_dashboard(selected_fm, financial_models)
+
+		return {
+			'tables': dashboard_data,
+			'sensi_diff': self._compute_differences(dashboard_data['Sensi']),
+			'sensi_diff_irr': self._compute_differences(dashboard_data['Sensi_IRR'])
+		}
+
+
 	def _build_dashboard(
 		self, 
-		selected_model: SolarFinancialModel, 
+		selected_fm: SolarFinancialModel, 
 		financial_models: Dict[str, SolarFinancialModel]
 	) -> Dict[str, Any]:
 		"""Build dashboard data from financial models"""
@@ -383,15 +533,16 @@ class FinancialModelView(View):
 			if key.startswith("sponsor")
 		}
 		
-		data = selected_model.financial_model
+		data = selected_fm.financial_model
 
-		return self._build_dashboard_tables(
+		return self._build_dashboard_data(
 			data['dict_uses_sources'],
 			data['dict_results'],
 			table_sensi, 
 			table_sensi_IRR,
 		)
 
+	"""@timer_decorator"""
 	def _compute_differences(self, table_sensi):
 		# Check if the table has a header row (key '')
 		headers = table_sensi.get('', None)
@@ -404,7 +555,7 @@ class FinancialModelView(View):
 		
 		# Check if the DataFrame is empty or has no valid columns
 		if df.empty:
-			print("Warning: DataFrame is empty.")
+			logger.error("Warning: DataFrame is empty.")
 			return table_sensi
 		
 		# Set column names if the header row exists and if it matches the number of columns
@@ -412,11 +563,11 @@ class FinancialModelView(View):
 			if isinstance(headers, list) and len(headers) == len(df.columns):
 				df.columns = headers
 			else:
-				print("Warning: Header length mismatch or invalid header format.")
+				logger.error("Warning: Header length mismatch or invalid header format.")
 		
 		# Check that we have enough columns (at least one numeric column and the Audit column)
 		if df.shape[1] < 2:
-			print("Warning: Input dictionary has insufficient columns.")
+			logger.error("Warning: Input dictionary has insufficient columns.")
 			return table_sensi
 
 		# Function to convert formatted strings to numeric values
@@ -496,10 +647,9 @@ class FinancialModelView(View):
 			else:
 				return obj
 
-		# Return the cleaned dictionary, now fully JSON serializable
 		return replace_nan(result)
 
-	def _build_dashboard_tables(
+	def _build_dashboard_data(
 		self, 
 		dict_uses_sources: Dict, 
 		dict_results: Dict, 
@@ -510,7 +660,7 @@ class FinancialModelView(View):
 		output_formats = {
 			"Effective gearing": "{:.2%}",
 			"Average DSCR": "{:.2f}x",
-			"Debt IRR": "{:.2%}",
+			"Senior _create_fm": "{:.2%}",
 			"Share capital IRR": "{:.2%}",
 			"Shareholder loan IRR": "{:.2%}",
 			"Equity IRR": "{:.2%}",
@@ -537,21 +687,22 @@ class FinancialModelView(View):
 		Return true if the user changed any assumptions of the project form, except for sensitivities assumptions.
 		This is used to determine if all models need to be regenerated.
 		"""
-		# Define fields that are considered sensitivity parameters
+		# Define fields that are considered sensitivity parameters à corriger: valuation et sponsor_IRR
 		excluded_fields = {
 			'sensi_production', 'sensi_inflation', 'sensi_opex', 
-			'sensi_production_sponsor', 'sensi_inflation_sponsor', 'sensi_opex_sponsor'
+			'sensi_production_sponsor', 'sensi_inflation_sponsor', 'sensi_opex_sponsor', 'sponsor_irr', 'valuation', 
 		}
 		
 		# Get all changed fields excluding sensitivity parameters
 		changed_fields = set(project_form.changed_data) - excluded_fields
 		
-		# Log the non-sensitivity fields that changed
-		logger.error(f"Changed non-sensitivity fields: {changed_fields}")
+		"""logger.error(f"Changed non-sensitivity fields: {changed_fields}")"""
+
+
 		
 		# Return True if any non-sensitivity field changed
 		return bool(changed_fields)
-
+	
 	def _project_form_sensi_changed(self, project_form, sensitivity_type):
 		"""
 		Check if a specific sensitivity parameter changed.
@@ -561,130 +712,11 @@ class FinancialModelView(View):
 		changed_fields = set(project_form.changed_data)
 		
 		# Check if the sensitivity parameter is in the changed fields
-		logger.error(f"Checking if sensitivity {sensitivity_type} has changed")
+		"""logger.error(f"Checking if sensitivity {sensitivity_type} has changed")"""
 		result = sensitivity_type in changed_fields
-		logger.error(f"Sensitivity {sensitivity_type} changed: {result}")
 		
 		return result
 
 
 
 
-
-
-	"""def _create_financial_models(self, request, project, project_form, scenario):
-		# First create lender base model as it's required for others
-		base_lender_model = self._create_model(project, "lender_case")
-		
-		# Now create sponsor base model which depends on lender model
-		base_sponsor_model = self._create_model(project, "sponsor_case")
-		
-		# Initialize financial models dictionary with base cases
-		financial_models = {
-			'Lender_base_case': base_lender_model,
-			'Sponsor_base_case': base_sponsor_model
-		}
-		
-		# Create all sensitivity models
-		for scenario_key, model_type in self.SCENARIO_MAP.items():
-			# Skip base cases which we've already created
-			if model_type in ["lender_case", "sponsor_case"]:
-				continue
-			model = self._create_model(project, model_type)
-			financial_models[scenario_key] = model
-
-		logger.error(financial_models.items())
-
-		# Get selected model
-		selected_model = financial_models.get(scenario, base_lender_model)
-		
-		# Generate Dashboard Tables
-		dashboard_tables = self._build_dashboard(selected_model, financial_models)
-		table_sensi_diff = self._compute_differences(dashboard_tables['Sensi'])
-		table_sensi_diff_IRR = self._compute_differences(dashboard_tables['Sensi_IRR'])
-	
-
-		# Format Data for Charts
-		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_model.extract_values_for_charts()
-		
-		# Prepare and return JSON response
-		return self._prepare_json_response(selected_model, dashboard_tables, table_sensi_diff, table_sensi_diff_IRR, charts_data_constr, charts_data_eoy, charts_data_sum_year)"""
-
-
-
-				
-	"""def _create_model(self, project: Project, model_type: str) -> SolarFinancialModel:
-		# Create or update a financial model of the specified type
-		# First, ensure lender base case exists as it's needed for dependency
-		if model_type != "lender_case":
-			lender_base, _ = SolarFinancialModel.objects.get_or_create(
-				project=project,
-				identifier="lender_case",
-				defaults={'financial_model': {}}
-			)
-			if not lender_base.financial_model:
-				lender_base.create_financial_model(
-					model_type='lender_case',
-					debt_sizing_sculpting=True
-				)
-		
-		# Now create or get the requested model
-		model, created = SolarFinancialModel.objects.get_or_create(
-			project=project,
-			identifier=model_type,
-			defaults={'financial_model': {}}
-		)
-		
-		# Determine model parameters
-		is_lender_case = model_type.startswith('lender_case') or model_type.startswith('sensi_') and not model_type.endswith('_sponsor')
-		is_sponsor_case = model_type.startswith('sponsor_case') or model_type.endswith('_sponsor')
-		is_base_case = model_type in ['lender_case', 'sponsor_case']
-		
-		# Set sensitivity parameters
-		sensi_params = {}
-		if not is_base_case:
-			# Handle sponsor case sensitivities differently
-			if is_sponsor_case:
-				if 'sensi_production' in model_type:
-					sensi_params['sensi_production'] = project.sensi_production_sponsor
-				elif 'sensi_inflation' in model_type:
-					sensi_params['sensi_inflation'] = project.sensi_inflation_sponsor
-				elif 'sensi_opex' in model_type:
-					sensi_params['sensi_opex'] = project.sensi_opex_sponsor
-			else:
-				# Handle lender case sensitivities
-				if 'sensi_production' in model_type:
-					sensi_params['sensi_production'] = project.sensi_production
-				elif 'sensi_inflation' in model_type:
-					sensi_params['sensi_inflation'] = project.sensi_inflation
-				elif 'sensi_opex' in model_type:
-					sensi_params['sensi_opex'] = project.sensi_opex
-		
-		# Set dependency for non-lender base cases
-		if model_type != "lender_case":
-			lender_base = SolarFinancialModel.objects.get(project=project, identifier="lender_case")
-			model.depends_on = lender_base
-			model.save()
-		
-		# Create the financial model
-		base_model_type = 'lender_case' if is_lender_case else 'sponsor_case'
-		model.create_financial_model(
-			model_type=base_model_type,
-			debt_sizing_sculpting=(is_lender_case),
-			**sensi_params
-		)
-		
-		return model"""
-
-
-	"""	SCENARIO_MAP = {
-		'Lender_base_case': "Lender Base Case",
-		'Lender_sensi_prod': "sensi_production",
-		'Lender_sensi_inf': "sensi_inflation", 
-		'Lender_sensi_opex': "sensi_opex",
-		'Sponsor_base_case': "sponsor",
-		'Sponsor_sensi_prod': "sensi_production_sponsor",
-		'Sponsor_sensi_inf': "sensi_inflation_sponsor",
-		'Sponsor_sensi_opex': "sensi_opex_sponsor",
-
-		}"""

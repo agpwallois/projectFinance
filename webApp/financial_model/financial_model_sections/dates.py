@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 logger = logging.getLogger(__name__)
 
 
-class FinancialModelDates:
+class Dates:
 	"""
 	A class responsible for initializing and managing the date ranges
 	used in a financial model. It calculates start/end dates for both
@@ -19,7 +19,7 @@ class FinancialModelDates:
 
 	def __init__(self, instance: Any) -> None:
 		"""
-		Initialize the FinancialModelDates with the main project instance.
+		Initialize the Dates with the main project instance.
 
 		Args:
 			instance: Main object containing project data, periods, and

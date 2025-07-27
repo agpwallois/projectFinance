@@ -88,22 +88,25 @@ for (const key in dict) {
 
         // Adding the values from the JSON data array in separate columns
         const valuesArray = subValue[nestedKey];
-        for (let i = 0; i < valuesArray.length; i++) {
-          const value = valuesArray[i];
-          let formattedValue;
+        // Add null/undefined check here
+        if (valuesArray && Array.isArray(valuesArray)) {
+          for (let i = 0; i < valuesArray.length; i++) {
+            const value = valuesArray[i];
+            let formattedValue;
 
-          if (isDate(value)) {
-            // Format as date if it's a date object
-            formattedValue = formatDate(value);
-          } else if (columnFormatting[subKey]) {
-            // Use specified formatting function if available
-            formattedValue = columnFormatting[subKey](value);
-          } else {
-            // Default to formatting as integer
-            formattedValue = formatAsInt(value);
+            if (isDate(value)) {
+              // Format as date if it's a date object
+              formattedValue = formatDate(value);
+            } else if (columnFormatting[subKey]) {
+              // Use specified formatting function if available
+              formattedValue = columnFormatting[subKey](value);
+            } else {
+              // Default to formatting as integer
+              formattedValue = formatAsFloat(value);
+            }
+
+            tableContent += "<td>" + formattedValue + "</td>";
           }
-
-          tableContent += "<td>" + formattedValue + "</td>";
         }
 
         tableContent += "</tr>";
@@ -122,22 +125,25 @@ for (const key in dict) {
 
       // Adding the values from the JSON data array in separate columns
       const valuesArray = subValue;
-      for (let i = 0; i < valuesArray.length; i++) {
-        const value = valuesArray[i];
-        let formattedValue;
+      // Add null/undefined check here
+      if (valuesArray && Array.isArray(valuesArray)) {
+        for (let i = 0; i < valuesArray.length; i++) {
+          const value = valuesArray[i];
+          let formattedValue;
 
-        if (isDate(value)) {
-          // Format as date if it's a date object
-          formattedValue = formatDate(value);
-        } else if (columnFormatting[subKey]) {
-          // Use specified formatting function if available
-          formattedValue = columnFormatting[subKey](value);
-        } else {
-          // Default to formatting as integer
-          formattedValue = formatAsInt(value);
+          if (isDate(value)) {
+            // Format as date if it's a date object
+            formattedValue = formatDate(value);
+          } else if (columnFormatting[subKey]) {
+            // Use specified formatting function if available
+            formattedValue = columnFormatting[subKey](value);
+          } else {
+            // Default to formatting as integer
+            formattedValue = formatAsFloat(value);
+          }
+
+          tableContent += "<td>" + formattedValue + "</td>";
         }
-
-        tableContent += "<td>" + formattedValue + "</td>";
       }
 
       tableContent += "</tr>";

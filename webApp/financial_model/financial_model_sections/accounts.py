@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import Dict, Any
-import numpy as np
-import pandas as pd
 from numpy.typing import NDArray
+import numpy as np
+
 
 @dataclass
 class AccountBalances:
@@ -10,7 +9,7 @@ class AccountBalances:
 	balance_eop: NDArray
 	balance_bop: NDArray
 
-class FinancialModelAccounts:
+class Accounts:
 	"""
 	Manages financial model accounts including distributions, SHL calculations,
 	and share capital management.
@@ -23,187 +22,232 @@ class FinancialModelAccounts:
 		
 	def initialize(self) -> None:
 		"""Initialize all account calculations and balances."""
-		self._calculate_distributions()
-		self._initialize_operating_account()
+		# Initialize arrays
+		self._initialize_arrays()
 		
-		# Perform iterative calculations
-		for i in range(self.instance.iteration):
-			self._calculate_SHL_interests(i)
-			self._distribute_cash()
+		# Perform iterative calculations if needed
+		self._calculate_period_by_period()
 			
-	def _calculate_distributions(self) -> None:
-		"""Calculate initial cash distributions and transfers."""
-		distr = self.model['distr_account']
+	def _initialize_arrays(self) -> None:
+		"""Initialize all arrays with proper dimensions."""
+		n_periods = len(self.model['flags']['operations'])
 		
-		# Calculate cash available for distribution
-		distr['cash_available_for_distribution'] = self._calculate_available_cash()
+	def _calculate_period_by_period(self) -> None:
+		"""Calculate all accounts period by period in the correct order."""
+		n_periods = len(self.model['flags']['operations'])
 		
-		# Calculate transfers to distribution account
-		distr['transfers_distribution_account'] = distr['cash_available_for_distribution'].clip(lower=0)
-		
-	def _calculate_available_cash(self) -> NDArray:
-		"""Calculate total available cash considering various factors."""
-		return (
-			self.model['CFS']['CFADS']
-			- self.model['senior_debt']['DS_effective']
-			- self.model['DSRA']['dsra_mov']
-			- self.instance.project.cash_min * np.array(self.model['flags']['operations'])
-		)
-		
-	def _initialize_operating_account(self) -> None:
-		"""Initialize the operating account balance."""
-		op_account = self.model['op_account']
-		distr = self.model['distr_account']
-		
-		# Calculate initial balance
-		op_account['balance_eop'] = (
-			distr['cash_available_for_distribution'] -
-			distr['transfers_distribution_account']
-		)
-		
-		# Roll the balance for initial funding
-		op_account['balance_eop'] = np.roll(op_account['balance_eop'], 1)
-		
-	def _calculate_SHL_interests(self, iteration: int) -> None:
-		"""
-		Calculate SHL (Shareholder Loan) interests for operations and construction.
-		
-		Args:
-			iteration: Current iteration number
-		"""
+		for i in range(n_periods):
+			# Step 1: Calculate beginning balances
+			self._set_beginning_balances(i)
+			
+			# Step 2: Calculate SHL interests for this period
+			self._calculate_period_SHL_interests(i)
+			
+			# Step 3: Calculate cash available for distribution
+			self._calculate_period_cash_available(i)
+			
+			# Step 4: Process transfers to distribution account
+			self._process_period_transfers(i)
+			
+			# Step 5: Process distributions (dividends, SHL payments)
+			self._process_period_distributions(i)
+			
+			# Step 6: Process share capital redemption (if liquidation)
+			self._process_period_share_capital(i)
+			
+			# Step 7: Update ending balances
+			self._update_period_ending_balances(i)
+			
+	def _set_beginning_balances(self, i: int) -> None:
+		"""Set beginning balances for all accounts."""
+		if i == 0:
+			# First period - all balances start at zero unless there's initial funding
+			self.model['op_account']['balance_bop'][i] = 0
+			self.model['distr_account']['balance_bop'][i] = 0
+			self.model['SHL']['balance_bop'][i] = 0
+			self.model['share_capital']['balance_bop'][i] = 0
+			self.model['IS']['retained_earnings_bop'][i] = 0
+		else:
+			# Subsequent periods - BoP equals previous EoP
+			self.model['op_account']['balance_bop'][i] = self.model['op_account']['balance_eop'][i-1]
+			self.model['distr_account']['balance_bop'][i] = self.model['distr_account']['balance_eop'][i-1]
+			self.model['SHL']['balance_bop'][i] = self.model['SHL']['balance_eop'][i-1]
+			self.model['share_capital']['balance_bop'][i] = self.model['share_capital']['balance_eop'][i-1]
+			self.model['IS']['retained_earnings_bop'][i] = self.model['IS']['retained_earnings_eop'][i-1]
+			
+	def _calculate_period_SHL_interests(self, i: int) -> None:
+		"""Calculate SHL interests for the period."""
 		shl = self.model['SHL']
-		days = self.model['days']['model']
+		days = self.model['days']['model'][i]
 		flags = self.model['flags']
 		
-		base_calculation = np.array(shl['balance_bop']) * self.instance.SHL_margin * days / self.days_per_year
+		# Interest calculation based on beginning balance
+		interest_amount = (
+			shl['balance_bop'][i] * 
+			self.instance.SHL_margin * 
+			days / self.days_per_year
+		)
 		
-		shl['interests_operations'] = base_calculation * flags['operations']
-		shl['interests_construction'] = base_calculation * flags['construction']
+		# Split between operations and construction
+		shl['interests_operations'][i] = interest_amount * flags['operations'][i]
+		shl['interests_construction'][i] = interest_amount * flags['construction'][i]
 		
-	def _distribute_cash(self) -> None:
-		"""Handle cash distribution logic including SHL, dividends, and share capital."""
-		self._process_SHL_payments()
-		self._process_dividend_payments()
-		self._update_account_balances()
-		self._process_share_capital()
+	def _calculate_period_cash_available(self, i: int) -> None:
+		"""Calculate cash available for distribution in this period."""
+		distr = self.model['distr_account']
+		op_account = self.model['op_account']
 		
-	def _process_SHL_payments(self) -> None:
-		"""Process SHL interest payments and repayments."""
+		# Cash available = CFADS - Senior Debt Service - DSRA movements - Min Cash
+		op_account['dsra_mov'][i] = self.model['DSRA']['dsra_mov'][i]
+		op_account['senior_debt_interests_paid'][i]  = self.model['senior_debt']['interests_operations'][i]
+		op_account['senior_debt_repayments'][i] = self.model['senior_debt']['repayments'][i]
+
+		cash_available = (
+			self.model['op_account']['CFADS'][i]
+			- op_account['senior_debt_interests_paid'][i]
+			- op_account['senior_debt_repayments'][i]
+			- self.model['DSRA']['dsra_mov'][i]
+			- self.instance.project.cash_min * self.model['flags']['operations'][i]
+		)
+		
+		distr['cash_available_for_distribution'][i] = cash_available
+		
+	def _process_period_transfers(self, i: int) -> None:
+		"""Process transfers from operating account to distribution account."""
+		distr = self.model['distr_account']
+		op_account = self.model['op_account']
+		
+		# Calculate how much can be transferred
+		# This is the positive cash available plus any existing operating account balance
+		available_in_op_account = (
+			op_account['balance_bop'][i] + 
+			max(distr['cash_available_for_distribution'][i], 0)
+		)
+		
+		# Transfer to distribution account (keeping minimum cash in operating account)
+		min_cash_requirement = self.instance.project.cash_min * self.model['flags']['operations'][i]
+		
+		transfer_amount = max(
+			available_in_op_account - min_cash_requirement,
+			0
+		)
+		
+		distr['transfers_distribution_account'][i] = transfer_amount
+		
+	def _process_period_distributions(self, i: int) -> None:
+		"""Process distributions: SHL interest, dividends, SHL repayments."""
 		distr = self.model['distr_account']
 		shl = self.model['SHL']
-		
-		# Calculate and process SHL interest payments
-		shl['interests_paid'] = np.minimum(
-			distr['transfers_distribution_account'],
-			shl['interests_operations']
-		)
-		
-		# Calculate cash available for dividends
-		distr['cash_available_for_dividends'] = (
-			distr['transfers_distribution_account'] - 
-			shl['interests_paid']
-		)
-		
-	def _process_dividend_payments(self) -> None:
-		"""Process dividend payments and calculate related metrics."""
-		distr = self.model['distr_account']
-		
-		# Calculate and process dividend payments
-		distr['dividends_paid'] = np.minimum(
-			distr['cash_available_for_dividends'],
-			self.model['IS']['distributable_profit']
-		)
-		
-		# Calculate cash available for SHL repayments
-		distr['cash_available_for_SHL_repayments'] = (
-			distr['cash_available_for_dividends'] - 
-			distr['dividends_paid']
-		)
-		
-		# Process SHL repayments
-		self.model['SHL']['repayments'] = np.minimum(
-			self.model['SHL']['balance_bop'],
-			distr['cash_available_for_SHL_repayments']
-		)
-		
-		# Calculate remaining cash for redemption
-		distr['cash_available_for_redemption'] = (
-			distr['cash_available_for_SHL_repayments'] - 
-			self.model['SHL']['repayments']
-		)
-		
-	def _update_account_balances(self) -> None:
-		"""Update all account balances including distribution account and retained earnings."""
-		self._update_distribution_account()
-		self._update_SHL_balances()
-		self._update_retained_earnings()
-		
-	def _update_distribution_account(self) -> None:
-		"""Update distribution account balances."""
-		distr = self.model['distr_account']
-		shl = self.model['SHL']
-		
-		period_movement = (
-			distr['transfers_distribution_account']
-			- shl['interests_paid']
-			- distr['dividends_paid']
-			- shl['repayments']
-		)
-		
-		distr['balance_eop'] = period_movement.cumsum()
-		distr['balance_bop'] = distr['balance_eop'] - period_movement
-		
-	def _update_SHL_balances(self) -> None:
-		"""Update SHL (Shareholder Loan) balances."""
-		shl = self.model['SHL']
-		
-		period_movement = (
-			self.model['injections']['SHL']
-			+ shl['interests_construction']
-			- shl['repayments']
-		)
-		
-		shl['balance_eop'] = period_movement.cumsum()
-		shl['balance_bop'] = shl['balance_eop'] - period_movement
-		
-	def _update_retained_earnings(self) -> None:
-		"""Update retained earnings and distributable profit."""
 		IS = self.model['IS']
 		
-		period_movement = (
-			IS['net_income']
-			- self.model['distr_account']['dividends_paid']
+		# Available cash in distribution account
+		available_cash = distr['balance_bop'][i] + distr['transfers_distribution_account'][i]
+		
+		# Step 1: Pay SHL interest first (senior to dividends)
+		shl_interest_due = shl['interests_operations'][i]
+		shl['interests_paid'][i] = min(available_cash, shl_interest_due)
+		
+		# Capitalize unpaid interest into SHL balance
+		unpaid_interest = shl_interest_due - shl['interests_paid'][i]
+		shl['interests_capitalized'] = getattr(shl, 'interests_capitalized', np.zeros(len(shl['balance_bop'])))
+		shl['interests_capitalized'][i] = unpaid_interest
+		
+		available_cash -= shl['interests_paid'][i]
+		
+		# Step 2: Calculate distributable profit for dividends
+		IS['distributable_profit'][i] = max(
+			IS['retained_earnings_bop'][i] + IS['net_income'][i],
+			0
 		)
 		
-		IS['retained_earnings_eop'] = period_movement.cumsum()
-		IS['retained_earnings_bop'] = IS['retained_earnings_eop'] - period_movement
-		IS['distributable_profit'] = np.clip(
-			IS['retained_earnings_bop'] + IS['net_income'],
-			0,
-			None
+		# Step 3: Pay dividends (limited by both cash and distributable profit)
+		distr['cash_available_for_dividends'][i] = available_cash
+		distr['dividends_paid'][i] = min(
+			available_cash,
+			IS['distributable_profit'][i]
 		)
+		available_cash -= distr['dividends_paid'][i]
 		
-	def _process_share_capital(self) -> None:
-		"""Process share capital repayments and update balances."""
+		# Step 4: SHL repayments with remaining cash
+		distr['cash_available_for_SHL_repayments'][i] = available_cash
+		shl['repayments'][i] = min(
+			available_cash,
+			shl['balance_bop'][i]  # Can't repay more than outstanding
+		)
+		available_cash -= shl['repayments'][i]
+		
+		# Step 5: Any remaining cash stays in distribution account
+		distr['cash_available_for_redemption'][i] = available_cash
+			
+	def _process_period_share_capital(self, i: int) -> None:
+		"""Process share capital redemption at liquidation."""
 		share_capital = self.model['share_capital']
 		distr = self.model['distr_account']
 		
-		# Calculate repayments
-		share_capital['repayments'] = (
-			distr['balance_bop'] *
-			self.model['flags']['liquidation_end']
+		# Only process if this is a liquidation period
+		if self.model['flags']['liquidation_end'][i] > 0:
+			# Calculate available cash in distribution account after all other payments
+			available_for_redemption = distr['cash_available_for_redemption'][i]
+			
+			# Redeem share capital up to available cash and outstanding balance
+			share_capital['repayments'][i] = min(
+				available_for_redemption,
+				share_capital['balance_bop'][i]
+			)
+		else:
+			share_capital['repayments'][i] = 0
+			
+	def _update_period_ending_balances(self, i: int) -> None:
+		"""Update all ending balances for the period."""
+		# Operating Account
+		op_account = self.model['op_account']
+		distr = self.model['distr_account']
+		
+		op_account['cash_available_for_distribution'][i] = distr['cash_available_for_distribution'][i]
+		op_account['transfers_distribution_account'][i] = distr['transfers_distribution_account'][i]
+
+		op_account['balance_eop'][i] = (
+			op_account['balance_bop'][i]
+			+ op_account['cash_available_for_distribution'][i]
+			- op_account['transfers_distribution_account'][i]
+		)
+
+		distr['SHL_interests_paid'][i] = self.model['SHL']['interests_paid'][i]
+		distr['SHL_repayments'][i] = self.model['SHL']['repayments'][i]
+		distr['share_capital_repayments'][i] = self.model['share_capital']['repayments'][i]
+		
+		# Distribution Account
+		distr['balance_eop'][i] = (
+			distr['balance_bop'][i]
+			+ distr['transfers_distribution_account'][i]
+			- distr['SHL_interests_paid'][i]
+			- distr['dividends_paid'][i]
+			- distr['SHL_repayments'][i]
+			- distr['share_capital_repayments'][i]
 		)
 		
-		# Update distribution account balance
-		distr['balance_eop'] -= share_capital['repayments']
-		
-		# Update share capital balances
-		period_movement = (
-			self.model['injections']['share_capital']
-			- share_capital['repayments']
+		# SHL Balance
+		shl = self.model['SHL']
+		shl['balance_eop'][i] = (
+			shl['balance_bop'][i]
+			+ self.model['sources']['SHL'][i]
+			+ shl['interests_construction'][i]  # Capitalized during construction
+			+ shl['interests_capitalized'][i]  # Capitalized during operations
+			- shl['repayments'][i]
 		)
 		
-		share_capital['balance_eop'] = period_movement.cumsum()
-		share_capital['balance_bop'] = (
-			share_capital['balance_eop'] - period_movement
+		# Share Capital Balance
+		share_capital = self.model['share_capital']
+		share_capital['balance_eop'][i] = (
+			share_capital['balance_bop'][i]
+			+ self.model['sources']['share_capital'][i]
+			- share_capital['repayments'][i]
+		)
+		
+		# Retained Earnings
+		IS = self.model['IS']
+		IS['retained_earnings_eop'][i] = (
+			IS['retained_earnings_bop'][i]
+			+ IS['net_income'][i]
+			- distr['dividends_paid'][i]
 		)

@@ -1,160 +1,45 @@
 <!-- Rewritten dashboard.html -->
-<div class="dashboard-container">
-    <!-- Project Overview Section -->
-    <div class="box-wrapper project-overview-wrapper" id="overview-wrapper">
-        <h2>Project Overview</h2>
-        <div class="overview-metrics-row">
-            <!-- Total Investment Box -->
-            <div class="overview-metrics-column">
-                <div class="overview-box">
-                    <h3>Capacity</h3>
-                    <div class="metric-value">{{ project.panels_capacity }} MW</div>
-                </div>
-            </div>
-            
-            <!-- Equity IRR Box -->
-            <div class="overview-metrics-column">
-                <div class="overview-box">
-                    <h3>Total Investment</h3>
-                    <div class="metric-value" id="total_uses"></div>
-                    <div class="metric-value" id="metric-status">XX / MW</div>
-                </div>
-            </div>
-            
-            <!-- Min DSCR Box -->
-            <div class="overview-metrics-column">
-                <div class="overview-box">
-                    <h3>Equity IRR</h3>
-                    <div class="metric-value" id="sponsor_IRR"></div>
-                </div>
-            </div>
-            
-            <!-- Status Box -->
-            <div class="overview-metrics-column">
-                <div class="overview-box">
-                    <h3>Min DSCR</h3>
-                    <div class="metric-value" id="lender_DSCR"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Scenario Analysis Section -->
+    <!-- Financial Metrics Section -->
     <div class="box-wrapper">
-        <div class="box" id="summary-sensitivities">
-            <h2>Scenario Analysis</h2>
-            <!-- Navigation tabs for Sponsor Case and Lender Case -->
-            <div class="scenario-nav-container">
-                <nav>
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item">
-                            <a class="nav-link-radio active" href="#sponsor-case-tab" data-bs-toggle="tab">Sponsor Case</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-radio" href="#lender-case-tab" data-bs-toggle="tab">Lender Case</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+         <h2>Key Metrics</h2>
+        <!-- Three columns side by side - Will be hidden in Development mode -->
+        <div class="metrics-row financing-mode-only">
+            <div class="metrics-column">
+                <div class="box-wrapper">
+                    <div class="box" id="summary-IRR">
+                        <h3>Project and Shareholder Return</h3>
+                        <h4>Project IRR</h4>
+                        <table class="table-sum">
+                            <tbody id="summary_project"></tbody>
+                        </table>
 
-            <div class="tab-content">
-                <!-- Sponsor Case Tab Content -->
-                <div class="tab-pane fade show active" id="sponsor-case-tab">
-                    <div class="summary-container">
-                        <div class="summary-scenario-left">
-                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input-sponsor">
-                                <thead>
-                                    <tr>
-                                        <th>Scenario</th>
-                                        <th>Sensitivity</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Base Case</td>
-                                        <td>-</td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input-sensi-sponsor">
-                                <tbody>
-                                    <tr>
-                                        <td>Production</td>
-                                        <td>{{ project_form.sensi_production_sponsor }}</td>
-                                        <td><div id="sponsor_sensi_production"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Inflation</td>
-                                        <td>{{ project_form.sensi_inflation_sponsor }}</td>
-                                        <td><div id="sponsor_sensi_inflation"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Operating costs</td>
-                                        <td>{{ project_form.sensi_opex_sponsor }}</td>
-                                        <td><div id="sponsor_sensi_opex"></div></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="summary-scenario-right">
-                            <table class="dashboard-sensi-table">
-                                <tbody id="sponsor_summary_sensi"></tbody>
-                            </table>
-                        </div>
+                        <h4>Equity IRR</h4>
+                        <table class="table-sum">
+                            <tbody id="summary_equity"></tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Lender Case Tab Content -->
-                <div class="tab-pane fade" id="lender-case-tab">
-                    <div class="summary-container">
-                        <div class="summary-scenario-left">
-                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input">
-                                <thead>
-                                    <tr>
-                                        <th>Scenario</th>
-                                        <th>Sensitivity</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Base Case</td>
-                                        <td>-</td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <div class="metrics-column">
+                <div class="box-wrapper">
+                    <div class="box" id="summary-debt">
+                        <h3>Senior Debt Metrics</h3>
+                        <table class="table-sum">
+                            <tbody id="summary_debt"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input-sensi">
-                                <tbody>
-                                    <tr>
-                                        <td>Production</td>
-                                        <td>{{ project_form.sensi_production }}</td>
-                                        <td><div id="sensi_production"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Inflation</td>
-                                        <td>{{ project_form.sensi_inflation }}</td>
-                                        <td><div id="sensi_inflation"></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Operating costs</td>
-                                        <td>{{ project_form.sensi_opex }}</td>
-                                        <td><div id="sensi_opex"></div></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="summary-scenario-right">
-                            <table class="dashboard-sensi-table">
-                                <tbody id="summary_sensi"></tbody>
-                            </table>
-                        </div>
+            <div class="metrics-column">
+                <div class="box-wrapper">
+                    <div class="box" id="summary-audit">
+                        <h3>Audit and Control</h3>
+                        <table class="table-sum">
+                            <tbody id="summary_audit"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -180,50 +65,12 @@
         </div>
     </div>
 
-    <!-- Financial Metrics Section -->
-    <div class="box-wrapper">
-        <!-- Three columns side by side - Will be hidden in Development mode -->
-        <div class="metrics-row financing-mode-only">
-            <div class="metrics-column">
-                <div class="box-wrapper">
-                    <div class="box" id="summary-IRR">
-                        <h2>Project and Shareholder Return</h2>
-                        <h4>Project IRR</h4>
-                        <table class="table-sum">
-                            <tbody id="summary_project"></tbody>
-                        </table>
 
-                        <h4>Equity IRR</h4>
-                        <table class="table-sum">
-                            <tbody id="summary_equity"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="box-wrapper">
+    <h2>Financial Statements</h2>
+                    {% include 'financial_model/annual_financial_statements.html' %}
 
-            <div class="metrics-column">
-                <div class="box-wrapper">
-                    <div class="box" id="summary-debt">
-                        <h2>Senior Debt Metrics</h2>
-                        <table class="table-sum">
-                            <tbody id="summary_debt"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="metrics-column">
-                <div class="box-wrapper">
-                    <div class="box" id="summary-audit">
-                        <h2>Audit and Control</h2>
-                        <table class="table-sum">
-                            <tbody id="summary_audit"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 
     <!-- Operational Tabs Section - Only shown when project status is "Operational" -->
     {% if project.project_status == "Operational" %}
@@ -287,5 +134,14 @@
         <div class="box" id="nav-summary-charts">
             {% block jquery %}{% include 'financial_model/charts.html' %}{% endblock %}
         </div>
+
+
+<div class="box-wrapper">
+<h2>Calculation</h2>
+        {% include 'financial_model/calculation.html' %}
+
+
+        </div>
     </div>
-</div>
+
+

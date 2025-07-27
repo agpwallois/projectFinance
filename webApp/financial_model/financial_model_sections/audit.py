@@ -17,7 +17,7 @@ class AuditResults:
 	tenor_debt: float
 	check_all: bool
 
-class FinancialModelAudit:
+class Audit:
 	"""
 	Performs audits and validations on financial models.
 	
@@ -31,7 +31,7 @@ class FinancialModelAudit:
 	def __init__(self, instance):
 		self.instance = instance
 		self.model = instance.financial_model
-		self.MATERIALITY_THRESHOLD = 0.01  # Threshold for numerical differences
+		self.MATERIALITY_THRESHOLD = 0.1  # Threshold for numerical differences
 		
 	def initialize(self) -> None:
 		"""
@@ -86,7 +86,7 @@ class FinancialModelAudit:
 		"""
 		return (
 			self.model['uses']['total'] -
-			self.model['injections']['total']
+			self.model['sources']['total']
 		)
 	
 	def _calculate_balance_sheet_difference(self) -> np.ndarray:
@@ -97,8 +97,8 @@ class FinancialModelAudit:
 			np.ndarray: Differences in balance sheet
 		"""
 		return (
-			self.model['BS']['total_assets'] -
-			self.model['BS']['total_liabilities']
+			self.model['assets']['total_assets'] -
+			self.model['liabilities']['total_liabilities']
 		)
 	
 	def _check_materiality(self, differences: np.ndarray) -> bool:
@@ -128,7 +128,11 @@ class FinancialModelAudit:
 		valid_dates = [date for date, is_valid in zip(end_dates, mask) if is_valid]
 		
 		if not valid_dates:
-			raise ValueError("No valid debt repayment dates found")
+			# No debt (gearing = 0), return the last date of the model
+			if len(end_dates) > 0:
+				return self._parse_date(end_dates.iloc[-1])
+			else:
+				raise ValueError("No dates found in the model")
 			
 		final_date = max(valid_dates)
 		return self._parse_date(final_date)

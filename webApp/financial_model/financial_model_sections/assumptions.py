@@ -7,9 +7,27 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class FinancialModelAssumptions:
+class Assumptions:
+
+
+	ELECTRICITY_PRICES_CHOICES= [
+	('1', 'Low'),
+	('2', 'Central'),
+	('3', 'High'),
+	]
+
+	PRODUCTION_CHOICES= [
+	('1', 'P90'),
+	('2', 'P75'),
+	('3', 'P50'),
+	]
+
+	ELECTRICITY_PRICES_CHOICES_DICT = dict(ELECTRICITY_PRICES_CHOICES)
+	PRODUCTION_CHOICES_DICT = dict(PRODUCTION_CHOICES)
+
 	def __init__(self, instance):
 		self.instance = instance
+
 
 	def initialize(self):
 		# Set key project dates
@@ -124,10 +142,20 @@ class FinancialModelAssumptions:
 		self.instance.target_DSCR = float(project.debt_target_DSCR)
 		self.instance.target_gearing = float(project.debt_gearing_max) / 100
 		self.instance.dsra = 6 if int(project.DSRA_choice) == 1 else 12
-		self.instance.iteration = 30
+		self.instance.iteration = 50
 		self.instance.SHL_margin = float(project.SHL_margin) / 100
 		self.instance.p50 = project.p50 / 1000
 		self.instance.lender_production = project.production_choice
 		self.instance.sponsor_production = project.sponsor_production_choice
+
+		self.instance.lender_production_text = self.PRODUCTION_CHOICES_DICT.get(str(self.instance.lender_production))
+		self.instance.sponsor_production_text = self.PRODUCTION_CHOICES_DICT.get(str(self.instance.sponsor_production))
+
+		self.instance.price_elec_choice = project.price_elec_choice
+		self.instance.sponsor_price_elec_choice = project.sponsor_price_elec_choice
+
+		self.instance.lender_mkt_price_choice_text = self.ELECTRICITY_PRICES_CHOICES_DICT.get(str(self.instance.price_elec_choice))
+		self.instance.sponsor_mkt_price_choice_text = self.ELECTRICITY_PRICES_CHOICES_DICT.get(str(self.instance.sponsor_price_elec_choice))
+
 		self.instance.contract_price = float(project.contract_price)
 		self.instance.periodicity = project.periodicity

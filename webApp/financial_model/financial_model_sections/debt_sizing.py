@@ -2,7 +2,7 @@ import numpy as np
 from typing import Any
 
 
-class FinancialModelSeniorDebtSizing:
+class SeniorDebtSizing:
 	"""
 	A class responsible for calculating senior debt sizing and repayments
 	in a project’s financial model.
@@ -17,6 +17,10 @@ class FinancialModelSeniorDebtSizing:
 					  relevant parameters (e.g., target_DSCR, target_gearing, etc.).
 		"""
 		self.instance = instance
+		fm = self.instance.financial_model
+		fm["debt_sizing"] = {}
+		fm['discount_factor'] = {}
+
 
 	def calculate_senior_debt_amount(self) -> None:
 		"""
@@ -57,7 +61,7 @@ class FinancialModelSeniorDebtSizing:
 
 		# ----- 3) DSCR & CFADS for amortization -----
 		fm['debt_sizing']['CFADS_amo'] = (
-			fm['CFS']['cash_flows_operating'] * fm['flags']['debt_amo']
+			fm['op_account']['cash_flows_operating'] * fm['flags']['debt_amo']
 		)
 		fm['debt_sizing']['target_DSCR'] = (
 			self.instance.target_DSCR * fm['flags']['debt_amo']
@@ -82,6 +86,8 @@ class FinancialModelSeniorDebtSizing:
 			fm['debt_sizing']['target_debt_gearing']
 		)
 
+		
+
 	def calculate_senior_debt_repayments(self) -> None:
 		"""
 		Calculates the target repayments for senior debt, using a sculpting approach
@@ -91,7 +97,7 @@ class FinancialModelSeniorDebtSizing:
 		fm = self.instance.financial_model
 
 		# Sum of all senior debt drawdowns
-		senior_debt_drawdowns_sum = np.sum(fm['injections']['senior_debt'])
+		senior_debt_drawdowns_sum = np.sum(fm['sources']['senior_debt'])
 
 		# Net Present Value (NPV) of CFADS for amortization
 		npv_cfads = np.sum(

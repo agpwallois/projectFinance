@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class FinancialModelRatios:
+class Ratios:
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model
@@ -41,7 +41,7 @@ class FinancialModelRatios:
 
 	def _calculate_dscr_effective(self):
 		"""Calculate the Debt Service Coverage Ratio (DSCR)."""
-		cfads_amo = np.array(self.financial_model['CFS']['CFADS_amo'])
+		cfads_amo = np.array(self.financial_model['op_account']['CFADS_amo'])
 		ds_effective = np.array(self.financial_model['senior_debt']['DS_effective'])
 
 		self.financial_model['ratios']['DSCR_effective'] = np.divide(
@@ -54,7 +54,7 @@ class FinancialModelRatios:
 	def _calculate_llcr(self):
 		"""Calculate the Loan Life Coverage Ratio (LLCR)."""
 		avg_interest_rate = np.array(self.financial_model['discount_factor']['avg_interest_rate'])
-		cfads_amo = self.financial_model['CFS']['CFADS_amo']
+		cfads_amo = self.financial_model['op_account']['CFADS_amo']
 		balance_eop = self.financial_model['senior_debt']['balance_eop']
 		model_end = self.financial_model['dates']['model']['end']
 
@@ -65,7 +65,7 @@ class FinancialModelRatios:
 	def _calculate_plcr(self):
 		"""Calculate the Project Life Coverage Ratio (PLCR)."""
 		avg_interest_rate = np.array(self.financial_model['discount_factor']['avg_interest_rate'])
-		cfads = self.financial_model['CFS']['CFADS']
+		cfads = self.financial_model['op_account']['CFADS']
 		balance_eop = self.financial_model['senior_debt']['balance_eop']
 		model_end = self.financial_model['dates']['model']['end']
 
@@ -93,7 +93,13 @@ class FinancialModelRatios:
 
 def calculate_ratio(avg_interest_rate, CFADS, senior_debt_balance_eop, dates_series):
 	"""Calculate financial coverage ratios."""
-	avg_i = avg_interest_rate[avg_interest_rate > 0].mean()
+	# Handle case where there's no debt (gearing = 0)
+	filtered_rates = avg_interest_rate[avg_interest_rate > 0]
+	if len(filtered_rates) == 0:
+		# No debt means no interest rate, return zeros for ratio
+		return np.zeros_like(CFADS)
+	
+	avg_i = filtered_rates.mean()
 	discounted_CFADS = compute_npv(CFADS, avg_i, dates_series)
 	return divide_with_condition(discounted_CFADS, senior_debt_balance_eop)
 

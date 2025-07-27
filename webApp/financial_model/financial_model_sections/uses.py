@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-class FinancialModelUses:
+class Uses:
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model
@@ -25,6 +25,15 @@ class FinancialModelUses:
 		uses = self.financial_model['uses']
 		uses['construction'] = self.financial_model['construction_costs']['total']
 		uses['development_fee'] = 0
+
+		uses['interests_construction'] = self.financial_model['senior_debt']['interests_construction']
+		uses['upfront_fee'] = self.financial_model['senior_debt']['upfront_fee']
+		uses['commitment_fees'] = self.financial_model['senior_debt']['commitment_fees']
+
+
+
+
+
 		uses['senior_debt_idc_and_fees'] = (
 			self.financial_model['senior_debt']['interests_construction'] +
 			self.financial_model['senior_debt']['upfront_fee'] +
@@ -44,9 +53,15 @@ class FinancialModelUses:
 		uses['total'] = (
 			np.array(uses['construction']) +
 			np.array(uses['development_fee']) +
-			np.array(uses['senior_debt_idc_and_fees']) +
+			np.array(uses['interests_construction']) +
+			np.array(uses['upfront_fee']) +
+			np.array(uses['commitment_fees']) +
 			np.array(uses['reserves'])
 		)
+
+		""" np.array(uses['local_taxes']) """
+
+		uses['total_cumul'] = pd.Series(uses['total']).cumsum()
 
 	def _calculate_total_depreciable_uses(self):
 		"""Calculate total depreciable 'uses'."""
@@ -54,6 +69,8 @@ class FinancialModelUses:
 		uses['total_depreciable'] = (
 			np.array(uses['construction']) +
 			np.array(uses['development_fee']) +
-			np.array(uses['senior_debt_idc_and_fees']) +
+			np.array(uses['interests_construction']) +
+			np.array(uses['upfront_fee']) +
+			np.array(uses['commitment_fees']) +
 			np.array(self.financial_model['SHL']['interests_construction'])
 		)

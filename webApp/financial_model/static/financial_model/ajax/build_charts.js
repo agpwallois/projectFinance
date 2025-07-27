@@ -90,7 +90,7 @@ function updateChartsAnnual(json) {
         chartDebtS.update();  
 
         chartDebtOut.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartDebtOut.data.datasets[0].data = Object.values(json.df_annual['injections']['senior_debt']);
+        chartDebtOut.data.datasets[0].data = Object.values(json.df_annual['sources']['senior_debt']);
         chartDebtOut.data.datasets[1].data = Object.values(json.df_annual['senior_debt']['repayments']);
         chartDebtOut.data.datasets[2].data = Object.values(json.df_eoy['senior_debt']['balance_eop']);
         chartDebtOut.update();  
@@ -112,6 +112,14 @@ function updateChartsAnnual(json) {
         chartCash.data.datasets[2].data = Object.values(json.df_annual['distr_account']['dividends_paid']);
         chartCash.data.datasets[3].data = Object.values(json.df_annual['share_capital']['repayments']);
         chartCash.update();  
+
+
+        chartProduction.data.labels = Object.keys(json.df_annual['opex']['total']);
+        chartProduction.data.datasets[0].data = Object.values(json.df_annual['production']['total']);
+        chartProduction.data.datasets[1].data = Object.values(json.df_eoy['capacity']['degradation_factor']);
+        chartProduction.update();  
+
+
 }
 
 function updateChartsDebtPeriodicity(json) {
@@ -138,7 +146,7 @@ function updateChartsDebtPeriodicity(json) {
         chartDebtS.update();  
 
         chartDebtOut.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartDebtOut.data.datasets[0].data = Object.values(json.df['injections']['senior_debt']);
+        chartDebtOut.data.datasets[0].data = Object.values(json.df['sources']['senior_debt']);
         chartDebtOut.data.datasets[1].data = Object.values(json.df['senior_debt']['repayments']);
         chartDebtOut.data.datasets[2].data = Object.values(json.df['senior_debt']['balance_eop']);
         chartDebtOut.update();  
@@ -159,5 +167,14 @@ function updateChartsDebtPeriodicity(json) {
         chartCash.data.datasets[1].data = Object.values(json.df['distr_account']['balance_eop']);
         chartCash.data.datasets[2].data = Object.values(json.df['distr_account']['dividends_paid']);
         chartCash.data.datasets[3].data = Object.values(json.df['share_capital']['repayments']);
-        chartCash.update();  
+        chartCash.update(); 
+
+        chartProduction.data.labels = Object.values(json.df['dates']['model']['end']);
+        chartProduction.data.datasets[0].data = Object.values(json.df['production']['total']);
+        chartProduction.data.datasets[1].data = Object.values(json.df['capacity']['degradation_factor']);
+        chartProduction.update();  
+
+
+
+
 }

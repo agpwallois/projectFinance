@@ -90,6 +90,10 @@ class FinancialModelIRR:
 		# ---- Valuation calculations (today’s date discounting) ----
 		self._calculate_current_valuations()
 
+
+
+
+
 	def _get_share_capital_cf(self) -> pd.Series:
 		"""
 		Retrieves share capital related cash flows.
@@ -99,7 +103,7 @@ class FinancialModelIRR:
 		"""
 		fm = self.instance.financial_model
 		return (
-			-fm["injections"]["share_capital"]
+			-fm["sources"]["share_capital"]
 			+ fm["distr_account"]["dividends_paid"]
 			+ fm["share_capital"]["repayments"]
 		)
@@ -113,7 +117,7 @@ class FinancialModelIRR:
 		"""
 		fm = self.instance.financial_model
 		return (
-			-fm["injections"]["SHL"]
+			-fm["sources"]["SHL"]
 			+ fm["SHL"]["interests_operations"]
 			+ fm["SHL"]["repayments"]
 		)
@@ -137,7 +141,7 @@ class FinancialModelIRR:
 		"""
 		fm = self.instance.financial_model
 		return (
-			-fm["injections"]["senior_debt"]
+			-fm["sources"]["senior_debt"]
 			+ fm["senior_debt"]["repayments"]
 			+ fm["senior_debt"]["interests"]
 			+ fm["senior_debt"]["upfront_fee"]
@@ -169,14 +173,16 @@ class FinancialModelIRR:
 			fm_irr["payback_date"] = "error"
 			fm_irr["payback_time"] = "error"
 
+
+
 	def _calculate_gearing_during_finplan(self) -> None:
 		"""
 		Calculates the gearing ratio during the financial plan, defined as:
 		cumulative senior debt / (cumulative equity + cumulative senior debt).
 		"""
 		fm = self.instance.financial_model
-		cum_senior_debt = fm["injections"]["senior_debt"].cumsum()
-		cum_equity = fm["injections"]["equity"].cumsum()
+		cum_senior_debt = fm["sources"]["senior_debt"].cumsum()
+		cum_equity = fm["sources"]["equity"].cumsum()
 		fm["gearing_during_finplan"] = cum_senior_debt / (cum_equity + cum_senior_debt)
 
 	def _calculate_current_valuations(self) -> None:
@@ -246,7 +252,7 @@ def calculate_xirr(dates: Union[pd.Series, List[datetime.date]], cash_flows: pd.
 	try:
 		return xirr(dates, cash_flows)
 	except InvalidPaymentsError:
-		print(f"Warning: Invalid cash flows provided for XIRR calculation: {cash_flows}")
+		"""print(f"Warning: Invalid cash flows provided for XIRR calculation: {cash_flows}")"""
 		return 0.0
 
 
@@ -265,6 +271,9 @@ def create_IRR_curve(
 	Returns:
 		A list of IRR values (as percentages) at each step, clipped to >= 0.
 	"""
+
+	equity_cash_flows = pd.Series(equity_cash_flows)
+
 	irr_values = []
 	for i in range(1, len(equity_cash_flows) + 1):
 		subset_cash_flows = equity_cash_flows.iloc[:i]
@@ -310,15 +319,3 @@ def find_payback_date(
 	return None
 
 
-def determine_debt_constraint(debt_amount: float, debt_amount_gearing: float) -> str:
-	"""
-	Determines which debt constraint (Gearing or DSCR) is active based on two input metrics.
-
-	Args:
-		debt_amount: The calculated debt amount from DSCR perspective.
-		debt_amount_gearing: The calculated debt amount from gearing perspective.
-
-	Returns:
-		"Gearing" if debt_amount exceeds debt_amount_gearing, otherwise "DSCR".
-	"""
-	return "Gearing" if debt_amount > debt_amount_gearing else "DSCR"

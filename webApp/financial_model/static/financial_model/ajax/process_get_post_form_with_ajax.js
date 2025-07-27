@@ -1,13 +1,20 @@
+// Global variable to track the currently selected scenario
+let currentSelectedScenario = 'sponsor_base_case';
+
 $(document).ready(function() {
     // Initialize the application
     initializeApplication();
-    makeGetRequest('lender_base_case');  // Always use RadioScenario1
-
+    makeGetRequest('sponsor_base_case');
+    
+    // Set up a one-time event listener for when the first AJAX request completes
+    $(document).one('ajaxComplete', function() {
+        // Apply initial highlighting
+        applyHighlightingToScenario(currentSelectedScenario);
+    });
 });
 
-
 function initializeApplication() {
-
+    setupRadioButtonHandlers()
     set_up_sensitivities_form_submission_listeners();
     hide_construction_months_fields();
     hide_years_fields();
@@ -17,8 +24,93 @@ function initializeApplication() {
     });
 }
 
+function setupRadioButtonHandlers() {
+    // Handle radio button changes for scenario selection
+    $(document).on('change', 'input[name="scenarios"]', function() {
+        if (this.checked) {
+            const selectedScenario = $(this).val();
+            
+            // Store the selected scenario
+            currentSelectedScenario = selectedScenario;
+            
+            // Highlight the selected row
+            highlightSelectedRow(this);
+            
+            console.log(selectedScenario)
+            // Make GET request with the selected scenario
+            makeGetRequest(selectedScenario);
+        }
+    });
+}
+
+function highlightSelectedRow(radioElement) {
+    // Remove 'selected' class from all rows in both left and right tables
+    $('.dashboard-sensi-table tr').removeClass('selected');
+    
+    // Find the parent row of the clicked radio button
+    const $selectedRow = $(radioElement).closest('tr');
+    
+    // Add 'selected' class to the clicked row
+    $selectedRow.addClass('selected');
+    
+    // Find the corresponding row in the right table and highlight it
+    if ($selectedRow.closest('.summary-scenario-left').length > 0) {
+        // Get the value of the radio button to determine which scenario
+        const radioValue = $(radioElement).val();
+        
+        // Get all radio buttons in order to find the index
+        const $allRadios = $selectedRow.closest('.summary-scenario-left').find('input[name="scenarios"]');
+        const selectedIndex = $allRadios.index(radioElement);
+        
+        // Find the right table container
+        const $rightTable = $selectedRow.closest('.summary-container').find('.summary-scenario-right table');
+        
+        // Check if there's a header row in the right table
+        const $rightTableHeader = $rightTable.find('thead tr');
+        const hasHeader = $rightTableHeader.length > 0;
+        
+        // Find all data rows in the right table (excluding header if present)
+        const $rightTableRows = $rightTable.find('tbody tr');
+        
+        // If the right table has more rows than we have radios, it might have a header row in tbody
+        // Let's check the first row to see if it contains th elements
+        const firstRowHasHeaders = $rightTableRows.first().find('th').length > 0;
+        
+        // Calculate the correct index
+        let adjustedIndex = selectedIndex;
+        if (firstRowHasHeaders && $rightTableRows.length > $allRadios.length) {
+            // Skip the first row if it's a header row in tbody
+            adjustedIndex = selectedIndex + 1;
+        }
+        
+        // Use the adjusted index to select the corresponding row
+        const $rightRow = $rightTableRows.eq(adjustedIndex);
+        
+        if ($rightRow.length > 0) {
+            $rightRow.addClass('selected');
+        }
+    }
+}
+
+function showLoader() {
+    // Show the loading modal
+    $("#loading-modal").show();
+    // Alternative: if you prefer to use display style directly
+    // document.getElementById("loading-modal").style.display = "block";
+}
+
+function hideLoader() {
+    // Hide the loading modal
+    $("#loading-modal").hide();
+    // Alternative: if you prefer to use display style directly
+    // document.getElementById("loading-modal").style.display = "none";
+}
+
 function handleFormSubmission(e, formElement) {
     e.preventDefault();
+
+    // Show loader before making the request
+    showLoader();
 
     var formData = $(formElement).serialize();
 
@@ -26,25 +118,40 @@ function handleFormSubmission(e, formElement) {
         type: 'POST',
         url: "", // Add your URL here
         data: formData,
-        success: handleSuccess,
-        error: handleAjaxError
+        success: function(json) {
+            // Hide loader on success
+            hideLoader();
+            handleSuccess(json);
+        },
+        error: function(xhr, status, error) {
+            // Hide loader on error
+            hideLoader();
+            handleAjaxError(xhr, status, error);
+        }
     };
 
     $.ajax(postSettings);
 }
 
 function makeGetRequest(value) {
+
+
     var getSettings = {
         url: '', // Add your URL here
         method: 'GET',
         data: {
-            'scenario': value  // Always pass 'RadioScenario1'
+            'scenario': value 
         },
         success: function(json) {
-
+            // Hide loader on success
+            hideLoader();
             handleSuccess(json);
         },
-        error: handleAjaxError
+        error: function(xhr, status, error) {
+            // Hide loader on error
+            hideLoader();
+            handleAjaxError(xhr, status, error);
+        }
     };
     $.ajax(getSettings);
 }
@@ -53,12 +160,21 @@ function handleSuccess(json) {
     console.log(json.df);
     console.log(json.tables);
     console.log(json.sidebar_data);
-
+    console.log(json.table_sensi_diff);
+    console.log(json.table_sensi_diff_IRR);
+    console.log(json.annual_financial_statements);
+    console.log(json.fs_financing_plan_data);
 
     build_computation_table(json);
     build_dashboard_tables(json);
+    build_annual_financial_statements(json);
+    build_fs_financing_plan(json);
+
     build_charts(json);
     update_sidebar_data(json);
+
+    // Apply highlighting based on the stored selected scenario
+    applyHighlightingToScenario(currentSelectedScenario);
 
     function handleDropdownChange() {
         var selectedOption = $("#myDropdown").val();
@@ -75,6 +191,17 @@ function handleSuccess(json) {
 
     // Trigger on change event
     $("#myDropdown").change(handleDropdownChange);
+}
+
+// New function to apply highlighting based on scenario value
+function applyHighlightingToScenario(scenarioValue) {
+    // Find the radio button with the matching value
+    const radioToHighlight = $(`input[name="scenarios"][value="${scenarioValue}"]`);
+    
+    if (radioToHighlight.length > 0) {
+        // Apply highlighting to the row containing this radio button
+        highlightSelectedRow(radioToHighlight[0]);
+    }
 }
 
 function handleAjaxError(xhr, status, error) {

@@ -1,6 +1,6 @@
 import numpy as np
 
-class FinancialModelConstructionCosts:
+class ConstructionCosts:
 	"""
 	Handles initialization and calculation of construction costs
 	in the financial model.

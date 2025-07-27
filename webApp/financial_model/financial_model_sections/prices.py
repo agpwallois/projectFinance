@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Dict, Any, List, Union
 
 @dataclass
-class FinancialModelPrices:
+class Prices:
 	"""
 	Handles price calculations for financial models, including merchant and contract prices
 	in both real and nominal terms.

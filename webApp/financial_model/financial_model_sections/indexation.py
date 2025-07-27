@@ -2,7 +2,7 @@ from decimal import Decimal
 import pandas as pd
 
 
-class FinancialModelIndexation:
+class Indexation:
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model

@@ -6,47 +6,311 @@
 
     <!-- Project Header - Positioned right after header but before sidebar and content -->
     <div class="project-header">
+        <a href="{% url 'project_list' %}" style="text-decoration: none; margin-right: 10px; font-weight: bold;">&#8592;</a>
         <h1 id="project_name">Project: {{ project.name }} </h1>
         <div class="metric-value" id="metric-status">{{ project.project_status }}</div>
     </div>
     
-    <!-- Navigation Container - Below project header, containing nav tabs and toggle -->
-    <div class="navigation-container">
-        <!-- Combined Nav Bar with Toggle -->
-        <div class="nav-container">
-            <nav>
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#nav-summary" data-bs-toggle="tab">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#nav-calculation" data-bs-toggle="tab">Computation</a>
-                    </li>
-                </ul>
-            </nav>
-            
 
-        </div>
-    </div>
+   
+     </div>
+
+
+
 
     <!-- Include Sidebar -->
     {% include 'financial_model/sidebar.html' %}
 
     <div id="content">
-        <div id="content-box">
+
+<div id="content-box">
+    <!-- Project Overview Section -->
+     
+    <div class="box-wrapper project-overview-wrapper" id="overview-wrapper">
+        <h2>Project Overview</h2>
+        <div class="overview-metrics-row">
+            <!-- Total Investment Box -->
+             
+            <div class="overview-metrics-column">
+                <div class="overview-box">
+                    <div class="metric-value" id="capacity"></div>
+                    <h3>Capacity (MW)</h3>
+ 
+                </div>
+            </div>
+            
+            <!-- Equity IRR Box -->
+            <div class="overview-metrics-column">
+                <div class="overview-box">
+                    <div class="metric-value" id="total_uses"></div>
+                    <h3>Total Project Costs (kEUR)</h3>
+    
+                </div>
+            </div>
+            
+            <!-- Min DSCR Box -->
+            <div class="overview-metrics-column">
+                <div class="overview-box">
+                    <div class="metric-value" id="sponsor_IRR"></div>
+                    <h3>Sponsor Case Equity IRR</h3>
+ 
+                </div>
+            </div>
+
+            <!-- Status Box -->
+            <div class="overview-metrics-column">
+                <div class="overview-box">
+                    <div class="metric-value" id="gearing"></div>
+                     <h3>Senior Debt Gearing</h3>
+    
+                </div>
+            </div>
+            
+            <!-- Status Box -->
+            <div class="overview-metrics-column">
+                <div class="overview-box">
+                    <div class="metric-value" id="lender_DSCR"></div>
+                     <h3>Lender Case Min DSCR</h3>
+    
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </div>
+
+
+
+</div>
+
+
+<div id="content-box">
+
+    <div class="dashboard-container">
+        <h2>Scenario Selection</h2>
+     <!-- Scenario Analysis Section -->
+        <div class="box" id="summary-sensitivities">
+            <!-- Navigation tabs for Sponsor Case and Lender Case -->
+        <!-- Modal -->
+        <div id="loading-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+          <div style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); font-size:18px;">
+            Creating scenarios... Please wait.
+          </div>
+        </div>
+
+        <div class="navigation-container">
+            <div class="nav-container">
+                <nav>
+<ul class="nav nav-tabs scenario-nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" href="#sponsor-case-tab" data-bs-toggle="tab">
+        Sponsor Scenarios&nbsp;<br>
+        <small>(<span id="sponsor_prod_choice" class="d-inline"></span>, <span id="sponsor_mkt_price_choice" class="d-inline"></span> prices)</small>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#lender-case-tab" data-bs-toggle="tab">
+        Lender Scenarios&nbsp;<br>
+        <small>(<span id="lender_prod_choice" class="d-inline"></span>, <span id="lender_mkt_price_choice" class="d-inline"></span> prices)</small>
+        </a>
+    </li>
+</ul>
+
+
+
+
+
+                </nav>
+            </div>
+</div>
             <div class="tab-content">
+                <!-- Sponsor Case Tab Content -->
+                <div class="tab-pane fade show active" id="sponsor-case-tab">
 
-                <div class="tab-pane fade show active" id="nav-summary" role="tabpanel">
+
+                    <div class="summary-container">
+                        <div class="summary-scenario-left">
+                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input-sponsor">
+                                <thead>
+                                    <tr>
+                                        <th>Selection</th>
+                                        <th>Scenario</th>
+                                        <th>Sensitivity</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="sponsor_base_case" checked>
+                                        </td>
+                                        <td>Base Case</td>
+                                        <td>-</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input-sensi-sponsor">
+                                <tbody>
+                                    <tr>
+                                     <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="sponsor_sensi_prod">
+                                        </td>
+
+                                        <td>Production</td>
+                                        <td>{{ project_form.sensi_production_sponsor }}</td>
+                                        <td><div id="sponsor_sensi_production"></div></td>
+                                    </tr>
+                                    <tr>
+                                    <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="sponsor_sensi_inf">
+                                        </td>
+
+                                        <td>Inflation</td>
+
+
+                                        <td>{{ project_form.sensi_inflation_sponsor }}</td>
+                                        <td><div id="sponsor_sensi_inflation"></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="sponsor_sensi_opex">
+                                        </td>
+
+                                        <td>Operating costs</td>
+                                        <td>{{ project_form.sensi_opex_sponsor }}</td>
+                                        <td><div id="sponsor_sensi_opex"></div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="summary-scenario-right">
+                            <table class="dashboard-sensi-table">
+                                <tbody id="sponsor_summary_sensi"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lender Case Tab Content -->
+                <div class="tab-pane fade" id="lender-case-tab">
+
+
+                    <div class="summary-container">
+                        <div class="summary-scenario-left">
+                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input">
+                                <thead>
+                                    <tr>
+                                        <th>Selection</th>
+                                        <th>Scenario</th>
+                                        <th>Sensitivity</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="lender_base_case">
+                                        </td>
+
+                                        <td>Base Case</td>
+                                        <td>-</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="dashboard-sensi-table" id="dashboard-sensi-table-input-sensi">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="lender_sensi_prod">
+                                        </td>
+
+                                        <td>Production</td>
+                                        <td>{{ project_form.sensi_production }}</td>
+                                        <td><div id="sensi_production"></div></td>
+                                    </tr>
+                                    <tr>
+                                       <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="lender_sensi_inf">
+                                        </td>
+
+                                        <td>Inflation</td>
+                                        <td>{{ project_form.sensi_inflation }}</td>
+                                        <td><div id="sensi_inflation"></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input" type="radio" name="scenarios" value="lender_sensi_opex">
+                                        </td>
+
+                                        <td>Operating costs</td>
+                                        <td>{{ project_form.sensi_opex }}</td>
+                                        <td><div id="sensi_opex"></div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="summary-scenario-right">
+                            <table class="dashboard-sensi-table">
+                                <tbody id="summary_sensi"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+        <div id="content-box">
+
+<div class="dashboard-container">
+    <h2>Selected Scenario Overview</h2>
+    <!-- Navigation Container - Below project header, containing nav tabs and toggle -->
+
+
+            <div class="tab-content">
+                
+
                     {% include 'financial_model/dashboard.html' %}
-                </div>
+      
 
-                <!-- Calculation Tab Content -->
-                <div class="tab-pane fade" id="nav-calculation" role="tabpanel">
-                    {% include 'financial_model/calculation.html' %}
-                </div>
+
+
                 
             </div>
         </div>
     </div>
+
+    </div>
+
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Allow clicking anywhere on row to select radio
+    $(document).on('click', '.dashboard-sensi-table tr', function(e) {
+        // Don't trigger if clicking directly on the radio button or if it's a header row
+        if (e.target.type === 'radio' || $(this).find('th').length > 0) return;
+        
+        const radio = $(this).find('input[type="radio"][name="scenarios"]');
+        if (radio.length > 0 && !radio.is(':checked')) {
+            radio.click();
+        }
+    });
+});
+</script>
+
+
+
+
+
 {% endblock %}

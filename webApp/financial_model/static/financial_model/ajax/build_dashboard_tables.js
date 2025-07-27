@@ -6,6 +6,7 @@ function build_dashboard_tables(json) {
     "Share capital IRR": "%",
     "Shareholder loan IRR": "%",
     "Equity IRR": "%",
+    "Effective gearing": "%",
 
     "Payback date": "date",
     "Payback time": "years from FC",
@@ -13,6 +14,7 @@ function build_dashboard_tables(json) {
     "Constraint": "text",
     "Average life": "years from FC",
     "Average DSCR": "x", // Ensure this key is unique or logic combined
+    
     "Balance sheet": "true/false",
     "Financing plan": "true/false",
 
@@ -24,7 +26,7 @@ function build_dashboard_tables(json) {
     "Minimum DSCR": "x",
     "Equity injection": "text",
     "Subgearing": "%",
-    "Debt IRR": "%",
+    "Senior Debt IRR": "%",
     "Production": "x",
     "Operating costs": "x",
     "Debt maturity": "true/false",
@@ -47,10 +49,10 @@ function build_dashboard_tables(json) {
 
 
   tables.forEach((table) => {
-    build_dashboard_table(table.data, table.selector, table.additionalData); // Pass optional arg
+    build_dashboard_table(table.data, table.selector); // Pass optional arg
   });
 
-function build_dashboard_table(json_input, div_output, additional_data) {
+function build_dashboard_table(json_input, div_output) {
   let table_result = "<table>";
 
   // Check if the first key is an empty string (assuming it contains headers)
@@ -81,8 +83,8 @@ function build_dashboard_table(json_input, div_output, additional_data) {
       }
 
       $.each(data, function (_, cellData) {
-        if (cellData === "False") {
-          table_result += "<td class='red-cell'>" + cellData + "</td>";
+        if (cellData === "false" || cellData === "False") {
+          table_result += "<td><span class='red-dot'></span>" + cellData + "</td>";
         } else {
           table_result += "<td>" + cellData + "</td>";
         }
@@ -103,15 +105,17 @@ function build_dashboard_table(json_input, div_output, additional_data) {
 
 function build_dashboard_table_sensi(json) {
     function createTable(tableData, diffData) {
-        let table_result = `<table class="sensi-table">`;
+        let table_result = "<table class='sensi-table'>";
 
         // Get headers
         const headers = tableData[""];
         table_result += "<thead><tr>";
         $.each(headers, function (_, header) {
-            table_result += `<th>${header}</th>`;
+            table_result += "<th>" + header + "</th>";
         });
         table_result += "</tr></thead><tbody>";
+        
+
 
         // Process all scenarios (except the headers row)
         Object.keys(tableData).forEach(function(scenario) {
@@ -137,6 +141,13 @@ function build_dashboard_table_sensi(json) {
 
                 // Handle valid data
                 if (cellData !== "-" && cellData !== "nanx" && cellData !== "nan%") {
+       
+                    
+                    // Check if this is a false value - also check trimmed version and boolean
+                    const cellDataStr = String(cellData).trim();
+                    const isFalse = (cellDataStr === "false" || cellDataStr === "False" || cellData === false);
+
+                    
                     if (diffValue && diffValue !== "-" && diffValue !== "nanx" && diffValue !== "nan%" && !isLastColumn) {
                         // Parse the diff value
                         let numericDiff = 0;
@@ -155,21 +166,30 @@ function build_dashboard_table_sensi(json) {
                                          (numericDiff < 0 ? "impact-negative" : "impact-neutral");
 
                         // Cell with diff value
-                        table_result += `
-                            <td class="value-cell">
-                                <div class="value-container">
-                                    <div class="main-value">${cellData}</div>
-                                    <div class="impact-indicator ${impactClass}">${diffValue}</div>
-                                </div>
-                            </td>
-                        `;
+                        table_result += "<td class='value-cell'>";
+                        table_result += "<div class='value-container'>";
+                        table_result += "<div class='main-value'>";
+                        
+                        if (isFalse) {
+                            table_result += "<span class='red-dot'></span>";
+                        }
+                        table_result += cellData;
+                        
+                        table_result += "</div>";
+                        table_result += "<div class='impact-indicator " + impactClass + "'>" + diffValue + "</div>";
+                        table_result += "</div>";
+                        table_result += "</td>";
                     } else {
                         // Cell without diff value
-                        table_result += `<td class="value-cell">${cellData}</td>`;
+                        table_result += "<td class='value-cell'>";
+                        if (isFalse) {
+                            table_result += "<span class='red-dot'></span>";
+                        }
+                        table_result += cellData + "</td>";
                     }
                 } else {
                     // Empty cell for invalid data
-                    table_result += `<td></td>`;
+                    table_result += "<td></td>";
                 }
             });
 
