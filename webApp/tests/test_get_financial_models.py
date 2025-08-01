@@ -14,7 +14,7 @@ django.setup()
 
 from financial_model.views import FinancialModelView
 from financial_model.model_project import Project
-from financial_model.model_solar_financial_model import SolarFinancialModel
+from financial_model.model_solar_fm import SolarFinancialModel
 
 
 class TestGetFinancialModels(TestCase):

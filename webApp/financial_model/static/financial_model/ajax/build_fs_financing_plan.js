@@ -1,7 +1,7 @@
 function build_fs_financing_plan(json) {
   
   // The data is in the fs_financing_plan_data
-  const allData = json.fs_financing_plan_data;
+  const allData = json.fs_financing_plan;
   
   // Get the maximum array length to determine number of columns
   let maxLength = 0;
@@ -23,17 +23,24 @@ function build_fs_financing_plan(json) {
   
   let tableContent = "<table class='table table-bordered'>";
   
- 
+
   tableContent += "<tbody>";
   
   // Process each section
-  sections.forEach(section => {
+  sections.forEach((section, sectionIndex) => {
     const sectionData = allData[section.key];
     
     if (!sectionData) return;
     
-    let isFirstRowInSection = true;
-    const sectionRowCount = Object.keys(sectionData).filter(key => Array.isArray(sectionData[key])).length;
+    // Add section header row
+    if (sectionIndex > 0) {
+      // Add some spacing between sections
+      tableContent += "<tr class='section-spacer'><td colspan='" + (maxLength + 2) + "'>&nbsp;</td></tr>";
+    }
+    
+    tableContent += "<tr class='section-header'>";
+    tableContent += `<td colspan="${maxLength + 2}">${section.title}</td>`;
+    tableContent += "</tr>";
     
     // Process each item in the section data
     for (const subKey in sectionData) {
@@ -43,12 +50,6 @@ function build_fs_financing_plan(json) {
         // Check if this row is a "Total" row
         const isTotal = subKey.toLowerCase().includes('total');
         tableContent += isTotal ? "<tr class='total-row'>" : "<tr>";
-        
-        // Add section title only for the first row of each section
-        if (isFirstRowInSection) {
-          tableContent += `<td rowspan="${sectionRowCount}" style="vertical-align: middle; font-weight: bold;">${section.title}</td>`;
-          isFirstRowInSection = false;
-        }
         
         tableContent += "<td>" + convertToTitleCase(subKey) + "</td>";
         
@@ -132,4 +133,3 @@ function formatAsPercent(num) {
     maximumFractionDigits: 2,
   }).format(num);
 }
-

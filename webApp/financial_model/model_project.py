@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date
-
+from django.conf import settings
+from authentication.models import Company, User
 
 class Project(models.Model):
 
@@ -34,7 +35,8 @@ class Project(models.Model):
 
 
 
-
+	company = models.ForeignKey(Company, on_delete=models.CASCADE, default=1)
+	creator = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
 	created_date = models.DateTimeField(auto_now_add=True)
 	updated_date = models.DateTimeField(auto_now=True)

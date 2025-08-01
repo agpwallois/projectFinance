@@ -12,7 +12,7 @@ class IncomeStatement:
 	def calculate_period(self, period: int) -> Dict[str, float]:
 		"""Calculate income statement items for a specific period."""
 		# Get required inputs
-		ebitda = self.financial_model['EBITDA']['EBITDA'][period]
+		ebitda = self.financial_model['IS']['EBITDA'][period]
 		depreciation = self.financial_model['IS']['depreciation'][period]
 		senior_debt_interest = self.financial_model['senior_debt']['interests_operations'][period]
 		shl_interest = self.financial_model['SHL']['interests_operations'][period]

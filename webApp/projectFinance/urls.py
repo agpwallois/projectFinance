@@ -17,16 +17,21 @@ from django.contrib import admin
 from django.urls import path, include
 from home_page.views import HomePageView
 from financial_model.views import FinancialModelView
-from dashboard.views import projects_dashboard
+from dashboard.views import projects_dashboard, create_project, delete_project
+from authentication.views import login_view, logout_view, register_view
 
 
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', HomePageView.as_view(), name='home'),
+	path('login/', login_view, name='login'),  
+	path('logout/', logout_view, name='logout'),
+	path('register/', register_view, name='register'),
 	path('projects/', projects_dashboard, name='project_list'),
 	path('project/<int:id>/', FinancialModelView.as_view(), name='project_view'),
-
+	path('projects/create/', create_project, name='create_project'),
+	path('projects/delete/', delete_project, name='delete_project'),
 ]
 
 admin.site.site_url = '/projects/'

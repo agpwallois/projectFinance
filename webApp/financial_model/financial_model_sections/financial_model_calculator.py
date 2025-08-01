@@ -58,6 +58,9 @@ class FinancialModelCalculator:
 	@profile_method
 	def initialize(self):
 		"""Initialize all calculations using period-by-period approach."""
+
+		
+		
 		self._initialize_all_arrays()
 		
 		# Calculate period by period to handle interdependencies
@@ -65,11 +68,17 @@ class FinancialModelCalculator:
 			self._calculate_period(period)
 
 
+		IS = self.financial_model['IS']
 		IS['contracted_revenues'] = self.financial_model['revenues']['contract']
 		IS['merchant_revenues'] = self.financial_model['revenues']['merchant']
-		IS['total'] = self.financial_model['revenues']['total']
-		IS['senior_debt_interests'] = self.financial_model['senior_debt']['interests_operations']
-		IS['shareholder_loan_interests'] = self.financial_model['SHL']['SHL_interests_paid']
+		IS['total_revenues'] = self.financial_model['revenues']['total']
+		IS['senior_debt_interests'] = -1*self.financial_model['senior_debt']['interests_operations']
+		IS['shareholder_loan_interests'] = -1*self.financial_model['SHL']['interests_operations']
+		IS['operating_costs'] = -1*self.financial_model['opex']['operating_costs']
+		IS['lease_costs'] = -1*self.financial_model['opex']['lease_costs']
+		IS['total_opex'] = -1*self.financial_model['opex']['total']
+
+
 
 
 	def _initialize_all_arrays(self):
@@ -79,7 +88,7 @@ class FinancialModelCalculator:
 		# Create dictionary of all arrays to initialize
 		arrays_to_init = {
 			'EBITDA': ['EBITDA', 'EBITDA_margin'],
-			'IS': ['EBIT', 'EBT', 'corporate_income_tax', 'net_income', 
+			'IS': ['EBITDA', 'EBITDA_margin', 'EBIT', 'EBT', 'corporate_income_tax', 'net_income', 
 				   'retained_earnings_bop', 'retained_earnings_eop', 'distributable_profit'],
 			'op_account': ['EBITDA', 'working_cap_movement', 'corporate_tax', 
 						  'cash_flows_operating', 'construction_costs', 'development_fee',
@@ -141,8 +150,8 @@ class FinancialModelCalculator:
 		ebitda_value = revenues - opex
 		ebitda_margin = ebitda_value / revenues if revenues > 0 else 0
 		
-		self.financial_model['EBITDA']['EBITDA'][period] = ebitda_value
-		self.financial_model['EBITDA']['EBITDA_margin'][period] = ebitda_margin
+		self.financial_model['IS']['EBITDA'][period] = ebitda_value
+		self.financial_model['IS']['EBITDA_margin'][period] = ebitda_margin
 		
 	def _calculate_period_shl_interests(self, period: int):
 		"""Calculate SHL interests for a single period (needed before income statement)."""
@@ -176,7 +185,7 @@ class FinancialModelCalculator:
 
 		# EBIT = EBITDA - Depreciation
 		IS['EBIT'][period] = (
-			self.financial_model['EBITDA']['EBITDA'][period] -
+			self.financial_model['IS']['EBITDA'][period] -
 			self.financial_model['IS']['depreciation'][period]
 		)
 
@@ -204,7 +213,7 @@ class FinancialModelCalculator:
 		flags = self.financial_model['flags']
 		
 		# Operating Cash Flows
-		op_account['EBITDA'][period] = self.financial_model['EBITDA']['EBITDA'][period]
+		op_account['EBITDA'][period] = self.financial_model['IS']['EBITDA'][period]
 		op_account['working_cap_movement'][period] = self.financial_model['working_cap']['working_cap_movement'][period]
 		op_account['corporate_tax'][period] = self.financial_model['IS']['corporate_income_tax'][period]
 		

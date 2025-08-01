@@ -64,7 +64,7 @@ class ProjectForm(forms.ModelForm):
 
 	class Meta:
 	 model = Project
-	 fields = '__all__'
+	 exclude = ['company', 'creator', 'created_at', 'updated_at']
 	 widgets = {
 		'start_construction': forms.DateInput(attrs={'type': 'date',}),
 		'end_construction': forms.DateInput(attrs={'type': 'date',}),

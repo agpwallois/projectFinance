@@ -18,7 +18,7 @@ class SeniorDebtSizing:
 		"""
 		self.instance = instance
 		fm = self.instance.financial_model
-		fm["debt_sizing"] = {}
+		"""fm["debt_sizing"] = {}"""
 		fm['discount_factor'] = {}
 
 

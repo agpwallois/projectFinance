@@ -6,69 +6,47 @@
         <!-- Three columns side by side - Will be hidden in Development mode -->
         <div class="metrics-row financing-mode-only">
             <div class="metrics-column">
-                <div class="box-wrapper">
-                    <div class="box" id="summary-IRR">
+                    <div class="box-key-metrics" id="summary-IRR">
                         <h3>Project and Shareholder Return</h3>
-                        <h4>Project IRR</h4>
-                        <table class="table-sum">
-                            <tbody id="summary_project"></tbody>
-                        </table>
+
 
                         <h4>Equity IRR</h4>
                         <table class="table-sum">
                             <tbody id="summary_equity"></tbody>
                         </table>
-                    </div>
+
+                        <h4>Project IRR</h4>
+                        <table class="table-sum">
+                            <tbody id="summary_project"></tbody>
+                        </table>        
                 </div>
             </div>
 
             <div class="metrics-column">
-                <div class="box-wrapper">
-                    <div class="box" id="summary-debt">
+                    <div class="box-key-metrics" id="summary-debt">
                         <h3>Senior Debt Metrics</h3>
                         <table class="table-sum">
                             <tbody id="summary_debt"></tbody>
                         </table>
-                    </div>
                 </div>
             </div>
 
             <div class="metrics-column">
-                <div class="box-wrapper">
-                    <div class="box" id="summary-audit">
+                    <div class="box-key-metrics" id="summary-audit">
                         <h3>Audit and Control</h3>
                         <table class="table-sum">
                             <tbody id="summary_audit"></tbody>
                         </table>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Financing Plan Section -->
-    <div class="box-wrapper">
-        <h2>Financing Plan</h2>
-
-        <div class="financing-plan-container">
-            <!-- Sources Section -->
-            <div class="financing-plan-box">
-                <h4>Sources</h4>
-                {% block jjjquery %}{% include 'financial_model/chart_fp_sources.html' %}{% endblock %}
-            </div>
-
-            <!-- Uses Section -->
-            <div class="financing-plan-box">
-                <h4>Uses</h4>
-                {% block jjquery %}{% include 'financial_model/chart_fp_uses.html' %}{% endblock %}
-            </div>
-        </div>
-    </div>
 
 
 <div class="box-wrapper">
     <h2>Financial Statements</h2>
-                    {% include 'financial_model/annual_financial_statements.html' %}
+                    {% include 'financial_model/financial_statements.html' %}
 
 </div>
 
@@ -118,9 +96,41 @@
 
     <!-- Charts Section -->
     <div class="box-wrapper">
-        <div class="box-wrapper-chart">
+
+
             <div class="left">
-                <h2>Charts</h2>
+                <h2>Charts: Construction Phase</h2>
+            </div>
+
+
+    <!-- Financing Plan Section -->
+        <div class="financing-plan-container">
+            <!-- Sources Section -->
+            <div class="financing-plan-box">
+                <h4>Sources</h4>
+                {% block jjjquery %}{% include 'financial_model/chart_fp_sources.html' %}{% endblock %}
+            </div>
+
+            <!-- Uses Section -->
+            <div class="financing-plan-box">
+                <h4>Uses</h4>
+                {% block jjquery %}{% include 'financial_model/chart_fp_uses.html' %}{% endblock %}
+            </div>
+    </div>
+
+<div class="charts-container">
+
+	<div class="graph"><canvas id="chartProjectCosts"></canvas></div>
+	<div class="graph"><canvas id="chartFinPlan"></canvas></div>
+
+</div>
+
+        <div class="box-wrapper-chart">
+
+
+
+            <div class="left">
+                <h2>Charts: Operating Phase</h2>
             </div>
 
             <div class="right">
@@ -132,6 +142,9 @@
         </div>
 
         <div class="box" id="nav-summary-charts">
+        
+
+
             {% block jquery %}{% include 'financial_model/charts.html' %}{% endblock %}
         </div>
 

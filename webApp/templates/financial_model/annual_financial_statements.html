@@ -1,11 +1,5 @@
-<!-- Updated HTML structure for annual_financial_statements.html -->
+<!-- Updated HTML structure for fs_financial_statements.html -->
 
-<!-- Add the navigation controls banner before the tabs -->
-<div class="excel-navigation-banner">
-    <div class="excel-nav-controls">
-        <span class="nav-instruction"><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> Navigate cells</span>
-    </div>
-</div>
 
 <!-- Financial Statements Navigation -->
 <ul class="nav nav-tabs scenario-nav-tabs" id="financialStatementsTab" role="tablist">
@@ -39,11 +33,30 @@
 <!-- Financial Statements Tab Content -->
 <div class="tab-content" id="financialStatementsTabContent">
     <div class="tab-pane fade show active" id="financing-plan" role="tabpanel" aria-labelledby="financing-plan-tab">
+        
+        
         <div class="table-wrapper">
             <table class="table_annual excel-navigable" id="fs_financing_plan_table">
                 <tbody id="fs_financing_plan"></tbody>
             </table>
         </div>
+
+    <!-- Financing Plan Section -->
+        <div class="financing-plan-container">
+            <!-- Sources Section -->
+            <div class="financing-plan-box">
+                <h4>Sources</h4>
+                {% block jjjquery %}{% include 'financial_model/chart_fp_sources.html' %}{% endblock %}
+            </div>
+
+            <!-- Uses Section -->
+            <div class="financing-plan-box">
+                <h4>Uses</h4>
+                {% block jjquery %}{% include 'financial_model/chart_fp_uses.html' %}{% endblock %}
+            </div>
+    </div>
+
+
     </div>
     <div class="tab-pane fade" id="income-statement" role="tabpanel" aria-labelledby="income-statement-tab">
         <div class="table-wrapper">
@@ -72,187 +85,10 @@
             <table class="table_annual excel-navigable">
                 <tbody id="annual_balance_sheet"></tbody>
             </table>
+
+
+
         </div>
     </div>
 </div>
 
-<!-- JavaScript for Excel-like Navigation -->
-<script>
-$(document).ready(function() {
-    let currentRow = 1;
-    let currentCol = 1;
-    let currentTable = null;
-    
-    // Initialize navigation after a short delay to ensure tables are populated
-    setTimeout(function() {
-        initializeNavigation();
-    }, 100);
-    
-    // Also try to initialize immediately
-    initializeNavigation();
-    
-    // Reinitialize when switching tabs
-    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
-        setTimeout(function() {
-            initializeNavigation();
-        }, 50);
-    });
-    
-    function initializeNavigation() {
-        // Find the active table
-        currentTable = $('.tab-pane.active .excel-navigable').first();
-        if (currentTable.length === 0 || currentTable.find('td').length === 0) {
-            // If no cells found, try again after a delay
-            setTimeout(initializeNavigation, 200);
-            return;
-        }
-        
-        // Add navigation attributes to all cells
-        currentTable.find('td').each(function() {
-            const $cell = $(this);
-            const row = $cell.parent().index() + 1;
-            const col = $cell.index() + 1;
-            $cell.attr('data-nav-row', row);
-            $cell.attr('data-nav-col', col);
-        });
-        
-        // Select first cell
-        currentRow = 1;
-        currentCol = 1;
-        selectCell(currentRow, currentCol);
-    }
-    
-    function selectCell(row, col) {
-        if (!currentTable || currentTable.length === 0) return;
-        
-        const $cell = currentTable.find(`td[data-nav-row="${row}"][data-nav-col="${col}"]`);
-        if ($cell.length === 0) return;
-        
-        // Remove previous selection
-        $('.excel-navigable td').removeClass('excel-selected');
-        
-        // Add selection to new cell
-        $cell.addClass('excel-selected');
-        
-        // Update current position
-        currentRow = row;
-        currentCol = col;
-        
-        // Ensure cell is visible
-        ensureCellVisible($cell);
-    }
-    
-    function ensureCellVisible($cell) {
-        const container = $cell.closest('.tab-pane');
-        if (!container.length) return;
-        
-        const cellTop = $cell.offset().top - container.offset().top;
-        const cellBottom = cellTop + $cell.outerHeight();
-        const containerHeight = container.height();
-        const scrollTop = container.scrollTop();
-        
-        if (cellTop < 0) {
-            container.scrollTop(scrollTop + cellTop - 50);
-        } else if (cellBottom > containerHeight) {
-            container.scrollTop(scrollTop + cellBottom - containerHeight + 50);
-        }
-    }
-    
-    function getTableDimensions() {
-        if (!currentTable || currentTable.length === 0) return { rows: 0, cols: 0 };
-        
-        const rows = currentTable.find('tr').length;
-        let maxCols = 0;
-        
-        // Find the maximum number of columns across all rows
-        currentTable.find('tr').each(function() {
-            const cols = $(this).find('td').length;
-            if (cols > maxCols) maxCols = cols;
-        });
-        
-        return { rows, cols: maxCols };
-    }
-    
-    // Keyboard navigation handler
-    $(document).on('keydown', function(e) {
-        if (!currentTable || !currentTable.is(':visible') || currentTable.find('td').length === 0) return;
-        
-        // Check if user is typing in an input field
-        if ($(e.target).is('input, select, textarea')) return;
-        
-        const { rows, cols } = getTableDimensions();
-        let handled = true;
-        
-        switch(e.key) {
-            case 'ArrowUp':
-                if (currentRow > 1) {
-                    selectCell(currentRow - 1, currentCol);
-                }
-                break;
-                
-            case 'ArrowDown':
-                if (currentRow < rows) {
-                    selectCell(currentRow + 1, currentCol);
-                }
-                break;
-                
-            case 'ArrowLeft':
-                if (currentCol > 1) {
-                    selectCell(currentRow, currentCol - 1);
-                }
-                break;
-                
-            case 'ArrowRight':
-                if (currentCol < cols) {
-                    selectCell(currentRow, currentCol + 1);
-                }
-                break;
-                
-            default:
-                handled = false;
-        }
-        
-        if (handled) {
-            e.preventDefault();
-        }
-    });
-    
-    // Click to select cell
-    $(document).on('click', '.excel-navigable td', function() {
-        const $this = $(this);
-        const row = $this.parent().index() + 1;
-        const col = $this.index() + 1;
-        
-        currentTable = $this.closest('.excel-navigable');
-        
-        // Re-initialize attributes for this table
-        currentTable.find('td').each(function() {
-            const $cell = $(this);
-            const r = $cell.parent().index() + 1;
-            const c = $cell.index() + 1;
-            $cell.attr('data-nav-row', r);
-            $cell.attr('data-nav-col', c);
-        });
-        
-        selectCell(row, col);
-    });
-    
-    // Also listen for when table content changes
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                setTimeout(initializeNavigation, 100);
-            }
-        });
-    });
-    
-    // Observe changes in all table bodies
-    const tableIds = ['annual_IS', 'annual_op_account', 'annual_distr_account', 'annual_balance_sheet'];
-    tableIds.forEach(function(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            observer.observe(element, { childList: true, subtree: true });
-        }
-    });
-});
-</script>

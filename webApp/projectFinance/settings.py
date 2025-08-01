@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'financial_model',
     'home_page',
+    'authentication',  
+
+
 ]
 
 MIDDLEWARE = [
@@ -50,12 +53,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.middleware.CompanyVerificationMiddleware',
 ]
 
 ROOT_URLCONF = 'projectFinance.urls'
-
-
-LOGIN_URL = 'login'
 
 TEMPLATES = [
     {
@@ -130,4 +131,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'home_page.User'
+
+AUTH_USER_MODEL = 'authentication.User'
+
+LOGIN_URL = '/login/' 
+LOGIN_REDIRECT_URL = '/projects/'
+LOGOUT_REDIRECT_URL = '/login/'

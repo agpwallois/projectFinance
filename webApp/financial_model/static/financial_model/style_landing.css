@@ -22,7 +22,7 @@
 }
 
 #dashboard_sidebar {
-    width: 320px;
+    width: 275px;
     background-color: white;
     border-right: 1px solid rgb(221, 221, 221);
     position: sticky;
@@ -215,7 +215,6 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    line-height: 2rem;
     font-size: 1rem;
     margin-top: 10px;
 }
@@ -261,17 +260,22 @@ thead {
     box-shadow: var(--box-shadow);
     padding: 20px;
     transition: all 0.3s;
+    align-items: center;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;   
 }
 
 .metric-title {
     font-size: 1rem;
-    color: #6c757d;
-    margin-bottom: 10px;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
 }
 
 .metric-value {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #212529;
 }
 
@@ -297,8 +301,15 @@ thead {
     width: 100%;
     position: relative;
     margin-bottom: 10px;
+    overflow: hidden; /* This prevents overflow */
 }
 
+.chart-container canvas {
+    max-width: 100% !important;
+    max-height: 175px !important;
+    width: 100% !important;
+    height: 175px !important;
+}
 .chart-title {
     font-size: 1rem;
     color: #6c757d;
@@ -339,4 +350,82 @@ p {
     font-weight: 300;
     line-height: 1.7em;
     color: rgb(51, 51, 51);
+}
+
+
+/* Project Type Pills */
+.project-type {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.type-solar-ground-mounted {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.type-solar-rooftop {
+    background: #fef3c7;
+    color: #d97706;
+}
+.type-wind {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.type-hydro {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+/* Country flags */
+.country-flag {
+    width: 20px;
+    height: 15px;
+    border-radius: 2px;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+.france { 
+    background: linear-gradient(90deg, #002395 33%, white 33%, white 66%, #ed2939 66%); 
+}
+
+.spain { 
+    background: linear-gradient(to bottom, #aa151b 25%, #f1bf00 25%, #f1bf00 75%, #aa151b 75%); 
+}
+
+/* IRR column styling */
+.irr-value {
+    color: #059669;
+    font-weight: bold;
+}
+
+/* Valuation column styling */
+.valuation-value {
+    color: #059669;
+    font-weight: bold;
+}
+
+.clickable-row {
+    position: relative;
+}
+
+.clickable-row::after {
+    content: "→";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 16px;
+    z-index: 5;
+    transition: all 0.3s ease;
+}
+
+.clickable-row:hover::after {
+    transform: translateY(-50%) translateX(3px);
 }

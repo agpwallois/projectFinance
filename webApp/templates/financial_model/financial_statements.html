@@ -1,0 +1,80 @@
+<!-- Updated HTML structure for fs_financial_statements.html -->
+
+
+<!-- Financial Statements Navigation -->
+<ul class="nav nav-tabs scenario-nav-tabs" id="financialStatementsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="financing-plan-tab" data-bs-toggle="tab" data-bs-target="#financing-plan" type="button" role="tab" aria-controls="financing-plan" aria-selected="true">
+            Financing Plan
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="income-statement-tab" data-bs-toggle="tab" data-bs-target="#income-statement" type="button" role="tab" aria-controls="income-statement" aria-selected="true">
+            Income Statement
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="operating-account-tab" data-bs-toggle="tab" data-bs-target="#operating-account" type="button" role="tab" aria-controls="operating-account" aria-selected="false">
+            Operating Account
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="distribution-account-tab" data-bs-toggle="tab" data-bs-target="#distribution-account" type="button" role="tab" aria-controls="distribution-account" aria-selected="false">
+            Distribution Account
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="balance-sheet-tab" data-bs-toggle="tab" data-bs-target="#balance-sheet" type="button" role="tab" aria-controls="balance-sheet" aria-selected="false">
+            Balance Sheet
+        </button>
+    </li>
+</ul>
+
+<!-- Financial Statements Tab Content -->
+<div class="tab-content" id="financialStatementsTabContent">
+    <div class="tab-pane fade show active" id="financing-plan" role="tabpanel" aria-labelledby="financing-plan-tab">
+        
+        
+        <div class="table-wrapper">
+            <table class="table_annual" id="fs_financing_plan_table">
+                <tbody id="fs_financing_plan"></tbody>
+            </table>
+        </div>
+
+
+
+    </div>
+    <div class="tab-pane fade" id="income-statement" role="tabpanel" aria-labelledby="income-statement-tab">
+        <div class="table-wrapper">
+            <table class="table_annual">
+                <tbody id="annual_IS"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="operating-account" role="tabpanel" aria-labelledby="operating-account-tab">
+        <div class="table-wrapper">
+            <table class="table_annual">
+                <tbody id="annual_op_account"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="distribution-account" role="tabpanel" aria-labelledby="distribution-account-tab">
+        <div class="table-wrapper">
+            <table class="table_annual">
+                <tbody id="annual_distr_account"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="balance-sheet" role="tabpanel" aria-labelledby="balance-sheet-tab">
+        <div class="table-wrapper">
+            <table class="table_annual">
+                <tbody id="annual_balance_sheet"></tbody>
+            </table>
+
+
+
+        </div>
+    </div>
+</div>
+

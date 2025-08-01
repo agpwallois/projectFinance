@@ -85,7 +85,7 @@ class DeclareVariables:
 
 		# Track maximum initial funding requirement
 		self.instance.initial_funding_max = 0
-
+		fm["debt_sizing"] = {}
 		# Debt Sizing - target debt amount determined by gearing
 		fm["debt_sizing"]["target_debt_amount"] = (
 			fm["uses"]["total"].sum() * float(project.debt_gearing_max) / 100

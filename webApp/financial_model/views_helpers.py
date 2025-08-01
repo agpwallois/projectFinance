@@ -20,7 +20,7 @@ def calc_sum_nested_dict(computation_displayed):
 
 	return all_sums
 
-def build_dashboard_table(results, specific_formats=None):
+def build_dashboard_cards(results, specific_formats=None):
 	table = {}
 
 	# Default format to be applied if no specific format is provided
@@ -52,7 +52,7 @@ def build_dashboard_table(results, specific_formats=None):
 
 	return table
 
-def build_dashboard_table_sensi(results):
+def build_dashboard_cards_sensi(results):
     metrics = [("Min DSCR", "{:.2f}x"), ("Avg. DSCR", "{:.2f}x"), 
               ("Min LLCR", "{:.2f}x"), ("Audit", None)]  # Specific format only for "Audit"
     
@@ -90,7 +90,7 @@ def build_dashboard_table_sensi(results):
     return dashboard_sensitivity_tables
 
 
-def build_dashboard_table_sensi_sponsor(results):
+def build_dashboard_cards_sensi_sponsor(results):
     metrics = [("Equity IRR", "{:.1f}%"), ("Audit", None)]  # Specific format only for "Audit"
     
     # Create headers for the table

@@ -24,17 +24,6 @@
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 				    
-		    <script src="{% static 'financial_model/ajax/process_get_post_form_with_ajax.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/set_up_sensitivities_form_submission_listeners.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/hide_construction_months_fields.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/hide_years_fields.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/build_computation_table.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/build_dashboard_tables.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/build_annual_financial_statements.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/build_fs_financing_plan.js' %}"></script>
-
-		    <script src="{% static 'financial_model/ajax/build_charts.js' %}"></script>
-		    <script src="{% static 'financial_model/ajax/update_sidebar_data.js' %}"></script>
 
             <style>
                 :root {
@@ -70,6 +59,7 @@
 			    background-color: white; 
 	   		    border-bottom: solid 1px rgb(221,221,221);
 			    padding-left: 15px; /* Adjust the padding top and bottom */
+			    padding-right: 40px;
 			    height: 50px; /* Adjust the height as needed */
 			    margin: 0px;
 			    position: fixed;
@@ -77,6 +67,7 @@
 			    font-weight: bold;
 			    display: flex; /* Add this to use flexbox */
 			    align-items: center;
+			    justify-content: space-between;
 			}
 
                 .logo {
@@ -107,6 +98,40 @@
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 }
+                
+                .user-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-weight: normal;
+                }
+                
+                .user-email {
+                    color: #64748b;
+                    font-size: 14px;
+                    font-weight: 500;
+                }
+                
+          
+          
+                .logout-btn {
+                    color: #64748b !important;
+                    text-decoration: none !important;
+                    font-size: 1rem !important;
+                    font-weight: 400 !important;
+                    padding: 8px 12px;
+                    transition: color 0.2s ease;
+                }
+
+                .logout-btn:hover {
+                    color: #0d6efd !important;
+                    text-decoration: none !important;
+                }
+
+                .logout-btn i {
+                    font-size: 1rem !important;
+                    margin-right: 6px;
+                }
 
             </style>
 
@@ -120,6 +145,15 @@
              <a href="{% url 'project_list' %}" id="shango"><div class="logo">
                 <h1><span class="logo-icon"><i class="fas fa-bolt"></i></span>Shango</h1>
             </div></a>
+            {% if user.is_authenticated %}
+            <div class="user-info">
+                <span class="user-email">{{ user.email }}</span>
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+            {% endif %}
 		</header>
 
 		<wrapper>

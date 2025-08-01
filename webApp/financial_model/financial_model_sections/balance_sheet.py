@@ -29,7 +29,7 @@ class BalanceSheet:
         bs_assets['DSRA'] = self.financial_model['DSRA']['dsra_eop']
         bs_assets['distribution_account'] = self.financial_model['distr_account']['balance_eop']
 
-        bs_assets['total_assets'] = (
+        bs_assets['total'] = (
             bs_assets['PPE'] +
             bs_assets['accounts_receivable'] +
             bs_assets['DSRA'] +
@@ -50,7 +50,7 @@ class BalanceSheet:
         bs_liabilities['accounts_payable'] = self.financial_model['working_cap']['accounts_payable_eop']
 
 
-        bs_liabilities['total_liabilities'] = (
+        bs_liabilities['total'] = (
             bs_liabilities['accounts_payable'] +
             bs_liabilities['senior_debt'] +
             bs_liabilities['shareholder_loan'] +

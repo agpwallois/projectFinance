@@ -14,7 +14,6 @@
 <script>
 
 
-
 const ctxchartOpRevenuesbyTech = document.getElementById('chartOpRevenuesbyTech');
 const chartOpRevenuesbyTech = new Chart(ctxchartOpRevenuesbyTech, {
     data: {
@@ -23,72 +22,58 @@ const chartOpRevenuesbyTech = new Chart(ctxchartOpRevenuesbyTech, {
             type: 'bar',
             label: 'Solar - ground-mounted',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#3b82f6',
-            ],
-            borderWidth: 1
+            backgroundColor: '#3b82f6',
+            borderWidth: 1,
+            stack: 'stack1'  // Explicitly assign to stack
         },{
-
             type: 'bar',
             label: 'Solar - rooftop',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#10b981',
-            ],
-
-            borderWidth: 1
+            backgroundColor: '#fbbf24',
+            borderWidth: 1,
+            stack: 'stack1'  // Same stack as other bars
         },{
-
             type: 'bar',
             label: 'Wind',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#fbbf24',
-            ],
-
-            borderWidth: 1
+            backgroundColor: '#10b981',
+            borderWidth: 1,
+            stack: 'stack1'  // Same stack as other bars
         },{
-
             type: 'line',
             label: 'Total',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#f43f5e',
-            ],
-            borderColor: [
-                '#f43f5e',
-            ],
-            borderWidth: 1
-        },
-        ]
+            backgroundColor: '#f43f5e',
+            borderColor: '#f43f5e',
+            borderWidth: 2,
+            fill: false,
+            // Don't assign to stack - line should overlay
+            yAxisID: 'y'  // Use same y-axis but not stacked
+        }]
     },
     options: {
-
-        responsive:true,
+        responsive: true,
         maintainAspectRatio: false,
-
-      plugins:{
-        legend: {
-            position: 'top',
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Revenues (kEUR)'
+            }
         },
-
-         title: {
-            display: true,
-            text: 'Revenues (kEUR)'
-        }},
-
         scales: {
             x: {
                 stacked: true,
             },
             y: {
                 stacked: true,
-            },
+                beginAtZero: true
+            }
         }
     }
 });
-
-
 
 const ctxchartOpRevenuesbyCountry = document.getElementById('chartOpRevenuesbyCountry');
 const chartOpRevenuesbyCountry = new Chart(ctxchartOpRevenuesbyCountry, {
@@ -98,56 +83,47 @@ const chartOpRevenuesbyCountry = new Chart(ctxchartOpRevenuesbyCountry, {
             type: 'bar',
             label: 'France',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#3b82f6',
-            ],
-            borderWidth: 1
+            backgroundColor: '#3b82f6',
+            borderWidth: 1,
+            stack: 'stack1'
         },{
-
             type: 'bar',
             label: 'Spain',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#10b981',
-            ],
-            borderWidth: 1
+            backgroundColor: '#10b981',
+            borderWidth: 1,
+            stack: 'stack1'
         },{
-
             type: 'line',
             label: 'Total',
             data: [1,2,3,4,5,6],
-            backgroundColor: [
-                '#f43f5e',
-            ],
-            borderColor: [
-                '#f43f5e',
-            ],
-            borderWidth: 1
-        },
-        ]
+            backgroundColor: '#f43f5e',
+            borderColor: '#f43f5e',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y'
+        }]
     },
     options: {
-
-        responsive:true,
+        responsive: true,
         maintainAspectRatio: false,
-
-      plugins:{
-        legend: {
-            position: 'top',
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Revenues (kEUR)'
+            }
         },
-
-         title: {
-            display: true,
-            text: 'Revenues (kEUR)'
-        }},
-
         scales: {
             x: {
                 stacked: true,
             },
             y: {
                 stacked: true,
-            },
+                beginAtZero: true
+            }
         }
     }
 });

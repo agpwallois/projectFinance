@@ -71,9 +71,11 @@ h3 {
 }
 
 h4 {
-    font-size: 1rem;
-    text-decoration: underline;
-    margin-bottom: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
+    
 }
 
 h6 {
@@ -105,13 +107,18 @@ h6:hover {
     padding-right: 20px;
     padding-bottom: 20px;
     min-height: 100vh;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     position: absolute;
     left: 0;
     color: rgb(59, 69, 78);
     background: rgb(244, 244, 244);
 }
 
+#content.sidebar-collapsed {
+    width: 100%; /* Full width for background coverage */
+    padding-right: 80px; /* Add padding to push content away from button */
+    box-sizing: border-box;
+}
 /* ===================================================
     5. SIDEBAR
     =================================================== */
@@ -144,6 +151,121 @@ h6:hover {
     margin-top: 10px;
     margin-right: 15px;
 }
+
+/* Modified sidebar header with collapse button */
+.sidebar-header {
+    display: flex;
+    justify-content: flex-start; /* Changed from space-between to flex-start */
+    align-items: center;
+    gap: 15px; /* Add gap between h1 and button */
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.sidebar-header h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Collapse button styling */
+.sidebar-collapse-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #64748b;
+    font-size: 16px;
+    padding: 0;
+}
+
+.sidebar-collapse-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: scale(1.05);
+}
+
+/* Arrow rotation animation */
+.sidebar-collapse-btn .arrow {
+    transition: transform 0.3s ease;
+}
+
+.sidebar-collapsed .sidebar-collapse-btn .arrow {
+    transform: rotate(180deg);
+}
+
+/* Update existing sidebar wrapper */
+#sidebar-wrapper.sidebar-collapsed {
+    transform: translateX(100%);
+}
+
+
+
+/* Floating expand button when sidebar is collapsed */
+.sidebar-expand-btn {
+    position: fixed;
+    right: 20px;
+    top: 110px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    width: 45px;
+    height: 45px;
+    display: none !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #64748b;
+    font-size: 16px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(20px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-expand-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: translateX(0) scale(1.05);
+}
+
+/* Show and animate the expand button when sidebar is collapsed */
+body.sidebar-collapsed .sidebar-expand-btn {
+    display: flex !important;
+    opacity: 1;
+    transform: translateX(0);
+    animation: slideInFromRight 0.4s ease-out;
+}
+
+/* Alternative: Use wrapper class if body class doesn't work */
+#sidebar-wrapper.sidebar-collapsed ~ .sidebar-expand-btn {
+    display: flex !important;
+    opacity: 1;
+    transform: translateX(0);
+    animation: slideInFromRight 0.4s ease-out;
+}
+
+/* Slide in animation */
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 
 #sidebar h1,
 #project-status-box h1 {
@@ -200,7 +322,7 @@ h6:hover {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     position: fixed;
     top: 50px;
-    z-index: 1;
+    z-index: 3;
     display: flex;
     align-items: center;
 }
@@ -479,6 +601,137 @@ h6:hover {
     padding-left: 0px;
     overflow: auto;
     height: 1075px;
+}
+
+/* ===================================================
+    KEY METRICS BOX STYLING
+    =================================================== */
+
+.box-key-metrics {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.box-key-metrics:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.box-key-metrics::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.box-key-metrics:hover::before {
+    transform: scaleX(1);
+}
+
+.box-key-metrics h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+    text-decoration: none;
+    letter-spacing: -0.025em;
+    line-height: 1.5;
+}
+
+.box-key-metrics h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+    text-decoration: none;
+    border-bottom: 1px solid #f8fafc;
+    padding-bottom: 0.5rem;
+}
+
+.box-key-metrics h4:first-of-type {
+    margin-top: 0;
+}
+
+.box-key-metrics .table-sum {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.box-key-metrics .table-sum:last-child {
+    margin-bottom: 0;
+}
+
+.box-key-metrics .table-sum tbody tr {
+    border-bottom: 1px solid #f8fafc;
+    transition: background-color 0.15s ease;
+}
+
+.box-key-metrics .table-sum tbody tr:last-child {
+    border-bottom: none;
+}
+
+.box-key-metrics .table-sum tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.03);
+}
+
+.box-key-metrics .table-sum tbody td {
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    vertical-align: middle;
+    border: none;
+}
+
+.box-key-metrics .table-sum tbody td:first-child {
+    color: #64748b;
+    font-weight: 500;
+    width: 60%;
+}
+
+.box-key-metrics .table-sum tbody td:last-child {
+    color: #1e293b;
+    font-weight: 600;
+    text-align: right;
+    width: 40%;
+}
+
+/* Special styling for important metrics */
+.box-key-metrics .table-sum tbody tr.highlight td:last-child {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #059669;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+}
+
+/* Specific styling for each metrics section */
+#summary-IRR .box-key-metrics::before {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+#summary-debt .box-key-metrics::before {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+#summary-audit .box-key-metrics::before {
+    background: linear-gradient(135deg, #10b981, #059669);
 }
 
 /* ===================================================
@@ -853,17 +1106,19 @@ input[type="checkbox"] {
 /* Enhanced Overview Box Hover Effects */
 .overview-box {
     background-color: white;
-    border-radius: 3px;
-    padding: 10px;
+    border-radius: 12px;
+    padding: 1.5rem;
     height: 100%;
-    border: solid 1px rgb(221,221,221);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .overview-box::before {
@@ -910,8 +1165,12 @@ input[type="checkbox"] {
 
 .charts-container {
     display: flex;
-    height: 300px;
+    width: 100%;
+    gap: 15px;
+    flex-wrap: wrap;
+    min-height: 300px; /* Use min-height instead of height */
 }
+
 
 .charts-container-vertical {
     display: flex;
@@ -935,10 +1194,12 @@ input[type="checkbox"] {
 
 .graph {
     display: flex;
-    width: 100%;
+    flex: 1;
     padding: 10px;
     justify-content: center;
     align-items: center;
+    min-width: 0; /* Prevents flex items from overflowing */
+    height: 300px; /* Set a height for the charts */
 }
 
 .graph > * {
@@ -1299,77 +1560,17 @@ input[type="checkbox"] {
     22. EXCEL-LIKE NAVIGATION - ELEGANT PROJECT FINANCE STYLE
     =================================================== */
 
-/* Navigation Banner - Minimalist Design */
-.excel-navigation-banner {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 10px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-}
-
-.excel-nav-controls {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.nav-instruction {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    color: #6b7280;
-    font-weight: 400;
-}
-
-.nav-instruction kbd {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 3px;
-    box-shadow: inset 0 -1px 0 #e5e7eb;
-    color: #374151;
-    display: inline-block;
-    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1;
-    padding: 3px 5px;
-    white-space: nowrap;
-}
-
-.excel-nav-status {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 0.9rem;
-    color: #475569;
-}
-
-.excel-nav-status strong {
-    color: #1e293b;
-    font-weight: 600;
-}
-
-.excel-nav-status .separator {
-    color: #cbd5e1;
-}
 
 /* Table wrapper for scroll functionality */
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
     overflow-y: visible;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     margin-bottom: 20px;
 }
 
 /* Table Styling - Enhanced Financial Look */
-.table_annual.excel-navigable {
+.table_annual {
     width: 100%;
     border-collapse: collapse;
     background: #ffffff;
@@ -1379,9 +1580,13 @@ input[type="checkbox"] {
     min-width: 800px; /* Ensure table has minimum width to trigger scroll */
 }
 
+
+
+
+
 /* Table Headers and Cells - Clear Borders */
-.table_annual.excel-navigable th,
-.table_annual.excel-navigable td {
+.table_annual th,
+.table_annual td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
@@ -1389,125 +1594,80 @@ input[type="checkbox"] {
 }
 
 /* Table Headers - Professional Style */
-.table_annual.excel-navigable thead th {
+.table_annual thead th {
     background-color: #f8f9fa;
     font-weight: bold;
     font-size: 0.85rem;
     color: #2c3e50;
     position: sticky;
     top: 0;
-    z-index: 10;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
-/* First Column Styling - Row Headers */
-.table_annual.excel-navigable td:first-child {
-    background-color: #f8f9fa;
-}
-
-
-
-/* Selected Cell - Clear Blue Highlight */
-.table_annual.excel-navigable td.excel-selected {
-    background-color: #e3f2fd !important;
-    outline: 2px solid #0d6efd;
-    outline-offset: -2px;
-    z-index: 2;
-}
-
-/* Hover Effect */
-.table_annual.excel-navigable td:hover:not(.excel-selected) {
-    background-color: #f5f5f5;
-}
-
-/* Row Hover */
-.table_annual.excel-navigable tr:hover {
-    background-color: #f5f5f5;
+.table_annual td:first-child {
+    min-width: 200px; /* Minimum width to prevent wrapping */
+    white-space: nowrap; /* Prevent text from wrapping */
+    position: sticky; /* Make it sticky for horizontal scrolling */
+    left: 0;
+    z-index: 1;
 }
 
 /* Alternating Row Colors */
-.table_annual.excel-navigable tbody tr:nth-child(even) {
+.table_annual tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-.table_annual.excel-navigable tbody tr:nth-child(even) td:first-child {
-    background-color: #f3f4f6;
+.table_annual tbody tr:nth-child(odd) {
+    background-color: white;
 }
 
-/* Total Rows - Special Styling */
-.table_annual.excel-navigable tr.total {
+/* Add these comprehensive rules instead */
+.table_annual tbody tr:nth-child(odd) td:first-child {
+    background-color: white;
+}
+
+.table_annual tbody tr:nth-child(even) td:first-child {
+    background-color: #f9f9f9;
+}
+
+/* For the second column sticky cells */
+#fs_financing_plan_table tbody tr:nth-child(odd) td:nth-child(2),
+#annual_balance_sheet tbody tr:nth-child(odd) td:nth-child(2) {
+    background-color: white;
+}
+
+#fs_financing_plan_table tbody tr:nth-child(even) td:nth-child(2),
+#annual_balance_sheet tbody tr:nth-child(even) td:nth-child(2) {
+    background-color: #f9f9f9;
+}
+
+/* Financial Total Rows - Special Styling */
+.table_annual tr.financial-total {
     font-weight: bold;
-    background-color: #e8f4f8;
+    background-color: #e0f2fe  !important;
 }
 
-.table_annual.excel-navigable tr.total td {
-    background-color: #e8f4f8;
-    border-top: 2px solid #4a90e2;
-    border-bottom: 2px solid #4a90e2;
+.table_annual tr.financial-total td {
+    background-color: #e0f2fe  !important;
     font-weight: bold;
-
 }
 
-/* Section Headers */
-.table_annual.excel-navigable tr.section-header {
+.table_annual tr.section-header {
     font-weight: bold;
-    background-color: #e0e0e0;
+    background-color: white !important;
 }
 
-.table_annual.excel-navigable tr.section-header td {
-    background-color: #e0e0e0;
+.table_annual tr.section-header td {
+    background-color: white !important;
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 0.05em;
+    text-align: left !important;
+    position: sticky;
+    left: 0;
+    z-index: 2; /* Higher than regular sticky columns */
 }
-
-/* Remove Pulsing Animation */
-.excel-navigable td.excel-selected::after {
-    display: none;
-}
-
-/* Negative Numbers - Red */
-.table_annual.excel-navigable td.negative {
-    color: #dc3545;
-}
-
-/* Positive Numbers - Optional Green */
-.table_annual.excel-navigable td.positive {
-    color: #28a745;
-}
-
-/* Focus indication for keyboard navigation */
-.excel-navigable:focus-within {
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-    border-radius: 8px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .excel-navigation-banner {
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px 15px;
-    }
-    
-    .excel-nav-controls {
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .nav-instruction {
-        font-size: 0.75rem;
-    }
-    
-    .excel-nav-status {
-        font-size: 0.85rem;
-    }
-}
-
-
-
-
 
 
 
@@ -1669,8 +1829,25 @@ input:checked + .slider:before {
     FINANCING PLAN TABLE STYLES
     =================================================== */
 
-/* Highlight "Total" rows with light blue background */
-#fs_financing_plan_table tr.total-row td {
+
+
+/* Optional: Make the total row text darker */
+.total-row td {
+    font-weight: bold;
+    color: #495057;
     background-color: #e0f2fe !important;
-    font-weight: 800; 
+    
+}
+
+
+.pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  margin: 2px;
+  text-align: center;
+  min-width: 40px;
 }

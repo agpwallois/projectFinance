@@ -14,7 +14,7 @@ const chartDevTech = new Chart(ctxchartDevTech, {
     data: {
         labels: ['Solar - ground - mounted','Wind', 'Solar - rooftop'],
         datasets: [{
-            data: [{{ capacity_per_tech.0.total_capacity }}, {{ capacity_per_tech.1.total_capacity }}, {{ capacity_per_tech.2.total_capacity }}],
+            data: [{{ capacity_in_development_per_tech.0.total_capacity }}, {{ capacity_in_development_per_tech.1.total_capacity }}, {{ capacity_in_development_per_tech.2.total_capacity }}],
             backgroundColor: ['#3b82f6', '#10b981', '#fbbf24'],
             borderWidth: 1
         }]
@@ -24,8 +24,11 @@ const chartDevTech = new Chart(ctxchartDevTech, {
         maintainAspectRatio: false,
         layout: {
             padding: {
-                left: 50 // Adds space for legend on the left
-            }
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 10
+        }
         },
         plugins: {
             legend: {
@@ -96,7 +99,7 @@ const chartDevCountry = new Chart(ctxchartDevCountry, {
         labels: ['France', 'Spain'],
         datasets: [{
             label: 'Capacity (MW)',
-            data: [{{ capacity_per_country.0.total_capacity }}, {{ capacity_per_country.1.total_capacity }}],
+            data: [{{ capacity_in_development_per_country.0.total_capacity }}, {{ capacity_in_development_per_country.1.total_capacity }}],
             backgroundColor: ['#3b82f6', '#10b981'],
             borderWidth: 1
         }]
@@ -105,6 +108,14 @@ const chartDevCountry = new Chart(ctxchartDevCountry, {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 10,
+                right: 10, // Reduced from 50 to 10
+                bottom: 10,
+                left: 10
+            }
+        },
         plugins: {
             legend: {
                 display: false,
@@ -113,16 +124,17 @@ const chartDevCountry = new Chart(ctxchartDevCountry, {
                 display: false
             },
             datalabels: {
-                color: '#000',
+                color: '#fff',
                 font: {
-                    size: 14
+                    size: 14 // Reduced font size
                 },
                 formatter: function(value, context) {
-                    return `${value.toLocaleString()} kW`; 
+                    return `${value.toLocaleString()} MW`; // Changed from kW to MW
                 },
-                anchor: 'end',
-                align: 'end',
-                display: true
+                anchor: 'center', // Changed from 'end' to 'center'
+                align: 'center',  // Changed from 'end' to 'center'
+                display: true,
+                clip: true // This ensures labels stay within bounds
             }
         },
         scales: {
@@ -143,12 +155,12 @@ const chartDevCountry = new Chart(ctxchartDevCountry, {
                 ticks: {
                     display: true,
                     font: {
-                        size: 14
+                        size: 14 // Reduced font size
                     }
                 }
             }
         }
     },
-    plugins: [ChartDataLabels] // Ensure ChartDataLabels plugin is loaded
+    plugins: [ChartDataLabels]
 });
 </script>

@@ -97,8 +97,8 @@ class Audit:
 			np.ndarray: Differences in balance sheet
 		"""
 		return (
-			self.model['assets']['total_assets'] -
-			self.model['liabilities']['total_liabilities']
+			self.model['assets']['total'] -
+			self.model['liabilities']['total']
 		)
 	
 	def _check_materiality(self, differences: np.ndarray) -> bool:

@@ -14,7 +14,8 @@ import math
 import copy
 from datetime import date
 from decimal import Decimal
-
+from django.http import Http404
+from authentication.utils import get_user_company
 from functools import wraps
 
 # Django imports
@@ -26,20 +27,21 @@ from django.contrib.auth.decorators import login_required
 # Application-specific imports
 from .forms import ProjectForm
 from .model_project import Project
-from .model_solar_financial_model import SolarFinancialModel
-from .model_wind_financial_model import WindFinancialModel
+from .model_solar_fm import SolarFinancialModel
+from .model_wind_fm import WindFinancialModel
 from .property_taxes import property_tax, tfpb_standard_reduction
 import requests
 from django.urls import reverse
 import logging
 import concurrent.futures
+from django.utils.decorators import method_decorator
 
 from concurrent.futures import ThreadPoolExecutor
 
 from .views_helpers import (
-	build_dashboard_table,
-	build_dashboard_table_sensi,
-	build_dashboard_table_sensi_sponsor,
+	build_dashboard_cards,
+	build_dashboard_cards_sensi,
+	build_dashboard_cards_sensi_sponsor,
 
 )
 
@@ -70,6 +72,7 @@ def timer_decorator(method):
 
 	return timed
 
+@method_decorator(login_required, name='dispatch')
 class FinancialModelView(View):
 
 	# settings.py or configuration file
@@ -109,9 +112,41 @@ class FinancialModelView(View):
 		},
 	}
 
+	def dispatch(self, request, *args, **kwargs):
+		"""Override dispatch to add company-based authorization"""
+		# First call the parent dispatch to handle login_required
+		response = super().dispatch(request, *args, **kwargs)
+		return response
+	
+	def _check_project_access(self, request, project_id):
+		"""Check if user has access to this project based on company"""
+		try:
+			# Get user's company
+			user_company = get_user_company(request.user)
+			
+			if not user_company:
+				messages.error(request, 'Your account is not associated with any company.')
+				return False
+			
+			# Get the project and check if it belongs to user's company
+			project = get_object_or_404(Project, id=project_id)
+			
+			if project.company != user_company:
+				# Project doesn't belong to user's company
+				return False
+				
+			return True
+			
+		except Exception as e:
+			logger.error(f"Error checking project access: {e}")
+			return False
 
 	""" GET METHOD """
 	def get(self, request, id: int):
+		# Check project access first
+		if not self._check_project_access(request, id):
+			raise Http404("Project not found or access denied")
+
 		"""Handle GET requests for financial model data"""    
 		project = get_object_or_404(Project, id=id)
 		context = {'project_form': ProjectForm(instance=project), 'project': project}
@@ -141,16 +176,33 @@ class FinancialModelView(View):
 	def post(self, request, id):
 		"""Handle POST requests for financial model updates"""
 
+		# Check project access first
+		if not self._check_project_access(request, id):
+			raise Http404("Project not found or access denied")
+			
 		project = get_object_or_404(Project, id=id)
+			
 		project_form = ProjectForm(request.POST, instance=project)
 
 		if not project_form.is_valid():
-			return JsonResponse({'error': project_form.errors.as_json()}, status=400)
+			# DETAILED ERROR LOGGING
+			logger.error(f"Form validation failed!")
+			logger.error(f"Form errors: {project_form.errors}")
+			
+			# Check which required fields are missing
+			for field_name, field in project_form.fields.items():
+				if field.required and not request.POST.get(field_name):
+					logger.error(f"MISSING REQUIRED FIELD: {field_name}")
+			
+			return JsonResponse({
+				'error': f'Form validation failed: {project_form.errors}',
+				'missing_fields': [name for name, field in project_form.fields.items() 
+								if field.required and not request.POST.get(name)]
+			}, status=400)
 
 		project_form.save()
-				
 		return self._create_financial_models(request, project, project_form)
-		
+			
 	@timer_decorator
 	def _create_financial_models(self, request, project, project_form):
 		"""Create or update financial models based on the scenario and project form data."""
@@ -241,10 +293,10 @@ class FinancialModelView(View):
 
 		# Extract chart data
 		charts_data = self._extract_charts_data(selected_fm)
-		fs_financing_plan_data = self._extract_fs_data(selected_fm)
 
-		annual_financial_statements = selected_fm.calc_annual_financial_statements()
-		
+		# Extract financial statements data
+
+		financial_statements = self._extract_financial_statements(selected_fm)
 
 		return self._prepare_json_response(
 			selected_fm, 
@@ -252,8 +304,8 @@ class FinancialModelView(View):
 			displayed_metrics, 
 			dashboard_data, 
 			charts_data, 
-			fs_financing_plan_data,
-			annual_financial_statements
+			financial_statements,
+
 		)
 
 	def _create_all_financial_models(self, project):
@@ -323,16 +375,7 @@ class FinancialModelView(View):
 		}
 
 
-	def _extract_fs_data(self, selected_fm):
-		"""
-		Extract and format data needed for chart generation.
 
-		Returns:
-			dict: Chart data organized by type
-		"""
-		fs_financing_plan_data = selected_fm.extract_fs_data()
-
-		return fs_financing_plan_data
 
 
 	def _calculate_project_valuation(self, sponsor_model):
@@ -445,7 +488,7 @@ class FinancialModelView(View):
 			"sponsor_IRR": f"{financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100:.1f}%",  # Percentage with 1 decimal
 			"lender_DSCR": f"{financial_models['lender_base_case'].financial_model['dict_results']['Sensi']['Min DSCR']:.2f}x",  # 2 decimals + "x"
 			"total_uses": f"{financial_models['lender_base_case'].financial_model['dict_uses_sources']['Uses']['Total']:,.1f}",  # Thousands separator + 1 decimal
-			"gearing": f"{financial_models['lender_base_case'].financial_model['dict_results']['Debt metrics']['Effective gearing'] * 100:.1f}%",  # Gearing as percentage
+			"gearing": financial_models['lender_base_case'].financial_model['dict_results']['Debt metrics']['Effective gearing'],  # Gearing as percentage
 		
 		}
 		sidebar_data = financial_models['sponsor_base_case'].financial_model['dict_sidebar']
@@ -454,6 +497,17 @@ class FinancialModelView(View):
 		
 		return displayed_metrics
 
+
+	def _extract_financial_statements(self, selected_fm: SolarFinancialModel) -> Dict[str, Any]:
+		"""Extract and package all financial statements data"""
+		return {
+			'financing_plan': selected_fm.extract_fs_financing_plan_data(),
+			'financial_statements': selected_fm.extract_fs_financial_statements_data(),
+			'balance_sheet': selected_fm.extract_fs_balance_sheet_data()
+		}
+
+
+
 	def _prepare_json_response(
 		self, 
 		selected_fm: SolarFinancialModel, 
@@ -461,23 +515,22 @@ class FinancialModelView(View):
 		displayed_metrics: Dict, 
 		dashboard_data: Dict, 
 		charts_data: Dict, 
-		fs_financing_plan_data:Dict,
-		annual_financial_statements: Dict,
+		financial_statements:Dict,
 
 	) -> JsonResponse:
 		"""Prepare JSON response with all financial model data"""
 		try:
 			return JsonResponse({
 				"df": selected_fm.financial_model,
-				"tables": dashboard_data['tables'],
+				"dashboard_cards": dashboard_data['tables'],
 				"table_sensi_diff": dashboard_data['sensi_diff'],
 				"table_sensi_diff_IRR": dashboard_data['sensi_diff_irr'], 
 				"charts_data_constr": charts_data['construction'],
 				"df_annual": charts_data['sum_year'],
 				"df_eoy": charts_data['end_of_year'],
-				"fs_financing_plan_data": fs_financing_plan_data,
-
-				"annual_financial_statements": annual_financial_statements,
+				"fs_financing_plan": financial_statements['financing_plan'],
+				"fs_balance_sheet": financial_statements['balance_sheet'],
+				"fs_financial_statements": financial_statements['financial_statements'],
 			
 				"sidebar_data": displayed_metrics, 
 			}, safe=False)
@@ -661,9 +714,9 @@ class FinancialModelView(View):
 			"Effective gearing": "{:.2%}",
 			"Average DSCR": "{:.2f}x",
 			"Senior _create_fm": "{:.2%}",
+			"Equity IRR": "{:.2%}",
 			"Share capital IRR": "{:.2%}",
 			"Shareholder loan IRR": "{:.2%}",
-			"Equity IRR": "{:.2%}",
 			"Project IRR (pre-tax)": "{:.2%}",
 			"Project IRR (post-tax)": "{:.2%}"
 		}
@@ -671,15 +724,15 @@ class FinancialModelView(View):
 		sorted_uses = dict(sorted(dict_uses_sources['Uses'].items(), key=lambda item: item[1], reverse=True))
 		
 		return {
-			'Uses': build_dashboard_table(sorted_uses, output_formats),
-			'Sources': build_dashboard_table(dict_uses_sources['Sources'], output_formats),
-			'Project IRR': build_dashboard_table(dict_results['Project IRR'], output_formats),
-			'Equity metrics': build_dashboard_table(dict_results['Equity metrics'], output_formats),
-			'Debt metrics': build_dashboard_table(dict_results['Debt metrics'], output_formats),
-			'Audit': build_dashboard_table(dict_results['Audit'], output_formats),
-			'Valuation': build_dashboard_table(dict_results['Valuation'], output_formats),
-			'Sensi': build_dashboard_table_sensi(table_sensi),
-			'Sensi_IRR': build_dashboard_table_sensi_sponsor(table_sensi_IRR),
+			'Uses': build_dashboard_cards(sorted_uses, output_formats),
+			'Sources': build_dashboard_cards(dict_uses_sources['Sources'], output_formats),
+			'Project IRR': build_dashboard_cards(dict_results['Project IRR'], output_formats),
+			'Equity metrics': build_dashboard_cards(dict_results['Equity metrics'], output_formats),
+			'Debt metrics': build_dashboard_cards(dict_results['Debt metrics'], output_formats),
+			'Audit': build_dashboard_cards(dict_results['Audit'], output_formats),
+			'Valuation': build_dashboard_cards(dict_results['Valuation'], output_formats),
+			'Sensi': build_dashboard_cards_sensi(table_sensi),
+			'Sensi_IRR': build_dashboard_cards_sensi_sponsor(table_sensi_IRR),
 		}
 
 	def _project_form_changed(self, project_form):

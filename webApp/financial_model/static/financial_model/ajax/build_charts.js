@@ -20,7 +20,7 @@ function build_charts(json) {
 
 
     // Extract data from json
-    const usesData = json.tables['Uses'];
+    const usesData = json.dashboard_cards['Uses'];
     const labels = Object.keys(usesData).filter(key => key !== 'Total');  // Exclude "Total"
     const dataValues = labels.map(key => parseFloat(usesData[key][0]));
 
@@ -54,7 +54,7 @@ function build_charts(json) {
     // Update the chart
     chartUses.update();
 
-        const sourcesData = json.tables['Sources'];
+        const sourcesData = json.dashboard_cards['Sources'];
         const excludedKeys = ['Total', 'Equity'];
         const sourcesLabels = Object.keys(sourcesData).filter(key => !excludedKeys.includes(key));
         const sourcesValues = sourcesLabels.map(key => parseFloat(sourcesData[key][0]));

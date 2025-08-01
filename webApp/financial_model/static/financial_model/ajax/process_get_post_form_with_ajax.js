@@ -17,7 +17,7 @@ function initializeApplication() {
     setupRadioButtonHandlers()
     set_up_sensitivities_form_submission_listeners();
     hide_construction_months_fields();
-    hide_years_fields();
+    hide_sidebar_years_fields();
 
     $(document).on('submit', '#post-form', function(e) {
         handleFormSubmission(e, this);
@@ -158,17 +158,20 @@ function makeGetRequest(value) {
 
 function handleSuccess(json) {
     console.log(json.df);
-    console.log(json.tables);
+    console.log(json.dashboard_cards);
     console.log(json.sidebar_data);
     console.log(json.table_sensi_diff);
     console.log(json.table_sensi_diff_IRR);
-    console.log(json.annual_financial_statements);
-    console.log(json.fs_financing_plan_data);
+    console.log(json.fs_financial_statements);
+    console.log(json.fs_financing_plan);
+    console.log(json.fs_balance_sheet);
 
     build_computation_table(json);
-    build_dashboard_tables(json);
-    build_annual_financial_statements(json);
+    build_dashboard_cards(json);
+    
+    build_fs_financial_statements(json);
     build_fs_financing_plan(json);
+    build_fs_balance_sheet(json);
 
     build_charts(json);
     update_sidebar_data(json);

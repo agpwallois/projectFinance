@@ -12,7 +12,7 @@ class CashFlowStatement:
 	def calculate_period(self, period: int) -> Dict[str, float]:
 		"""Calculate cash flows for a specific period."""
 		# Operating cash flows
-		ebitda = self.financial_model['EBITDA']['EBITDA'][period]
+		ebitda = self.financial_model['IS']['EBITDA'][period]
 		working_cap_movement = self.financial_model['working_cap']['working_cap_movement'][period]
 		corporate_tax = self.financial_model['IS']['corporate_income_tax'][period]
 		

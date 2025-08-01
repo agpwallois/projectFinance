@@ -12,9 +12,6 @@
     </div>
     
 
-   
-     </div>
-
 
 
 
@@ -34,7 +31,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="capacity"></div>
-                    <h3>Capacity (MW)</h3>
+                    <h4>Capacity (kWp)</h4>
  
                 </div>
             </div>
@@ -43,7 +40,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="total_uses"></div>
-                    <h3>Total Project Costs (kEUR)</h3>
+                    <h4>Total Project Costs (kEUR)</h4>
     
                 </div>
             </div>
@@ -52,7 +49,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="sponsor_IRR"></div>
-                    <h3>Sponsor Case Equity IRR</h3>
+                    <h4>Sponsor Case Equity IRR</h4>
  
                 </div>
             </div>
@@ -61,7 +58,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="gearing"></div>
-                     <h3>Senior Debt Gearing</h3>
+                     <h4>Senior Debt Gearing</h4>
     
                 </div>
             </div>
@@ -70,7 +67,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="lender_DSCR"></div>
-                     <h3>Lender Case Min DSCR</h3>
+                     <h4>Lender Case Min DSCR</h4>
     
                 </div>
             </div>
@@ -96,32 +93,27 @@
         <!-- Modal -->
         <div id="loading-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
           <div style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); font-size:18px;">
-            Creating scenarios... Please wait.
+            Creating scenarios... Please wait 5 seconds.
           </div>
         </div>
 
         <div class="navigation-container">
             <div class="nav-container">
                 <nav>
-<ul class="nav nav-tabs scenario-nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link active" href="#sponsor-case-tab" data-bs-toggle="tab">
-        Sponsor Scenarios&nbsp;<br>
-        <small>(<span id="sponsor_prod_choice" class="d-inline"></span>, <span id="sponsor_mkt_price_choice" class="d-inline"></span> prices)</small>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#lender-case-tab" data-bs-toggle="tab">
-        Lender Scenarios&nbsp;<br>
-        <small>(<span id="lender_prod_choice" class="d-inline"></span>, <span id="lender_mkt_price_choice" class="d-inline"></span> prices)</small>
-        </a>
-    </li>
-</ul>
-
-
-
-
-
+                <ul class="nav nav-tabs scenario-nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#sponsor-case-tab" data-bs-toggle="tab">
+                        Sponsor Scenarios&nbsp;<br>
+                        <small>(<span id="sponsor_prod_choice" class="d-inline"></span>, <span id="sponsor_mkt_price_choice" class="d-inline"></span> prices)</small>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#lender-case-tab" data-bs-toggle="tab">
+                        Lender Scenarios&nbsp;<br>
+                        <small>(<span id="lender_prod_choice" class="d-inline"></span>, <span id="lender_mkt_price_choice" class="d-inline"></span> prices)</small>
+                        </a>
+                    </li>
+                </ul>
                 </nav>
             </div>
 </div>
@@ -292,6 +284,11 @@
 
     </div>
 
+<!-- Floating expand button (shown when sidebar is collapsed) -->
+<button type="button" class="sidebar-expand-btn" id="sidebarExpandBtn" title="Expand sidebar">
+    ←
+</button>
+
 </form>
 
 <script>
@@ -309,8 +306,65 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarWrapper = document.getElementById('sidebar-wrapper');
+    const contentArea = document.getElementById('content');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const expandBtn = document.getElementById('sidebarExpandBtn');
+    const body = document.body;
+
+    function collapseSidebar() {
+        sidebarWrapper.classList.add('sidebar-collapsed');
+        contentArea.classList.add('sidebar-collapsed');
+        body.classList.add('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', 'true');
+    }
+
+    function expandSidebar() {
+        sidebarWrapper.classList.remove('sidebar-collapsed');
+        contentArea.classList.remove('sidebar-collapsed');
+        body.classList.remove('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', 'false');
+    }
+
+    collapseBtn.addEventListener('click', collapseSidebar);
+    expandBtn.addEventListener('click', expandSidebar);
+
+    // Optional: Keyboard shortcut (Ctrl+B)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+            if (sidebarWrapper.classList.contains('sidebar-collapsed')) {
+                expandSidebar();
+            } else {
+                collapseSidebar();
+            }
+        }
+    });
+
+    // Restore saved state
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        collapseSidebar();
+    }
+});
+</script>
 
 
 
+<!-- AJAX Scripts - Only loaded on project view page -->
+<script src="{% static 'financial_model/ajax/process_get_post_form_with_ajax.js' %}"></script>
+<script src="{% static 'financial_model/ajax/set_up_sensitivities_form_submission_listeners.js' %}"></script>
+<script src="{% static 'financial_model/ajax/hide_construction_months_fields.js' %}"></script>
+<script src="{% static 'financial_model/ajax/hide_sidebar_years_fields.js' %}"></script>
+<script src="{% static 'financial_model/ajax/build_computation_table.js' %}"></script>
+
+<script src="{% static 'financial_model/ajax/build_dashboard_cards.js' %}"></script>
+<script src="{% static 'financial_model/ajax/build_fs_financial_statements.js' %}"></script>
+<script src="{% static 'financial_model/ajax/build_fs_financing_plan.js' %}"></script>
+<script src="{% static 'financial_model/ajax/build_fs_balance_sheet.js' %}"></script>
+
+<script src="{% static 'financial_model/ajax/build_charts.js' %}"></script>
+<script src="{% static 'financial_model/ajax/update_sidebar_data.js' %}"></script>
 
 {% endblock %}
