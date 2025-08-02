@@ -25,7 +25,7 @@ def extract_fs_financing_plan_data(financial_model):
             if isinstance(date, str) and date:
                 try:
                     # Parse the date and format to MM/YYYY
-                    parsed_date = pd.to_datetime(date)
+                    parsed_date = pd.to_datetime(date, dayfirst=True)
                     formatted_dates.append(parsed_date.strftime('%m/%Y'))
                 except:
                     # If parsing fails, keep original

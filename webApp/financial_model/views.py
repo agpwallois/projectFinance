@@ -1,3 +1,4 @@
+
 # Standard library imports
 import calendar
 import datetime
@@ -23,6 +24,7 @@ from django.http import JsonResponse
 from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 # Application-specific imports
 from .forms import ProjectForm
@@ -140,6 +142,15 @@ class FinancialModelView(View):
 		except Exception as e:
 			logger.error(f"Error checking project access: {e}")
 			return False
+
+	def _get_model_class(self, project):
+		"""Get the appropriate model class based on project technology"""
+		if project.technology.startswith('Solar'):
+			return SolarFinancialModel
+		elif project.technology.startswith('Wind'):  
+			return WindFinancialModel
+		else:
+			raise ValueError(f"Unknown technology: {project.technology}")
 
 	""" GET METHOD """
 	def get(self, request, id: int):
@@ -264,26 +275,27 @@ class FinancialModelView(View):
 		return financial_models
 
 
-	def _get_financial_models(self, project: Project) -> Dict[str, SolarFinancialModel]:
+	def _get_financial_models(self, project: Project) -> Dict[str, Any]:
 		"""Retrieve all financial models for a project"""
 		financial_models = {}
+		model_class = self._get_model_class(project)
 		
 		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
 			try:
-				model = SolarFinancialModel.objects.get(
+				model = model_class.objects.get(
 					project=project, 
 					identifier=scenario_id
 				)
 				financial_models[scenario_id] = model
 
-			except SolarFinancialModel.DoesNotExist:
+			except model_class.DoesNotExist:
 				# Create missing models on demand
 				model = self._create_fm(project, scenario_id, scenario_config)
 				financial_models[scenario_id] = model
 				
 		return financial_models
 
-	def _build_response_data(self, selected_fm: SolarFinancialModel, financial_models: Dict[str, SolarFinancialModel]) -> JsonResponse:
+	def _build_response_data(self, selected_fm, financial_models: Dict[str, Any]) -> JsonResponse:
 		"""Build the JSON response data for both GET and POST requests"""
 		# Generate dashboard data
 		dashboard_data = self._generate_dashboard_data(selected_fm, financial_models)
@@ -375,9 +387,6 @@ class FinancialModelView(View):
 		}
 
 
-
-
-
 	def _calculate_project_valuation(self, sponsor_model):
 		"""
 		Calculate and return the project valuation.
@@ -402,14 +411,16 @@ class FinancialModelView(View):
 
 
 	@timer_decorator
-	def _create_fm(self, project: Project, scenario_id: str, scenario_config: dict) -> SolarFinancialModel:
+	def _create_fm(self, project: Project, scenario_id: str, scenario_config: dict):
 		"""
 		Create or update a financial model based on the given scenario configuration.
 		All models except Lender_base_case depend on Lender_base_case.
 		"""
+		model_class = self._get_model_class(project)
+		
 		# First ensure Lender_base_case exists as it's needed for dependency
 		if scenario_id != 'lender_base_case':
-			lender_base_case, lender_created = SolarFinancialModel.objects.get_or_create(
+			lender_base_case, lender_created = model_class.objects.get_or_create(
 				project=project,
 				identifier='lender_base_case',
 				defaults={'financial_model': {}}
@@ -429,7 +440,7 @@ class FinancialModelView(View):
 			depends_on = None
 
 		# Get or create the model instance
-		model, created = SolarFinancialModel.objects.get_or_create(
+		model, created = model_class.objects.get_or_create(
 			project=project,
 			identifier=scenario_id,  # Use the mapping to get the identifier
 			defaults={'financial_model': {}}
@@ -498,7 +509,7 @@ class FinancialModelView(View):
 		return displayed_metrics
 
 
-	def _extract_financial_statements(self, selected_fm: SolarFinancialModel) -> Dict[str, Any]:
+	def _extract_financial_statements(self, selected_fm) -> Dict[str, Any]:
 		"""Extract and package all financial statements data"""
 		return {
 			'financing_plan': selected_fm.extract_fs_financing_plan_data(),
@@ -510,7 +521,7 @@ class FinancialModelView(View):
 
 	def _prepare_json_response(
 		self, 
-		selected_fm: SolarFinancialModel, 
+		selected_fm, 
 		financial_models: Dict,
 		displayed_metrics: Dict, 
 		dashboard_data: Dict, 
@@ -567,8 +578,8 @@ class FinancialModelView(View):
 
 	def _build_dashboard(
 		self, 
-		selected_fm: SolarFinancialModel, 
-		financial_models: Dict[str, SolarFinancialModel]
+		selected_fm, 
+		financial_models: Dict[str, Any]
 	) -> Dict[str, Any]:
 		"""Build dashboard data from financial models"""
 
@@ -767,9 +778,5 @@ class FinancialModelView(View):
 		# Check if the sensitivity parameter is in the changed fields
 		"""logger.error(f"Checking if sensitivity {sensitivity_type} has changed")"""
 		result = sensitivity_type in changed_fields
-		
+
 		return result
-
-
-
-

@@ -7,7 +7,7 @@
     <!-- Project Header - Positioned right after header but before sidebar and content -->
     <div class="project-header">
         <a href="{% url 'project_list' %}" style="text-decoration: none; margin-right: 10px; font-weight: bold;">&#8592;</a>
-        <h1 id="project_name">Project: {{ project.name }} </h1>
+        <h1 id="project_name"> Project: {{ project.name }} ({{ project.technology }})</h1>
         <div class="metric-value" id="metric-status">{{ project.project_status }}</div>
     </div>
     
@@ -355,9 +355,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- AJAX Scripts - Only loaded on project view page -->
 <script src="{% static 'financial_model/ajax/process_get_post_form_with_ajax.js' %}"></script>
 <script src="{% static 'financial_model/ajax/set_up_sensitivities_form_submission_listeners.js' %}"></script>
-<script src="{% static 'financial_model/ajax/hide_construction_months_fields.js' %}"></script>
-<script src="{% static 'financial_model/ajax/hide_sidebar_years_fields.js' %}"></script>
+<script src="{% static 'financial_model/ajax/hide_sidebar_construction_months_fields.js' %}"></script>
+<script src="{% static 'financial_model/ajax/hide_sidebar_mkt_prices_years_fields.js' %}"></script>
+<script src="{% static 'financial_model/ajax/hide_sidebar_solar_or_wind_fields.js' %}"></script>
+
+
 <script src="{% static 'financial_model/ajax/build_computation_table.js' %}"></script>
+
+
 
 <script src="{% static 'financial_model/ajax/build_dashboard_cards.js' %}"></script>
 <script src="{% static 'financial_model/ajax/build_fs_financial_statements.js' %}"></script>
@@ -365,6 +370,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="{% static 'financial_model/ajax/build_fs_balance_sheet.js' %}"></script>
 
 <script src="{% static 'financial_model/ajax/build_charts.js' %}"></script>
-<script src="{% static 'financial_model/ajax/update_sidebar_data.js' %}"></script>
+<script src="{% static 'financial_model/ajax/update_dashboard_and_sidebar_cards.js' %}"></script>
 
 {% endblock %}

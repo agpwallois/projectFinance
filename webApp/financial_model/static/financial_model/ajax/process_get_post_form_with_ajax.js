@@ -16,8 +16,9 @@ $(document).ready(function() {
 function initializeApplication() {
     setupRadioButtonHandlers()
     set_up_sensitivities_form_submission_listeners();
-    hide_construction_months_fields();
-    hide_sidebar_years_fields();
+    hide_sidebar_construction_months_fields();
+    hide_sidebar_mkt_prices_years_fields();
+    hide_sidebar_solar_or_wind_fields();
 
     $(document).on('submit', '#post-form', function(e) {
         handleFormSubmission(e, this);
@@ -174,7 +175,7 @@ function handleSuccess(json) {
     build_fs_balance_sheet(json);
 
     build_charts(json);
-    update_sidebar_data(json);
+    update_dashboard_and_sidebar_cards(json);
 
     // Apply highlighting based on the stored selected scenario
     applyHighlightingToScenario(currentSelectedScenario);

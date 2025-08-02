@@ -1,4 +1,4 @@
-function update_sidebar_data(json) {
+function update_dashboard_and_sidebar_cards(json) {
 
         var dict_sidebar = {
                 COD:"#dateCOD",
@@ -16,7 +16,7 @@ function update_sidebar_data(json) {
                 lender_mkt_price_choice:"#lender_mkt_price_choice",
                 sponsor_mkt_price_choice:"#sponsor_mkt_price_choice",
                 gearing:"#gearing",
-                installed_capacity:"#capacity",
+                capacity:"#capacity",
 
         };
 
@@ -24,6 +24,9 @@ function update_sidebar_data(json) {
                 var key = Object.keys(dict_sidebar)[i];
                 $(Object.values(dict_sidebar)[i]).html(json.sidebar_data[key]);
         }
+        
+        // Also update #capacity with installed_capacity data
+        $("#capacity").html(json.sidebar_data["installed_capacity"]);
 
         for (var i = 0; i < 42; i++) {
                 $("#elecPriceLabel"+i).html(json.sidebar_data['price_elec_dict'][i]);

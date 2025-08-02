@@ -24,6 +24,8 @@ function build_dashboard_cards(json) {
     "Average life (from Financial Close)": "years",
     "Maximum gearing": "%",
     "Minimum DSCR": "x",
+    "Minimum LLCR": "x",
+
     "Equity injection": "text",
     "Subgearing": "%",
     "Senior Debt IRR": "%",

@@ -359,47 +359,45 @@ const chartDSCR = new Chart(ctx10, {
 			type: 'line',
 			label: 'DSCR',
 			data: [1,2,3,4,5,6],
-			backgroundColor: '#f43f5e', // orange-500
-			borderColor: '#f43f5e', // orange-500
+			backgroundColor: '#f43f5e',
+			borderColor: '#f43f5e',
 			borderWidth: 1
 		},{
 			type: 'line',
 			label: 'LLCR',
 			data: [1,2,3,4,5,6],
-			backgroundColor: '#3b82f6', // orange-500
-			borderColor: '#3b82f6', // orange-500
+			backgroundColor: '#3b82f6',
+			borderColor: '#3b82f6',
 			borderWidth: 1
 		},{
 			type: 'line',
 			label: 'PLCR',
 			data: [1,2,3,4,5,6],
-			backgroundColor: '#10b981', // orange-500 (was rgb(16, 185, 129))
-			borderColor: '#10b981', // orange-500 (was rgb(16, 185, 129))
+			backgroundColor: '#10b981',
+			borderColor: '#10b981',
 			borderWidth: 1
-		}
-		]
+		}]
 	},
 	options: {
-		responsive:true,
+		responsive: true,
 		maintainAspectRatio: false,
-
-	  plugins:{
-		legend: {
-			position: 'top',
+		plugins: {
+			legend: {
+				position: 'top',
+			},
+			title: {
+				display: true,
+				text: 'Debt ratios (x)'
+			}
 		},
-
-		 title: {
-			display: true,
-			text: 'Debt ratios (x)'
-		}},
-
 		scales: {
 			y: {
+				max: 3,  // This sets the maximum y-axis value to 3
 				ticks: {
-                    callback: function (value) {
-                        return value.toString() + 'x';
-                    }
-                }
+					callback: function (value) {
+						return value.toString() + 'x';
+					}
+				}
 			},
 		}
 	}

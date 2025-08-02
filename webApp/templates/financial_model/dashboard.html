@@ -52,46 +52,25 @@
 
     <!-- Operational Tabs Section - Only shown when project status is "Operational" -->
     {% if project.project_status == "Operational" %}
-    <div class="operational_tabs">
-        <nav>
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#nav-changelog" data-bs-toggle="tab">Changelog</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#nav-valuation" data-bs-toggle="tab">Valuation</a>
-                </li>
-            </ul>
-        </nav>
 
-        <div class="box-wrapper">
-            <div class="tab-content">
-                <!-- Changelog Tab Content -->
-                <div class="tab-pane fade show active" id="nav-changelog">
-                    <div class="box">
-                        <h2>Changelog</h2>
-                    </div>
-                </div>
 
-                <!-- Valuation Tab Content -->
-                <div class="tab-pane fade" id="nav-valuation">
-                    <div class="box">
-                        <h2>Valuation</h2>
-
-                        <script>
+    <div class="box-wrapper">
+                        <h2>Valuation      (<script>
                             var options = { year: 'numeric', month: 'long', day: 'numeric' };
                             var formattedDate = new Date().toLocaleDateString(undefined, options);
                             document.write(formattedDate);
-                        </script>
+                        </script>)</h2>
 
+                  
+    <div class="box-key-metrics">
                         <table class="table-sum">
                             <tbody id="summary_valuation"></tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
+
+    </div>
+
+
     {% endif %}
 
     <!-- Charts Section -->

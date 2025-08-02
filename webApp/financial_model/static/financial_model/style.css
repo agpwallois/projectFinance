@@ -734,6 +734,8 @@ body.sidebar-collapsed .sidebar-expand-btn {
     background: linear-gradient(135deg, #10b981, #059669);
 }
 
+
+
 /* ===================================================
     9. TABLES
     =================================================== */
@@ -1851,3 +1853,4 @@ input:checked + .slider:before {
   text-align: center;
   min-width: 40px;
 }
+

@@ -1,4 +1,4 @@
-function hide_construction_months_fields() {
+function hide_sidebar_construction_months_fields() {
   // Get the start and end date fields
   var startDateField = $('#id_start_construction');
   var endDateField = $('#id_end_construction');

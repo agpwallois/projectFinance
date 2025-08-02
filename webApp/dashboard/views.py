@@ -259,24 +259,30 @@ def get_project_data(projects):
 	project_data = {}
 	for project in projects:
 		try:
-			# Choose the right model based on project technology
-			# Check if technology starts with 'Solar' to handle variations like 'Solar - ground-mounted'
+			# Get the appropriate model class based on project technology
 			if project.technology.startswith('Solar'):
-				sponsor_result = SolarFinancialModel.objects.get(
-					project=project, identifier='sponsor'
-				).financial_model
+				model_class = SolarFinancialModel
 			elif project.technology.startswith('Wind'):
-				sponsor_result = WindFinancialModel.objects.get(
-					project=project, identifier='sponsor'
-				).financial_model
+				model_class = WindFinancialModel
 			else:
 				logger.warning(f"Unknown technology type: {project.technology} for project {project.name}")
 				project_data[project.id] = None
 				continue
 			
+			# Try to get sponsor_base_case model first, fallback to sponsor for backwards compatibility
+			try:
+				sponsor_result = model_class.objects.get(
+					project=project, identifier='sponsor_base_case'
+				).financial_model
+			except model_class.DoesNotExist:
+				# Fallback to old identifier for backwards compatibility
+				sponsor_result = model_class.objects.get(
+					project=project, identifier='sponsor'
+				).financial_model
+			
 			project_data[project.id] = sponsor_result
-		except (SolarFinancialModel.DoesNotExist, WindFinancialModel.DoesNotExist):
-			logger.info(f"No financial model with identifier='sponsor' for project {project.name}")
+		except model_class.DoesNotExist:
+			logger.info(f"No financial model with identifier='sponsor_base_case' or 'sponsor' for project {project.name}")
 			project_data[project.id] = None
 		except Exception as e:
 			logger.error(f"Error getting project data for {project.name}: {str(e)}")
@@ -296,13 +302,20 @@ def calculate_yearly_revenues(projects):
 	
 	for project in operational_projects:
 		try:
-			# Get financial model based on technology
-			"""if project.technology.startswith('Solar'):"""
-			model = SolarFinancialModel.objects.get(project=project, identifier='sponsor_base_case')
-			"""elif project.technology.startswith('Wind'):
-				model = WindFinancialModel.objects.get(project=project, identifier='sponsor_base_case')
+			# Get the appropriate model class based on project technology
+			if project.technology.startswith('Solar'):
+				model_class = SolarFinancialModel
+			elif project.technology.startswith('Wind'):
+				model_class = WindFinancialModel
 			else:
-				continue"""
+				continue
+			
+			# Try to get sponsor_base_case model first, fallback to sponsor for backwards compatibility
+			try:
+				model = model_class.objects.get(project=project, identifier='sponsor_base_case')
+			except model_class.DoesNotExist:
+				# Fallback to old identifier for backwards compatibility
+				model = model_class.objects.get(project=project, identifier='sponsor')
 			
 			sponsor_result = model.financial_model
 			
@@ -333,7 +346,7 @@ def calculate_yearly_revenues(projects):
 				except (ValueError, TypeError):
 					continue
 					
-		except (SolarFinancialModel.DoesNotExist, WindFinancialModel.DoesNotExist):
+		except model_class.DoesNotExist:
 			continue
 		except Exception:
 			continue

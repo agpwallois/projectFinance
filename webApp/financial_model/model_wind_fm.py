@@ -13,7 +13,7 @@ class WindFinancialModel(FinancialModel):
 
 		self.financial_model['capacity'] = {}
 
-		self.financial_model['capacity']['before_degradation'] = self.project.installed_capacity*self.financial_model['flags']['operations']
+		self.financial_model['capacity']['before_degradation'] = self.installed_capacity*self.financial_model['flags']['operations']
 		self.financial_model['capacity']['degradation_factor'] = 1/(1+0)**self.financial_model['time_series']['years_from_COD_avg']
 		self.financial_model['capacity']['after_degradation'] = self.financial_model['capacity']['before_degradation']
 

@@ -1,4 +1,4 @@
-function hide_sidebar_years_fields() {
+function hide_sidebar_mkt_prices_years_fields() {
     // Get the input fields by ID prefixes
   var fields = {
     startDate: $('#id_start_construction'),
