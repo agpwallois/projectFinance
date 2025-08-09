@@ -190,7 +190,7 @@ function handleSuccess(json) {
     build_dashboard_cards(json);
     console.timeEnd('build_dashboard_cards');
 
-    build_computation_table(json);
+    //build_computation_table(json);
     
     // Build financial statements
     console.time('build_fs_financial_statements');

@@ -1,6 +1,9 @@
 import numpy as np
 from typing import Any
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class SeniorDebtSizing:
 	"""
@@ -85,11 +88,6 @@ class SeniorDebtSizing:
 			fm['debt_sizing']['target_debt_DSCR'],
 			fm['debt_sizing']['target_debt_gearing']
 		)
-
-		"""if self.instance.project.devfee_choice == "1":
-		self.instance.development_fee = 1000
-		else:
-		self.instance.development_fee = 0"""
 
 
 		fm['debt_sizing']['constraint'] = "DSCR" if fm['debt_sizing']['target_debt_DSCR'] < fm['debt_sizing']['target_debt_gearing'] else "Gearing"

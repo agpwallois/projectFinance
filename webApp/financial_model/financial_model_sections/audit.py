@@ -89,7 +89,7 @@ class Audit:
 
 		debt_maturity_check = self._check_debt_maturity(final_repayment_date, debt_maturity_rounded)
 
-		logger.error(final_repayment_date)
+		"""logger.error(final_repayment_date)"""
 
 		# Combine all checks
 		check_all = all([

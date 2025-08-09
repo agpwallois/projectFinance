@@ -45,6 +45,14 @@ class DeclareVariables:
 		# Initialize sub-dictionaries in the financial_model
 		fm["op_account"] = {}
 		fm["senior_debt"] = {}
+		fm["senior_debt"] = {
+			"interests_construction": np.full(data_length, 0),
+			"upfront_fee": np.full(data_length, 0),
+			"commitment_fees": np.full(data_length, 0),
+
+		}
+
+
 		fm["discount_factor"] = {}
 		fm["assets"] = {}
 		fm["liabilities"] = {}
@@ -57,6 +65,8 @@ class DeclareVariables:
 		# Uses and their cumulative total
 		fm["uses"] = {}
 		fm["uses"]["total"] = fm["construction_costs"]["total"]
+		fm["uses"]["total_wo_dev_fee"] = fm["construction_costs"]["total"]
+	
 		fm["uses"]["total_cumul"] = fm["uses"]["total"].cumsum()
 
 		# Shareholder Loan (SHL)
@@ -91,6 +101,9 @@ class DeclareVariables:
 		fm["debt_sizing"]["target_debt_amount"] = (
 			fm["uses"]["total"].sum() * float(project.debt_gearing_max) / 100
 		)
+		fm["debt_sizing"]["target_debt_DSCR"] = (
+			fm["uses"]["total"].sum() * float(project.debt_gearing_max) / 100
+		)		
 
 		# Senior Debt Repayments placeholder
 		fm["senior_debt"]["target_repayments"] = np.full(data_length, 0)

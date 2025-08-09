@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Uses:
@@ -11,7 +14,7 @@ class Uses:
 		"""Calculates and updates the 'uses' section of the financial model."""
 		self._initialize_uses_section()
 		self._calculate_uses_categories()
-		self._ensure_types_section()
+		self._calculate_total_uses_wo_dev_fee()
 		self._calculate_total_uses()
 		self._calculate_total_depreciable_uses()
 
@@ -24,15 +27,23 @@ class Uses:
 		"""Calculate individual 'uses' categories."""
 		uses = self.financial_model['uses']
 		uses['construction'] = self.financial_model['construction_costs']['total']
-		uses['development_fee'] = float(self.instance.project.devfee_paid_FC) * 100 * self.financial_model['flags']['construction_start'] + float(self.instance.project.devfee_paid_COD) * 100 * self.financial_model['flags']['construction_end']
+
+		# ----- 4.5) Development Fee Optimization -----
+		if self.instance.project.devfee_choice == 1:
+			# Calculate optimized development fee based on debt capacity
+			total_uses_wo_dev_fee = self.financial_model['uses']['total_wo_dev_fee'].sum()
+			self.instance.development_fee = max(0, self.financial_model['debt_sizing']['target_debt_DSCR']/self.instance.target_gearing - total_uses_wo_dev_fee)
+		else:
+			self.instance.development_fee = 0
+
+		"""logger.error(self.instance.development_fee)"""
+
+		uses['development_fee'] = float(self.instance.project.devfee_paid_FC) * self.instance.development_fee * self.financial_model['flags']['construction_start'] + float(self.instance.project.devfee_paid_COD) * self.instance.development_fee * self.financial_model['flags']['construction_end']
+	
 
 		uses['interests_construction'] = self.financial_model['senior_debt']['interests_construction']
 		uses['upfront_fee'] = self.financial_model['senior_debt']['upfront_fee']
 		uses['commitment_fees'] = self.financial_model['senior_debt']['commitment_fees']
-
-
-
-
 
 		uses['senior_debt_idc_and_fees'] = (
 			self.financial_model['senior_debt']['interests_construction'] +
@@ -42,10 +53,18 @@ class Uses:
 		uses['reserves'] = self.financial_model['DSRA']['initial_funding']
 		uses['local_taxes'] = self.financial_model['local_taxes']['total']
 
-	def _ensure_types_section(self):
-		"""Ensure the 'types' section exists in the financial model."""
-		if 'types' not in self.financial_model:
-			self.financial_model['types'] = {}
+
+	def _calculate_total_uses_wo_dev_fee(self):
+		"""Calculate the total 'uses'."""
+		uses = self.financial_model['uses']
+		uses['total_wo_dev_fee'] = (
+			np.array(uses['construction']) +
+			np.array(uses['interests_construction']) +
+			np.array(uses['upfront_fee']) +
+			np.array(uses['commitment_fees']) +
+			np.array(uses['reserves'])
+		)
+
 
 	def _calculate_total_uses(self):
 		"""Calculate the total 'uses'."""

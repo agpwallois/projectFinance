@@ -74,6 +74,8 @@ class FinancingPlan:
 		
 		# Effective gearing may be lower than target due to DSCR constraints
 		self.model.gearing_eff = self.model.senior_debt_amount / total_project_costs
+		"""logger.error(self.model.senior_debt_amount)
+		logger.error(total_project_costs)"""
 	
 	def _calculate_equity_requirement(self):
 		"""Calculate total equity required as the difference between uses and debt."""
@@ -83,6 +85,8 @@ class FinancingPlan:
 			total_uses - 
 			self.model.senior_debt_amount
 		)
+
+		"""logger.error(self.total_equity_required)"""
 		
 
 		# Convert subgearing from percentage to decimal
@@ -165,6 +169,8 @@ class FinancingPlan:
 			a_min=None,  # No minimum constraint
 			a_max=self.model.senior_debt_amount  # Cap at total debt capacity
 		)
+
+		"""logger.error(self.model.gearing_eff)"""
 		
 		# Convert cumulative to period-by-period amounts
 		debt_drawdowns = np.ediff1d(
@@ -176,7 +182,8 @@ class FinancingPlan:
 		equity_drawdowns = (
 			self.model.financial_model['uses']['total'] - debt_drawdowns
 		)
-		
+
+
 		self.model.financial_model['sources']['senior_debt'] = debt_drawdowns
 		self.model.financial_model['sources']['equity'] = equity_drawdowns
 	
@@ -188,6 +195,7 @@ class FinancingPlan:
 		SHL: Subordinated debt that can potentially be repaid to shareholders
 		"""
 		total_equity = self.model.financial_model['sources']['equity']
+		
 		
 		# Share capital = equity × (1 - subgearing percentage)
 		self.model.financial_model['sources']['share_capital'] = (
@@ -209,7 +217,8 @@ class FinancingPlan:
 		# Validation check
 		total_sources = pd.Series(self.model.financial_model['sources']['total']).sum()
 		total_uses = pd.Series(self.model.financial_model['uses']['total']).sum()
-		
+
+
 		if not np.isclose(total_sources, total_uses, rtol=1e-10):
 			logger.warning(f"sources ({total_sources:,.0f}) don't match uses ({total_uses:,.0f})")
 	

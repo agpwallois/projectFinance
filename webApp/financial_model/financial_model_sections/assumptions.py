@@ -148,7 +148,7 @@ class Assumptions:
 		self.instance.target_DSCR = float(project.debt_target_DSCR)
 		self.instance.target_gearing = float(project.debt_gearing_max) / 100
 		self.instance.dsra = 6 if int(project.DSRA_choice) == 1 else 12
-		self.instance.iteration = 30
+		self.instance.iteration = 50
 		self.instance.SHL_margin = float(project.SHL_margin) / 100
 		self.instance.p50 = project.p50 / 1000
 		self.instance.lender_production = project.production_choice

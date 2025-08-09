@@ -62,7 +62,8 @@ def extract_fs_financing_plan_data(financial_model):
             '': financial_model['dates']['model']['end'],
         },
         'fs_uses': {
-			'construction_costs': financial_model['construction_costs']['total'],
+			'construction_costs': financial_model['uses']['construction'],
+			'development fee (optimised)': financial_model['uses']['development_fee'],
 			'senior_debt_interests_construction': financial_model['uses']['interests_construction'],
 			'senior_debt_upfront_fee': financial_model['uses']['upfront_fee'],
 			'senior_debt_commitment_fees': financial_model['uses']['commitment_fees'],

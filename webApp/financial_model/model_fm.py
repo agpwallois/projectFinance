@@ -189,9 +189,10 @@ class FinancialModel(models.Model):
 	]
 
 	CALCULATIONS_BEFORE_DEBT = [
-		FinancingPlan,
-		SeniorDebt,
+
 		Uses,
+		FinancingPlan,
+		SeniorDebt,		
 		Depreciation,
 	]
 
@@ -269,20 +270,24 @@ class FinancialModel(models.Model):
 
 			"""Execute iterative debt sizing and sculpting process."""
 	
-			self._run_component_list(self.CALCULATIONS_BEFORE_DEBT)
+			self._run_component_list(self.CALCULATIONS_BEFORE_DEBT)	
 			
 			self._run_component_list(self.CALCULATIONS_SENSI)
+
+
 			self._calculate_senior_debt()
+
+
 			self._run_component_list(self.CALCULATIONS_FM_OUTPUTS)
 
 
-			"""self._run_calculations(debt_sizing_sculpting=True)"""
+
+
+
 			
 			if self._structuring_case_has_converged():
 				break
 				
-		"""self._persist_debt_data()"""
-
 	def _apply_debt_from_dependency(self):
 		"""
 		Apply and copy debt values from the dependent model, then run calculations.
