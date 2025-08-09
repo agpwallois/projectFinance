@@ -172,7 +172,7 @@
            
         </div>
         <div class="metric-card">
-            <div class="metric-value">${{ total_valuation_in_operations|thousands_separator }}M</div>
+            <div class="metric-value">${{ total_valuation_in_operations|thousands_separator }} kEUR</div>
             <div class="metric-title">Portfolio Valuation</div>
 
         </div>
@@ -237,7 +237,7 @@
                             <td>{{ project.created_date }}</td>
                             <td>{{ project.updated_date }}</td>
                             <td><span class="irr-value">{{ project.sponsor_irr|floatformat:2 }}%</span></td>
-                            <td><span class="valuation-value">${{ project.valuation|floatformat:0 }}M</span></td>
+                            <td><span class="valuation-value">${{ project.valuation|thousands_separator}} kEUR</span></td>
                         </tr>
                         {% endif %}
                     {% endfor %}

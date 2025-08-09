@@ -28,15 +28,20 @@ class Times:
 		"""Calculate the number of days in each year."""
 		dates_end = pd.Series(self.financial_model['dates']['model']['end'])
 		is_leap_year = dates_end.dt.is_leap_year
-		self.financial_model['time_series']['days_in_year'] = (
-			is_leap_year * 366 + (~is_leap_year) * 365
-		)
+		days_in_year = is_leap_year * 366 + (~is_leap_year) * 365
+		# Ensure int64 dtype for consistency
+		self.financial_model['time_series']['days_in_year'] = days_in_year.astype('int64')
 
 	def _calculate_years_in_period(self):
 		"""Calculate the number of years in each period."""
 		days_model = self.financial_model['days']['model']
 		days_in_year = self.financial_model['time_series']['days_in_year']
-		self.financial_model['time_series']['years_in_period'] = days_model / days_in_year
+		# Use np.where to handle division by zero
+		self.financial_model['time_series']['years_in_period'] = np.where(
+			days_in_year != 0,
+			days_model / days_in_year,
+			0
+		)
 
 	def _calculate_years_during_operations(self):
 		"""Calculate the number of years during operations."""
@@ -70,7 +75,12 @@ class Times:
 		"""Calculate the percentage of days in the operations period."""
 		days_operations = pd.Series(self.financial_model['days']['operations'])
 		days_model = pd.Series(self.financial_model['days']['model'])
-		self.financial_model['time_series']['pct_in_operations_period'] = days_operations / days_model
+		# Handle division by zero
+		self.financial_model['time_series']['pct_in_operations_period'] = np.where(
+			days_model != 0,
+			days_operations / days_model,
+			0
+		)
 
 	def _calculate_years_from_base_dates(self):
 		"""Calculate years from base dates for specific keys."""
@@ -98,12 +108,12 @@ def get_quarters(date_list):
 
 
 def calc_years_from_base_dates(days_series, days_in_year):
-	"""Calculate years from base dates for specific keys."""
+	"""Calculate cumulative years from base dates for specific keys."""
 	keys = ['contract_indexation', 'merchant_indexation', 'opex_indexation', 'lease_indexation']
 	years_from_base_dates = {}
 
 	for key in keys:
-		years = (days_series[key] / days_in_year).cumsum()
-		years_from_base_dates[key] = years
+		years = days_series[key] / days_in_year
+		years_from_base_dates[key] = years.cumsum()
 
 	return years_from_base_dates

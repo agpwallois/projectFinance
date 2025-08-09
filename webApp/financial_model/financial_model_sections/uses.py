@@ -24,7 +24,7 @@ class Uses:
 		"""Calculate individual 'uses' categories."""
 		uses = self.financial_model['uses']
 		uses['construction'] = self.financial_model['construction_costs']['total']
-		uses['development_fee'] = 0
+		uses['development_fee'] = float(self.instance.project.devfee_paid_FC) * 100 * self.financial_model['flags']['construction_start'] + float(self.instance.project.devfee_paid_COD) * 100 * self.financial_model['flags']['construction_end']
 
 		uses['interests_construction'] = self.financial_model['senior_debt']['interests_construction']
 		uses['upfront_fee'] = self.financial_model['senior_debt']['upfront_fee']

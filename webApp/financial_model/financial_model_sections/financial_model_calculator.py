@@ -4,7 +4,6 @@ from typing import Dict, Any, Optional, Tuple
 import logging
 
 
-from numba import jit
 import cProfile
 import pstats
 from functools import wraps
@@ -58,16 +57,17 @@ class FinancialModelCalculator:
 	@profile_method
 	def initialize(self):
 		"""Initialize all calculations using period-by-period approach."""
-
+		import logging
+		logger = logging.getLogger(__name__)
 		
+		logger.info("=== Starting FinancialModelCalculator.initialize() ===")
 		
 		self._initialize_all_arrays()
 		
 		# Calculate period by period to handle interdependencies
 		for period in range(self.n_periods):
 			self._calculate_period(period)
-
-
+		
 		IS = self.financial_model['IS']
 		IS['contracted_revenues'] = self.financial_model['revenues']['contract']
 		IS['merchant_revenues'] = self.financial_model['revenues']['merchant']
@@ -77,6 +77,16 @@ class FinancialModelCalculator:
 		IS['operating_costs'] = -1*self.financial_model['opex']['operating_costs']
 		IS['lease_costs'] = -1*self.financial_model['opex']['lease_costs']
 		IS['total_opex'] = -1*self.financial_model['opex']['total']
+
+
+		op_account = self.financial_model['op_account']
+		op_account['share_capital'] = self.financial_model['sources']['share_capital']
+		op_account['shareholder_loan'] = self.financial_model['sources']['SHL']
+		op_account['senior_debt'] = self.financial_model['sources']['senior_debt']
+		op_account['dsra_additions'] = self.financial_model['DSRA']['dsra_additions']
+		op_account['dsra_release'] = self.financial_model['DSRA']['dsra_release']
+		op_account['dsra_initial_funding'] = -1*self.financial_model['DSRA']['initial_funding']
+		op_account['cash_available_for_dsra'] = 1*self.financial_model['DSRA']['cash_available_for_dsra']
 
 
 
@@ -92,9 +102,11 @@ class FinancialModelCalculator:
 				   'retained_earnings_bop', 'retained_earnings_eop', 'distributable_profit'],
 			'op_account': ['EBITDA', 'working_cap_movement', 'corporate_tax', 
 						  'cash_flows_operating', 'construction_costs', 'development_fee',
+						  'senior_debt_interests_construction', 'senior_debt_upfront_fee', 'senior_debt_commitment_fees',
+						  'reserves', 'local_taxes',
 						  'cash_flows_investing', 'cash_flows_financing', 'CFADS', 
 						  'CFADS_amo', 'CFADS_operations', 'balance_bop', 'balance_eop',
-						  'cash_available_for_distribution', 'transfers_distribution_account',
+						  'cash_flow_available_for_distribution', 'cash_available_for_distribution', 'transfers_distribution_account',
 						  'dsra_mov', 'senior_debt_interests_paid', 'senior_debt_repayments'],
 			'distr_account': ['balance_bop', 'balance_eop', 'transfers_distribution_account',
 							 'cash_available_for_distribution', 'cash_available_for_dividends',
@@ -181,15 +193,11 @@ class FinancialModelCalculator:
 		"""Calculate income statement items for a single period."""
 		IS = self.financial_model['IS']
 
-
-
 		# EBIT = EBITDA - Depreciation
 		IS['EBIT'][period] = (
 			self.financial_model['IS']['EBITDA'][period] -
 			self.financial_model['IS']['depreciation'][period]
 		)
-
-
 		
 		# EBT = EBIT - Interest Expenses
 		IS['EBT'][period] = (
@@ -215,34 +223,39 @@ class FinancialModelCalculator:
 		# Operating Cash Flows
 		op_account['EBITDA'][period] = self.financial_model['IS']['EBITDA'][period]
 		op_account['working_cap_movement'][period] = self.financial_model['working_cap']['working_cap_movement'][period]
-		op_account['corporate_tax'][period] = self.financial_model['IS']['corporate_income_tax'][period]
+		op_account['corporate_tax'][period] = -self.financial_model['IS']['corporate_income_tax'][period]
 		
 		op_account['cash_flows_operating'][period] = (
 			op_account['EBITDA'][period] + 
-			op_account['working_cap_movement'][period] -
+			op_account['working_cap_movement'][period] +
 			op_account['corporate_tax'][period]
 		)
 		
 		# Investing Cash Flows
-		op_account['construction_costs'][period] = self.financial_model['uses']['construction'][period]
-		
-		op_account['cash_flows_investing'][period] = -(
-			op_account['construction_costs'][period]
+		op_account['construction_costs'][period] = -self.financial_model['uses']['construction'][period]
+		op_account['development_fee'] = -self.financial_model['uses']['development_fee']
+		op_account['senior_debt_interests_construction'][period] = -self.financial_model['uses']['interests_construction'][period]
+		op_account['senior_debt_upfront_fee'][period] = -self.financial_model['uses']['upfront_fee'][period]
+		op_account['senior_debt_commitment_fees'][period] = -self.financial_model['uses']['commitment_fees'][period]
+		op_account['local_taxes'][period] = -self.financial_model['uses']['local_taxes'][period]
+
+
+	
+		op_account['cash_flows_investing'][period] = (
+			op_account['construction_costs'][period] +
+			op_account['senior_debt_interests_construction'][period] +
+			op_account['senior_debt_upfront_fee'][period] +
+			op_account['senior_debt_commitment_fees'][period] +
+			op_account['reserves'][period] +
+			op_account['local_taxes'][period] 
 		)
 		
-		# Financing Cash Flows
-		financing_outflows = (
-			self.financial_model['senior_debt']['upfront_fee'][period] +
-			self.financial_model['senior_debt']['interests_construction'][period] +
-			self.financial_model['senior_debt']['commitment_fees'][period]
-		)
-		
-		financing_inflows = (
+	
+		op_account['cash_flows_financing'][period] = (
 			self.financial_model['sources']['senior_debt'][period] +
-			self.financial_model['sources']['equity'][period]
+			self.financial_model['sources']['SHL'][period] + 
+			self.financial_model['sources']['share_capital'][period] 
 		)
-		
-		op_account['cash_flows_financing'][period] = financing_inflows - financing_outflows
 		
 		# CFADS
 		op_account['CFADS'][period] = (

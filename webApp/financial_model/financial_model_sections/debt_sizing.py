@@ -18,7 +18,7 @@ class SeniorDebtSizing:
 		"""
 		self.instance = instance
 		fm = self.instance.financial_model
-		"""fm["debt_sizing"] = {}"""
+		fm["debt_sizing"] = {}
 		fm['discount_factor'] = {}
 
 
@@ -86,7 +86,13 @@ class SeniorDebtSizing:
 			fm['debt_sizing']['target_debt_gearing']
 		)
 
-		
+		"""if self.instance.project.devfee_choice == "1":
+		self.instance.development_fee = 1000
+		else:
+		self.instance.development_fee = 0"""
+
+
+		fm['debt_sizing']['constraint'] = "DSCR" if fm['debt_sizing']['target_debt_DSCR'] < fm['debt_sizing']['target_debt_gearing'] else "Gearing"
 
 	def calculate_senior_debt_repayments(self) -> None:
 		"""

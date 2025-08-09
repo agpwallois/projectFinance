@@ -5,6 +5,9 @@ import numpy as np
 from datetime import date, datetime
 from dateutil import parser
 from dataclasses import dataclass
+import logging
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class AuditResults:
@@ -56,10 +59,38 @@ class Audit:
 		balance_sheet_check = self._check_materiality(balance_sheet_diff)
 		
 		# Calculate debt related metrics
+
+
+
 		final_repayment_date = self._determine_final_debt_repayment_date()
 		tenor_debt = self._calculate_debt_tenor(final_repayment_date)
-		debt_maturity_check = self._check_debt_maturity(final_repayment_date)
-		
+
+		# Adjust the debt maturity debt at the end of quarter / semester to check whether the final repayment date occurs at the right period
+
+		# Adjust to period end
+		if self.instance.periodicity == 3 or self.instance.periodicity == '3':
+			# Quarterly - Move to end of quarter
+			quarter = (self.instance.debt_maturity.month - 1) // 3 + 1
+			end_month = quarter * 3
+			debt_maturity_rounded = self.instance.debt_maturity.replace(
+				month=end_month, 
+				day=calendar.monthrange(self.instance.debt_maturity.year, end_month)[1]
+			)
+		elif self.instance.periodicity == 6 or self.instance.periodicity == '6':
+			# Semi-annual - Move to end of semester
+			if self.instance.debt_maturity.month <= 6:
+				debt_maturity_rounded = self.instance.debt_maturity.replace(month=6, day=30)
+			else:
+				debt_maturity_rounded = self.instance.debt_maturity.replace(month=12, day=31)
+		else:
+			# Fallback - shouldn't happen with current choices
+			debt_maturity_rounded = self.instance.debt_maturity
+
+
+		debt_maturity_check = self._check_debt_maturity(final_repayment_date, debt_maturity_rounded)
+
+		logger.error(final_repayment_date)
+
 		# Combine all checks
 		check_all = all([
 			financing_plan_check,
@@ -166,7 +197,7 @@ class Audit:
 		days_difference = (final_repayment_date - self.instance.project.start_construction).days
 		return round(days_difference / 365.25, 1)
 	
-	def _check_debt_maturity(self, final_repayment_date: date) -> bool:
+	def _check_debt_maturity(self, final_repayment_date: date, debt_maturity_rounded: date) -> bool:
 		"""
 		Check if final repayment date matches expected debt maturity.
 		
@@ -176,7 +207,7 @@ class Audit:
 		Returns:
 			bool: True if dates match
 		"""
-		return final_repayment_date == self.instance.debt_maturity
+		return final_repayment_date == debt_maturity_rounded
 	
 	def _store_audit_results(self, results: AuditResults) -> None:
 		"""

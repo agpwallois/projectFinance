@@ -28,6 +28,13 @@
             Balance Sheet
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="debt-schedule-sheet-tab" data-bs-toggle="tab" data-bs-target="#debt-schedule" type="button" role="tab" aria-controls="debt-schedule" aria-selected="false">
+            Debt Schedule
+        </button>
+    </li>
+
+
 </ul>
 
 <!-- Financial Statements Tab Content -->
@@ -36,17 +43,18 @@
         
         
         <div class="table-wrapper">
-            <table class="table_annual" id="fs_financing_plan_table">
+            <table class="table_annual excel-navigable" id="fs_financing_plan_table">
                 <tbody id="fs_financing_plan"></tbody>
             </table>
         </div>
 
+   
 
 
     </div>
     <div class="tab-pane fade" id="income-statement" role="tabpanel" aria-labelledby="income-statement-tab">
         <div class="table-wrapper">
-            <table class="table_annual">
+            <table class="table_annual excel-navigable">
                 <tbody id="annual_IS"></tbody>
             </table>
         </div>
@@ -54,26 +62,42 @@
 
     <div class="tab-pane fade" id="operating-account" role="tabpanel" aria-labelledby="operating-account-tab">
         <div class="table-wrapper">
-            <table class="table_annual">
+            <table class="table_annual excel-navigable">
                 <tbody id="annual_op_account"></tbody>
             </table>
         </div>
     </div>
     <div class="tab-pane fade" id="distribution-account" role="tabpanel" aria-labelledby="distribution-account-tab">
         <div class="table-wrapper">
-            <table class="table_annual">
+            <table class="table_annual excel-navigable">
                 <tbody id="annual_distr_account"></tbody>
             </table>
         </div>
     </div>
     <div class="tab-pane fade" id="balance-sheet" role="tabpanel" aria-labelledby="balance-sheet-tab">
         <div class="table-wrapper">
-            <table class="table_annual">
+            <table class="table_annual excel-navigable">
                 <tbody id="annual_balance_sheet"></tbody>
             </table>
 
 
 
+        </div>
+    </div>
+    <div class="tab-pane fade" id="debt-schedule" role="tabpanel" aria-labelledby="debt-schedule-sheet-tab">
+        <div class="table-wrapper">
+            <table class="table_annual excel-navigable" id="debt-schedule">
+                <thead>
+                    <tr>
+                        <th>Date Start</th>
+                        <th>Date End</th>
+                        <th>Repayment</th>
+                        <th>Interests</th>
+                        <th>Debt Service</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>

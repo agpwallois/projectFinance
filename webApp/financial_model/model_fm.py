@@ -38,6 +38,10 @@ from .model_fm_helpers_fs_financial_statements import (
 	extract_fs_financial_statements_data, 
 )
 
+from .model_fm_helpers_fs_debt_schedule import (
+	extract_fs_debt_schedule_data, 
+)
+
 
 
 
@@ -75,24 +79,54 @@ def timer_decorator(method):
 
 
 class CustomJSONEncoder(json.JSONEncoder):
+	def encode(self, o):
+		"""Override encode to handle NaN/Infinity at the top level."""
+		if isinstance(o, float):
+			if np.isnan(o) or np.isinf(o):
+				return json.dumps(None)
+		return super().encode(o)
+	
 	def default(self, obj):
 
 		if isinstance(obj, pd.Series):
-			return obj.tolist()
+			return self._convert_to_serializable(obj.tolist())
 		elif isinstance(obj, pd.Timestamp):
 			return obj.strftime('%d/%m/%Y')
 		elif isinstance(obj, Decimal):
 			return float(obj)
 		elif isinstance(obj, np.ndarray):
-			return obj.tolist()
+			return self._convert_to_serializable(obj.tolist())
 		elif isinstance(obj, np.integer):
 			return int(obj)
 		elif isinstance(obj, np.floating):
-			return float(obj)
+			return self._convert_float(float(obj))
 		elif isinstance(obj, np.bool_):
 			return bool(obj)
+		elif isinstance(obj, float) and (np.isnan(obj) or np.isinf(obj)):
+			return None
 
 		return super().default(obj)
+	
+	def _convert_float(self, value):
+		"""Convert float values, handling NaN and Infinity."""
+		if np.isnan(value):
+			return None
+		elif np.isinf(value):
+			return None
+		else:
+			return value
+	
+	def _convert_to_serializable(self, lst):
+		"""Recursively convert list elements to serializable format."""
+		result = []
+		for item in lst:
+			if isinstance(item, float):
+				result.append(self._convert_float(item))
+			elif isinstance(item, list):
+				result.append(self._convert_to_serializable(item))
+			else:
+				result.append(item)
+		return result
 
 
 
@@ -261,6 +295,16 @@ class FinancialModel(models.Model):
 		self.financial_model['senior_debt']['repayments'] = (
 			self.depends_on.financial_model['senior_debt']['repayments'].copy()
 		)
+		
+		# Copy debt sizing information from dependent model if it exists
+		if 'debt_sizing' in self.depends_on.financial_model:
+			if 'debt_sizing' not in self.financial_model:
+				self.financial_model['debt_sizing'] = {}
+			# Copy the constraint value from the base case
+			if 'constraint' in self.depends_on.financial_model['debt_sizing']:
+				self.financial_model['debt_sizing']['constraint'] = (
+					self.depends_on.financial_model['debt_sizing']['constraint']
+				)
 
 
 		self._copy_base_case_data_for_sensitivity()
@@ -451,9 +495,34 @@ class FinancialModel(models.Model):
 		"""Extract all required table values."""
 		return extract_fs_financial_statements_data(self.financial_model)
 
+	def extract_fs_debt_schedule_data(self):
+		"""Extract all required table values."""
+		return extract_fs_debt_schedule_data(self.financial_model)
 
 	def save(self, *args, **kwargs):
 		"""Override save to ensure proper JSON conversion."""
+		import logging
+		logger = logging.getLogger(__name__)
+		
+		# Log distribution account values before conversion
+		if 'distr_account' in self.financial_model:
+			distr = self.financial_model['distr_account']
+			if 'balance_bop' in distr and 'balance_eop' in distr:
+				logger.info("=== Distribution Account Values Before Save ===")
+				# Check if it's already a list or still an array
+				bop_data = distr['balance_bop']
+				eop_data = distr['balance_eop']
+				
+				if isinstance(bop_data, (list, np.ndarray)) and isinstance(eop_data, (list, np.ndarray)):
+					for i in range(min(10, len(bop_data))):
+						bop = bop_data[i] if i < len(bop_data) else 0
+						eop = eop_data[i] if i < len(eop_data) else 0
+						prev_eop = eop_data[i-1] if i > 0 and i-1 < len(eop_data) else 0
+						continuity = "✓" if i == 0 or abs(bop - prev_eop) < 0.01 else "✗"
+						logger.info(f"Period {i}: BOP={bop:.2f}, EOP={eop:.2f}, Prev_EOP={prev_eop:.2f} {continuity}")
+				else:
+					logger.warning(f"Distribution account data types: BOP={type(bop_data)}, EOP={type(eop_data)}")
+		
 		self.financial_model = convert_to_list(self.financial_model)
 		super().save(*args, **kwargs)
 

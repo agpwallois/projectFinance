@@ -103,8 +103,8 @@ class FinancialModelIRR:
 		"""
 		fm = self.instance.financial_model
 		return (
-			-fm["sources"]["share_capital"]
-			+ fm["distr_account"]["dividends_paid"]
+			- fm["sources"]["share_capital"]
+			- fm["distr_account"]["dividends_paid"]
 			+ fm["share_capital"]["repayments"]
 		)
 
@@ -117,7 +117,7 @@ class FinancialModelIRR:
 		"""
 		fm = self.instance.financial_model
 		return (
-			-fm["sources"]["SHL"]
+			- fm["sources"]["SHL"]
 			+ fm["SHL"]["interests_operations"]
 			+ fm["SHL"]["repayments"]
 		)

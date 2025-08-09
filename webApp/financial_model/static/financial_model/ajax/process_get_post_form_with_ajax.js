@@ -110,24 +110,37 @@ function hideLoader() {
 function handleFormSubmission(e, formElement) {
     e.preventDefault();
 
+    console.log('Starting POST request');
+    console.time('POST request total time');
+
     // Show loader before making the request
     showLoader();
 
     var formData = $(formElement).serialize();
+    
+    // Add the current selected scenario to the form data
+    formData += '&scenario=' + encodeURIComponent(currentSelectedScenario);
 
     var postSettings = {
         type: 'POST',
         url: "", // Add your URL here
         data: formData,
+        beforeSend: function() {
+            console.time('Server POST response time');
+        },
         success: function(json) {
+            console.timeEnd('Server POST response time');
             // Hide loader on success
             hideLoader();
             handleSuccess(json);
+            console.timeEnd('POST request total time');
         },
         error: function(xhr, status, error) {
+            console.timeEnd('Server POST response time');
             // Hide loader on error
             hideLoader();
             handleAjaxError(xhr, status, error);
+            console.timeEnd('POST request total time');
         }
     };
 
@@ -135,6 +148,9 @@ function handleFormSubmission(e, formElement) {
 }
 
 function makeGetRequest(value) {
+    console.log('Starting GET request for scenario:', value);
+    console.time('GET request total time');
+
 
 
     var getSettings = {
@@ -143,43 +159,70 @@ function makeGetRequest(value) {
         data: {
             'scenario': value 
         },
+        beforeSend: function() {
+            console.time('Server response time');
+        },
         success: function(json) {
+            console.timeEnd('Server response time');
+
+            console.log(json);
+
             // Hide loader on success
             hideLoader();
             handleSuccess(json);
+            console.timeEnd('GET request total time');
         },
         error: function(xhr, status, error) {
+            console.timeEnd('Server response time');
             // Hide loader on error
             hideLoader();
             handleAjaxError(xhr, status, error);
+            console.timeEnd('GET request total time');
         }
     };
     $.ajax(getSettings);
 }
 
 function handleSuccess(json) {
-    console.log(json.df);
-    console.log(json.dashboard_cards);
-    console.log(json.sidebar_data);
-    console.log(json.table_sensi_diff);
-    console.log(json.table_sensi_diff_IRR);
-    console.log(json.fs_financial_statements);
-    console.log(json.fs_financing_plan);
-    console.log(json.fs_balance_sheet);
+    
+    // Build dashboard cards first
+    console.time('build_dashboard_cards');
+    build_dashboard_cards(json);
+    console.timeEnd('build_dashboard_cards');
 
     build_computation_table(json);
-    build_dashboard_cards(json);
     
+    // Build financial statements
+    console.time('build_fs_financial_statements');
     build_fs_financial_statements(json);
+    console.timeEnd('build_fs_financial_statements');
+    
+    console.time('build_fs_financing_plan');
     build_fs_financing_plan(json);
+    console.timeEnd('build_fs_financing_plan');
+    
+    console.time('build_fs_balance_sheet');
     build_fs_balance_sheet(json);
+    console.timeEnd('build_fs_balance_sheet');
 
-    build_charts(json);
+    console.time('build_fs_debt_schedule');
+    build_fs_debt_schedule(json);
+    console.timeEnd('build_fs_debt_schedule');
+
+    // Update dashboard and sidebar
+    console.time('update_dashboard_and_sidebar_cards');
     update_dashboard_and_sidebar_cards(json);
+    console.timeEnd('update_dashboard_and_sidebar_cards');
 
-    // Apply highlighting based on the stored selected scenario
-    applyHighlightingToScenario(currentSelectedScenario);
-
+    // BUILD CHARTS - This is the critical section
+    console.time('build_charts_total');
+    
+    // First, build the initial charts (construction phase charts)
+    console.time('build_charts');
+    build_charts(json);
+    console.timeEnd('build_charts');
+    
+    // Set up the dropdown handler BEFORE triggering it
     function handleDropdownChange() {
         var selectedOption = $("#myDropdown").val();
 
@@ -190,11 +233,26 @@ function handleSuccess(json) {
         }
     }
 
-    // Trigger on document ready
-    handleDropdownChange();
+    // Remove any existing change handlers to avoid duplicates
+    $("#myDropdown").off('change');
+    
+    // Set up the change event handler
+    $("#myDropdown").on('change', handleDropdownChange);
+    
+    // Trigger the initial update based on current dropdown value
+    // Use setTimeout to ensure build_charts completes first
+    setTimeout(() => {
+        handleDropdownChange();
+    }, 0);
+    
+    console.timeEnd('build_charts_total');
 
-    // Trigger on change event
-    $("#myDropdown").change(handleDropdownChange);
+    // Apply highlighting
+    console.time('applyHighlightingToScenario');
+    applyHighlightingToScenario(currentSelectedScenario);
+    console.timeEnd('applyHighlightingToScenario');
+    
+
 }
 
 // New function to apply highlighting based on scenario value
@@ -209,14 +267,72 @@ function applyHighlightingToScenario(scenarioValue) {
 }
 
 function handleAjaxError(xhr, status, error) {
-    try {
-        const obj = JSON.parse(xhr.responseJSON.error);
-        const array = Object.values(obj)[0];
-        const firstElement = array[0];
-        alert(firstElement.message);
-        console.log(obj);
-    } catch (e) {
-        alert(xhr.responseJSON.error_type + " " + xhr.responseJSON.line_number + " " + xhr.responseJSON.message);
-        console.log(xhr);
+    console.log('Error response:', xhr.responseJSON);
+    
+    if (xhr.responseJSON) {
+        // Check if it's a form validation error with the new clean format
+        if (xhr.responseJSON.validation_errors && xhr.responseJSON.validation_errors.length > 0) {
+            const errorMessages = xhr.responseJSON.validation_errors;
+            alert('Form validation error:\n' + errorMessages.join('\n'));
+        } 
+        // Check if it's a form validation error with the old HTML format
+        else if (xhr.responseJSON.error && xhr.responseJSON.error.includes('Form validation failed:')) {
+            // Extract the error message from the HTML
+            const errorHtml = xhr.responseJSON.error;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(errorHtml, 'text/html');
+            
+            // Try to find error messages in the HTML
+            const errorMessages = [];
+            const errorListItems = doc.querySelectorAll('.errorlist li');
+            
+            errorListItems.forEach(item => {
+                // Skip list items that contain nested lists (like __all__)
+                if (!item.querySelector('ul')) {
+                    const message = item.textContent.trim();
+                    if (message && message !== '__all__') {
+                        errorMessages.push(message);
+                    }
+                }
+            });
+            
+            if (errorMessages.length > 0) {
+                alert('Form validation error:\n' + errorMessages.join('\n'));
+            } else {
+                // Fallback to showing the raw error if we can't parse it
+                alert('Form validation failed. Please check your input.');
+            }
+        } 
+        // Handle other types of errors
+        else if (xhr.responseJSON.error) {
+            try {
+                const obj = JSON.parse(xhr.responseJSON.error);
+                const array = Object.values(obj)[0];
+                const firstElement = array[0];
+                alert(firstElement.message);
+                console.log(obj);
+            } catch (e) {
+                // Fallback error display
+                alert('Error: ' + xhr.responseJSON.error);
+            }
+        } 
+        // Handle structured error responses
+        else if (xhr.responseJSON.error_type) {
+            const errorParts = [];
+            if (xhr.responseJSON.error_type) errorParts.push(xhr.responseJSON.error_type);
+            if (xhr.responseJSON.line_number) errorParts.push('Line ' + xhr.responseJSON.line_number);
+            if (xhr.responseJSON.message) errorParts.push(xhr.responseJSON.message);
+            
+            alert(errorParts.join(' - '));
+        } 
+        else {
+            // Generic error with response
+            alert('An error occurred: ' + JSON.stringify(xhr.responseJSON));
+        }
+    } else {
+        // Generic error fallback when no response JSON
+        alert('An error occurred while processing your request.');
     }
+    
+    console.log('Full error details:', xhr);
 }

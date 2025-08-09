@@ -10,10 +10,9 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 		"Uses": {
 			"Construction costs": sum(financial_model['construction_costs']['total']),
 			"Development fee": 0,
-			"Debt interests & fees": sum(financial_model['uses']['senior_debt_idc_and_fees']),
-			"Upfront fee": sum(financial_model['senior_debt']['upfront_fee']),
-			"Commitment fees": sum(financial_model['senior_debt']['commitment_fees']),
-			"IDC": sum(financial_model['senior_debt']['interests_construction']),
+			"Debt upfront fee": sum(financial_model['senior_debt']['upfront_fee']),
+			"Debt commitment fees": sum(financial_model['senior_debt']['commitment_fees']),
+			"Debt interests": sum(financial_model['senior_debt']['interests_construction']),
 			"Local taxes": sum(financial_model['local_taxes']['total']),
 			"Development tax": sum(financial_model['local_taxes']['development_tax']),
 			"Archeological tax": sum(financial_model['local_taxes']['archeological_tax']),
@@ -54,6 +53,7 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 		},
 		"Debt metrics": {
 			"Debt amount": f"{senior_debt_amount:,.1f}",
+			"Debt amount constraint": financial_model['debt_sizing']['constraint'],
 			"Effective gearing": f"{gearing_eff * 100:.1f}%",
 			"Tenor (door-to-door)": financial_model['audit']['tenor_debt'],
 			"Average DSCR": f"{financial_model['ratios']['DSCR_avg']:,.2f}x",
@@ -67,14 +67,14 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 			"Debt maturity": "true" if financial_model['audit']['debt_maturity'] else "false",
 		},
 		"Valuation": {
-			f"{financial_model['IRR']['eqt_discount_factor_less_1'] * 100:.2f}%":
-				financial_model['IRR']['valuation_less_1'],
+			f"Discount factor @{financial_model['IRR']['eqt_discount_factor_less_1'] * 100:.2f}%":
+				f"{financial_model['IRR']['valuation_less_1']:.1f}",
 
-			f"{financial_model['IRR']['eqt_discount_factor'] * 100:.2f}%":
-				financial_model['IRR']['valuation'],
+			f"Discount factor @{financial_model['IRR']['eqt_discount_factor'] * 100:.2f}%":
+				f"{financial_model['IRR']['valuation']:.1f}",
 
-			f"{financial_model['IRR']['eqt_discount_factor_plus_1'] * 100:.2f}%":
-				financial_model['IRR']['valuation_plus_1'],
+			f"Discount factor @{financial_model['IRR']['eqt_discount_factor_plus_1'] * 100:.2f}%":
+				f"{financial_model['IRR']['valuation_plus_1']:.1f}",
 		},
 	}
 

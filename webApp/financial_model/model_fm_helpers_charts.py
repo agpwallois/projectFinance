@@ -43,6 +43,10 @@ def extract_EoY_values_for_charts(financial_model):
 	Extracts end-of-year (EoY) values from the financial_model dict
 	and returns them in a filtered format.
 	"""
+	import logging
+	logger = logging.getLogger(__name__)
+	logger.info("=== Extracting EoY Values for Charts ===")
+	
 	# Define the keys that need processing
 	required_keys = {
 		'senior_debt': ['balance_eop', 'DS_effective'],
@@ -82,6 +86,12 @@ def extract_EoY_values_for_charts(financial_model):
 			if key in financial_model and sub_key in financial_model[key]:
 				series = financial_model[key][sub_key]
 				value_eoy[key][sub_key] = process_series(series, period_end_series)
+				
+				# Log distribution account values
+				if key == 'distr_account' and sub_key == 'balance_eop':
+					logger.info(f"Distribution Account EoY values: {value_eoy[key][sub_key]}")
+					# Also log the raw series for first few periods
+					logger.info(f"Distribution Account raw series (first 10): {series[:10] if isinstance(series, list) else 'Not a list'}")
 
 	# Convert defaultdict to a regular dictionary for output
 	return dict(value_eoy)

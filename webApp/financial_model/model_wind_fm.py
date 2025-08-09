@@ -7,9 +7,12 @@ class WindFinancialModel(FinancialModel):
 		super().__init__(*args, **kwargs)
 
 		self.installed_capacity = self.project.wind_turbine_installed*1000*self.project.capacity_per_turbine
+		import logging
+		logger = logging.getLogger(__name__)
 
 	def create_capacity_series(self):
-
+		import logging
+		logger = logging.getLogger(__name__)
 
 		self.financial_model['capacity'] = {}
 

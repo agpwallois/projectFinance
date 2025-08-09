@@ -1,47 +1,68 @@
 <!-- Rewritten dashboard.html -->
 
+
     <!-- Financial Metrics Section -->
     <div class="box-wrapper">
          <h2>Key Metrics</h2>
-        <!-- Three columns side by side - Will be hidden in Development mode -->
-        <div class="metrics-row financing-mode-only">
+        
+        <!-- First row - Three columns side by side -->
+        <div class="metrics-row">
             <div class="metrics-column">
-                    <div class="box-key-metrics" id="summary-IRR">
-                        <h3>Project and Shareholder Return</h3>
+                <div class="box-key-metrics" id="summary-IRR">
+                    <h3>Project and Shareholder Return</h3>
 
+                    <h4>Equity IRR</h4>
+                    <table class="table-sum">
+                        <tbody id="summary_equity"></tbody>
+                    </table>
 
-                        <h4>Equity IRR</h4>
-                        <table class="table-sum">
-                            <tbody id="summary_equity"></tbody>
-                        </table>
-
-                        <h4>Project IRR</h4>
-                        <table class="table-sum">
-                            <tbody id="summary_project"></tbody>
-                        </table>        
+                    <h4>Project IRR</h4>
+                    <table class="table-sum">
+                        <tbody id="summary_project"></tbody>
+                    </table>        
                 </div>
             </div>
 
             <div class="metrics-column">
-                    <div class="box-key-metrics" id="summary-debt">
-                        <h3>Senior Debt Metrics</h3>
-                        <table class="table-sum">
-                            <tbody id="summary_debt"></tbody>
-                        </table>
+                <div class="box-key-metrics" id="summary-debt">
+                    <h3>Senior Debt Metrics</h3>
+                    <table class="table-sum">
+                        <tbody id="summary_debt"></tbody>
+                    </table>
                 </div>
             </div>
 
             <div class="metrics-column">
-                    <div class="box-key-metrics" id="summary-audit">
-                        <h3>Audit and Control</h3>
-                        <table class="table-sum">
-                            <tbody id="summary_audit"></tbody>
-                        </table>
+                <div class="box-key-metrics" id="summary-audit">
+                    <h3>Audit and Control</h3>
+                    <table class="table-sum">
+                        <tbody id="summary_audit"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- Second row - One column (will take 1/3 width, other 2/3 empty) -->
+        <div class="metrics-row">      
+            <div class="metrics-column">
+                <div class="box-key-metrics" id="summary-valuation">
+                    <h3>Equity valuation <small>(DDM - <script>
+                        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+                        var formattedDate = new Date().toLocaleDateString(undefined, options);
+                        document.write(formattedDate);
+                    </script>)</small>
+                    </h3>
+                    <table class="table-sum">
+                        <tbody id="summary_valuation"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Empty columns to maintain 1/3 width alignment -->
+            <div class="metrics-column"></div>
+            <div class="metrics-column"></div>
+
+        </div>
+    </div>
 
 
 <div class="box-wrapper">
@@ -50,28 +71,7 @@
 
 </div>
 
-    <!-- Operational Tabs Section - Only shown when project status is "Operational" -->
-    {% if project.project_status == "Operational" %}
 
-
-    <div class="box-wrapper">
-                        <h2>Valuation      (<script>
-                            var options = { year: 'numeric', month: 'long', day: 'numeric' };
-                            var formattedDate = new Date().toLocaleDateString(undefined, options);
-                            document.write(formattedDate);
-                        </script>)</h2>
-
-                  
-    <div class="box-key-metrics">
-                        <table class="table-sum">
-                            <tbody id="summary_valuation"></tbody>
-                        </table>
-    </div>
-
-    </div>
-
-
-    {% endif %}
 
     <!-- Charts Section -->
     <div class="box-wrapper">

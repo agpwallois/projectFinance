@@ -67,6 +67,10 @@ class Production:
 		seasonality_array = np.array(self.instance.financial_model['seasonality'])
 		capacity_array = np.array(self.instance.financial_model['capacity']['after_degradation'])
 		
+		# Debug logging
+		import logging
+		logger = logging.getLogger(__name__)
+		
 		# Vectorized calculation
 		self.instance.financial_model['production']['total'] = pd.Series(
 			production_volume * seasonality_array * capacity_array * (1 + float(sensi_production))

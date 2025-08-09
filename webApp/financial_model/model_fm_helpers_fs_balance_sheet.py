@@ -23,6 +23,10 @@ def extract_fs_balance_sheet_data(financial_model):
     Extracts year-end balance sheet values from a financial model dictionary.
     Returns values as at 31/12/N for each year.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info("=== Extracting Balance Sheet Data ===")
+    
     def process_series(series, end_dates):
         """Helper function to get year-end values."""
         values = {}
@@ -47,6 +51,7 @@ def extract_fs_balance_sheet_data(financial_model):
         dayfirst=True
     )
 
+
     section_mapping = {
         'assets': 'annual_assets',
         'liabilities': 'annual_liabilities'
@@ -59,6 +64,7 @@ def extract_fs_balance_sheet_data(financial_model):
                 if isinstance(series, (list, tuple)):
                     result = process_series(series, period_end_series)
                     financial_statements[output_key][sub_key] = result
+       
 
     # Reordering logic applied to all relevant sections
     for section_key, order_list in REORDER_MAPPING.items():

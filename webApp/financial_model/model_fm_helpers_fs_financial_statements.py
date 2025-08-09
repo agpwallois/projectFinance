@@ -12,17 +12,18 @@ INCOME_STATEMENT_ORDER = [
 ]
 
 OPERATING_ACCOUNT_ORDER = [
-    'balance_bop', 'cash_flows_operating', 'construction_costs',
-    'development_fee', 'cash_flows_investing', 'cash_flows_financing',
-    'CFADS', 'senior_debt_interests_paid', 'senior_debt_repayments',
-    'cash_available_for_distribution', 'transfers_distribution_account', 'balance_eop'
+    'balance_bop', 'EBITDA', 'working_cap_movement', 'corporate_tax', 'cash_flows_operating', 'construction_costs',
+    'development_fee', 'senior_debt_interests_construction', 'senior_debt_upfront_fee', 'senior_debt_commitment_fees', 'reserves', 'local_taxes', 'cash_flows_investing', 
+    'senior_debt', 'share_capital', 'shareholder_loan', 'cash_flows_financing',
+    'CFADS', 'senior_debt_interests_paid', 'senior_debt_repayments', 'dsra_initial_funding', 'dsra_additions', 'dsra_releases',
+    'transfers_distribution_account', 'balance_eop'
 ]
 
 DISTRIBUTION_ACCOUNT_ORDER = [
-    'balance_bop', 'transfers_distribution_account', 'cash_available_for_distribution',
-    'shl_interests_paid', 'cash_available_for_shl_repayments', 'shl_repayments',
-    'cash_available_for_dividends', 'dividends_paid',
-    'cash_available_for_redemption', 'share_capital_repayments', 'balance_eop'
+    'balance_bop', 'transfers_distribution_account',
+    'SHL_interests_paid', 'dividends_paid',
+    'SHL_repayments',
+    'share_capital_repayments', 'balance_eop'
 ]
 
 # Mapping for reordering
@@ -36,7 +37,7 @@ def extract_fs_financial_statements_data(financial_model):
     """
     Calculates and reorders annual financial statements from a financial model dictionary.
     """
-    def process_series(series, end_dates):
+    def process_series_sum(series, end_dates):
         """Helper function to sum values by year."""
         values = {}
         for i, end_date in enumerate(end_dates):
@@ -45,6 +46,33 @@ def extract_fs_financial_statements_data(financial_model):
                 val = float(val) if isinstance(val, (int, float)) else 0.0
                 year = end_date.year
                 values[year] = values.get(year, 0.0) + val
+        return values
+    
+    def process_series_eoy(series, end_dates):
+        """Helper function to get year-end values (for balance_eop items)."""
+        values = {}
+        for i, end_date in enumerate(end_dates):
+            if i < len(series):
+                val = series[i]
+                val = float(val) if isinstance(val, (int, float)) else 0.0
+                year = end_date.year
+                # Only keep the value if this is a year-end date (31st December)
+                if end_date.month == 12 and end_date.day == 31:
+                    values[year] = val
+        return values
+    
+    def process_series_boy(series, start_dates):
+        """Helper function to get beginning-of-year values (for balance_bop items).
+        This takes the value as at 01/01 of each year."""
+        values = {}
+        for i, start_date in enumerate(start_dates):
+            if i < len(series):
+                val = series[i]
+                val = float(val) if isinstance(val, (int, float)) else 0.0
+                year = start_date.year
+                # Only keep the value if this is a year start date (1st January)
+                if start_date.month == 1 and start_date.day == 1:
+                    values[year] = val
         return values
 
     financial_statements = {
@@ -55,6 +83,12 @@ def extract_fs_financial_statements_data(financial_model):
 
     period_end_series = pd.to_datetime(
         financial_model['dates']['model']['end'],
+        format='%d/%m/%Y',
+        dayfirst=True
+    )
+    
+    period_start_series = pd.to_datetime(
+        financial_model['dates']['model']['start'],
         format='%d/%m/%Y',
         dayfirst=True
     )
@@ -70,7 +104,16 @@ def extract_fs_financial_statements_data(financial_model):
             section_data = financial_model[source_section]
             for sub_key, series in section_data.items():
                 if isinstance(series, (list, tuple)):
-                    result = process_series(series, period_end_series)
+                    # Use appropriate processing based on the key type
+                    if 'balance_bop' in sub_key.lower():
+                        # Beginning of period balance - value as at 01/01 of current year
+                        result = process_series_boy(series, period_start_series)
+                    elif 'balance_eop' in sub_key.lower():
+                        # End of period balance - value as at 31/12 of current year
+                        result = process_series_eoy(series, period_end_series)
+                    else:
+                        # All other items - sum throughout the year
+                        result = process_series_sum(series, period_end_series)
                     financial_statements[output_key][sub_key] = result
 
     # Reordering logic applied to all relevant sections

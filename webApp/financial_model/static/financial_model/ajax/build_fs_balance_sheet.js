@@ -69,7 +69,7 @@ function build_fs_balance_sheet(json) {
         years.forEach(year => {
           const value = yearValues[year];
           if (value !== undefined && value !== null) {
-            const formattedValue = formatAsInt(value);
+            const formattedValue = formatAsFloat(value);
             tableContent += "<td>" + formattedValue + "</td>";
           } else {
             tableContent += "<td>-</td>";
@@ -90,4 +90,12 @@ function build_fs_balance_sheet(json) {
   } else {
     console.warn("Element with selector #annual_balance_sheet not found");
   }
+}
+
+function formatAsFloat(dataValue) {
+  const formattedValue = dataValue.toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return formattedValue;
 }

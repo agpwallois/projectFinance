@@ -56,7 +56,7 @@ function build_fs_financial_statements(json) {
         years.forEach(year => {
           const value = subValue[year];
           if (value !== undefined && value !== null) {
-            const formattedValue = formatAsInt(value);
+            const formattedValue = formatAsFloat(value);
             tableContent += "<td>" + formattedValue + "</td>";
           } else {
             tableContent += "<td>-</td>";
@@ -72,7 +72,7 @@ function build_fs_financial_statements(json) {
         
         for (let i = 0; i < subValue.length && i < years.length; i++) {
           const value = subValue[i];
-          const formattedValue = formatAsInt(value);
+          const formattedValue = formatAsFloat(value);
           tableContent += "<td>" + formattedValue + "</td>";
         }
         
@@ -104,10 +104,9 @@ function applyFinancialTotalStyling(tableSelector) {
     'cash_flows_investing',
     'cash_flows_financing',
     'cfads',
-    'cash_available_for_distribution',
-    'cash_available_for_SHL_repayments',
-    'cash_available_for_dividends',
-    'cash_available_for_redemption',
+    'balance_bop',   
+    'balance_eop',   
+   
   ];
   
   // Find and style the relevant rows
@@ -143,4 +142,12 @@ function convertToTitleCase(snakeCaseStr) {
 
 function formatAsInt(dataValue) {
   return Math.floor(dataValue).toString();
+}
+
+function formatAsFloat(dataValue) {
+  const formattedValue = dataValue.toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return formattedValue;
 }

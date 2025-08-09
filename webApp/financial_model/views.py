@@ -19,6 +19,7 @@ from django.http import Http404
 from authentication.utils import get_user_company
 from functools import wraps
 
+
 # Django imports
 from django.http import JsonResponse
 from django.views.generic import ListView
@@ -153,6 +154,7 @@ class FinancialModelView(View):
 			raise ValueError(f"Unknown technology: {project.technology}")
 
 	""" GET METHOD """
+	@timer_decorator
 	def get(self, request, id: int):
 		# Check project access first
 		if not self._check_project_access(request, id):
@@ -166,7 +168,8 @@ class FinancialModelView(View):
 			return self._process_get_request(request, project)
 			
 		return render(request, "financial_model/project_view.html", context)
-
+	
+	@timer_decorator
 	def _process_get_request(self, request, project: Project) -> JsonResponse:
 		"""Process AJAX requests for financial model data"""
 		
@@ -205,8 +208,21 @@ class FinancialModelView(View):
 				if field.required and not request.POST.get(field_name):
 					logger.error(f"MISSING REQUIRED FIELD: {field_name}")
 			
+			# Extract clean error messages from form errors
+			error_messages = []
+			for field, errors in project_form.errors.items():
+				if field == '__all__':
+					# Non-field errors
+					for error in errors:
+						error_messages.append(str(error))
+				else:
+					# Field-specific errors
+					for error in errors:
+						error_messages.append(f"{field}: {error}")
+			
 			return JsonResponse({
-				'error': f'Form validation failed: {project_form.errors}',
+				'error': 'Form validation failed',
+				'validation_errors': error_messages,
 				'missing_fields': [name for name, field in project_form.fields.items() 
 								if field.required and not request.POST.get(name)]
 			}, status=400)
@@ -241,8 +257,6 @@ class FinancialModelView(View):
 
 	def _update_selective_financial_models(self, project, project_form):
 		"""Update only the financial models affected by sensitivity changes."""
-		
-		logger.error("Updating")
 		# Get existing models (without creating missing ones since we'll recreate them anyway)
 		financial_models = self._get_financial_models(project)
 		
@@ -274,27 +288,36 @@ class FinancialModelView(View):
 		
 		return financial_models
 
-
+	@timer_decorator
 	def _get_financial_models(self, project: Project) -> Dict[str, Any]:
 		"""Retrieve all financial models for a project"""
-		financial_models = {}
 		model_class = self._get_model_class(project)
+		scenario_ids = list(self.FINANCIAL_MODEL_SCENARIOS.keys())
+		
+		# Single query to get all existing models
+		existing_models = model_class.objects.filter(
+			project=project,
+			identifier__in=scenario_ids
+		)
+		
+		# Create lookup dictionary
+		models_by_id = {model.identifier: model for model in existing_models}
+		
+		# Build result and create missing models
+		financial_models = {}
+		models_to_create = []
 		
 		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
-			try:
-				model = model_class.objects.get(
-					project=project, 
-					identifier=scenario_id
-				)
-				financial_models[scenario_id] = model
-
-			except model_class.DoesNotExist:
-				# Create missing models on demand
+			if scenario_id in models_by_id:
+				financial_models[scenario_id] = models_by_id[scenario_id]
+			else:
+				# Queue for bulk creation or create individually
 				model = self._create_fm(project, scenario_id, scenario_config)
 				financial_models[scenario_id] = model
-				
+		
 		return financial_models
-
+	
+	@timer_decorator
 	def _build_response_data(self, selected_fm, financial_models: Dict[str, Any]) -> JsonResponse:
 		"""Build the JSON response data for both GET and POST requests"""
 		# Generate dashboard data
@@ -332,7 +355,7 @@ class FinancialModelView(View):
 		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
 			model = self._create_fm(project, scenario_id, scenario_config)
 			financial_models[scenario_id] = model
-			logger.debug(f"Created financial model for scenario: {scenario_id}")
+			logger.error(f"Created financial model for scenario: {scenario_id}")
 
 		return financial_models
 
@@ -378,8 +401,23 @@ class FinancialModelView(View):
 		Returns:
 			dict: Chart data organized by type
 		"""
+		# Add logging to debug
+		logger.info(f"Extracting charts data for model: {selected_fm.identifier}")
+		
 		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_fm.extract_values_for_charts()
-
+		
+		# Debug log the extracted data
+		logger.info(f"charts_data_constr keys: {list(charts_data_constr.keys()) if charts_data_constr else 'None'}")
+		logger.info(f"charts_data_eoy keys: {list(charts_data_eoy.keys()) if charts_data_eoy else 'None'}")
+		logger.info(f"charts_data_sum_year keys: {list(charts_data_sum_year.keys()) if charts_data_sum_year else 'None'}")
+		
+		# Check if we have actual data
+		if charts_data_sum_year and 'opex' in charts_data_sum_year:
+			sample_opex = charts_data_sum_year['opex'].get('total', {})
+			if sample_opex:
+				first_value = list(sample_opex.values())[0] if sample_opex else 'No data'
+				logger.info(f"Sample OPEX total first value: {first_value}")
+		
 		return {
 			'construction': charts_data_constr,
 			'end_of_year': charts_data_eoy,
@@ -406,7 +444,7 @@ class FinancialModelView(View):
 		# Apply rounding logic (placeholder for actual calculation)
 		rounded_value = 1000  # TODO: Implement actual valuation calculation
 
-		return rounded_value
+		return valuation_value
 
 
 
@@ -496,7 +534,7 @@ class FinancialModelView(View):
 	def _collect_displayed_metrics(self, financial_models):
 
 		displayed_metrics = {
-			"sponsor_IRR": f"{financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100:.1f}%",  # Percentage with 1 decimal
+			"sponsor_IRR": f"{financial_models['sponsor_base_case'].financial_model['dict_results']['Sensi_IRR']['Equity IRR'] * 100:.2f}%",  # Percentage with 1 decimal
 			"lender_DSCR": f"{financial_models['lender_base_case'].financial_model['dict_results']['Sensi']['Min DSCR']:.2f}x",  # 2 decimals + "x"
 			"total_uses": f"{financial_models['lender_base_case'].financial_model['dict_uses_sources']['Uses']['Total']:,.1f}",  # Thousands separator + 1 decimal
 			"gearing": financial_models['lender_base_case'].financial_model['dict_results']['Debt metrics']['Effective gearing'],  # Gearing as percentage
@@ -514,7 +552,9 @@ class FinancialModelView(View):
 		return {
 			'financing_plan': selected_fm.extract_fs_financing_plan_data(),
 			'financial_statements': selected_fm.extract_fs_financial_statements_data(),
-			'balance_sheet': selected_fm.extract_fs_balance_sheet_data()
+			'balance_sheet': selected_fm.extract_fs_balance_sheet_data(),
+			'debt_schedule': selected_fm.extract_fs_debt_schedule_data()
+
 		}
 
 
@@ -542,6 +582,7 @@ class FinancialModelView(View):
 				"fs_financing_plan": financial_statements['financing_plan'],
 				"fs_balance_sheet": financial_statements['balance_sheet'],
 				"fs_financial_statements": financial_statements['financial_statements'],
+				"fs_debt_schedule": financial_statements['debt_schedule'],
 			
 				"sidebar_data": displayed_metrics, 
 			}, safe=False)
@@ -760,7 +801,6 @@ class FinancialModelView(View):
 		# Get all changed fields excluding sensitivity parameters
 		changed_fields = set(project_form.changed_data) - excluded_fields
 		
-		"""logger.error(f"Changed non-sensitivity fields: {changed_fields}")"""
 
 
 		
@@ -776,7 +816,6 @@ class FinancialModelView(View):
 		changed_fields = set(project_form.changed_data)
 		
 		# Check if the sensitivity parameter is in the changed fields
-		"""logger.error(f"Checking if sensitivity {sensitivity_type} has changed")"""
 		result = sensitivity_type in changed_fields
 
 		return result

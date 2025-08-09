@@ -298,7 +298,7 @@ def calculate_yearly_revenues(projects):
 	# Filter for operational projects only
 	operational_projects = [p for p in projects if p.project_status == "Operational"]
 
-	logger.error(operational_projects)
+	"""logger.error(operational_projects)"""
 	
 	for project in operational_projects:
 		try:

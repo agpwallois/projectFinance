@@ -616,7 +616,11 @@ body.sidebar-collapsed .sidebar-expand-btn {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
 }
+
 
 .box-key-metrics:hover {
     transform: translateY(-2px);
@@ -1086,6 +1090,7 @@ input[type="checkbox"] {
     gap: 10px;
     margin-bottom: 10px;
 }
+
 
 .metrics-column {
     flex: 1;

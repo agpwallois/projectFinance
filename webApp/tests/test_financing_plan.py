@@ -99,6 +99,7 @@ class TestFinancingPlan(unittest.TestCase):
             'total_cumul': pd.Series([1000, 2500, 4500])
         }
         self.financing_plan.total_equity_required = 2200  # Falls within period 2
+        self.mock_model.senior_debt_amount = 2300  # Update to match expected debt requirement
         self.financing_plan._initialize_sources()
         
         # Execute

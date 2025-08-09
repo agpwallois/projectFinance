@@ -1,10 +1,8 @@
 function build_computation_table(json) {
 
-
   const columnLabel = {
     "dates": "date",
     "flags": "flag",
-
   };
 
   const columnFormatting = {
@@ -167,7 +165,6 @@ function convertToTitleCase(snakeCaseStr) {
   return titleCaseStr;
 }
 
-
 // Function to check if a value is a date
 function isDate(value) {
   // Consider values as date strings in format DD/MM/YYYY
@@ -193,48 +190,67 @@ function formatDate(value) {
   }
 }
 
-
-  function formatDSCR(dataValue) {
-    const formattedValue = dataValue.toFixed(2) + "x";
-    return formattedValue;
+function formatDSCR(dataValue) {
+  // Check for zero value first
+  if (dataValue === 0) {
+    return "-";
   }
+  const formattedValue = dataValue.toFixed(2) + "x";
+  return formattedValue;
+}
 
-  function formatOther(dataValue) {
-    const roundedValue = Math.round(Math.abs(dataValue) * 10) / 10;
-    const formattedValue = roundedValue.toLocaleString("fr-FR", {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    });
-    return dataValue < 0 ? `(${formattedValue})` : formattedValue;
+function formatOther(dataValue) {
+  // Check for zero value first
+  if (dataValue === 0) {
+    return "-";
   }
+  const roundedValue = Math.round(Math.abs(dataValue) * 10) / 10;
+  const formattedValue = roundedValue.toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return dataValue < 0 ? `(${formattedValue})` : formattedValue;
+}
 
-  function formatAsInt(dataValue) {
-    return Math.floor(dataValue).toString();
+function formatAsInt(dataValue) {
+  // Check for zero value first
+  if (dataValue === 0) {
+    return "-";
   }
+  return Math.floor(dataValue).toString();
+}
 
-  function formatAsFloat(dataValue) {
-    const formattedValue = dataValue.toLocaleString("fr-FR", {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    });
-    return formattedValue;
+function formatAsFloat(dataValue) {
+  // Check for zero value first
+  if (dataValue === 0) {
+    return "-";
   }
+  const formattedValue = dataValue.toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return formattedValue;
+}
 
-  function containsExcludedWords(pd_column_name) {
-    const excludedWords = ["date", "end", "start"];
-    for (const word of excludedWords) {
-      if (pd_column_name.toLowerCase().includes(word)) {
-        return true;
-      }
+function containsExcludedWords(pd_column_name) {
+  const excludedWords = ["date", "end", "start"];
+  for (const word of excludedWords) {
+    if (pd_column_name.toLowerCase().includes(word)) {
+      return true;
     }
-    return false;
   }
+  return false;
+}
 
-  function formatAsPercent(num) {
-    return new Intl.NumberFormat("default", {
-      style: "percent",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(num);
+function formatAsPercent(num) {
+  // Check for zero value first
+  if (num === 0) {
+    return "-";
   }
+  return new Intl.NumberFormat("default", {
+    style: "percent",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+}
 }

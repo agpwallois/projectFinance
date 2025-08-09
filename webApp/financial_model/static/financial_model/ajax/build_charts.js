@@ -1,180 +1,266 @@
 function build_charts(json) {
-
-        chartProjectCosts.data.labels = Object.values(json.charts_data_constr['dates_model_end']);
-        chartProjectCosts.data.datasets[0].data = Object.values(json.charts_data_constr['construction_costs_total']);
-        chartProjectCosts.data.datasets[1].data = Object.values(json.charts_data_constr['uses_total_cumul']);
-        chartProjectCosts.data.datasets[2].data = Object.values(json.charts_data_constr['construction_costs_total']);
-        chartProjectCosts.data.datasets[3].data = Object.values(json.charts_data_constr['uses_senior_debt_idc_and_fees']);
-        chartProjectCosts.data.datasets[4].data = Object.values(json.charts_data_constr['DSRA_initial_funding']);
-        chartProjectCosts.data.datasets[5].data = Object.values(json.charts_data_constr['construction_costs_total']);
-        chartProjectCosts.update();
-
-        chartFinPlan.data.labels = Object.values(json.charts_data_constr['dates_model_end']);
-        chartFinPlan.data.datasets[0].data = Object.values(json.charts_data_constr['charts_share_capital_inj_neg']);
-        chartFinPlan.data.datasets[1].data = Object.values(json.charts_data_constr['charts_shl_draw_neg']);
-        chartFinPlan.data.datasets[2].data = Object.values(json.charts_data_constr['charts_senior_debt_draw_neg']);
-        chartFinPlan.data.datasets[3].data = Object.values(json.charts_data_constr['uses_total']);
-        chartFinPlan.data.datasets[4].data = Object.values(json.charts_data_constr['gearing_during_finplan']);
-        chartFinPlan.update();  
-
-
-
-    // Extract data from json
-    const usesData = json.dashboard_cards['Uses'];
-    const labels = Object.keys(usesData).filter(key => key !== 'Total');  // Exclude "Total"
-    const dataValues = labels.map(key => parseFloat(usesData[key][0]));
-
-    // Calculate max value with padding for better visualization
-    const maxValue = Math.max(...dataValues) * 1.1; // Add 10% padding (ajusté de 20% pour moins d'espace vide)
-
-    // Calculate background data (difference between max and each value)
-    const backgroundData = dataValues.map(value => maxValue - value);
-
-    // Update chart data
-    chartUses.data.labels = labels;
-    chartUses.data.datasets[0].data = dataValues;      // Actual data bars (now dataset 0)
-    chartUses.data.datasets[1].data = backgroundData;  // Background (gray) bars (now dataset 1)
-
-
-
-    // Update max scale to ensure bars fill the right amount of space
+    // Cache frequently accessed data
+    const constrData = json.charts_data_constr;
+    const dashboardCards = json.dashboard_cards;
+    
+    // Pre-compute all values at once
+    const dates = Object.values(constrData['dates_model_end']);
+    const constrCostsTotal = Object.values(constrData['construction_costs_total']);
+    const usesTotalCumul = Object.values(constrData['uses_total_cumul']);
+    const seniorDebtIdc = Object.values(constrData['uses_senior_debt_idc_and_fees']);
+    const dsraFunding = Object.values(constrData['DSRA_initial_funding']);
+    const shareCapitalInj = Object.values(constrData['charts_share_capital_inj_neg']);
+    const shlDraw = Object.values(constrData['charts_shl_draw_neg']);
+    const seniorDebtDraw = Object.values(constrData['charts_senior_debt_draw_neg']);
+    const usesTotal = Object.values(constrData['uses_total']);
+    const gearing = Object.values(constrData['gearing_during_finplan']);
+    
+    // Batch update chartProjectCosts
+    const projectCostsData = chartProjectCosts.data;
+    projectCostsData.labels = dates;
+    projectCostsData.datasets[0].data = constrCostsTotal;
+    projectCostsData.datasets[1].data = usesTotalCumul;
+    projectCostsData.datasets[2].data = constrCostsTotal;
+    projectCostsData.datasets[3].data = seniorDebtIdc;
+    projectCostsData.datasets[4].data = dsraFunding;
+    projectCostsData.datasets[5].data = constrCostsTotal;
+    
+    // Batch update chartFinPlan
+    const finPlanData = chartFinPlan.data;
+    finPlanData.labels = dates;
+    finPlanData.datasets[0].data = shareCapitalInj;
+    finPlanData.datasets[1].data = shlDraw;
+    finPlanData.datasets[2].data = seniorDebtDraw;
+    finPlanData.datasets[3].data = usesTotal;
+    finPlanData.datasets[4].data = gearing;
+    
+    // Process Uses data
+    const usesData = dashboardCards['Uses'];
+    const usesLabels = Object.keys(usesData).filter(key => key !== 'Total');
+    const usesValues = usesLabels.map(key => parseFloat(usesData[key][0]));
+    const maxValue = Math.max(...usesValues) * 1.1;
+    const backgroundData = usesValues.map(value => maxValue - value);
+    
+    // Batch update chartUses
+    const chartUsesData = chartUses.data;
+    chartUsesData.labels = usesLabels;
+    chartUsesData.datasets[0].data = usesValues;
+    chartUsesData.datasets[1].data = backgroundData;
     chartUses.options.scales.x.max = maxValue;
-
-    // Make sure we have enough colors if there are many data points
-    if (labels.length > chartUses.data.datasets[0].backgroundColor.length) {
+    
+    // Ensure enough colors for chartUses
+    if (usesLabels.length > chartUsesData.datasets[0].backgroundColor.length) {
         const defaultColors = ['#CE65FF', '#FF6630', '#FECD32', '#34CB98'];
-        while (chartUses.data.datasets[0].backgroundColor.length < labels.length) {
-            chartUses.data.datasets[0].backgroundColor.push(
-                defaultColors[chartUses.data.datasets[0].backgroundColor.length % defaultColors.length]
-            );
+        const bgColors = chartUsesData.datasets[0].backgroundColor;
+        while (bgColors.length < usesLabels.length) {
+            bgColors.push(defaultColors[bgColors.length % defaultColors.length]);
         }
     }
-
     
-    // Update the chart
+    // Process Sources data
+    const sourcesData = dashboardCards['Sources'];
+    const excludedKeys = ['Total', 'Equity'];
+    const sourcesLabels = Object.keys(sourcesData).filter(key => !excludedKeys.includes(key));
+    const sourcesValues = sourcesLabels.map(key => parseFloat(sourcesData[key][0]));
+    
+    // Batch update chartSources
+    chartSources.data.labels = sourcesLabels;
+    chartSources.data.datasets[0].data = sourcesValues;
+    
+    // Single update call for all charts
+    chartProjectCosts.update();
+    chartFinPlan.update();
     chartUses.update();
-
-        const sourcesData = json.dashboard_cards['Sources'];
-        const excludedKeys = ['Total', 'Equity'];
-        const sourcesLabels = Object.keys(sourcesData).filter(key => !excludedKeys.includes(key));
-        const sourcesValues = sourcesLabels.map(key => parseFloat(sourcesData[key][0]));
-
-        chartSources.data.labels = sourcesLabels;
-        chartSources.data.datasets[0].data = sourcesValues;
-        chartSources.update();
-
-
+    chartSources.update();
 }
 
 function updateChartsAnnual(json) {
-
-        chartCashFlow.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartCashFlow.data.datasets[0].data = Object.values(json.df_annual['opex']['total']);
-        chartCashFlow.data.datasets[1].data = Object.values(json.df_annual['opex']['lease_costs']);
-        chartCashFlow.data.datasets[2].data = Object.values(json.df_annual['revenues']['contract']);
-        chartCashFlow.data.datasets[3].data = Object.values(json.df_annual['revenues']['merchant']);
-        chartCashFlow.data.datasets[4].data = Object.values(json.df_annual['senior_debt']['DS_effective']);
-        chartCashFlow.update();  
-
-        chartEqtFlow.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartEqtFlow.data.datasets[0].data = Object.values(json.df_annual['charts']['share_capital_inj_and_repay']);
-        chartEqtFlow.data.datasets[1].data = Object.values(json.df_annual['charts']['shl_inj_and_repay']);
-        chartEqtFlow.data.datasets[2].data = Object.values(json.df_annual['distr_account']['dividends_paid']);
-        chartEqtFlow.data.datasets[3].data = Object.values(json.df_eoy['IRR']['irr_curve']);
-        chartEqtFlow.update();  
-
-        chartDebtS.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartDebtS.data.datasets[1].data = Object.values(json.df_annual['senior_debt']['interests_operations']);
-        chartDebtS.data.datasets[0].data = Object.values(json.df_annual['senior_debt']['repayments']);
-        chartDebtS.data.datasets[2].data = Object.values(json.df_eoy['ratios']['DSCR_effective']);
-        chartDebtS.update();  
-
-        chartDebtOut.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartDebtOut.data.datasets[0].data = Object.values(json.df_annual['sources']['senior_debt']);
-        chartDebtOut.data.datasets[1].data = Object.values(json.df_annual['senior_debt']['repayments']);
-        chartDebtOut.data.datasets[2].data = Object.values(json.df_eoy['senior_debt']['balance_eop']);
-        chartDebtOut.update();  
-
-        chartDSCR.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartDSCR.data.datasets[0].data = Object.values(json.df_eoy['ratios']['DSCR_effective']);
-        chartDSCR.data.datasets[1].data = Object.values(json.df_eoy['ratios']['LLCR']);
-        chartDSCR.data.datasets[2].data = Object.values(json.df_eoy['ratios']['PLCR']);
-        chartDSCR.update();  
-
-        chartDSRA.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartDSRA.data.datasets[0].data = Object.values(json.df_annual['senior_debt']['DS_effective']);
-        chartDSRA.data.datasets[1].data = Object.values(json.df_eoy['DSRA']['dsra_bop']);
-        chartDSRA.update();  
-
-        chartCash.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartCash.data.datasets[0].data = Object.values(json.df_eoy['IS']['retained_earnings_bop']);
-        chartCash.data.datasets[1].data = Object.values(json.df_eoy['distr_account']['balance_eop']);
-        chartCash.data.datasets[2].data = Object.values(json.df_annual['distr_account']['dividends_paid']);
-        chartCash.data.datasets[3].data = Object.values(json.df_annual['share_capital']['repayments']);
-        chartCash.update();  
-
-
-        chartProduction.data.labels = Object.keys(json.df_annual['opex']['total']);
-        chartProduction.data.datasets[0].data = Object.values(json.df_annual['production']['total']);
-        chartProduction.data.datasets[1].data = Object.values(json.df_eoy['capacity']['degradation_factor']);
-        chartProduction.update();  
-
-
+    // Cache frequently accessed data
+    const annual = json.df_annual;
+    const eoy = json.df_eoy;
+    
+    // Pre-compute common labels (all charts use the same)
+    const labels = Object.keys(annual['opex']['total']);
+    
+    // Pre-compute all data arrays
+    const opexTotal = Object.values(annual['opex']['total']);
+    const leaseCosts = Object.values(annual['opex']['lease_costs']);
+    const contractRev = Object.values(annual['revenues']['contract']);
+    const merchantRev = Object.values(annual['revenues']['merchant']);
+    const dsEffective = Object.values(annual['senior_debt']['DS_effective']);
+    const shareCapital = Object.values(annual['charts']['share_capital_inj_and_repay']);
+    const shlInj = Object.values(annual['charts']['shl_inj_and_repay']);
+    const dividends = Object.values(annual['distr_account']['dividends_paid']).map(value => value * -1);
+    const irrCurve = Object.values(eoy['IRR']['irr_curve']);
+    const interests = Object.values(annual['senior_debt']['interests_operations']);
+    const repayments = Object.values(annual['senior_debt']['repayments']);
+    const dscrEffective = Object.values(eoy['ratios']['DSCR_effective']);
+    const seniorDebt = Object.values(annual['sources']['senior_debt']);
+    const balanceEop = Object.values(eoy['senior_debt']['balance_eop']);
+    const llcr = Object.values(eoy['ratios']['LLCR']);
+    const plcr = Object.values(eoy['ratios']['PLCR']);
+    const dsraBop = Object.values(eoy['DSRA']['dsra_bop']);
+    const retainedEarnings = Object.values(eoy['IS']['retained_earnings_bop']);
+    const distrBalance = Object.values(eoy['distr_account']['balance_eop']);
+    const shareRepayments = Object.values(annual['share_capital']['repayments']);
+    const production = Object.values(annual['production']['total']);
+    const degradation = Object.values(eoy['capacity']['degradation_factor']);
+    
+    // Batch update all charts
+    const charts = [
+        {
+            chart: chartCashFlow,
+            datasets: [opexTotal, leaseCosts, contractRev, merchantRev, dsEffective]
+        },
+        {
+            chart: chartEqtFlow,
+            datasets: [shareCapital, shlInj, dividends, irrCurve]
+        },
+        {
+            chart: chartDebtS,
+            datasets: [repayments, interests, dscrEffective]
+        },
+        {
+            chart: chartDebtOut,
+            datasets: [seniorDebt, repayments, balanceEop]
+        },
+        {
+            chart: chartDSCR,
+            datasets: [dscrEffective, llcr, plcr]
+        },
+        {
+            chart: chartDSRA,
+            datasets: [dsEffective, dsraBop]
+        },
+        {
+            chart: chartCash,
+            datasets: [retainedEarnings, distrBalance, dividends, shareRepayments]
+        },
+        {
+            chart: chartProduction,
+            datasets: [production, degradation]
+        }
+    ];
+    
+    // Update all charts in a single loop
+    charts.forEach(({ chart, datasets }) => {
+        chart.data.labels = labels;
+        datasets.forEach((data, index) => {
+            chart.data.datasets[index].data = data;
+        });
+        chart.update();
+    });
 }
 
 function updateChartsDebtPeriodicity(json) {
+    // Cache frequently accessed data
+    const df = json.df;
+    
+    // Pre-compute common labels
+    const labels = Object.values(df['dates']['model']['end']);
+    
+    // Pre-compute all data arrays
+    const dataArrays = {
+        opexTotal: Object.values(df['opex']['total']),
+        leaseCosts: Object.values(df['opex']['lease_costs']),
+        contractRev: Object.values(df['revenues']['contract']),
+        merchantRev: Object.values(df['revenues']['merchant']),
+        dsEffective: Object.values(df['senior_debt']['DS_effective']),
+        shareCapital: Object.values(df['charts']['share_capital_inj_and_repay']),
+        shlInj: Object.values(df['charts']['shl_inj_and_repay']),
+        dividends: Object.values(df['distr_account']['dividends_paid']),
+        irrCurve: Object.values(df['IRR']['irr_curve']),
+        interests: Object.values(df['senior_debt']['interests_operations']),
+        repayments: Object.values(df['senior_debt']['repayments']),
+        dscrEffective: Object.values(df['ratios']['DSCR_effective']),
+        seniorDebt: Object.values(df['sources']['senior_debt']),
+        balanceEop: Object.values(df['senior_debt']['balance_eop']),
+        llcr: Object.values(df['ratios']['LLCR']),
+        plcr: Object.values(df['ratios']['PLCR']),
+        dsraBop: Object.values(df['DSRA']['dsra_bop']),
+        retainedEarnings: Object.values(df['IS']['retained_earnings_bop']),
+        distrBalance: Object.values(df['distr_account']['balance_eop']),
+        shareRepayments: Object.values(df['share_capital']['repayments']),
+        production: Object.values(df['production']['total']),
+        degradation: Object.values(df['capacity']['degradation_factor'])
+    };
+    
+    // Define chart configurations
+    const chartConfigs = [
+        {
+            chart: chartCashFlow,
+            data: [dataArrays.opexTotal, dataArrays.leaseCosts, dataArrays.contractRev, 
+                   dataArrays.merchantRev, dataArrays.dsEffective]
+        },
+        {
+            chart: chartEqtFlow,
+            data: [dataArrays.shareCapital, dataArrays.shlInj, dataArrays.dividends, 
+                   dataArrays.irrCurve]
+        },
+        {
+            chart: chartDebtS,
+            data: [dataArrays.interests, dataArrays.repayments, dataArrays.dscrEffective]
+        },
+        {
+            chart: chartDebtOut,
+            data: [dataArrays.seniorDebt, dataArrays.repayments, dataArrays.balanceEop]
+        },
+        {
+            chart: chartDSCR,
+            data: [dataArrays.dscrEffective, dataArrays.llcr, dataArrays.plcr]
+        },
+        {
+            chart: chartDSRA,
+            data: [dataArrays.dsEffective, dataArrays.dsraBop]
+        },
+        {
+            chart: chartCash,
+            data: [dataArrays.retainedEarnings, dataArrays.distrBalance, 
+                   dataArrays.dividends, dataArrays.shareRepayments]
+        },
+        {
+            chart: chartProduction,
+            data: [dataArrays.production, dataArrays.degradation]
+        }
+    ];
+    
+    // Update all charts efficiently
+    chartConfigs.forEach(({ chart, data }) => {
+        chart.data.labels = labels;
+        data.forEach((dataset, index) => {
+            chart.data.datasets[index].data = dataset;
+        });
+        chart.update();
+    });
+}
 
-        chartCashFlow.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartCashFlow.data.datasets[0].data = Object.values(json.df['opex']['total']);
-        chartCashFlow.data.datasets[1].data = Object.values(json.df['opex']['lease_costs']);
-        chartCashFlow.data.datasets[2].data = Object.values(json.df['revenues']['contract']);
-        chartCashFlow.data.datasets[3].data = Object.values(json.df['revenues']['merchant']);
-        chartCashFlow.data.datasets[4].data = Object.values(json.df['senior_debt']['DS_effective']);
-        chartCashFlow.update();  
-
-        chartEqtFlow.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartEqtFlow.data.datasets[0].data = Object.values(json.df['charts']['share_capital_inj_and_repay']);
-        chartEqtFlow.data.datasets[1].data = Object.values(json.df['charts']['shl_inj_and_repay']);
-        chartEqtFlow.data.datasets[2].data = Object.values(json.df['distr_account']['dividends_paid']);
-        chartEqtFlow.data.datasets[3].data = Object.values(json.df['IRR']['irr_curve']);
-        chartEqtFlow.update();  
-
-        chartDebtS.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartDebtS.data.datasets[0].data = Object.values(json.df['senior_debt']['interests_operations']);
-        chartDebtS.data.datasets[1].data = Object.values(json.df['senior_debt']['repayments']);
-        chartDebtS.data.datasets[2].data = Object.values(json.df['ratios']['DSCR_effective']);
-        chartDebtS.update();  
-
-        chartDebtOut.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartDebtOut.data.datasets[0].data = Object.values(json.df['sources']['senior_debt']);
-        chartDebtOut.data.datasets[1].data = Object.values(json.df['senior_debt']['repayments']);
-        chartDebtOut.data.datasets[2].data = Object.values(json.df['senior_debt']['balance_eop']);
-        chartDebtOut.update();  
-
-        chartDSCR.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartDSCR.data.datasets[0].data = Object.values(json.df['ratios']['DSCR_effective']);
-        chartDSCR.data.datasets[1].data = Object.values(json.df['ratios']['LLCR']);
-        chartDSCR.data.datasets[2].data = Object.values(json.df['ratios']['PLCR']);
-        chartDSCR.update();  
-
-        chartDSRA.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartDSRA.data.datasets[0].data = Object.values(json.df['senior_debt']['DS_effective']);
-        chartDSRA.data.datasets[1].data = Object.values(json.df['DSRA']['dsra_bop']);
-        chartDSRA.update();  
-
-        chartCash.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartCash.data.datasets[0].data = Object.values(json.df['IS']['retained_earnings_bop']);
-        chartCash.data.datasets[1].data = Object.values(json.df['distr_account']['balance_eop']);
-        chartCash.data.datasets[2].data = Object.values(json.df['distr_account']['dividends_paid']);
-        chartCash.data.datasets[3].data = Object.values(json.df['share_capital']['repayments']);
-        chartCash.update(); 
-
-        chartProduction.data.labels = Object.values(json.df['dates']['model']['end']);
-        chartProduction.data.datasets[0].data = Object.values(json.df['production']['total']);
-        chartProduction.data.datasets[1].data = Object.values(json.df['capacity']['degradation_factor']);
-        chartProduction.update();  
-
-
-
-
+// Additional optimization: Batch all chart updates if multiple functions are called sequentially
+function batchUpdateCharts(updateFunctions, json) {
+    // Disable chart animations temporarily for faster updates
+    const charts = [chartProjectCosts, chartFinPlan, chartUses, chartSources, 
+                   chartCashFlow, chartEqtFlow, chartDebtS, chartDebtOut, 
+                   chartDSCR, chartDSRA, chartCash, chartProduction];
+    
+    // Store original animation settings
+    const originalAnimations = charts.map(chart => ({
+        chart: chart,
+        animation: chart.options.animation
+    }));
+    
+    // Disable animations
+    charts.forEach(chart => {
+        if (chart.options) {
+            chart.options.animation = false;
+        }
+    });
+    
+    // Execute all update functions
+    updateFunctions.forEach(fn => fn(json));
+    
+    // Restore animations
+    originalAnimations.forEach(({ chart, animation }) => {
+        if (chart.options) {
+            chart.options.animation = animation;
+        }
+    });
 }

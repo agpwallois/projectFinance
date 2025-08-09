@@ -22,41 +22,9 @@ class Accounts:
 		
 	def initialize(self) -> None:
 		"""Initialize all account calculations and balances."""
-		# Initialize arrays
-		self._initialize_arrays()
-		
-		# Perform iterative calculations if needed
-		self._calculate_period_by_period()
-			
-	def _initialize_arrays(self) -> None:
-		"""Initialize all arrays with proper dimensions."""
-		n_periods = len(self.model['flags']['operations'])
-		
-	def _calculate_period_by_period(self) -> None:
-		"""Calculate all accounts period by period in the correct order."""
-		n_periods = len(self.model['flags']['operations'])
-		
-		for i in range(n_periods):
-			# Step 1: Calculate beginning balances
-			self._set_beginning_balances(i)
-			
-			# Step 2: Calculate SHL interests for this period
-			self._calculate_period_SHL_interests(i)
-			
-			# Step 3: Calculate cash available for distribution
-			self._calculate_period_cash_available(i)
-			
-			# Step 4: Process transfers to distribution account
-			self._process_period_transfers(i)
-			
-			# Step 5: Process distributions (dividends, SHL payments)
-			self._process_period_distributions(i)
-			
-			# Step 6: Process share capital redemption (if liquidation)
-			self._process_period_share_capital(i)
-			
-			# Step 7: Update ending balances
-			self._update_period_ending_balances(i)
+		# Note: The actual period-by-period calculations are handled by 
+		# FinancialModelCalculator which calls the individual period methods
+		pass
 			
 	def _set_beginning_balances(self, i: int) -> None:
 		"""Set beginning balances for all accounts."""
@@ -107,10 +75,9 @@ class Accounts:
 			- op_account['senior_debt_interests_paid'][i]
 			- op_account['senior_debt_repayments'][i]
 			- self.model['DSRA']['dsra_mov'][i]
-			- self.instance.project.cash_min * self.model['flags']['operations'][i]
 		)
-		
-		distr['cash_available_for_distribution'][i] = cash_available
+
+		op_account['cash_flow_available_for_distribution'][i] = cash_available
 		
 	def _process_period_transfers(self, i: int) -> None:
 		"""Process transfers from operating account to distribution account."""
@@ -121,9 +88,12 @@ class Accounts:
 		# This is the positive cash available plus any existing operating account balance
 		available_in_op_account = (
 			op_account['balance_bop'][i] + 
-			max(distr['cash_available_for_distribution'][i], 0)
+			max(op_account['cash_flow_available_for_distribution'][i], 0)
 		)
 		
+		op_account['cash_available_for_distribution'][i] = available_in_op_account
+
+
 		# Transfer to distribution account (keeping minimum cash in operating account)
 		min_cash_requirement = self.instance.project.cash_min * self.model['flags']['operations'][i]
 		
@@ -131,7 +101,8 @@ class Accounts:
 			available_in_op_account - min_cash_requirement,
 			0
 		)
-		
+
+		op_account['transfers_distribution_account'][i] = -1*transfer_amount
 		distr['transfers_distribution_account'][i] = transfer_amount
 		
 	def _process_period_distributions(self, i: int) -> None:
@@ -142,6 +113,7 @@ class Accounts:
 		
 		# Available cash in distribution account
 		available_cash = distr['balance_bop'][i] + distr['transfers_distribution_account'][i]
+		distr['cash_available_for_distribution'][i] = available_cash
 		
 		# Step 1: Pay SHL interest first (senior to dividends)
 		shl_interest_due = shl['interests_operations'][i]
@@ -162,11 +134,11 @@ class Accounts:
 		
 		# Step 3: Pay dividends (limited by both cash and distributable profit)
 		distr['cash_available_for_dividends'][i] = available_cash
-		distr['dividends_paid'][i] = min(
+		distr['dividends_paid'][i] = -min(
 			available_cash,
 			IS['distributable_profit'][i]
 		)
-		available_cash -= distr['dividends_paid'][i]
+		available_cash += distr['dividends_paid'][i]
 		
 		# Step 4: SHL repayments with remaining cash
 		distr['cash_available_for_SHL_repayments'][i] = available_cash
@@ -203,29 +175,26 @@ class Accounts:
 		op_account = self.model['op_account']
 		distr = self.model['distr_account']
 		
-		op_account['cash_available_for_distribution'][i] = distr['cash_available_for_distribution'][i]
-		op_account['transfers_distribution_account'][i] = distr['transfers_distribution_account'][i]
-
 		op_account['balance_eop'][i] = (
 			op_account['balance_bop'][i]
-			+ op_account['cash_available_for_distribution'][i]
-			- op_account['transfers_distribution_account'][i]
+			+ op_account['cash_flow_available_for_distribution'][i]
+			+ op_account['transfers_distribution_account'][i]
 		)
 
-		distr['SHL_interests_paid'][i] = self.model['SHL']['interests_paid'][i]
-		distr['SHL_repayments'][i] = self.model['SHL']['repayments'][i]
-		distr['share_capital_repayments'][i] = self.model['share_capital']['repayments'][i]
+		distr['SHL_interests_paid'][i] = -1*self.model['SHL']['interests_paid'][i]
+		distr['SHL_repayments'][i] = -1*self.model['SHL']['repayments'][i]
+		distr['share_capital_repayments'][i] = -1*self.model['share_capital']['repayments'][i]
 		
 		# Distribution Account
 		distr['balance_eop'][i] = (
 			distr['balance_bop'][i]
 			+ distr['transfers_distribution_account'][i]
-			- distr['SHL_interests_paid'][i]
-			- distr['dividends_paid'][i]
-			- distr['SHL_repayments'][i]
-			- distr['share_capital_repayments'][i]
+			+ distr['SHL_interests_paid'][i]
+			+ distr['dividends_paid'][i]
+			+ distr['SHL_repayments'][i]
+			+ distr['share_capital_repayments'][i]
 		)
-		
+
 		# SHL Balance
 		shl = self.model['SHL']
 		shl['balance_eop'][i] = (
@@ -249,5 +218,5 @@ class Accounts:
 		IS['retained_earnings_eop'][i] = (
 			IS['retained_earnings_bop'][i]
 			+ IS['net_income'][i]
-			- distr['dividends_paid'][i]
+			+ distr['dividends_paid'][i]
 		)

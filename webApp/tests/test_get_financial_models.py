@@ -25,21 +25,26 @@ class TestGetFinancialModels(TestCase):
         self.view = FinancialModelView()
         self.mock_project = MagicMock(spec=Project)
     
-    @patch('financial_model.views.SolarFinancialModel.objects.get')
-    def test_get_financial_models_retrieves_8_models(self, mock_get):
+    @patch('financial_model.views.SolarFinancialModel.objects.filter')
+    def test_get_financial_models_retrieves_8_models(self, mock_filter):
         """Test that _get_financial_models retrieves all 8 financial models"""
+        # Mock the project's technology attribute
+        self.mock_project.technology = 'Solar'
+        
         # Create 8 mock models
-        mock_models = {}
+        mock_models = []
         for scenario_id in self.view.FINANCIAL_MODEL_SCENARIOS.keys():
             mock_model = MagicMock(spec=SolarFinancialModel)
             mock_model.identifier = scenario_id
-            mock_models[scenario_id] = mock_model
+            mock_models.append(mock_model)
         
-        # Configure mock to return the appropriate model for each scenario
-        mock_get.side_effect = lambda project, identifier: mock_models[identifier]
+        # Configure mock filter to return all models
+        mock_filter.return_value = mock_models
         
-        # Call the method
-        result = self.view._get_financial_models(self.mock_project)
+        # Mock the _create_fm method to avoid actual model creation
+        with patch.object(self.view, '_create_fm') as mock_create_fm:
+            # Call the method
+            result = self.view._get_financial_models(self.mock_project)
         
         # Verify 8 models are returned
         self.assertEqual(len(result), 8)

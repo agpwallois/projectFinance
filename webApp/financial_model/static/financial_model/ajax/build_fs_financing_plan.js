@@ -85,7 +85,7 @@ function build_fs_financing_plan(json) {
               formattedValue = typeof value === 'number' ? formatAsPercent(value) : (value || "-");
             } else if (typeof value === 'number') {
               // Format all other numeric values as integers
-              formattedValue = formatAsInt(value);
+              formattedValue = formatAsFloat(value);
             } else {
               formattedValue = value || "-";
             }
@@ -132,4 +132,13 @@ function formatAsPercent(num) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(num);
+}
+
+
+function formatAsFloat(dataValue) {
+  const formattedValue = dataValue.toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return formattedValue;
 }

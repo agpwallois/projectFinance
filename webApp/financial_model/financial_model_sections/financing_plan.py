@@ -77,11 +77,14 @@ class FinancingPlan:
 	
 	def _calculate_equity_requirement(self):
 		"""Calculate total equity required as the difference between uses and debt."""
+		total_uses = pd.Series(self.model.financial_model['uses']['total']).sum()
+		
 		self.total_equity_required = (
-			pd.Series(self.model.financial_model['uses']['total']).sum() - 
+			total_uses - 
 			self.model.senior_debt_amount
 		)
 		
+
 		# Convert subgearing from percentage to decimal
 		self.model.subgearing = float(self.model.project.subgearing) / 100
 	
@@ -99,6 +102,7 @@ class FinancingPlan:
 		# Get period-by-period project costs
 		period_costs = self.model.financial_model['uses']['total']
 		cumulative_costs = self.model.financial_model['uses']['total_cumul']
+
 		
 		# Initialize arrays
 		equity_drawdowns = np.zeros_like(period_costs)
@@ -108,33 +112,37 @@ class FinancingPlan:
 		for period in range(len(period_costs)):
 			cumulative_cost_to_date = cumulative_costs[period]
 			
-			if cumulative_cost_to_date <= self.total_equity_required:
+			
+			# Get previous cumulative cost (0 for first period)
+			prev_cumulative = cumulative_costs[period - 1] if period > 0 else 0
+			
+			if prev_cumulative >= self.total_equity_required:
+				# Pure debt phase - all equity has been drawn
+				equity_drawdowns[period] = 0
+				debt_drawdowns[period] = period_costs[period]
+				
+			elif cumulative_cost_to_date <= self.total_equity_required:
 				# Still within equity-only phase
 				# All costs in this period are covered by equity
 				equity_drawdowns[period] = period_costs[period]
 				debt_drawdowns[period] = 0
 				
 			else:
-				# We've exceeded total equity requirement - now drawing debt
-				# Check if this is the transition period
-				if period > 0 and cumulative_costs[period - 1] < self.total_equity_required:
-					# This is the transition period
-					# Equity covers remaining amount up to total equity requirement
-					remaining_equity = self.total_equity_required - cumulative_costs[period - 1]
-					equity_drawdowns[period] = remaining_equity
-					debt_drawdowns[period] = period_costs[period] - remaining_equity
-				else:
-					# Pure debt phase - all costs covered by debt
-					equity_drawdowns[period] = 0
-					debt_drawdowns[period] = period_costs[period]
+				# Transition period - we cross from equity to debt in this period
+				# Equity covers remaining amount up to total equity requirement
+				remaining_equity = self.total_equity_required - prev_cumulative
+				equity_drawdowns[period] = remaining_equity
+				debt_drawdowns[period] = period_costs[period] - remaining_equity
 		
 		# Store the calculated drawdowns
 		self.model.financial_model['sources']['equity'] = equity_drawdowns
 		self.model.financial_model['sources']['senior_debt'] = debt_drawdowns
 		
+		
 		# Validation: ensure totals match requirements
 		total_equity_drawn = np.sum(equity_drawdowns)
 		total_debt_drawn = np.sum(debt_drawdowns)
+
 		
 		if not np.isclose(total_equity_drawn, self.total_equity_required, rtol=1e-10):
 			logger.warning(f"Equity drawn ({total_equity_drawn:,.0f}) doesn't match requirement ({self.total_equity_required:,.0f})")

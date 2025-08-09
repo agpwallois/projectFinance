@@ -64,6 +64,7 @@ class DeclareVariables:
 			"balance_bop": np.full(data_length, 1),
 			"interests_construction": np.full(data_length, 0),
 			"interests_operations": np.full(data_length, 0),
+			"interests_paid": np.full(data_length, 0),
 		}
 
 		# Operating Account

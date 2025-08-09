@@ -82,6 +82,15 @@
 
 </div>
 
+    <!-- Operational Tabs Section - Only shown when project status is "Operational" -->
+    {% if project.project_status == "Operational" %}
+
+
+
+
+
+    {% endif %}
+
 
 <div id="content-box">
 
@@ -93,7 +102,7 @@
         <!-- Modal -->
         <div id="loading-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
           <div style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3); font-size:18px;">
-            Creating scenarios... Please wait 5 seconds.
+            Creating scenarios... Please wait.
           </div>
         </div>
 
@@ -368,6 +377,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="{% static 'financial_model/ajax/build_fs_financial_statements.js' %}"></script>
 <script src="{% static 'financial_model/ajax/build_fs_financing_plan.js' %}"></script>
 <script src="{% static 'financial_model/ajax/build_fs_balance_sheet.js' %}"></script>
+<script src="{% static 'financial_model/ajax/build_fs_debt_schedule.js' %}"></script>
+
 
 <script src="{% static 'financial_model/ajax/build_charts.js' %}"></script>
 <script src="{% static 'financial_model/ajax/update_dashboard_and_sidebar_cards.js' %}"></script>
