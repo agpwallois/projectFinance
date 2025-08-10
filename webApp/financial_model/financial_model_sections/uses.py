@@ -62,7 +62,8 @@ class Uses:
 			np.array(uses['interests_construction']) +
 			np.array(uses['upfront_fee']) +
 			np.array(uses['commitment_fees']) +
-			np.array(uses['reserves'])
+			np.array(uses['reserves']) +
+			np.array(uses['local_taxes'])
 		)
 
 
@@ -75,10 +76,10 @@ class Uses:
 			np.array(uses['interests_construction']) +
 			np.array(uses['upfront_fee']) +
 			np.array(uses['commitment_fees']) +
-			np.array(uses['reserves'])
+			np.array(uses['reserves']) +
+			np.array(uses['local_taxes'])
+	
 		)
-
-		""" np.array(uses['local_taxes']) """
 
 		uses['total_cumul'] = pd.Series(uses['total']).cumsum()
 

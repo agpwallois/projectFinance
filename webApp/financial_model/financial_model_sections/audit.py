@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Union, Optional
 import pandas as pd
 import numpy as np
+import calendar
 from datetime import date, datetime
 from dateutil import parser
 from dataclasses import dataclass
@@ -17,6 +18,9 @@ class AuditResults:
 	financing_plan_check: bool
 	balance_sheet_check: bool
 	debt_maturity_check: bool
+	operating_account_check: bool
+	distribution_account_check: bool
+	dsra_usage_check: bool
 	tenor_debt: float
 	check_all: bool
 
@@ -58,6 +62,13 @@ class Audit:
 		financing_plan_check = self._check_materiality(financing_plan_diff)
 		balance_sheet_check = self._check_materiality(balance_sheet_diff)
 		
+		# Check account balances are non-negative
+		operating_account_check = self._check_operating_account_balance()
+		distribution_account_check = self._check_distribution_account_balance()
+		
+		# Check DSRA usage
+		dsra_usage_check = self._check_dsra_usage()
+		
 		# Calculate debt related metrics
 
 
@@ -95,7 +106,10 @@ class Audit:
 		check_all = all([
 			financing_plan_check,
 			balance_sheet_check,
-			debt_maturity_check
+			debt_maturity_check,
+			operating_account_check,
+			distribution_account_check,
+			dsra_usage_check
 		])
 		
 		return AuditResults(
@@ -104,6 +118,9 @@ class Audit:
 			financing_plan_check=financing_plan_check,
 			balance_sheet_check=balance_sheet_check,
 			debt_maturity_check=debt_maturity_check,
+			operating_account_check=operating_account_check,
+			distribution_account_check=distribution_account_check,
+			dsra_usage_check=dsra_usage_check,
 			tenor_debt=tenor_debt,
 			check_all=check_all
 		)
@@ -209,6 +226,48 @@ class Audit:
 		"""
 		return final_repayment_date == debt_maturity_rounded
 	
+	def _check_operating_account_balance(self) -> bool:
+		"""
+		Check if operating account end-of-period balance is non-negative for all periods.
+		
+		Returns:
+			bool: True if all operating account balances are >= 0
+		"""
+		try:
+			operating_balance_eop = np.array(self.model['op_account']['balance_eop'])
+			return np.all(operating_balance_eop >= -self.MATERIALITY_THRESHOLD)
+		except KeyError:
+			logger.warning("Operating account balance_eop not found in model")
+			return False
+	
+	def _check_distribution_account_balance(self) -> bool:
+		"""
+		Check if distribution account end-of-period balance is non-negative for all periods.
+		
+		Returns:
+			bool: True if all distribution account balances are >= 0
+		"""
+		try:
+			distribution_balance_eop = np.array(self.model['distr_account']['balance_eop'])
+			return np.all(distribution_balance_eop >= -self.MATERIALITY_THRESHOLD)
+		except KeyError:
+			logger.warning("Distribution account balance_eop not found in model")
+			return False
+	
+	def _check_dsra_usage(self) -> bool:
+		"""
+		Check if DSRA is used (i.e., dsra_release > 0 at any period).
+		
+		Returns:
+			bool: True if DSRA is used (at least one period has dsra_release > 0)
+		"""
+		try:
+			dsra_release = np.array(self.model['ratios']['DSCR_effective'])
+			return np.any(dsra_release > 1)
+		except KeyError:
+			logger.warning("DSRA release not found in model")
+			return False
+	
 	def _store_audit_results(self, results: AuditResults) -> None:
 		"""
 		Store audit results in the financial model.
@@ -223,5 +282,8 @@ class Audit:
 			'check_balance_sheet': results.balance_sheet_check,
 			'tenor_debt': results.tenor_debt,
 			'debt_maturity': results.debt_maturity_check,
+			'check_operating_account': results.operating_account_check,
+			'check_distribution_account': results.distribution_account_check,
+			'check_dsra_usage': results.dsra_usage_check,
 			'check_all': results.check_all
 		}

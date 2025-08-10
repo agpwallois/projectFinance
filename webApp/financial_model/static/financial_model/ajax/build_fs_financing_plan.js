@@ -78,21 +78,36 @@ function build_fs_financing_plan(json) {
             
             // Format based on data type and section
             if (section.key === 'fs_dates') {
-              formattedValue = value === 'Total' ? 'Total' : 
-                (value.includes('T') ? value.substring(5, 7) + '/' + value.substring(0, 4) : value);
-            } else if (section.key === 'fs_gearing' && subKey === 'gearing') {
-              // Format gearing as percentage
-              formattedValue = typeof value === 'number' ? formatAsPercent(value) : (value || "-");
+              // Check if value is 'TOTAL' or 'Total' (case insensitive)
+              if (value && typeof value === 'string' && value.toUpperCase() === 'TOTAL') {
+                formattedValue = 'TOTAL';
+              } else if (value && typeof value === 'string' && value.includes('T') && value.length > 7) {
+                // Only apply date formatting to actual date strings (longer than 7 characters)
+                formattedValue = value.substring(5, 7) + '/' + value.substring(0, 4);
+              } else {
+                formattedValue = value;
+              }
             } else if (typeof value === 'number') {
-              // Format all other numeric values as integers
-              formattedValue = formatAsFloat(value);
+              // Check if value is 0
+              if (value === 0) {
+                formattedValue = "-";
+              } else if (section.key === 'fs_gearing' && subKey === 'gearing') {
+                // Format gearing as percentage (non-zero values)
+                formattedValue = formatAsPercent(value);
+              } else {
+                // Format all other numeric values as floats (non-zero values)
+                formattedValue = formatAsFloat(value);
+              }
             } else {
               formattedValue = value || "-";
             }
             
-            tableContent += "<td>" + formattedValue + "</td>";
+            // Add bold class to third column (index 0 in data values)
+            const cellClass = i === 0 ? " class='third-column-bold'" : "";
+            tableContent += "<td" + cellClass + ">" + formattedValue + "</td>";
           } else {
-            tableContent += "<td>-</td>";
+            const cellClass = i === 0 ? " class='third-column-bold'" : "";
+            tableContent += "<td" + cellClass + ">-</td>";
           }
         }
         
@@ -133,7 +148,6 @@ function formatAsPercent(num) {
     maximumFractionDigits: 2,
   }).format(num);
 }
-
 
 function formatAsFloat(dataValue) {
   const formattedValue = dataValue.toLocaleString("fr-FR", {

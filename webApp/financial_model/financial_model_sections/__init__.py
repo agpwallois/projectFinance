@@ -17,19 +17,18 @@ from .senior_debt import SeniorDebt
 
 from .uses import Uses
 from .depreciation import Depreciation
-from .income_statement import IncomeStatement
+from .income_statement_helper import IncomeStatementHelper
 from .debt_sizing import SeniorDebtSizing
-from .cash_flow_statement import CashFlowStatement
+from .cash_flow_statement_helper import CashFlowStatementHelper
+from .dsra_helper import DSRAHelper
+from .accounts_helper import AccountsHelper
 
 from .financial_model_calculator import FinancialModelCalculator
 
-
-from .dsra import FinancialModelDSRA
 from .balance_sheet import BalanceSheet
 from .ratios import Ratios
 from .irr import FinancialModelIRR
 
 from .audit import Audit
-from .accounts import Accounts
 from .variables_declaration import DeclareVariables
 

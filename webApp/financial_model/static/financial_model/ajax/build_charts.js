@@ -1,10 +1,34 @@
+// Function to format dates from "2032-06-30T00:00:00" to "06-2032"
+function formatDateForChart(dateStr) {
+    if (!dateStr) return dateStr;
+    
+    // Handle both ISO format (2032-06-30T00:00:00) and DD/MM/YYYY format
+    let date;
+    if (dateStr.includes('T')) {
+        // ISO format
+        date = new Date(dateStr);
+    } else if (dateStr.includes('/')) {
+        // DD/MM/YYYY format - convert to Date
+        const parts = dateStr.split('/');
+        date = new Date(parts[2], parts[1] - 1, parts[0]);
+    } else {
+        return dateStr; // Return as-is if format not recognized
+    }
+    
+    if (isNaN(date.getTime())) return dateStr;
+    
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}-${year}`;
+}
+
 function build_charts(json) {
     // Cache frequently accessed data
     const constrData = json.charts_data_constr;
     const dashboardCards = json.dashboard_cards;
     
     // Pre-compute all values at once
-    const dates = Object.values(constrData['dates_model_end']);
+    const dates = Object.values(constrData['dates_model_end']).map(formatDateForChart);
     const constrCostsTotal = Object.values(constrData['construction_costs_total']);
     const usesTotalCumul = Object.values(constrData['uses_total_cumul']);
     const seniorDebtIdc = Object.values(constrData['uses_senior_debt_idc_and_fees']);
@@ -157,7 +181,7 @@ function updateChartsDebtPeriodicity(json) {
     const df = json.df;
     
     // Pre-compute common labels
-    const labels = Object.values(df['dates']['model']['end']);
+    const labels = Object.values(df['dates']['model']['end']).map(formatDateForChart);
     
     // Pre-compute all data arrays
     const dataArrays = {

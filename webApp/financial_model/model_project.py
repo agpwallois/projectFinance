@@ -311,6 +311,7 @@ class Project(models.Model):
 	index_rate_lease = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 
+	""" 
 	tfpb_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	tfpb_department_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	tfpb_additional_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
@@ -327,6 +328,7 @@ class Project(models.Model):
 	cfe_intercommunal_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	cfe_specific_eqp_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	cfe_localCCI_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	"""
 
 	project_status = models.fields.CharField(choices=PROJECT_STATUS,max_length=100,default="Development")
 	discount_factor_valuation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=7)

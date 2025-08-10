@@ -772,6 +772,11 @@ class FinancialModelView(View):
 			"Project IRR (pre-tax)": "{:.2%}",
 			"Project IRR (post-tax)": "{:.2%}"
 		}
+		
+		# Add formatting for all Valuation metrics
+		for key in dict_results.get('Valuation', {}).keys():
+			if key.startswith("Discount factor"):
+				output_formats[key] = "{:,.1f}"
 
 		sorted_uses = dict(sorted(dict_uses_sources['Uses'].items(), key=lambda item: item[1], reverse=True))
 		

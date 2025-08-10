@@ -15,8 +15,13 @@ function build_dashboard_cards(json) {
     "Average life": "years from FC",
     "Average DSCR": "x", // Ensure this key is unique or logic combined
     
-    "Balance sheet": "true/false",
-    "Financing plan": "true/false",
+    "Balance sheet balanced": "flag",
+    "Financing sources equals uses": "flag",
+    "Debt repaid at maturity": "flag",
+    "Operating account balance ≥ 0": "flag",
+    "Distribution account balance ≥ 0": "flag",
+    "DSRA is unused": "flag",
+
 
     "": "",
     "Date of final repayment": "date",
@@ -31,7 +36,6 @@ function build_dashboard_cards(json) {
     "Senior Debt IRR": "%",
     "Production": "x",
     "Operating costs": "x",
-    "Debt maturity": "true/false",
     "Discount factor": "%",
     "Unit": "",
     "Total Uses": "",

@@ -3,17 +3,15 @@ import numpy as np
 from typing import Dict, Any, Optional, Tuple
 import logging
 
-
 import cProfile
 import pstats
 from functools import wraps
 
-# Import the required classes
-from .income_statement import IncomeStatement
-from .cash_flow_statement import CashFlowStatement
-from .dsra import FinancialModelDSRA
-from .accounts import Accounts
-
+# Import all helper classes
+from .income_statement_helper import IncomeStatementHelper
+from .cash_flow_statement_helper import CashFlowStatementHelper
+from .dsra_helper import DSRAHelper
+from .accounts_helper import AccountsHelper
 
 
 def profile_method(func):
@@ -35,62 +33,46 @@ def profile_method(func):
 	return wrapper
 
 
-
 class FinancialModelCalculator:
 	"""
 	Main calculator that orchestrates all financial calculations period by period
-	to handle interdependencies correctly.
+	to handle interdependencies correctly. Uses helper classes for all calculations.
 	"""
 	
 	def __init__(self, instance):
 		self.instance = instance
 		self.financial_model = instance.financial_model
 		self.n_periods = len(self.financial_model['flags']['operations'])
+		
 		# Set corporate tax rate (needed for income statement calculations)
-		self.instance.corporate_income_tax_rate = float(self.instance.project.corporate_income_tax) / 100		
-		# Initialize calculation classes
-		self.income_statement = IncomeStatement(instance)
-		self.cash_flow_statement = CashFlowStatement(instance)
-		self.dsra_calc = FinancialModelDSRA(instance)
-		self.accounts = Accounts(instance)
+		self.instance.corporate_income_tax_rate = float(self.instance.project.corporate_income_tax) / 100
+		
+		# Initialize all helper classes
+		self.income_statement_helper = IncomeStatementHelper(instance)
+		self.cash_flow_helper = CashFlowStatementHelper(instance)
+		self.dsra_helper = DSRAHelper(instance)
+		self.accounts_helper = AccountsHelper(instance)
 	
 	@profile_method
 	def initialize(self):
 		"""Initialize all calculations using period-by-period approach."""
-		import logging
 		logger = logging.getLogger(__name__)
-		
 		logger.info("=== Starting FinancialModelCalculator.initialize() ===")
 		
+		# Initialize all arrays
 		self._initialize_all_arrays()
+		
+		# Perform one-time DSRA calculations
+		self._initialize_dsra_calculations()
 		
 		# Calculate period by period to handle interdependencies
 		for period in range(self.n_periods):
 			self._calculate_period(period)
 		
-		IS = self.financial_model['IS']
-		IS['contracted_revenues'] = self.financial_model['revenues']['contract']
-		IS['merchant_revenues'] = self.financial_model['revenues']['merchant']
-		IS['total_revenues'] = self.financial_model['revenues']['total']
-		IS['senior_debt_interests'] = -1*self.financial_model['senior_debt']['interests_operations']
-		IS['shareholder_loan_interests'] = -1*self.financial_model['SHL']['interests_operations']
-		IS['operating_costs'] = -1*self.financial_model['opex']['operating_costs']
-		IS['lease_costs'] = -1*self.financial_model['opex']['lease_costs']
-		IS['total_opex'] = -1*self.financial_model['opex']['total']
-
-
-		op_account = self.financial_model['op_account']
-		op_account['share_capital'] = self.financial_model['sources']['share_capital']
-		op_account['shareholder_loan'] = self.financial_model['sources']['SHL']
-		op_account['senior_debt'] = self.financial_model['sources']['senior_debt']
-		op_account['dsra_additions'] = self.financial_model['DSRA']['dsra_additions']
-		op_account['dsra_release'] = self.financial_model['DSRA']['dsra_release']
-		op_account['dsra_initial_funding'] = -1*self.financial_model['DSRA']['initial_funding']
-		op_account['cash_available_for_dsra'] = 1*self.financial_model['DSRA']['cash_available_for_dsra']
-
-
-
-
+		# Map calculated values for reporting
+		self._map_income_statement_values()
+		self._map_operating_account_values()
+	
 	def _initialize_all_arrays(self):
 		"""Initialize all arrays with vectorized operations."""
 		n = self.n_periods
@@ -102,12 +84,13 @@ class FinancialModelCalculator:
 				   'retained_earnings_bop', 'retained_earnings_eop', 'distributable_profit'],
 			'op_account': ['EBITDA', 'working_cap_movement', 'corporate_tax', 
 						  'cash_flows_operating', 'construction_costs', 'development_fee',
-						  'senior_debt_interests_construction', 'senior_debt_upfront_fee', 'senior_debt_commitment_fees',
-						  'reserves', 'local_taxes',
+						  'senior_debt_interests_construction', 'senior_debt_upfront_fee', 
+						  'senior_debt_commitment_fees', 'reserves', 'local_taxes',
 						  'cash_flows_investing', 'cash_flows_financing', 'CFADS', 
 						  'CFADS_amo', 'CFADS_operations', 'balance_bop', 'balance_eop',
-						  'cash_flow_available_for_distribution', 'cash_available_for_distribution', 'transfers_distribution_account',
-						  'dsra_mov', 'senior_debt_interests_paid', 'senior_debt_repayments'],
+						  'cash_flow_available_for_distribution', 'cash_available_for_distribution', 
+						  'transfers_distribution_account', 'dsra_mov', 'senior_debt_interests_paid', 
+						  'senior_debt_repayments'],
 			'distr_account': ['balance_bop', 'balance_eop', 'transfers_distribution_account',
 							 'cash_available_for_distribution', 'cash_available_for_dividends',
 							 'cash_available_for_SHL_repayments', 'cash_available_for_redemption',
@@ -128,9 +111,18 @@ class FinancialModelCalculator:
 				self.financial_model[category] = {}
 			for field in fields:
 				self.financial_model[category][field] = np.zeros(n)
-
-
-
+	
+	def _initialize_dsra_calculations(self):
+		"""Perform one-time DSRA calculations that don't depend on period-by-period values."""
+		# Calculate effective debt service for all periods
+		self.dsra_helper.compute_senior_debt_effective()
+		
+		# Calculate DSRA targets for all periods
+		self.dsra_helper.compute_dsra_targets()
+		
+		# Calculate initial funding requirements
+		self.dsra_helper.compute_initial_funding()
+	
 	def _calculate_period(self, period: int):
 		"""
 		Calculate all financial metrics for a single period in the correct order
@@ -142,7 +134,7 @@ class FinancialModelCalculator:
 		# Step 2: Calculate SHL interests (needed for income statement)
 		self._calculate_period_shl_interests(period)
 		
-		# Step 3: Calculate Income Statement (needs SHL interests)
+		# Step 3: Calculate Income Statement (needs EBITDA and SHL interests)
 		self._calculate_period_income_statement(period)
 		
 		# Step 4: Calculate Cash Flow Statement (needs EBITDA and taxes)
@@ -153,18 +145,15 @@ class FinancialModelCalculator:
 		
 		# Step 6: Calculate account balances and distributions
 		self._calculate_period_accounts(period)
-		
+	
 	def _calculate_period_ebitda(self, period: int):
-		"""Calculate EBITDA for a single period."""
-		revenues = self.financial_model['revenues']['total'][period]
-		opex = self.financial_model['opex']['total'][period]
+		"""Calculate EBITDA for a single period using the helper."""
+		ebitda_results = self.income_statement_helper.calculate_ebitda(period)
 		
-		ebitda_value = revenues - opex
-		ebitda_margin = ebitda_value / revenues if revenues > 0 else 0
-		
-		self.financial_model['IS']['EBITDA'][period] = ebitda_value
-		self.financial_model['IS']['EBITDA_margin'][period] = ebitda_margin
-		
+		# Store results
+		self.financial_model['IS']['EBITDA'][period] = ebitda_results['ebitda']
+		self.financial_model['IS']['EBITDA_margin'][period] = ebitda_results['ebitda_margin']
+	
 	def _calculate_period_shl_interests(self, period: int):
 		"""Calculate SHL interests for a single period (needed before income statement)."""
 		shl = self.financial_model['SHL']
@@ -177,7 +166,7 @@ class FinancialModelCalculator:
 			shl_balance_bop = 0
 		else:
 			shl_balance_bop = shl['balance_eop'][period - 1]
-			
+		
 		# Calculate interest
 		interest_amount = (
 			shl_balance_bop * 
@@ -188,108 +177,82 @@ class FinancialModelCalculator:
 		# Split between operations and construction
 		shl['interests_operations'][period] = interest_amount * flags['operations'][period]
 		shl['interests_construction'][period] = interest_amount * flags['construction'][period]
-		
+	
 	def _calculate_period_income_statement(self, period: int):
-		"""Calculate income statement items for a single period."""
+		"""Calculate income statement items for a single period using the helper."""
 		IS = self.financial_model['IS']
-
-		# EBIT = EBITDA - Depreciation
-		IS['EBIT'][period] = (
-			self.financial_model['IS']['EBITDA'][period] -
-			self.financial_model['IS']['depreciation'][period]
+		
+		# Use helper to calculate income statement items
+		is_results = self.income_statement_helper.calculate_income_statement_items(
+			period=period,
+			ebitda=IS['EBITDA'][period],
+			depreciation=IS['depreciation'][period],
+			senior_debt_interest=self.financial_model['senior_debt']['interests_operations'][period],
+			shl_interest=self.financial_model['SHL']['interests_operations'][period]
 		)
 		
-		# EBT = EBIT - Interest Expenses
-		IS['EBT'][period] = (
-			IS['EBIT'][period] -
-			self.financial_model['senior_debt']['interests_operations'][period] -
-			self.financial_model['SHL']['interests_operations'][period]
-		)
-		
-		# Corporate Income Tax
-		IS['corporate_income_tax'][period] = max(
-			0,
-			self.instance.corporate_income_tax_rate * IS['EBT'][period]
-		)
-		
-		# Net Income
-		IS['net_income'][period] = IS['EBT'][period] - IS['corporate_income_tax'][period]
-		
+		# Store results
+		IS['EBIT'][period] = is_results['ebit']
+		IS['EBT'][period] = is_results['ebt']
+		IS['corporate_income_tax'][period] = is_results['corporate_income_tax']
+		IS['net_income'][period] = is_results['net_income']
+	
 	def _calculate_period_cash_flows(self, period: int):
-		"""Calculate cash flows for a single period."""
+		"""Calculate cash flows for a single period using the helper."""
 		op_account = self.financial_model['op_account']
-		flags = self.financial_model['flags']
+		IS = self.financial_model['IS']
 		
-		# Operating Cash Flows
-		op_account['EBITDA'][period] = self.financial_model['IS']['EBITDA'][period]
+		# Store EBITDA in operating account
+		op_account['EBITDA'][period] = IS['EBITDA'][period]
 		op_account['working_cap_movement'][period] = self.financial_model['working_cap']['working_cap_movement'][period]
-		op_account['corporate_tax'][period] = -self.financial_model['IS']['corporate_income_tax'][period]
+		op_account['corporate_tax'][period] = -IS['corporate_income_tax'][period]
 		
-		op_account['cash_flows_operating'][period] = (
-			op_account['EBITDA'][period] + 
-			op_account['working_cap_movement'][period] +
-			op_account['corporate_tax'][period]
+		# Calculate operating cash flows
+		cash_flows_operating = self.cash_flow_helper.calculate_operating_cash_flows(
+			period=period,
+			ebitda=op_account['EBITDA'][period],
+			working_cap_movement=op_account['working_cap_movement'][period],
+			corporate_tax=op_account['corporate_tax'][period]
+		)
+		op_account['cash_flows_operating'][period] = cash_flows_operating
+		
+		# Calculate investing cash flows
+		investing_results = self.cash_flow_helper.calculate_investing_cash_flows(period)
+		
+		# Store investing components
+		op_account['construction_costs'][period] = investing_results['construction_costs']
+		op_account['development_fee'][period] = investing_results['development_fee']
+		op_account['senior_debt_interests_construction'][period] = investing_results['senior_debt_interests_construction']
+		op_account['senior_debt_upfront_fee'][period] = investing_results['senior_debt_upfront_fee']
+		op_account['senior_debt_commitment_fees'][period] = investing_results['senior_debt_commitment_fees']
+		op_account['reserves'][period] = investing_results['reserves']
+		op_account['local_taxes'][period] = investing_results['local_taxes']
+		op_account['cash_flows_investing'][period] = investing_results['cash_flows_investing']
+		
+		# Calculate financing cash flows
+		cash_flows_financing = self.cash_flow_helper.calculate_financing_cash_flows(period)
+		op_account['cash_flows_financing'][period] = cash_flows_financing
+		
+		# Calculate CFADS
+		cfads_results = self.cash_flow_helper.calculate_cfads(
+			period=period,
+			cash_flows_operating=cash_flows_operating,
+			cash_flows_investing=investing_results['cash_flows_investing'],
+			cash_flows_financing=cash_flows_financing
 		)
 		
-		# Investing Cash Flows
-		op_account['construction_costs'][period] = -self.financial_model['uses']['construction'][period]
-		op_account['development_fee'] = -self.financial_model['uses']['development_fee']
-		op_account['senior_debt_interests_construction'][period] = -self.financial_model['uses']['interests_construction'][period]
-		op_account['senior_debt_upfront_fee'][period] = -self.financial_model['uses']['upfront_fee'][period]
-		op_account['senior_debt_commitment_fees'][period] = -self.financial_model['uses']['commitment_fees'][period]
-		op_account['local_taxes'][period] = -self.financial_model['uses']['local_taxes'][period]
-
-
+		# Store CFADS results
+		op_account['CFADS'][period] = cfads_results['cfads']
+		op_account['CFADS_amo'][period] = cfads_results['cfads_amo']
+		op_account['CFADS_operations'][period] = cfads_results['cfads_operations']
 	
-		op_account['cash_flows_investing'][period] = (
-			op_account['construction_costs'][period] +
-			op_account['senior_debt_interests_construction'][period] +
-			op_account['senior_debt_upfront_fee'][period] +
-			op_account['senior_debt_commitment_fees'][period] +
-			op_account['reserves'][period] +
-			op_account['local_taxes'][period] 
-		)
-		
-	
-		op_account['cash_flows_financing'][period] = (
-			self.financial_model['sources']['senior_debt'][period] +
-			self.financial_model['sources']['SHL'][period] + 
-			self.financial_model['sources']['share_capital'][period] 
-		)
-		
-		# CFADS
-		op_account['CFADS'][period] = (
-			op_account['cash_flows_operating'][period] +
-			op_account['cash_flows_investing'][period] +
-			op_account['cash_flows_financing'][period]
-		)
-		
-		op_account['CFADS_amo'][period] = op_account['CFADS'][period] * flags['debt_amo'][period]
-		op_account['CFADS_operations'][period] = op_account['CFADS'][period] * flags['operations'][period]
-		
 	def _calculate_period_dsra(self, period: int):
-		"""Calculate DSRA for a single period."""
-		# Initialize DSRA arrays and one-time calculations if first period
-		if period == 0:
-			# Calculate targets and initial funding (these are calculated once for all periods)
-			self.dsra_calc._compute_senior_debt_effective()
-			self.dsra_calc._compute_dsra_target()
-			self.dsra_calc._compute_initial_funding()
-		
-		# Calculate DSRA cash flow for this period (depends on current period CFADS)
+		"""Calculate DSRA movements for a single period using the helper."""
 		dsra = self.financial_model['DSRA']
-		dsra['cash_available_for_dsra'][period] = max(
-			self.financial_model['op_account']['CFADS_amo'][period] - 
-			self.financial_model['senior_debt']['DS_effective'][period], 
-			0
-		)
 		
-		# Calculate DSRA movements for this specific period
-		self._calculate_period_dsra_movements(period)
-
-	def _calculate_period_dsra_movements(self, period: int):
-		"""Calculate DSRA movements for a single period."""
-		dsra = self.financial_model['DSRA']
+		# Calculate cash available for DSRA (can be negative for shortfalls)
+		cash_available = self.dsra_helper.calculate_cash_available_for_dsra(period)
+		dsra['cash_available_for_dsra'][period] = cash_available
 		
 		# Set beginning balance
 		if period == 0:
@@ -297,64 +260,50 @@ class FinancialModelCalculator:
 		else:
 			dsra['dsra_bop'][period] = dsra['dsra_eop'][period - 1]
 		
-		# Current balance after initial funding
-		current_balance = dsra['dsra_bop'][period] + dsra['initial_funding'][period]
-		effective_target = dsra['dsra_target'][period] + dsra['initial_funding'][period]
-		target_gap = effective_target - current_balance
-		
-		# Calculate additions or releases
-		dsra['dsra_additions'][period] = 0
-		dsra['dsra_release'][period] = 0
-		
-		if target_gap > 0:
-			dsra['dsra_additions'][period] = min(
-				target_gap, dsra['cash_available_for_dsra'][period]
-			)
-		elif target_gap < 0:
-			dsra['dsra_release'][period] = abs(target_gap)
-		
-		# Calculate ending balance
-		dsra['dsra_eop'][period] = (
-			current_balance +
-			dsra['dsra_additions'][period] -
-			dsra['dsra_release'][period]
+		# Use helper to calculate movements
+		movements = self.dsra_helper.calculate_dsra_movements(
+			period=period,
+			dsra_bop=dsra['dsra_bop'][period],
+			initial_funding=dsra['initial_funding'][period],
+			target=dsra['dsra_target'][period],
+			cash_available=cash_available
 		)
 		
-		# Apply target ceiling
-		if dsra['dsra_eop'][period] > effective_target:
-			excess = dsra['dsra_eop'][period] - effective_target
-			dsra['dsra_release'][period] += excess
-			dsra['dsra_eop'][period] = effective_target
-		
-		# Calculate net movement
-		dsra['dsra_mov'][period] = dsra['dsra_eop'][period] - dsra['dsra_bop'][period]
-
+		# Store results
+		dsra['dsra_additions'][period] = movements['additions']
+		dsra['dsra_release'][period] = movements['release']
+		dsra['dsra_eop'][period] = movements['eop']
+		dsra['dsra_mov'][period] = movements['mov']
+	
 	def _calculate_period_accounts(self, period: int):
-		"""Calculate account balances and distributions for a single period."""
-		# Set beginning balances
-		self.accounts._set_beginning_balances(period)
-		
-		# Calculate cash available for distribution
-		self.accounts._calculate_period_cash_available(period)
-		
-		# Process transfers to distribution account
-		self.accounts._process_period_transfers(period)
-		
-		# Process distributions (dividends, SHL payments, etc.)
-		self.accounts._process_period_distributions(period)
-		
-		# Process share capital redemption
-		self.accounts._process_period_share_capital(period)
-		
-		# Update ending balances
-		self.accounts._update_period_ending_balances(period)
-
-
-
-
-
-
-
-
-
-
+		"""Calculate account balances and distributions for a single period using the helper."""
+		# All account calculations delegated to the helper
+		self.accounts_helper._set_beginning_balances(period)
+		self.accounts_helper._calculate_period_cash_available(period)
+		self.accounts_helper._process_period_transfers(period)
+		self.accounts_helper._process_period_distributions(period)
+		self.accounts_helper._process_period_share_capital(period)
+		self.accounts_helper._update_period_ending_balances(period)
+	
+	def _map_income_statement_values(self):
+		"""Map calculated values to Income Statement for reporting."""
+		IS = self.financial_model['IS']
+		IS['contracted_revenues'] = self.financial_model['revenues']['contract']
+		IS['merchant_revenues'] = self.financial_model['revenues']['merchant']
+		IS['total_revenues'] = self.financial_model['revenues']['total']
+		IS['senior_debt_interests'] = -1 * self.financial_model['senior_debt']['interests_operations']
+		IS['shareholder_loan_interests'] = -1 * self.financial_model['SHL']['interests_operations']
+		IS['operating_costs'] = -1 * self.financial_model['opex']['operating_costs']
+		IS['lease_costs'] = -1 * self.financial_model['opex']['lease_costs']
+		IS['total_opex'] = -1 * self.financial_model['opex']['total']
+	
+	def _map_operating_account_values(self):
+		"""Map calculated values to Operating Account for reporting."""
+		op_account = self.financial_model['op_account']
+		op_account['share_capital'] = self.financial_model['sources']['share_capital']
+		op_account['shareholder_loan'] = self.financial_model['sources']['SHL']
+		op_account['senior_debt'] = self.financial_model['sources']['senior_debt']
+		op_account['dsra_additions'] = self.financial_model['DSRA']['dsra_additions']
+		op_account['dsra_release'] = self.financial_model['DSRA']['dsra_release']
+		op_account['dsra_initial_funding'] = -1 * self.financial_model['DSRA']['initial_funding']
+		op_account['cash_available_for_dsra'] = self.financial_model['DSRA']['cash_available_for_dsra']

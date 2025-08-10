@@ -15,28 +15,53 @@ function build_fs_financial_statements(json) {
     
     let tableContent = "<table class='table table-bordered table_annual excel-navigable'>";
     
-    // First, we need to collect all unique years across all items
-    let allYears = new Set();
+    // First, we need to collect all unique columns (years + Total)
+    let allColumns = new Set();
     
-    // Collect years from all items
+    // Collect columns from all items
     for (const subKey in data) {
       const subValue = data[subKey];
       if (typeof subValue === 'object' && !Array.isArray(subValue)) {
-        Object.keys(subValue).forEach(year => allYears.add(year));
+        Object.keys(subValue).forEach(col => allColumns.add(col));
       }
     }
     
-    // Convert to array and sort
-    const years = Array.from(allYears).sort((a, b) => parseInt(a) - parseInt(b));
+    // Separate 'Total' from years
+    let columns = [];
+    let years = [];
     
-    // Build header row with years
+    allColumns.forEach(col => {
+      if (col === 'Total') {
+        // Total will be added first
+      } else {
+        years.push(col);
+      }
+    });
+    
+    // Sort years numerically
+    years.sort((a, b) => parseInt(a) - parseInt(b));
+    
+    // Build final column order: Total first, then sorted years
+    if (allColumns.has('Total')) {
+      columns.push('Total');
+    }
+    columns = columns.concat(years);
+    
+    // Build header row with columns
     tableContent += "<thead><tr>";
     tableContent += "<th></th>";
     tableContent += "<th></th>";
     
-    // Add year columns
-    years.forEach(year => {
-      tableContent += `<th>${year}</th>`;
+    // Add column headers
+    columns.forEach(col => {
+      let headerClass = "";
+      
+      // Add special styling for Total column header
+      if (col === 'Total') {
+        headerClass = " class='total-column'";
+      }
+      
+      tableContent += `<th${headerClass}>${col}</th>`;
     });
     
     tableContent += "</tr></thead>";
@@ -46,20 +71,35 @@ function build_fs_financial_statements(json) {
     for (const subKey in data) {
       const subValue = data[subKey];
       
-      // Check if subValue is an object with years as keys
+      // Check if subValue is an object with columns as keys
       if (typeof subValue === 'object' && !Array.isArray(subValue)) {
         tableContent += "<tr data-original-key='" + subKey + "'>";
         tableContent += "<td>" + convertToTitleCase(subKey) + "</td>";
         tableContent += "<td>kEUR</td>";
         
-        // Add values for each year
-        years.forEach(year => {
-          const value = subValue[year];
-          if (value !== undefined && value !== null) {
-            const formattedValue = formatAsFloat(value);
-            tableContent += "<td>" + formattedValue + "</td>";
+        // Add values for each column (Total first, then years)
+        columns.forEach(col => {
+          const value = subValue[col];
+          let cellClass = "";
+          
+          // Add special styling for Total column
+          if (col === 'Total') {
+            cellClass = " class='total-column'";
+          }
+          
+          // Check if this is a balance row and we're in the Total column
+          const isBalanceRow = subKey.toLowerCase().includes('balance');
+          const isTotalColumn = col === 'Total';
+          
+          if (isBalanceRow && isTotalColumn) {
+            // Don't show sum for balance rows in Total column
+            tableContent += "<td" + cellClass + ">-</td>";
+          } else if (value !== undefined && value !== null) {
+            // Check if value is 0
+            const formattedValue = (value === 0) ? "-" : formatAsFloat(value);
+            tableContent += "<td" + cellClass + ">" + formattedValue + "</td>";
           } else {
-            tableContent += "<td>-</td>";
+            tableContent += "<td" + cellClass + ">-</td>";
           }
         });
         
@@ -70,9 +110,10 @@ function build_fs_financial_statements(json) {
         tableContent += "<td>" + convertToTitleCase(subKey) + "</td>";
         tableContent += "<td>kEUR</td>";
         
-        for (let i = 0; i < subValue.length && i < years.length; i++) {
+        for (let i = 0; i < subValue.length && i < columns.length; i++) {
           const value = subValue[i];
-          const formattedValue = formatAsFloat(value);
+          // Check if value is 0
+          const formattedValue = (value === 0) ? "-" : formatAsFloat(value);
           tableContent += "<td>" + formattedValue + "</td>";
         }
         

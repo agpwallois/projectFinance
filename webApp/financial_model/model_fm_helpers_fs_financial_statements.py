@@ -13,9 +13,9 @@ INCOME_STATEMENT_ORDER = [
 
 OPERATING_ACCOUNT_ORDER = [
     'balance_bop', 'EBITDA', 'working_cap_movement', 'corporate_tax', 'cash_flows_operating', 'construction_costs',
-    'development_fee', 'senior_debt_interests_construction', 'senior_debt_upfront_fee', 'senior_debt_commitment_fees', 'reserves', 'local_taxes', 'cash_flows_investing', 
+    'development_fee', 'senior_debt_interests_construction', 'senior_debt_upfront_fee', 'senior_debt_commitment_fees', 'local_taxes', 'cash_flows_investing', 
     'senior_debt', 'share_capital', 'shareholder_loan', 'cash_flows_financing',
-    'CFADS', 'senior_debt_interests_paid', 'senior_debt_repayments', 'dsra_initial_funding', 'dsra_additions', 'dsra_releases',
+    'CFADS', 'senior_debt_interests_paid', 'senior_debt_repayments', 'dsra_initial_funding', 'dsra_additions', 'dsra_release',
     'transfers_distribution_account', 'balance_eop'
 ]
 
@@ -130,4 +130,83 @@ def extract_fs_financial_statements_data(financial_model):
 
         financial_statements[section_key] = reordered_section
 
+    # Add Total column at the beginning for each section
+    for section_key in financial_statements:
+        section_data = financial_statements[section_key]
+        
+        for sub_key, year_values in section_data.items():
+            if isinstance(year_values, dict) and year_values:
+                # Calculate total as sum of all years
+                if 'balance_bop' in sub_key.lower() or 'balance_eop' in sub_key.lower():
+                    # For balance items, take the last available value instead of sum
+                    total_value = list(year_values.values())[-1] if year_values else 0.0
+                else:
+                    # For flow items, sum all years
+                    total_value = sum(year_values.values())
+                
+                # Create new OrderedDict with Total first
+                new_ordered_values = OrderedDict()
+                new_ordered_values['Total'] = total_value
+                
+                # Add all existing year values after Total (sorted by year)
+                for year in sorted(year_values.keys()):
+                    new_ordered_values[year] = year_values[year]
+                
+                # Replace the original dict with the new ordered one
+                financial_statements[section_key][sub_key] = new_ordered_values
+
     return financial_statements
+
+
+def display_financial_statement(financial_statements, section_key):
+    """
+    Helper function to display a financial statement section as a DataFrame
+    with the Total column first.
+    """
+    section_data = financial_statements[section_key]
+    
+    if not section_data:
+        return pd.DataFrame()
+    
+    # Get all unique columns (years + 'Total')
+    all_columns = set()
+    for year_values in section_data.values():
+        if isinstance(year_values, dict):
+            all_columns.update(year_values.keys())
+    
+    # Ensure 'Total' is first, then sort the rest
+    column_order = []
+    if 'Total' in all_columns:
+        column_order.append('Total')
+        all_columns.remove('Total')
+    column_order.extend(sorted(all_columns))
+    
+    # Create DataFrame with proper column order
+    df_data = {}
+    for col in column_order:
+        df_data[col] = []
+        for row_key in section_data.keys():
+            value = section_data[row_key].get(col, 0.0) if isinstance(section_data[row_key], dict) else 0.0
+            df_data[col].append(value)
+    
+    df = pd.DataFrame(df_data, index=list(section_data.keys()))
+    return df
+
+
+# Example usage:
+if __name__ == "__main__":
+    # After calling extract_fs_financial_statements_data
+    # financial_statements = extract_fs_financial_statements_data(financial_model)
+    
+    # To display Income Statement with Total first:
+    # df_is = display_financial_statement(financial_statements, 'annual_IS')
+    # print(df_is)
+    
+    # To display Operating Account with Total first:
+    # df_op = display_financial_statement(financial_statements, 'annual_op_account')
+    # print(df_op)
+    
+    # To display Distribution Account with Total first:
+    # df_dist = display_financial_statement(financial_statements, 'annual_distr_account')
+    # print(df_dist)
+    pass

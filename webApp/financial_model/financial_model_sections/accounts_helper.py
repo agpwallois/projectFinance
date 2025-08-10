@@ -9,7 +9,7 @@ class AccountBalances:
 	balance_eop: NDArray
 	balance_bop: NDArray
 
-class Accounts:
+class AccountsHelper:
 	"""
 	Manages financial model accounts including distributions, SHL calculations,
 	and share capital management.

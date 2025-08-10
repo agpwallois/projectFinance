@@ -40,6 +40,83 @@ a:focus {
     3. TYPOGRAPHY
     =================================================== */
 
+/* Third column bold styling for financing plan table */
+.third-column-bold {
+    font-weight: bold;
+    color: #10b981 !important;
+    border-left: 3px dotted #10b981 !important;
+    border-right: 3px dotted #10b981 !important;    
+}
+
+
+/* Reset top borders for all third-column-bold elements */
+.third-column-bold {
+    border-top: none !important;
+}
+
+/* Add top border ONLY to the very first third-column-bold that contains "TOTAL" */
+tbody tr:nth-child(2) td.third-column-bold {
+    border-top: 3px dotted #10b981 !important;
+}
+
+/* Add bottom border only to the last total column cell in tbody */
+tbody tr:last-child .third-column-bold {
+    border-bottom: 3px dotted #10b981 !important;
+}
+
+
+/* First row bold styling for debt schedule table */
+.debt-schedule-total-row {
+    font-weight: bold;
+    background-color: #e0f2fe !important;
+    color: #10b981 !important;
+    border: 3px dotted #10b981 !important;
+
+}
+
+.debt-schedule-total-row td {
+    background-color: #e0f2fe !important;
+    font-weight: bold;
+    
+}
+
+/* Total column styling for financial statements */
+.total-column {
+    font-weight: bold !important;
+    color: #10b981 !important;
+    border-left: 3px dotted #10b981 !important;
+    border-right: 3px dotted #10b981 !important;
+}
+
+
+/* Add top border only to the first total column cell (header) */
+thead .total-column {
+    border-top: 3px dotted #10b981 !important;
+}
+
+/* Add bottom border only to the last total column cell in tbody */
+tbody tr:last-child .total-column {
+    border-bottom: 3px dotted #10b981 !important;
+}
+
+/* Sticky header for annual operating account table */
+#operating-account .table-wrapper {
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+#annual_op_account thead th {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 2;
+    padding: 8px 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
 h1 {
     font-size: 1.5rem;
 }
@@ -1578,15 +1655,15 @@ input[type="checkbox"] {
 
 /* Table Styling - Enhanced Financial Look */
 .table_annual {
-    width: 100%;
-    border-collapse: collapse;
-    background: #ffffff;
-    font-size: 0.9rem;
-    color: #333;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    min-width: 800px; /* Ensure table has minimum width to trigger scroll */
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  font-size: 0.9rem;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-width: 800px;
+  text-align: center;
 }
-
 
 
 
@@ -1596,9 +1673,16 @@ input[type="checkbox"] {
 .table_annual td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
+    text-align: center;
     position: relative;
 }
+
+/* First column - left aligned */
+.table_annual td:first-child {
+    text-align: left;
+}
+
+
 
 /* Table Headers - Professional Style */
 .table_annual thead th {
@@ -1613,7 +1697,6 @@ input[type="checkbox"] {
 }
 
 .table_annual td:first-child {
-    min-width: 200px; /* Minimum width to prevent wrapping */
     white-space: nowrap; /* Prevent text from wrapping */
     position: sticky; /* Make it sticky for horizontal scrolling */
     left: 0;

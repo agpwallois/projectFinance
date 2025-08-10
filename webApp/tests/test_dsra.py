@@ -16,7 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'webApp.settings')
 django.setup()
 
-from financial_model.financial_model_sections.dsra import FinancialModelDSRA, calc_dsra_target, calc_dsra_funding
+from financial_model.financial_model_sections.dsra import DSRAHelper, calc_dsra_target, calc_dsra_funding
 
 
 class TestDSRA(TestCase):
@@ -53,7 +53,7 @@ class TestDSRA(TestCase):
             }
         }
         
-        self.dsra_model = FinancialModelDSRA(self.mock_instance)
+        self.dsra_model = DSRAHelper(self.mock_instance)
 
     def test_init_sets_references_correctly(self):
         """Test that __init__ properly sets up references to nested dictionaries."""

@@ -23,13 +23,17 @@ def extract_fs_financing_plan_data(financial_model):
         formatted_dates = []
         for date in dates:
             if isinstance(date, str) and date:
-                try:
-                    # Parse the date and format to MM/YYYY
-                    parsed_date = pd.to_datetime(date, dayfirst=True)
-                    formatted_dates.append(parsed_date.strftime('%m/%Y'))
-                except:
-                    # If parsing fails, keep original
+                # Skip formatting for 'TOTAL' string
+                if date.upper() == 'TOTAL':
                     formatted_dates.append(date)
+                else:
+                    try:
+                        # Parse the date and format to MM/YYYY
+                        parsed_date = pd.to_datetime(date, dayfirst=True)
+                        formatted_dates.append(parsed_date.strftime('%m/%Y'))
+                    except:
+                        # If parsing fails, keep original
+                        formatted_dates.append(date)
             else:
                 formatted_dates.append(date)
         
@@ -43,7 +47,7 @@ def extract_fs_financing_plan_data(financial_model):
         # Special cases for different keys/sections
         if section == 'fs_dates' or 'date' in key.lower():
             # For dates, add empty string as first value
-            return ['Total'] + data
+            return ['TOTAL'] + data
         elif key == 'gearing' or key == 'cumulative_project_costs':
             # For gearing_during_finplan, add last value as first value
             return [data[-1]] + data
@@ -63,11 +67,13 @@ def extract_fs_financing_plan_data(financial_model):
         },
         'fs_uses': {
 			'construction_costs': financial_model['uses']['construction'],
-			'development fee (optimised)': financial_model['uses']['development_fee'],
-			'senior_debt_interests_construction': financial_model['uses']['interests_construction'],
-			'senior_debt_upfront_fee': financial_model['uses']['upfront_fee'],
-			'senior_debt_commitment_fees': financial_model['uses']['commitment_fees'],
-			'DSRA_initial_funding': financial_model['DSRA']['initial_funding'],
+			'development fee (if optimised)': financial_model['uses']['development_fee'],
+			'development_tax': financial_model['local_taxes']['development_tax'],
+ 			'archeological_tax': financial_model['local_taxes']['archeological_tax'],           
+			'debt_interests_during_construction': financial_model['uses']['interests_construction'],
+			'debt_upfront_fee': financial_model['uses']['upfront_fee'],
+			'debt_commitment_fees': financial_model['uses']['commitment_fees'],
+			'debt_service_reserve_account_initial_funding': financial_model['DSRA']['initial_funding'],
 			'Total': financial_model['uses']['total'],
         },
         'fs_sources': {

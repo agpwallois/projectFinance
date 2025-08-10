@@ -24,6 +24,6 @@ class WindFinancialModel(FinancialModel):
 
 		self.financial_model['local_taxes'] = {}
 	
-		self.financial_model['local_taxes']['development_tax'] = self.project.wind_turbine_installed*self.project.dev_tax_taxable_base_wind*self.development_tax_rate/1000*self.financial_model['flags']['construction_start']
+		self.financial_model['local_taxes']['development_tax'] = float(self.project.wind_turbine_installed)*float(self.project.dev_tax_taxable_base_wind)*float(self.development_tax_rate)/1000*self.financial_model['flags']['construction_start']
 		self.financial_model['local_taxes']['archeological_tax'] = 0*self.financial_model['flags']['construction_start']
 		self.financial_model['local_taxes']['total'] = self.financial_model['local_taxes']['development_tax'] + self.financial_model['local_taxes']['archeological_tax']

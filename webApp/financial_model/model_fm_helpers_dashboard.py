@@ -9,14 +9,13 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 	financial_model['dict_uses_sources'] = {
 		"Uses": {
 			"Construction costs": sum(financial_model['construction_costs']['total']),
-			"Development fee": 0,
+			"Development fee (if optimised)": sum(financial_model['uses']['development_fee']),
 			"Debt upfront fee": sum(financial_model['senior_debt']['upfront_fee']),
 			"Debt commitment fees": sum(financial_model['senior_debt']['commitment_fees']),
 			"Debt interests": sum(financial_model['senior_debt']['interests_construction']),
-			"Local taxes": sum(financial_model['local_taxes']['total']),
 			"Development tax": sum(financial_model['local_taxes']['development_tax']),
 			"Archeological tax": sum(financial_model['local_taxes']['archeological_tax']),
-			"Initial DSRA funding": sum(financial_model['DSRA']['initial_funding']),
+			"Debt service reserve account initial funding": sum(financial_model['DSRA']['initial_funding']),
 			"Total": sum(financial_model['uses']['total']),
 		},
 		"Sources": {
@@ -59,22 +58,25 @@ def create_dashboard_results(financial_model, senior_debt_amount, gearing_eff):
 			"Average DSCR": f"{financial_model['ratios']['DSCR_avg']:,.2f}x",
 			"Minimum DSCR": f"{financial_model['ratios']['DSCR_min']:,.2f}x",
 			"Minimum LLCR": f"{financial_model['ratios']['LLCR_min']:,.2f}x",
-			"Senior Debt IRR": f"{financial_model['IRR']['senior_debt'] * 100:.2f}%",
+			"Debt IRR": f"{financial_model['IRR']['senior_debt'] * 100:.2f}%",
 		},
 		"Audit": {
-			"Financing plan": "true" if financial_model['audit']['check_financing_plan'] else "false",
-			"Balance sheet": "true" if financial_model['audit']['check_balance_sheet'] else "false",
-			"Debt maturity": "true" if financial_model['audit']['debt_maturity'] else "false",
+			"Balance sheet balanced": "true" if financial_model['audit']['check_balance_sheet'] else "false",
+			"Financing sources equals uses": "true" if financial_model['audit']['check_financing_plan'] else "false",
+			"Debt repaid at maturity": "true" if financial_model['audit']['debt_maturity'] else "false",
+			"Operating account balance ≥ 0": "true" if financial_model['audit']['check_operating_account'] else "false",
+			"Distribution account balance ≥ 0": "true" if financial_model['audit']['check_distribution_account'] else "false",
+			"DSRA is unused": "true" if financial_model['audit']['check_dsra_usage'] else "false",
 		},
 		"Valuation": {
 			f"Discount factor @{financial_model['IRR']['eqt_discount_factor_less_1'] * 100:.2f}%":
-				f"{financial_model['IRR']['valuation_less_1']:.1f}",
+				financial_model['IRR']['valuation_less_1'],
 
 			f"Discount factor @{financial_model['IRR']['eqt_discount_factor'] * 100:.2f}%":
-				f"{financial_model['IRR']['valuation']:.1f}",
+				financial_model['IRR']['valuation'],
 
 			f"Discount factor @{financial_model['IRR']['eqt_discount_factor_plus_1'] * 100:.2f}%":
-				f"{financial_model['IRR']['valuation_plus_1']:.1f}",
+				financial_model['IRR']['valuation_plus_1'],
 		},
 	}
 

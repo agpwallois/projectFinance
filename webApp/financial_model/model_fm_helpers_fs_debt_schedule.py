@@ -63,7 +63,7 @@ def extract_fs_debt_schedule_data(financial_model):
     total_debt_service = debt_service_total.sum()
     
     # Add summary row at the top (empty strings for dates, totals for financial data)
-    start_dates_with_total = ['Total'] + start_dates_formatted
+    start_dates_with_total = ['TOTAL'] + start_dates_formatted
     end_dates_with_total = [''] + end_dates_formatted
     repayments_with_total = [total_repayments] + filtered_repayments.tolist()
     interests_with_total = [total_interests] + filtered_interests.tolist()

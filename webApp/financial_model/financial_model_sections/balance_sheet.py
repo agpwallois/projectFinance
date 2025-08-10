@@ -13,12 +13,14 @@ class BalanceSheet:
 
     def _compute_ppe(self):
         construction_costs = np.array(self.financial_model['construction_costs']['total']).cumsum()
+        local_taxes = np.array(self.financial_model['local_taxes']['total']).cumsum()
+
         senior_debt_idc_and_fees = self.financial_model['uses']['senior_debt_idc_and_fees'].cumsum()
         interests_construction = self.financial_model['SHL']['interests_construction'].cumsum()
         depreciation = self.financial_model['IS']['depreciation'].cumsum()
 
         self.financial_model['assets']['PPE'] = (
-            construction_costs + senior_debt_idc_and_fees + interests_construction - depreciation
+            construction_costs + local_taxes + senior_debt_idc_and_fees + interests_construction - depreciation
         )
 
     def _compute_total_assets(self):
