@@ -234,13 +234,19 @@ class FinancialModelView(View):
 	def _create_financial_models(self, request, project, project_form):
 		"""Create or update financial models based on the scenario and project form data."""
 
+		
+		# Debug specific fields that are appearing incorrectly
+		for field_name in ['capacity_per_turbine', 'wind_turbine_installed', 'panels_capacity', 'annual_degradation']:
+			if field_name in project_form.changed_data:
+				initial_value = project_form.initial.get(field_name)
+				cleaned_value = project_form.cleaned_data.get(field_name)
+		
 		# Check what type of changes to the form occurred
 		non_sensi_changed = self._project_form_changed(project_form)
+		
 		if non_sensi_changed:
 			# Create or update all financial models
-			"""logger.error("About to create all models")"""
 			financial_models = self._create_all_financial_models(project)
-			"""logger.error(f"Finished creating all models, got {len(financial_models)} models")"""
 			
 		else: 
 			# Only sensitivity fields changed - update models selectively
@@ -276,14 +282,12 @@ class FinancialModelView(View):
 		# Check each sensitivity field for changes
 		for sensi_field, affected_scenarios in sensitivity_mappings.items():
 			if self._project_form_sensi_changed(project_form, sensi_field):
-				logger.info(f"Sensitivity field {sensi_field} changed - updating scenarios: {affected_scenarios}")
 				models_to_update.update(affected_scenarios)
 		
 		# Update only the affected models
 		for scenario_id in models_to_update:
 			if scenario_id in self.FINANCIAL_MODEL_SCENARIOS:
 				scenario_config = self.FINANCIAL_MODEL_SCENARIOS[scenario_id]
-				logger.info(f"Updating financial model for scenario: {scenario_id}")
 				financial_models[scenario_id] = self._create_fm(project, scenario_id, scenario_config)
 		
 		return financial_models
@@ -355,7 +359,6 @@ class FinancialModelView(View):
 		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
 			model = self._create_fm(project, scenario_id, scenario_config)
 			financial_models[scenario_id] = model
-			logger.error(f"Created financial model for scenario: {scenario_id}")
 
 		return financial_models
 
@@ -797,21 +800,35 @@ class FinancialModelView(View):
 		Return true if the user changed any assumptions of the project form, except for sensitivities assumptions.
 		This is used to determine if all models need to be regenerated.
 		"""
-		# Define fields that are considered sensitivity parameters à corriger: valuation et sponsor_IRR
+		# Get the project instance to check technology
+		project = project_form.instance
+		
+		# Define fields that are considered sensitivity parameters
 		excluded_fields = {
 			'sensi_production', 'sensi_inflation', 'sensi_opex', 
-			'sensi_production_sponsor', 'sensi_inflation_sponsor', 'sensi_opex_sponsor', 'sponsor_irr', 'valuation', 
+			'sensi_production_sponsor', 'sensi_inflation_sponsor', 'sensi_opex_sponsor', 
+			'sponsor_irr', 'valuation',
 		}
 		
-		# Get all changed fields excluding sensitivity parameters
+		# Add technology-specific fields that should be excluded based on current technology
+		if project.technology and "Solar" in project.technology:
+			# Exclude wind-specific fields for solar projects
+			excluded_fields.update({
+				'wind_turbine_installed', 'capacity_per_turbine', 'dev_tax_taxable_base_wind'
+			})
+		elif project.technology == "Wind":
+			# Exclude solar-specific fields for wind projects
+			excluded_fields.update({
+				'panels_capacity', 'annual_degradation', 'panels_surface',
+				'dev_tax_taxable_base_solar', 'archeological_tax_base_solar', 'archeological_tax'
+			})
+		
+		# Get all changed fields excluding sensitivity parameters and irrelevant technology fields
 		changed_fields = set(project_form.changed_data) - excluded_fields
-		
-
-
-		
+				
 		# Return True if any non-sensitivity field changed
 		return bool(changed_fields)
-	
+		
 	def _project_form_sensi_changed(self, project_form, sensitivity_type):
 		"""
 		Check if a specific sensitivity parameter changed.
@@ -820,7 +837,8 @@ class FinancialModelView(View):
 		# Convert the changed data to a set
 		changed_fields = set(project_form.changed_data)
 		
+	
 		# Check if the sensitivity parameter is in the changed fields
 		result = sensitivity_type in changed_fields
-
+		
 		return result

@@ -13,26 +13,9 @@
                     {{ project_form.corporate_income_tax }}
                 </div>
             </div>
-            <div class="row-inline-wrapper" data-bs-toggle="modal" data-bs-target="#DevTaxModal">
-                <h6>Development tax</h6>
-            </div>
-            <div class="modal fade" id="DevTaxModal" tabindex="-1" role="dialog" aria-labelledby="DevTaxModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="DevTaxModalLabel">Taxe d'Aménagement</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="api_dev_tax_commune"></div>
-                            <a href="https://data.economie.gouv.fr/explore/dataset/delta_deliberation_tam_17_01_23">Data Source</a>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <h3>Development tax</h3>
+            {% if "Solar" in project.technology %}
+            <!-- Solar-specific fields -->
             <div class="row-inline-wrapper" id="solar_panels_surface">
                 <div class="row-inline-three-first">
                     <p>Panels surface area</p>
@@ -55,6 +38,9 @@
                     {{ project_form.dev_tax_taxable_base_solar }}
                 </div>
             </div>
+
+            {% elif project.technology == "Wind" %}
+            <!-- Wind-specific fields -->
             <div class="row-inline-wrapper" id="wind_devtax_cost">
                 <div class="row-inline-three-first">
                     <p>Tax base per WTG</p>
@@ -66,6 +52,8 @@
                     {{ project_form.dev_tax_taxable_base_wind }}
                 </div>
             </div>
+
+            {% endif %}
             <div class="row-inline-wrapper">
                 <div class="row-inline-three-first">
                     <p>Commune tax</p>
@@ -88,25 +76,10 @@
                     {{ project_form.dev_tax_department_tax }}
                 </div>
             </div>
-            <div class="row-inline-wrapper" data-bs-toggle="modal" data-bs-target="#ArchTaxModal">
-                <h6>Archeological tax</h6>
-            </div>
-            <div class="modal fade" id="ArchTaxModal" tabindex="-1" role="dialog" aria-labelledby="ArchTaxModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="ArchTaxModalLabel">Taxe Archéologique Préventive</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Explanation about the archeological tax.
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% if "Solar" in project.technology %}
+            <!-- Archaeological tax only applies to Solar projects -->
+                <h3>Archeological tax</h3>
+           
             <div class="row-inline-wrapper" id="solar_arctax_base">
                 <div class="row-inline-three-first">
                     <p>Tax base per m2</p>
@@ -129,6 +102,9 @@
                     {{ project_form.archeological_tax }}
                 </div>
             </div>
+            {% else %}
+
+            {% endif %}
             
             <!--
             

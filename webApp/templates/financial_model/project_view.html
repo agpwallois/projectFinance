@@ -52,7 +52,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="sponsor_IRR"></div>
-                    <h4>Sponsor Case Equity IRR</h4>
+                    <h4>Sponsor Base Case Equity IRR</h4>
  
                 </div>
             </div>
@@ -70,7 +70,7 @@
             <div class="overview-metrics-column">
                 <div class="overview-box">
                     <div class="metric-value" id="lender_DSCR"></div>
-                     <h4>Lender Case Min DSCR</h4>
+                     <h4>Lender Base Case Min DSCR</h4>
     
                 </div>
             </div>
@@ -369,10 +369,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- AJAX Scripts - Only loaded on project view page -->
 <script src="{% static 'financial_model/ajax/process_get_post_form_with_ajax.js' %}"></script>
-<script src="{% static 'financial_model/ajax/set_up_sensitivities_form_submission_listeners.js' %}"></script>
 <script src="{% static 'financial_model/ajax/hide_sidebar_construction_months_fields.js' %}"></script>
 <script src="{% static 'financial_model/ajax/hide_sidebar_mkt_prices_years_fields.js' %}"></script>
-<script src="{% static 'financial_model/ajax/hide_sidebar_solar_or_wind_fields.js' %}"></script>
+<script src="{% static 'financial_model/ajax/set_up_sensitivities_form_submission_listeners.js' %}"></script>
+
+
 
 
 <script src="{% static 'financial_model/ajax/build_computation_table.js' %}"></script>

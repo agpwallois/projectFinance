@@ -118,22 +118,22 @@
             </div>
             <div class="columns-container">
                 <div class="column-input">
-                    {% for field in project_form.visible_fields|slice:"58:100" %}
+                    {% for field in project_form.visible_fields|slice:"55:97" %}
                     <div class="year-box" id="elecPriceLabel{{ forloop.counter0 }}"></div>
                     {% endfor %}
                 </div>
                 <div class="column-input">
-                    {% for field in project_form.visible_fields|slice:"58:100" %}
+                    {% for field in project_form.visible_fields|slice:"55:97" %}
                     <p>{{ field }}</p>
                     {% endfor %}
                 </div>
                 <div class="column-input">
-                    {% for field in project_form.visible_fields|slice:"100:142" %}
+                    {% for field in project_form.visible_fields|slice:"97:139" %}
                     <p>{{ field }}</p>
                     {% endfor %}
                 </div>
                 <div class="column-input">
-                    {% for field in project_form.visible_fields|slice:"142:184" %}
+                    {% for field in project_form.visible_fields|slice:"139:181" %}
                     <p>{{ field }}</p>
                     {% endfor %}
                 </div>

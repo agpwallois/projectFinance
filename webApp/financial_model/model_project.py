@@ -299,15 +299,15 @@ class Project(models.Model):
 	"""timeline_quarters_ceiling = models.BooleanField(default=False, null=True)
 	"""
 
-	panels_surface = models.fields.DecimalField(max_digits=10, decimal_places=2, default=0)
-	dev_tax_taxable_base_solar = models.fields.DecimalField(max_digits=6, decimal_places=2, default=10)
-	dev_tax_taxable_base_wind = models.fields.DecimalField(max_digits=6, decimal_places=2, default=3000)
+	panels_surface = models.fields.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
+	dev_tax_taxable_base_solar = models.fields.DecimalField(max_digits=6, decimal_places=2, default=10, blank=True, null=True)
+	dev_tax_taxable_base_wind = models.fields.DecimalField(max_digits=6, decimal_places=2, default=3000, blank=True, null=True)
 	dev_tax_commune_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	dev_tax_department_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	
 
-	archeological_tax_base_solar = models.fields.DecimalField(max_digits=8, decimal_places=2, default=10)
-	archeological_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.4)
+	archeological_tax_base_solar = models.fields.DecimalField(max_digits=8, decimal_places=2, default=10, blank=True, null=True)
+	archeological_tax = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0.4, blank=True, null=True)
 
 
 	lease = models.fields.IntegerField(default="50")

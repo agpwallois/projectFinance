@@ -1,5 +1,6 @@
 // Global variable to track the currently selected scenario
 let currentSelectedScenario = 'sponsor_base_case';
+// Flag to track if financial models have been loaded for this project
 
 $(document).ready(function() {
     // Initialize the application
@@ -15,10 +16,9 @@ $(document).ready(function() {
 
 function initializeApplication() {
     setupRadioButtonHandlers()
-    set_up_sensitivities_form_submission_listeners();
     hide_sidebar_construction_months_fields();
     hide_sidebar_mkt_prices_years_fields();
-    hide_sidebar_solar_or_wind_fields();
+    set_up_sensitivities_form_submission_listeners();
 
     $(document).on('submit', '#post-form', function(e) {
         handleFormSubmission(e, this);
@@ -110,8 +110,8 @@ function hideLoader() {
 function handleFormSubmission(e, formElement) {
     e.preventDefault();
 
-    console.log('Starting POST request');
-    console.time('POST request total time');
+    //console.log('Starting POST request');
+    //console.time('POST request total time');
 
     // Show loader before making the request
     showLoader();
@@ -126,21 +126,21 @@ function handleFormSubmission(e, formElement) {
         url: "", // Add your URL here
         data: formData,
         beforeSend: function() {
-            console.time('Server POST response time');
+            //console.time('Server POST response time');
         },
         success: function(json) {
-            console.timeEnd('Server POST response time');
+            //console.timeEnd('Server POST response time');
             // Hide loader on success
             hideLoader();
             handleSuccess(json);
-            console.timeEnd('POST request total time');
+            //console.timeEnd('POST request total time');
         },
         error: function(xhr, status, error) {
-            console.timeEnd('Server POST response time');
+            //console.timeEnd('Server POST response time');
             // Hide loader on error
             hideLoader();
             handleAjaxError(xhr, status, error);
-            console.timeEnd('POST request total time');
+            //console.timeEnd('POST request total time');
         }
     };
 
@@ -148,10 +148,10 @@ function handleFormSubmission(e, formElement) {
 }
 
 function makeGetRequest(value) {
-    console.log('Starting GET request for scenario:', value);
-    console.time('GET request total time');
+    //console.log('Starting GET request for scenario:', value);
+    //console.time('GET request total time');
 
-
+    // Only show loader on the initial load when models might need to be created
 
     var getSettings = {
         url: '', // Add your URL here
@@ -160,24 +160,25 @@ function makeGetRequest(value) {
             'scenario': value 
         },
         beforeSend: function() {
-            console.time('Server response time');
+            //console.time('Server response time');
         },
         success: function(json) {
-            console.timeEnd('Server response time');
+            //console.timeEnd('Server response time');
 
             console.log(json);
 
-            // Hide loader on success
-            hideLoader();
+            // Hide loader if it was shown
+
             handleSuccess(json);
-            console.timeEnd('GET request total time');
+            //console.timeEnd('GET request total time');
         },
         error: function(xhr, status, error) {
-            console.timeEnd('Server response time');
-            // Hide loader on error
-            hideLoader();
+            //console.timeEnd('Server response time');
+            
+            // Hide loader if it was shown
+            
             handleAjaxError(xhr, status, error);
-            console.timeEnd('GET request total time');
+            //console.timeEnd('GET request total time');
         }
     };
     $.ajax(getSettings);
@@ -186,41 +187,41 @@ function makeGetRequest(value) {
 function handleSuccess(json) {
     
     // Build dashboard cards first
-    console.time('build_dashboard_cards');
+    //console.time('build_dashboard_cards');
     build_dashboard_cards(json);
-    console.timeEnd('build_dashboard_cards');
+    //console.timeEnd('build_dashboard_cards');
 
     // build_computation_table(json);
     
     // Build financial statements
-    console.time('build_fs_financial_statements');
+    //console.time('build_fs_financial_statements');
     build_fs_financial_statements(json);
-    console.timeEnd('build_fs_financial_statements');
+    //console.timeEnd('build_fs_financial_statements');
     
-    console.time('build_fs_financing_plan');
+    //console.time('build_fs_financing_plan');
     build_fs_financing_plan(json);
-    console.timeEnd('build_fs_financing_plan');
+    //console.timeEnd('build_fs_financing_plan');
     
-    console.time('build_fs_balance_sheet');
+    //console.time('build_fs_balance_sheet');
     build_fs_balance_sheet(json);
-    console.timeEnd('build_fs_balance_sheet');
+    //console.timeEnd('build_fs_balance_sheet');
 
-    console.time('build_fs_debt_schedule');
+    //console.time('build_fs_debt_schedule');
     build_fs_debt_schedule(json);
-    console.timeEnd('build_fs_debt_schedule');
+    //console.timeEnd('build_fs_debt_schedule');
 
     // Update dashboard and sidebar
-    console.time('update_dashboard_and_sidebar_cards');
+    //console.time('update_dashboard_and_sidebar_cards');
     update_dashboard_and_sidebar_cards(json);
-    console.timeEnd('update_dashboard_and_sidebar_cards');
+    //console.timeEnd('update_dashboard_and_sidebar_cards');
 
     // BUILD CHARTS - This is the critical section
-    console.time('build_charts_total');
+    //console.time('build_charts_total');
     
     // First, build the initial charts (construction phase charts)
-    console.time('build_charts');
+    //console.time('build_charts');
     build_charts(json);
-    console.timeEnd('build_charts');
+    //console.timeEnd('build_charts');
     
     // Set up the dropdown handler BEFORE triggering it
     function handleDropdownChange() {
@@ -245,12 +246,12 @@ function handleSuccess(json) {
         handleDropdownChange();
     }, 0);
     
-    console.timeEnd('build_charts_total');
+    //console.timeEnd('build_charts_total');
 
     // Apply highlighting
-    console.time('applyHighlightingToScenario');
+    //console.time('applyHighlightingToScenario');
     applyHighlightingToScenario(currentSelectedScenario);
-    console.timeEnd('applyHighlightingToScenario');
+    //console.timeEnd('applyHighlightingToScenario');
     
 
 }
