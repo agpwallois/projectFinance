@@ -24,7 +24,10 @@
     <!-- Project Overview Section -->
      
     <div class="box-wrapper project-overview-wrapper" id="overview-wrapper">
-        <h2>Project Overview</h2>
+        <h2>
+
+    Project Overview
+</h2>
         <div class="overview-metrics-row">
             <!-- Total Investment Box -->
              
@@ -95,7 +98,10 @@
 <div id="content-box">
 
     <div class="dashboard-container">
-        <h2>Scenario Selection</h2>
+        <h2>
+
+    Scenario Selection
+</h2>
      <!-- Scenario Analysis Section -->
         <div class="box" id="summary-sensitivities">
             <!-- Navigation tabs for Sponsor Case and Lender Case -->
@@ -147,7 +153,7 @@
                                         <td>
                                             <input class="form-check-input" type="radio" name="scenarios" value="sponsor_base_case" checked>
                                         </td>
-                                        <td>Base Case</td>
+                                        <td style="text-align: left;">Sponsor Base Case</td>
                                         <td>-</td>
                                         <td></td>
                                     </tr>
@@ -161,7 +167,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="sponsor_sensi_prod">
                                         </td>
 
-                                        <td>Production</td>
+                                        <td style="text-align: left;">Sensi: production</td>
                                         <td>{{ project_form.sensi_production_sponsor }}</td>
                                         <td><div id="sponsor_sensi_production"></div></td>
                                     </tr>
@@ -170,7 +176,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="sponsor_sensi_inf">
                                         </td>
 
-                                        <td>Inflation</td>
+                                        <td style="text-align: left;">Sensi: inflation</td>
 
 
                                         <td>{{ project_form.sensi_inflation_sponsor }}</td>
@@ -181,7 +187,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="sponsor_sensi_opex">
                                         </td>
 
-                                        <td>Operating costs</td>
+                                        <td style="text-align: left;">Sensi: operating costs</td>
                                         <td>{{ project_form.sensi_opex_sponsor }}</td>
                                         <td><div id="sponsor_sensi_opex"></div></td>
                                     </tr>
@@ -218,7 +224,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="lender_base_case">
                                         </td>
 
-                                        <td>Base Case</td>
+                                        <td style="text-align: left;">Lender Base Case</td>
                                         <td>-</td>
                                         <td></td>
                                     </tr>
@@ -232,7 +238,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="lender_sensi_prod">
                                         </td>
 
-                                        <td>Production</td>
+                                        <td style="text-align: left;">Sensi: production</td>
                                         <td>{{ project_form.sensi_production }}</td>
                                         <td><div id="sensi_production"></div></td>
                                     </tr>
@@ -241,7 +247,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="lender_sensi_inf">
                                         </td>
 
-                                        <td>Inflation</td>
+                                        <td style="text-align: left;">Sensi: inflation</td>
                                         <td>{{ project_form.sensi_inflation }}</td>
                                         <td><div id="sensi_inflation"></div></td>
                                     </tr>
@@ -250,7 +256,7 @@
                                             <input class="form-check-input" type="radio" name="scenarios" value="lender_sensi_opex">
                                         </td>
 
-                                        <td>Operating costs</td>
+                                        <td style="text-align: left;">Sensi: operating costs</td>
                                         <td>{{ project_form.sensi_opex }}</td>
                                         <td><div id="sensi_opex"></div></td>
                                     </tr>
@@ -274,7 +280,7 @@
         <div id="content-box">
 
 <div class="dashboard-container">
-    <h2>Selected Scenario Overview</h2>
+
     <!-- Navigation Container - Below project header, containing nav tabs and toggle -->
 
 

@@ -133,13 +133,17 @@ class Assumptions:
 
 	def _initialize_debt_parameters(self):
 		project = self.instance.project
+		"""
 		debt_components = [
 			float(project.debt_margin),
 			float(project.debt_swap_rate),
 			float(project.debt_swap_margin),
 			float(project.debt_reference_rate_buffer),
 		]
-		self.instance.senior_debt_interest_rate = sum(debt_components) / 100
+		"""
+
+		debt_components = float(project.debt_margin)
+		self.instance.senior_debt_interest_rate = debt_components / 100
 		self.instance.senior_debt_upfront_fee = float(project.debt_upfront_fee) / 100
 		self.instance.senior_debt_commitment_fee = float(project.debt_commitment_fee) / 100
 

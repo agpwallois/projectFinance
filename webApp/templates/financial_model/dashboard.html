@@ -3,8 +3,13 @@
 
     <!-- Financial Metrics Section -->
     <div class="box-wrapper">
-         <h2>Key Metrics</h2>
         
+    <h2>
+
+    Selected Scenario Key Metrics
+</h2>
+
+
         <!-- First row - Three columns side by side -->
         <div class="metrics-row">
             <div class="metrics-column">
@@ -66,7 +71,10 @@
 
 
 <div class="box-wrapper">
-    <h2>Financial Statements</h2>
+    <h2>
+
+    Financial Statements
+</h2>
                     {% include 'financial_model/financial_statements.html' %}
 
 </div>
@@ -78,7 +86,10 @@
 
 
             <div class="left">
-                <h2>Charts: Construction Phase</h2>
+                <h2>
+
+    Charts: Construction Phase
+</h2>
             </div>
 
 
@@ -109,7 +120,10 @@
 
 
             <div class="left">
-                <h2>Charts: Operating Phase</h2>
+                <h2>
+
+    Charts: Operating Phase
+</h2>
             </div>
 
             <div class="right">
@@ -128,12 +142,14 @@
         </div>
 
 
+        {% comment %}
 <div class="box-wrapper">
 <h2>Calculation</h2>
         {% include 'financial_model/calculation.html' %}
 
 
         </div>
+        {% endcomment %}
     </div>
 
 

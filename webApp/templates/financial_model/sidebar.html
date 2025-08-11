@@ -45,6 +45,19 @@
                         </div>
                     </div>
                 </div>
+                <!-- Construction Costs Section -->
+                <div class="accordion-item">
+                    <p class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Construction Costs
+                        </button>
+                    </p>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
+                        <div class="accordion-body">
+                            {% include 'financial_model/sidebar_construction_costs.html' %}
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Capacity and Production Section -->
                 <div class="accordion-item">
@@ -60,25 +73,13 @@
                     </div>
                 </div>
 
-                <!-- Construction Costs Section -->
-                <div class="accordion-item">
-                    <p class="accordion-header" id="headingFour">
-                        <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                            Construction Costs
-                        </button>
-                    </p>
-                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionSidebar">
-                        <div class="accordion-body">
-                            {% include 'financial_model/sidebar_construction_costs.html' %}
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Offtake and Market Prices Section -->
                 <div class="accordion-item">
                     <p class="accordion-header" id="headingFive">
                         <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                            Offtake and Market Prices
+                            Revenues
                         </button>
                     </p>
                     <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionSidebar">
@@ -92,7 +93,7 @@
                 <div class="accordion-item">
                     <p class="accordion-header" id="headingSix">
                         <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                            Operating Costs
+                            Operating Expenses
                         </button>
                     </p>
                     <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionSidebar">
@@ -102,44 +103,31 @@
                     </div>
                 </div>
 
-                <!-- Senior Debt Facilities Section -->
-                <div class="accordion-item">
-                    <p class="accordion-header" id="headingSeven">
-                        <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-                            Senior Debt Facilities
-                        </button>
-                    </p>
-                    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
-                        <div class="accordion-body">
-                            {% include 'financial_model/sidebar_senior_debt.html' %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tax and Accounting Section -->
-                <div class="accordion-item">
-                    <p class="accordion-header" id="headingEight">
-                        <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
-                            Tax and Accounting
-                        </button>
-                    </p>
-                    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
-                        <div class="accordion-body">
-                            {% include 'financial_model/sidebar_tax_accounting.html' %}
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Operations Section -->
                 <div class="accordion-item">
                     <p class="accordion-header" id="headingNine">
                         <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
-                            Operations
+                            Working Capital
                         </button>
                     </p>
                     <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#accordionSidebar">
                         <div class="accordion-body">
                             {% include 'financial_model/sidebar_operations.html' %}
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Senior Debt Facilities Section -->
+                <div class="accordion-item">
+                    <p class="accordion-header" id="headingSeven">
+                        <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                            Debt Financing
+                        </button>
+                    </p>
+                    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionSidebar">
+                        <div class="accordion-body">
+                            {% include 'financial_model/sidebar_senior_debt.html' %}
                         </div>
                     </div>
                 </div>
@@ -158,7 +146,25 @@
                     </div>
                 </div>
 
+                <!-- Tax and Accounting Section -->
+                <div class="accordion-item">
+                    <p class="accordion-header" id="headingEight">
+                        <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                            Tax
+                        </button>
+                    </p>
+                    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionSidebar">
+                        <div class="accordion-body">
+                            {% include 'financial_model/sidebar_tax_accounting.html' %}
+                        </div>
+                    </div>
+                </div>
+
+
+
+
                 <!-- Project Details Section -->
+                {% comment %}
                 <div class="accordion-item">
                     <p class="accordion-header" id="headingEleve">
                         <button class="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
@@ -171,18 +177,18 @@
                         </div>
                     </div>
                 </div>
+                {% endcomment %}
 
 
             </div>
         </div>
-    </div>
 </nav>
 
     <!-- Separate Project Status box -->
     <div id="project-status-box">
-        <h1>Project Status</h1>
+        <h1>Project Stage</h1>
         <div id="ProjectStatus">
-            <div id="ProjectStatusLabel">Project status</div>
+            <div id="ProjectStatusLabel">Project stage</div>
             <div>
                 {{ project_form.project_status }}
             </div>

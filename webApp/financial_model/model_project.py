@@ -247,16 +247,17 @@ class Project(models.Model):
 	index_rate_opex = models.fields.DecimalField(max_digits=4, decimal_places=2, default=2)
 
 	debt_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=5)
-	debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	"""debt_swap_rate = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	debt_swap_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
 	debt_reference_rate_buffer = models.fields.DecimalField(max_digits=4, decimal_places=2, default=0)
+	"""
 	
 	debt_upfront_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1.5)
 	debt_commitment_fee = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1)
 	
 	debt_target_DSCR = models.fields.DecimalField(max_digits=4, decimal_places=2, default=1.15)
 	debt_gearing_max = models.fields.DecimalField(max_digits=4, decimal_places=2, default=90)
-	debt_negative_tail = models.fields.IntegerField(default="0")
+	"""debt_negative_tail = models.fields.IntegerField(default="0")"""
 
 	debt_tenor = models.fields.IntegerField(default="20")
 
@@ -272,12 +273,13 @@ class Project(models.Model):
 	SHL_margin = models.fields.DecimalField(max_digits=4, decimal_places=2, default=3)
 
 
-	calculation_detail = models.fields.IntegerField(default="2")
+	"""calculation_detail = models.fields.IntegerField(default="2")
+	"""
 	payment_delay_revenues = models.fields.IntegerField(default="30")
 	payment_delay_costs = models.fields.IntegerField(default="30")
 
 	DSRA_choice = models.fields.IntegerField(default="1")
-	initial_wc = models.fields.IntegerField(default="0")
+	"""initial_wc = models.fields.IntegerField(default="0")"""
 	cash_min = models.fields.IntegerField(default="0")
 
 	sensi_production = models.fields.DecimalField(max_digits=3, decimal_places=0, default=0)
@@ -293,7 +295,9 @@ class Project(models.Model):
 
 	wind_turbine_installed = models.fields.IntegerField(default="3", blank=True, null=True)
 	capacity_per_turbine = models.fields.IntegerField(default="2", blank=True, null=True)
-	timeline_quarters_ceiling = models.BooleanField(default=False, null=True)
+	
+	"""timeline_quarters_ceiling = models.BooleanField(default=False, null=True)
+	"""
 
 	panels_surface = models.fields.DecimalField(max_digits=10, decimal_places=2, default=0)
 	dev_tax_taxable_base_solar = models.fields.DecimalField(max_digits=6, decimal_places=2, default=10)
@@ -333,8 +337,9 @@ class Project(models.Model):
 	project_status = models.fields.CharField(choices=PROJECT_STATUS,max_length=100,default="Development")
 	discount_factor_valuation = models.fields.DecimalField(max_digits=4, decimal_places=2, default=7)
 
-	contract = models.fields.CharField(choices=CONTRACT_CHOICES,max_length=100,default="CfD - AO")
+	"""contract = models.fields.CharField(choices=CONTRACT_CHOICES,max_length=100,default="CfD - AO")
 	rotor_diameter = models.fields.DecimalField(max_digits=4, decimal_places=2, default=92)
+	"""
 
 	sponsor_irr = models.fields.DecimalField(max_digits=10, decimal_places=2, default=0)
 	valuation = models.fields.DecimalField(max_digits=10, decimal_places=0, default=0)

@@ -64,7 +64,7 @@ class ProjectForm(forms.ModelForm):
 
 	class Meta:
 	 model = Project
-	 exclude = ['company', 'creator', 'created_at', 'updated_at']
+	 exclude = ['company', 'creator', 'created_at', 'updated_at', 'name', 'country', 'technology']
 	 widgets = {
 		'start_construction': forms.DateInput(attrs={'type': 'date',}),
 		'end_construction': forms.DateInput(attrs={'type': 'date',}),
@@ -79,7 +79,6 @@ class ProjectForm(forms.ModelForm):
 
 		'devfee_choice': forms.RadioSelect(choices=DEV_FEE_CHOICES),
 		'injection_choice': forms.RadioSelect(choices=EQUITY_CHOICES),
-		'calculation_detail': forms.RadioSelect(choices=CALCULATION_DETAILS_CHOICES),
 		'DSRA_choice': forms.RadioSelect(choices=DSRA_CHOICES),
 		'production_choice': forms.Select(choices=PRODUCTION_CHOICES),
 
@@ -114,7 +113,6 @@ class ProjectForm(forms.ModelForm):
 		exclude_from_formatting = [self.fields['periodicity'],
 								   self.fields['devfee_choice'],
 								   self.fields['injection_choice'],
-								   self.fields['calculation_detail'],
 								   self.fields['DSRA_choice'],
 								   self.fields['project_status'],
 				
