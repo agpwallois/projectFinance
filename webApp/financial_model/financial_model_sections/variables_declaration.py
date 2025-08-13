@@ -82,13 +82,13 @@ class DeclareVariables:
 
 		# Debt Service Reserve Account (DSRA)
 		fm["DSRA"] = {
-			"dsra_bop": np.full(data_length, 0),
-			"dsra_eop": np.full(data_length, 0),
+			"balance_bop": np.full(data_length, 0),
+			"balance_eop": np.full(data_length, 0),
 
 			"initial_funding": np.full(data_length, 0),
 			"dsra_mov": np.full(data_length, 0),
 			"dsra_additions": np.full(data_length, 0),
-			"dsra_release": np.full(data_length, 0),
+			"dsra_releases": np.full(data_length, 0),
 
 		}
 

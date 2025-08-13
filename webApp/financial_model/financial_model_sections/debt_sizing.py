@@ -62,6 +62,8 @@ class SeniorDebtSizing:
 			fm['discount_factor']['discount_factor'].cumprod()
 		)
 
+
+
 		# ----- 3) DSCR & CFADS for amortization -----
 		fm['debt_sizing']['CFADS_amo'] = (
 			fm['op_account']['cash_flows_operating'] * fm['flags']['debt_amo']
@@ -70,14 +72,23 @@ class SeniorDebtSizing:
 			self.instance.target_DSCR * fm['flags']['debt_amo']
 		)
 
+		logger.error(fm['debt_sizing']['CFADS_amo'])
+
 		# ----- 4) Target Debt (DSCR-based) -----
 		fm['debt_sizing']['target_DS'] = (
 			fm['debt_sizing']['CFADS_amo'] / self.instance.target_DSCR
 		)
+
+		logger.error(fm['debt_sizing']['target_DS'])
+		logger.error(fm['discount_factor']['discount_factor_cumul'])
+
+
 		fm['debt_sizing']['target_debt_DSCR'] = np.sum(
 			fm['debt_sizing']['target_DS'] *
 			fm['discount_factor']['discount_factor_cumul']
 		)
+
+
 
 		# ----- 5) Target Debt (Gearing-based) -----
 		total_uses = fm['uses']['total'].sum()

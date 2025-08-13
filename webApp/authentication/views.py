@@ -8,14 +8,10 @@ from authentication.models import Company, User
 
 def login_view(request):
 	if request.method == 'POST':
-		print(f"DEBUG LOGIN - POST data: {dict(request.POST)}")
 		
 		email = request.POST.get('email', '')
 		password = request.POST.get('password', '')
-		
-		print(f"DEBUG LOGIN - Email: '{email}'")
-		print(f"DEBUG LOGIN - Password provided: {'Yes' if password else 'No'}")
-		
+			
 		if not email or not password:
 			missing = []
 			if not email:

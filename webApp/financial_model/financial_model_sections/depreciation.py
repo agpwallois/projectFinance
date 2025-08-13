@@ -41,4 +41,4 @@ class Depreciation:
 		depreciation_schedule = total_depreciable * years_during_operations / operating_life
 		
 		# Store the calculated depreciation in the Income Statement section
-		fm["IS"]["depreciation"] = depreciation_schedule
+		fm["IS"]["depreciation"] = -1*depreciation_schedule

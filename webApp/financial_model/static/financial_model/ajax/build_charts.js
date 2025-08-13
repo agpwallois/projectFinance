@@ -123,7 +123,7 @@ function updateChartsAnnual(json) {
     const balanceEop = Object.values(eoy['senior_debt']['balance_eop']);
     const llcr = Object.values(eoy['ratios']['LLCR']);
     const plcr = Object.values(eoy['ratios']['PLCR']);
-    const dsraBop = Object.values(eoy['DSRA']['dsra_bop']);
+    const dsraBop = Object.values(eoy['DSRA']['balance_bop']);
     const retainedEarnings = Object.values(eoy['IS']['retained_earnings_bop']);
     const distrBalance = Object.values(eoy['distr_account']['balance_eop']);
     const shareRepayments = Object.values(annual['share_capital']['repayments']);
@@ -192,7 +192,7 @@ function updateChartsDebtPeriodicity(json) {
         dsEffective: Object.values(df['senior_debt']['DS_effective']),
         shareCapital: Object.values(df['charts']['share_capital_inj_and_repay']),
         shlInj: Object.values(df['charts']['shl_inj_and_repay']),
-        dividends: Object.values(df['distr_account']['dividends_paid']),
+        dividends: Object.values(df['distr_account']['dividends_paid']).map(value => value * -1),
         irrCurve: Object.values(df['IRR']['irr_curve']),
         interests: Object.values(df['senior_debt']['interests_operations']),
         repayments: Object.values(df['senior_debt']['repayments']),
@@ -201,7 +201,7 @@ function updateChartsDebtPeriodicity(json) {
         balanceEop: Object.values(df['senior_debt']['balance_eop']),
         llcr: Object.values(df['ratios']['LLCR']),
         plcr: Object.values(df['ratios']['PLCR']),
-        dsraBop: Object.values(df['DSRA']['dsra_bop']),
+        dsraBop: Object.values(df['DSRA']['balance_bop']),
         retainedEarnings: Object.values(df['IS']['retained_earnings_bop']),
         distrBalance: Object.values(df['distr_account']['balance_eop']),
         shareRepayments: Object.values(df['share_capital']['repayments']),

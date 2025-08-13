@@ -10,6 +10,7 @@ import json
 import pandas as pd
 import numpy as np
 from dateutil.relativedelta import relativedelta
+from django.contrib.postgres.indexes import GinIndex
 
 # Django Imports
 from django.db import models
@@ -171,6 +172,27 @@ class FinancialModel(models.Model):
 		on_delete=models.SET_NULL, 
 		related_name='dependent_models'
 	)
+
+	class Meta:
+		indexes = [
+			models.Index(
+				fields=['project', 'identifier'], 
+				name='fm_project_identifier_idx'
+			),
+			GinIndex(
+				fields=['financial_model'],
+				name='fm_financial_model_gin_idx'
+			),
+		]
+		
+		constraints = [
+			models.UniqueConstraint(
+				fields=['project', 'identifier'],
+				name='unique_project_identifier'
+			)
+		]
+
+
 
 	# Component initialization order
 	STATIC_COMPONENTS = [

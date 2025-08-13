@@ -99,45 +99,110 @@ class Dates:
 		construction_end: datetime.date,
 		liquidation_date: datetime.date
 	) -> pd.Series:
-		"""
-		Calculates the start dates for the financial model. This includes:
-		- A monthly range from construction start to construction end (freq='MS').
-		- A single date right after construction, plus a repeated range up to liquidation.
-
-		Args:
-			periodicity: Integer representing the frequency (in months) for operations.
-			construction_start: Date when construction starts.
-			construction_end: Date when construction ends.
-			liquidation_date: Date when liquidation occurs.
-
-		Returns:
-			A pd.Series of datetime64[ns] containing all start dates.
-		"""
-		months_to_add = math.floor(periodicity / 3)
-		frequency_string = f"{periodicity}MS"
-
+		"""Calculate start dates matching the end dates exactly"""
+		
 		first_day_construction = self._first_day_of_month(construction_start)
-		last_day_construction = self._last_day_of_month(construction_end)
-
-		# Date used to figure out the next operational period
-		first_operations_end = (
-			last_day_construction + datetime.timedelta(days=1)
-			+ relativedelta(months=months_to_add)
-			+ pd.tseries.offsets.QuarterEnd() * months_to_add
-		)
-
-		# Single date right after construction
-		first_operations_date = pd.Series([pd.Timestamp(last_day_construction + datetime.timedelta(days=1))])
-		second_operations_date = first_operations_end + datetime.timedelta(days=1)
-
-		last_day_liquidation = self._last_day_of_month(liquidation_date)
-
-		# Construct date ranges
-		construction_range = pd.date_range(first_day_construction, last_day_construction, freq='MS')
-		operations_range = pd.date_range(second_operations_date, last_day_liquidation, freq=frequency_string)
-
-		all_start_dates = pd.concat([pd.Series(construction_range), first_operations_date, pd.Series(operations_range)])
+		construction_end_month = self._first_day_of_month(construction_end)
+		
+		# Construction range (monthly) - only until the month containing construction_end
+		construction_start_dates = pd.date_range(first_day_construction, construction_end_month, freq='MS')
+		
+		# Operations start immediately after construction
+		first_operations_start = construction_end + datetime.timedelta(days=1)
+		
+		# Calculate minimum first operations end date (must be AFTER construction_end + periodicity)
+		min_first_operations_end = construction_end + relativedelta(months=periodicity)
+		
+		if periodicity == 6:  # Semi-annual
+			year = min_first_operations_end.year
+			month = min_first_operations_end.month
+			
+			# Find the next semi-annual end (30/06 or 31/12) that's AFTER min_first_operations_end
+			if month <= 6:
+				first_ops_end = datetime.date(year, 6, 30)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 12, 31)
+			else:
+				first_ops_end = datetime.date(year, 12, 31)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year + 1, 6, 30)
+			
+			# Generate all operations start dates
+			operations_start_dates = [first_operations_start]
+			
+			# Add subsequent semi-annual starts
+			current_end = first_ops_end
+			while current_end < liquidation_date:
+				# Next start is day after current end
+				next_start = current_end + datetime.timedelta(days=1)
+				if next_start <= liquidation_date:
+					operations_start_dates.append(next_start)
+				
+				# Move to next semi-annual end
+				if current_end.month == 6:
+					current_end = datetime.date(current_end.year, 12, 31)
+				else:
+					current_end = datetime.date(current_end.year + 1, 6, 30)
+			
+			operations_start_dates = pd.Series([pd.Timestamp(d) for d in operations_start_dates])
+		
+		elif periodicity == 3:  # Quarterly
+			year = min_first_operations_end.year
+			month = min_first_operations_end.month
+			
+			# Find the next quarterly end (31/03, 30/06, 30/09, 31/12) that's AFTER min_first_operations_end
+			if month <= 3:
+				first_ops_end = datetime.date(year, 3, 31)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 6, 30)
+			elif month <= 6:
+				first_ops_end = datetime.date(year, 6, 30)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 9, 30)
+			elif month <= 9:
+				first_ops_end = datetime.date(year, 9, 30)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 12, 31)
+			else:
+				first_ops_end = datetime.date(year, 12, 31)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year + 1, 3, 31)
+			
+			# Generate all operations start dates
+			operations_start_dates = [first_operations_start]
+			
+			# Add subsequent quarterly starts
+			current_end = first_ops_end
+			while current_end < liquidation_date:
+				# Next start is day after current end
+				next_start = current_end + datetime.timedelta(days=1)
+				if next_start <= liquidation_date:
+					operations_start_dates.append(next_start)
+				
+				# Move to next quarterly end
+				if current_end.month == 3:
+					current_end = datetime.date(current_end.year, 6, 30)
+				elif current_end.month == 6:
+					current_end = datetime.date(current_end.year, 9, 30)
+				elif current_end.month == 9:
+					current_end = datetime.date(current_end.year, 12, 31)
+				else:  # December
+					current_end = datetime.date(current_end.year + 1, 3, 31)
+			
+			operations_start_dates = pd.Series([pd.Timestamp(d) for d in operations_start_dates])
+		
+		else:
+			operations_start_dates = pd.Series([], dtype='datetime64[ns]')
+		
+		# Combine: construction + operations (no separate transition)
+		all_start_dates = pd.concat([
+			pd.Series(construction_start_dates), 
+			operations_start_dates
+		])
+		
+		"""logger.error(f"Start dates: {all_start_dates.reset_index(drop=True)}")"""
 		return all_start_dates.reset_index(drop=True)
+
 
 	def _calculate_model_end_dates(
 		self,
@@ -146,42 +211,131 @@ class Dates:
 		construction_end: datetime.date,
 		liquidation_date: datetime.date
 	) -> pd.Series:
-		"""
-		Calculates the end dates for the financial model. This includes:
-		- A monthly range for the construction phase (freq='M').
-		- A range from the first operational period up to a date that accounts
-		  for the specified periodicity beyond liquidation.
-
-		Args:
-			periodicity: Integer representing the frequency (in months) for operations.
-			construction_start: Date when construction starts.
-			construction_end: Date when construction ends.
-			liquidation_date: Date when liquidation occurs.
-
-		Returns:
-			A pd.Series of datetime64[ns] containing all end dates.
-		"""
-		months_to_add = math.floor(periodicity / 3)
-		frequency_string = f"{periodicity}M"
-
+		"""Calculate end dates matching the start dates exactly"""
+		
 		first_day_construction = self._first_day_of_month(construction_start)
-		last_day_construction = self._last_day_of_month(construction_end)
-
-		# The end of the first operational period
-		first_operations_end = (
-			last_day_construction + datetime.timedelta(days=1)
-			+ relativedelta(months=months_to_add)
-			+ pd.tseries.offsets.QuarterEnd() * months_to_add
-		)
-
-		# Determine how far we extend beyond liquidation based on periodicity
-		last_day_liquidation_plus_freq = self._first_day_of_next_month(liquidation_date, periodicity)
-
-		end_construction_dates = pd.date_range(first_day_construction, last_day_construction, freq='M')
-		end_operations_dates = pd.date_range(first_operations_end, last_day_liquidation_plus_freq, freq=frequency_string)
-
-		all_end_dates = pd.concat([pd.Series(end_construction_dates), pd.Series(end_operations_dates)])
+		construction_end_month = self._first_day_of_month(construction_end)
+		
+		# Build construction end dates manually
+		construction_end_dates = []
+		current_date = first_day_construction
+		
+		while current_date < construction_end_month:
+			month_end = self._last_day_of_month(current_date)
+			construction_end_dates.append(month_end)
+			current_date = current_date + relativedelta(months=1)
+		
+		# For the final construction month, use construction_end itself
+		construction_end_dates.append(construction_end)
+		construction_end_dates = pd.Series([pd.Timestamp(d) for d in construction_end_dates])
+		
+		# Calculate minimum first operations end date
+		min_first_operations_end = construction_end + relativedelta(months=periodicity)
+		
+		if periodicity == 6:  # Semi-annual
+			year = min_first_operations_end.year
+			month = min_first_operations_end.month
+			
+			if month <= 6:
+				first_ops_end = datetime.date(year, 6, 30)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 12, 31)
+			else:
+				first_ops_end = datetime.date(year, 12, 31)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year + 1, 6, 30)
+			
+			# Generate all operations end dates
+			operations_end_dates = []
+			current_end = first_ops_end
+			
+			while current_end <= liquidation_date:
+				if current_end < liquidation_date:
+					operations_end_dates.append(current_end)
+				else:
+					# Last period ends on liquidation date
+					operations_end_dates.append(liquidation_date)
+					break
+				
+				# Move to next semi-annual end
+				if current_end.month == 6:
+					next_end = datetime.date(current_end.year, 12, 31)
+				else:
+					next_end = datetime.date(current_end.year + 1, 6, 30)
+				
+				# Check if we've reached or passed liquidation
+				if next_end >= liquidation_date:
+					operations_end_dates.append(liquidation_date)
+					break
+				else:
+					current_end = next_end
+			
+			operations_end_dates = pd.Series([pd.Timestamp(d) for d in operations_end_dates])
+		
+		elif periodicity == 3:  # Quarterly
+			year = min_first_operations_end.year
+			month = min_first_operations_end.month
+			
+			if month <= 3:
+				first_ops_end = datetime.date(year, 3, 31)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 6, 30)
+			elif month <= 6:
+				first_ops_end = datetime.date(year, 6, 30)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 9, 30)
+			elif month <= 9:
+				first_ops_end = datetime.date(year, 9, 30)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year, 12, 31)
+			else:
+				first_ops_end = datetime.date(year, 12, 31)
+				if first_ops_end <= min_first_operations_end:
+					first_ops_end = datetime.date(year + 1, 3, 31)
+			
+			# Generate all operations end dates
+			operations_end_dates = []
+			current_end = first_ops_end
+			
+			while current_end <= liquidation_date:
+				if current_end < liquidation_date:
+					operations_end_dates.append(current_end)
+				else:
+					# Last period ends on liquidation date
+					operations_end_dates.append(liquidation_date)
+					break
+				
+				# Move to next quarterly end
+				if current_end.month == 3:
+					next_end = datetime.date(current_end.year, 6, 30)
+				elif current_end.month == 6:
+					next_end = datetime.date(current_end.year, 9, 30)
+				elif current_end.month == 9:
+					next_end = datetime.date(current_end.year, 12, 31)
+				else:  # December
+					next_end = datetime.date(current_end.year + 1, 3, 31)
+				
+				# Check if we've reached or passed liquidation
+				if next_end >= liquidation_date:
+					operations_end_dates.append(liquidation_date)
+					break
+				else:
+					current_end = next_end
+			
+			operations_end_dates = pd.Series([pd.Timestamp(d) for d in operations_end_dates])
+		
+		else:
+			operations_end_dates = pd.Series([], dtype='datetime64[ns]')
+		
+		# Combine: construction + operations
+		all_end_dates = pd.concat([
+			construction_end_dates, 
+			operations_end_dates
+		])
+		
+		"""logger.error(f"End dates: {all_end_dates.reset_index(drop=True)}")"""
 		return all_end_dates.reset_index(drop=True)
+
 
 	def _first_day_of_next_month(self, date: datetime.date, periodicity: int) -> datetime.date:
 		"""

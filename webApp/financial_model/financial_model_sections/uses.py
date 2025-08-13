@@ -90,6 +90,7 @@ class Uses:
 			np.array(uses['construction']) +
 			np.array(uses['development_fee']) +
 			np.array(uses['interests_construction']) +
+			np.array(uses['local_taxes']) +
 			np.array(uses['upfront_fee']) +
 			np.array(uses['commitment_fees']) +
 			np.array(self.financial_model['SHL']['interests_construction'])

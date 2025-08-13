@@ -15,7 +15,7 @@ OPERATING_ACCOUNT_ORDER = [
     'balance_bop', 'EBITDA', 'working_cap_movement', 'corporate_tax', 'cash_flows_operating', 'construction_costs',
     'development_fee', 'senior_debt_interests_construction', 'senior_debt_upfront_fee', 'senior_debt_commitment_fees', 'local_taxes', 'cash_flows_investing', 
     'senior_debt', 'share_capital', 'shareholder_loan', 'cash_flows_financing',
-    'CFADS', 'senior_debt_interests_paid', 'senior_debt_repayments', 'dsra_initial_funding', 'dsra_additions', 'dsra_release',
+    'CFADS', 'senior_debt_interests_paid', 'senior_debt_repayments', 'dsra_initial_funding', 'dsra_additions', 'dsra_releases',
     'transfers_distribution_account', 'balance_eop'
 ]
 
@@ -26,11 +26,19 @@ DISTRIBUTION_ACCOUNT_ORDER = [
     'share_capital_repayments', 'balance_eop'
 ]
 
+DSRA_ORDER = [
+    'balance_bop', 'initial_funding',
+    'dsra_additions', 'dsra_releases',
+    'balance_eop',
+]
+
 # Mapping for reordering
 REORDER_MAPPING = {
     'annual_IS': INCOME_STATEMENT_ORDER,
     'annual_op_account': OPERATING_ACCOUNT_ORDER,
-    'annual_distr_account': DISTRIBUTION_ACCOUNT_ORDER
+    'annual_distr_account': DISTRIBUTION_ACCOUNT_ORDER,
+    'annual_dsra': DSRA_ORDER
+
 }
 
 def extract_fs_financial_statements_data(financial_model):
@@ -78,7 +86,9 @@ def extract_fs_financial_statements_data(financial_model):
     financial_statements = {
         'annual_IS': {},
         'annual_op_account': {},
-        'annual_distr_account': {}
+        'annual_distr_account': {},
+        'annual_dsra': {},
+      
     }
 
     period_end_series = pd.to_datetime(
@@ -96,7 +106,10 @@ def extract_fs_financial_statements_data(financial_model):
     section_mapping = {
         'IS': 'annual_IS',
         'op_account': 'annual_op_account',
-        'distr_account': 'annual_distr_account'
+        'distr_account': 'annual_distr_account',
+        'DSRA': 'annual_dsra',
+
+
     }
 
     for source_section, output_key in section_mapping.items():

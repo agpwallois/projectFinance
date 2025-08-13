@@ -67,7 +67,6 @@ class Production:
 		seasonality_array = np.array(self.instance.financial_model['seasonality'])
 		capacity_array = np.array(self.instance.financial_model['capacity']['after_degradation'])
 		
-		# Debug logging
 		import logging
 		logger = logging.getLogger(__name__)
 		

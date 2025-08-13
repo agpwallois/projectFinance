@@ -38,10 +38,10 @@ class TestDSRA(TestCase):
                 'cash_available_for_dsra': np.zeros(5),
                 'dsra_target': np.zeros(5),
                 'initial_funding': np.zeros(5),
-                'dsra_bop': np.zeros(5),
-                'dsra_eop': np.zeros(5),
+                'balance_bop': np.zeros(5),
+                'balance_eop': np.zeros(5),
                 'dsra_additions': np.zeros(5),
-                'dsra_release': np.zeros(5),
+                'dsra_releases': np.zeros(5),
                 'dsra_mov': np.zeros(5)
             },
             'op_account': {
@@ -128,50 +128,50 @@ class TestDSRA(TestCase):
         self.dsra_model.dsra['cash_available_for_dsra'] = np.array([0, 50, 40, 30, 20])
         
         # Initialize arrays
-        for key in ['dsra_bop', 'dsra_eop', 'dsra_additions', 'dsra_release', 'dsra_mov']:
+        for key in ['balance_bop', 'balance_eop', 'dsra_additions', 'dsra_releases', 'dsra_mov']:
             self.dsra_model.dsra[key] = np.zeros(5)
         
         effective_target = self.dsra_model.dsra['dsra_target'] + self.dsra_model.dsra['initial_funding']
         
         # Test period 1 - need to add to reach target
-        self.dsra_model.dsra['dsra_eop'][0] = 200  # Previous period ending
+        self.dsra_model.dsra['balance_eop'][0] = 200  # Previous period ending
         self.dsra_model._compute_period_dsra(1, effective_target)
         
-        self.assertEqual(self.dsra_model.dsra['dsra_bop'][1], 200)
+        self.assertEqual(self.dsra_model.dsra['balance_bop'][1], 200)
         self.assertEqual(self.dsra_model.dsra['dsra_additions'][1], 0)  # Target already met
-        self.assertEqual(self.dsra_model.dsra['dsra_eop'][1], 200)
+        self.assertEqual(self.dsra_model.dsra['balance_eop'][1], 200)
 
-    def test_compute_period_dsra_release_needed(self):
+    def test_compute_period_dsra_releases_needed(self):
         """Test DSRA calculation when release is needed."""
         # Set up scenario where DSRA release is required
         self.dsra_model.dsra['dsra_target'] = np.array([0, 200, 150, 100, 0])
         self.dsra_model.dsra['initial_funding'] = np.array([0, 0, 0, 0, 0])
         
         # Initialize arrays
-        for key in ['dsra_bop', 'dsra_eop', 'dsra_additions', 'dsra_release', 'dsra_mov']:
+        for key in ['balance_bop', 'balance_eop', 'dsra_additions', 'dsra_releases', 'dsra_mov']:
             self.dsra_model.dsra[key] = np.zeros(5)
         
         effective_target = self.dsra_model.dsra['dsra_target'] + self.dsra_model.dsra['initial_funding']
         
         # Test period 2 - current balance exceeds target, should release
-        self.dsra_model.dsra['dsra_eop'][1] = 200  # Previous period ending
+        self.dsra_model.dsra['balance_eop'][1] = 200  # Previous period ending
         self.dsra_model._compute_period_dsra(2, effective_target)
         
-        self.assertEqual(self.dsra_model.dsra['dsra_bop'][2], 200)
-        self.assertEqual(self.dsra_model.dsra['dsra_release'][2], 50)  # 200 - 150
-        self.assertEqual(self.dsra_model.dsra['dsra_eop'][2], 150)
+        self.assertEqual(self.dsra_model.dsra['balance_bop'][2], 200)
+        self.assertEqual(self.dsra_model.dsra['dsra_releases'][2], 50)  # 200 - 150
+        self.assertEqual(self.dsra_model.dsra['balance_eop'][2], 150)
 
     def test_apply_target_ceiling(self):
         """Test that target ceiling is properly applied."""
         # Set up scenario where ending balance exceeds target
-        self.dsra_model.dsra['dsra_eop'] = np.array([0, 0, 180, 0, 0])
-        self.dsra_model.dsra['dsra_release'] = np.array([0, 0, 10, 0, 0])
+        self.dsra_model.dsra['balance_eop'] = np.array([0, 0, 180, 0, 0])
+        self.dsra_model.dsra['dsra_releases'] = np.array([0, 0, 10, 0, 0])
         effective_target = np.array([0, 200, 150, 100, 0])
         
         self.dsra_model._apply_target_ceiling(2, effective_target)
         
-        self.assertEqual(self.dsra_model.dsra['dsra_release'][2], 40)  # 10 + (180-150)
-        self.assertEqual(self.dsra_model.dsra['dsra_eop'][2], 150)
+        self.assertEqual(self.dsra_model.dsra['dsra_releases'][2], 40)  # 10 + (180-150)
+        self.assertEqual(self.dsra_model.dsra['balance_eop'][2], 150)
 
     def test_update_initial_funding_max(self):
         """Test updating maximum initial funding on instance."""

@@ -57,7 +57,7 @@ class IncomeStatementHelper:
 		dict with keys: ebit, ebt, corporate_income_tax, net_income
 		"""
 		# Calculate EBIT
-		ebit = ebitda - depreciation
+		ebit = ebitda + depreciation
 		
 		# Calculate EBT (Earnings Before Tax)
 		ebt = ebit - senior_debt_interest - shl_interest

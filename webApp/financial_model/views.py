@@ -235,7 +235,6 @@ class FinancialModelView(View):
 		"""Create or update financial models based on the scenario and project form data."""
 
 		
-		# Debug specific fields that are appearing incorrectly
 		for field_name in ['capacity_per_turbine', 'wind_turbine_installed', 'panels_capacity', 'annual_degradation']:
 			if field_name in project_form.changed_data:
 				initial_value = project_form.initial.get(field_name)
@@ -294,33 +293,88 @@ class FinancialModelView(View):
 
 	@timer_decorator
 	def _get_financial_models(self, project: Project) -> Dict[str, Any]:
-		"""Retrieve all financial models for a project"""
+		"""Retrieve all financial models for a project with optimized queries"""
 		model_class = self._get_model_class(project)
 		scenario_ids = list(self.FINANCIAL_MODEL_SCENARIOS.keys())
 		
-		# Single query to get all existing models
+		# OPTIMIZED: Single query using the composite index
+		# This will use the fm_project_identifier_idx index efficiently
 		existing_models = model_class.objects.filter(
 			project=project,
 			identifier__in=scenario_ids
-		)
+		).select_related('depends_on')  # Prefetch dependencies to avoid N+1 queries
 		
 		# Create lookup dictionary
 		models_by_id = {model.identifier: model for model in existing_models}
 		
 		# Build result and create missing models
 		financial_models = {}
-		models_to_create = []
 		
 		for scenario_id, scenario_config in self.FINANCIAL_MODEL_SCENARIOS.items():
 			if scenario_id in models_by_id:
 				financial_models[scenario_id] = models_by_id[scenario_id]
 			else:
-				# Queue for bulk creation or create individually
+				# Create missing model
 				model = self._create_fm(project, scenario_id, scenario_config)
 				financial_models[scenario_id] = model
 		
 		return financial_models
-	
+
+	# Alternative method for getting a single model (if needed):
+	def _get_single_financial_model(self, project: Project, scenario_id: str):
+		"""Get a single financial model with optimized query"""
+		model_class = self._get_model_class(project)
+		
+		try:
+			# This query will use the composite index efficiently
+			return model_class.objects.select_related('depends_on').get(
+				project=project,
+				identifier=scenario_id
+			)
+		except model_class.DoesNotExist:
+			scenario_config = self.FINANCIAL_MODEL_SCENARIOS.get(scenario_id)
+			if scenario_config:
+				return self._create_fm(project, scenario_id, scenario_config)
+			else:
+				raise ValueError(f"Unknown scenario: {scenario_id}")
+
+	# Optimized method for bulk operations:
+	def _bulk_get_or_create_models(self, project: Project, scenario_ids: list):
+		"""Efficiently get or create multiple models"""
+		model_class = self._get_model_class(project)
+		
+		# Get existing models in one query
+		existing_models = model_class.objects.filter(
+			project=project,
+			identifier__in=scenario_ids
+		).select_related('depends_on')
+		
+		existing_ids = {model.identifier for model in existing_models}
+		missing_ids = set(scenario_ids) - existing_ids
+		
+		# Bulk create missing models if any
+		if missing_ids:
+			models_to_create = []
+			for scenario_id in missing_ids:
+				scenario_config = self.FINANCIAL_MODEL_SCENARIOS.get(scenario_id)
+				if scenario_config:
+					model = model_class(
+						project=project,
+						identifier=scenario_id,
+						financial_model={}
+					)
+					models_to_create.append(model)
+			
+			if models_to_create:
+				model_class.objects.bulk_create(models_to_create)
+				# Re-fetch to get the created models with IDs
+				existing_models = model_class.objects.filter(
+					project=project,
+					identifier__in=scenario_ids
+				).select_related('depends_on')
+		
+		return {model.identifier: model for model in existing_models}
+		
 	@timer_decorator
 	def _build_response_data(self, selected_fm, financial_models: Dict[str, Any]) -> JsonResponse:
 		"""Build the JSON response data for both GET and POST requests"""
@@ -404,7 +458,6 @@ class FinancialModelView(View):
 		Returns:
 			dict: Chart data organized by type
 		"""
-		# Add logging to debug
 		logger.info(f"Extracting charts data for model: {selected_fm.identifier}")
 		
 		charts_data_constr, charts_data_eoy, charts_data_sum_year = selected_fm.extract_values_for_charts()

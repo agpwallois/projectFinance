@@ -37,6 +37,7 @@ class FinancialModelCalculator:
 	"""
 	Main calculator that orchestrates all financial calculations period by period
 	to handle interdependencies correctly. Uses helper classes for all calculations.
+	Also handles development fee optimization when gearing is the binding constraint.
 	"""
 	
 	def __init__(self, instance):
@@ -52,12 +53,19 @@ class FinancialModelCalculator:
 		self.cash_flow_helper = CashFlowStatementHelper(instance)
 		self.dsra_helper = DSRAHelper(instance)
 		self.accounts_helper = AccountsHelper(instance)
+		
+		# Development fee optimization tracking
+		self.dev_fee_optimization_active = False
+		self.previous_dev_fee = getattr(instance, 'development_fee', 0)
 	
 	@profile_method
 	def initialize(self):
 		"""Initialize all calculations using period-by-period approach."""
 		logger = logging.getLogger(__name__)
 		logger.info("=== Starting FinancialModelCalculator.initialize() ===")
+		
+		# Check if we need to optimize development fee
+		self._check_development_fee_optimization()
 		
 		# Initialize all arrays
 		self._initialize_all_arrays()
@@ -72,6 +80,133 @@ class FinancialModelCalculator:
 		# Map calculated values for reporting
 		self._map_income_statement_values()
 		self._map_operating_account_values()
+	
+	def _check_development_fee_optimization(self):
+		"""Check if development fee optimization should be performed."""
+		if self.instance.project.devfee_choice != 1:
+			self.dev_fee_optimization_active = False
+			return
+		
+		# Check if debt sizing results exist and gearing is the constraint
+		debt_sizing = self.financial_model.get('debt_sizing', {})
+		constraint = debt_sizing.get('constraint', '')
+		
+		if constraint == 'gearing':
+			self.dev_fee_optimization_active = True
+			self._optimize_development_fee()
+		else:
+			self.dev_fee_optimization_active = False
+			# Reset development fee if DSCR is binding
+			if hasattr(self.instance, 'development_fee'):
+				self.instance.development_fee = 0
+	
+	def _optimize_development_fee(self):
+		"""
+		Optimize development fee when gearing is the binding constraint.
+		This ensures maximum debt capacity utilization.
+		"""
+		logger = logging.getLogger(__name__)
+		
+		debt_sizing = self.financial_model.get('debt_sizing', {})
+		target_debt_gearing = debt_sizing.get('target_debt_gearing', 0)
+		target_gearing = getattr(self.instance, 'target_gearing', 0.7)
+		
+		if target_gearing == 0:
+			logger.warning("Target gearing is 0 - cannot optimize development fee")
+			return
+		
+		# Calculate maximum total uses that can be supported by gearing constraint
+		max_total_uses = target_debt_gearing / target_gearing
+		
+		# Get current uses without development fee
+		current_uses_wo_dev_fee = pd.Series(self.financial_model['uses']['total_wo_dev_fee']).sum()
+		
+		# Calculate optimal development fee
+		optimal_dev_fee = max(0, max_total_uses - current_uses_wo_dev_fee)
+		
+		# Store previous value for convergence checking
+		self.previous_dev_fee = getattr(self.instance, 'development_fee', 0)
+		
+		# Update development fee
+		self.instance.development_fee = optimal_dev_fee
+		
+		# Recalculate uses with new development fee
+		self._recalculate_uses_with_development_fee()
+		
+		logger.info(f"Development fee optimized: {optimal_dev_fee:,.0f} (previous: {self.previous_dev_fee:,.0f})")
+	
+	def _recalculate_uses_with_development_fee(self):
+		"""Recalculate uses components after development fee optimization."""
+		uses = self.financial_model['uses']
+		
+		# Recalculate development fee component
+		uses['development_fee'] = (
+			float(self.instance.project.devfee_paid_FC) * self.instance.development_fee * 
+			self.financial_model['flags']['construction_start'] + 
+			float(self.instance.project.devfee_paid_COD) * self.instance.development_fee * 
+			self.financial_model['flags']['construction_end']
+		)
+		
+		# Recalculate total uses
+		uses['total'] = (
+			np.array(uses['construction']) +
+			np.array(uses['development_fee']) +
+			np.array(uses['interests_construction']) +
+			np.array(uses['upfront_fee']) +
+			np.array(uses['commitment_fees']) +
+			np.array(uses['reserves']) +
+			np.array(uses['local_taxes'])
+		)
+		
+		uses['total_cumul'] = pd.Series(uses['total']).cumsum()
+		
+		# Recalculate total depreciable uses
+		uses['total_depreciable'] = (
+			np.array(uses['construction']) +
+			np.array(uses['development_fee']) +
+			np.array(uses['interests_construction']) +
+			np.array(uses['local_taxes']) +
+			np.array(uses['upfront_fee']) +
+			np.array(uses['commitment_fees']) +
+			np.array(self.financial_model['SHL']['interests_construction'])
+		)
+		
+		# Update depreciation calculation if needed
+		self._recalculate_depreciation()
+	
+	def _recalculate_depreciation(self):
+		"""Recalculate depreciation after uses change."""
+		# Total depreciable amount, e.g., from capital expenditures
+		total_depreciable = np.array(self.financial_model["uses"]["total_depreciable"]).sum()
+		
+		# The fraction of each period that falls into the operating phase
+		years_during_operations = np.array(self.financial_model["time_series"]["years_during_operations"])
+		
+		# Retrieve operating life, default to 1 to prevent division by zero
+		operating_life = self.instance.project.operating_life or 1
+		
+		# Distribute total depreciation over each period
+		depreciation_schedule = total_depreciable * years_during_operations / operating_life
+		
+		# Store the calculated depreciation in the Income Statement section
+		self.financial_model["IS"]["depreciation"] = -1 * depreciation_schedule
+	
+	def has_development_fee_converged(self) -> bool:
+		"""Check if development fee optimization has converged."""
+		if not self.dev_fee_optimization_active:
+			return True
+		
+		current_dev_fee = getattr(self.instance, 'development_fee', 0)
+		dev_fee_delta = abs(current_dev_fee - self.previous_dev_fee)
+		
+		# Consider converged if change is less than $1,000
+		converged = dev_fee_delta < 1000
+		
+		if converged:
+			logger = logging.getLogger(__name__)
+			logger.info(f"Development fee converged: {current_dev_fee:,.0f}")
+		
+		return converged
 	
 	def _initialize_all_arrays(self):
 		"""Initialize all arrays with vectorized operations."""
@@ -101,8 +236,8 @@ class FinancialModelCalculator:
 					'interests_capitalized'],
 			'senior_debt': ['DS_effective'],
 			'share_capital': ['balance_bop', 'balance_eop', 'repayments'],
-			'DSRA': ['dsra_bop', 'dsra_eop', 'dsra_target', 'initial_funding',
-					'dsra_additions', 'dsra_release', 'dsra_mov', 'cash_available_for_dsra']
+			'DSRA': ['balance_bop', 'balance_eop', 'dsra_target', 'initial_funding',
+					'dsra_additions', 'dsra_releases', 'dsra_mov', 'cash_available_for_dsra']
 		}
 		
 		# Initialize all arrays at once
@@ -256,14 +391,14 @@ class FinancialModelCalculator:
 		
 		# Set beginning balance
 		if period == 0:
-			dsra['dsra_bop'][period] = 0
+			dsra['balance_bop'][period] = 0
 		else:
-			dsra['dsra_bop'][period] = dsra['dsra_eop'][period - 1]
+			dsra['balance_bop'][period] = dsra['balance_eop'][period - 1]
 		
 		# Use helper to calculate movements
 		movements = self.dsra_helper.calculate_dsra_movements(
 			period=period,
-			dsra_bop=dsra['dsra_bop'][period],
+			balance_bop=dsra['balance_bop'][period],
 			initial_funding=dsra['initial_funding'][period],
 			target=dsra['dsra_target'][period],
 			cash_available=cash_available
@@ -271,8 +406,8 @@ class FinancialModelCalculator:
 		
 		# Store results
 		dsra['dsra_additions'][period] = movements['additions']
-		dsra['dsra_release'][period] = movements['release']
-		dsra['dsra_eop'][period] = movements['eop']
+		dsra['dsra_releases'][period] = -1*movements['release']
+		dsra['balance_eop'][period] = movements['eop']
 		dsra['dsra_mov'][period] = movements['mov']
 	
 	def _calculate_period_accounts(self, period: int):
@@ -303,7 +438,7 @@ class FinancialModelCalculator:
 		op_account['share_capital'] = self.financial_model['sources']['share_capital']
 		op_account['shareholder_loan'] = self.financial_model['sources']['SHL']
 		op_account['senior_debt'] = self.financial_model['sources']['senior_debt']
-		op_account['dsra_additions'] = self.financial_model['DSRA']['dsra_additions']
-		op_account['dsra_release'] = self.financial_model['DSRA']['dsra_release']
+		op_account['dsra_additions'] = -1*self.financial_model['DSRA']['dsra_additions']
+		op_account['dsra_releases'] = -1*self.financial_model['DSRA']['dsra_releases']
 		op_account['dsra_initial_funding'] = -1 * self.financial_model['DSRA']['initial_funding']
 		op_account['cash_available_for_dsra'] = self.financial_model['DSRA']['cash_available_for_dsra']

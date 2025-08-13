@@ -14,13 +14,14 @@ class BalanceSheet:
     def _compute_ppe(self):
         construction_costs = np.array(self.financial_model['construction_costs']['total']).cumsum()
         local_taxes = np.array(self.financial_model['local_taxes']['total']).cumsum()
+        dev_fee = np.array(self.financial_model['uses']['development_fee']).cumsum()
 
         senior_debt_idc_and_fees = self.financial_model['uses']['senior_debt_idc_and_fees'].cumsum()
         interests_construction = self.financial_model['SHL']['interests_construction'].cumsum()
         depreciation = self.financial_model['IS']['depreciation'].cumsum()
 
         self.financial_model['assets']['PPE'] = (
-            construction_costs + local_taxes + senior_debt_idc_and_fees + interests_construction - depreciation
+            construction_costs + dev_fee + local_taxes + senior_debt_idc_and_fees + interests_construction + depreciation
         )
 
     def _compute_total_assets(self):
@@ -28,7 +29,7 @@ class BalanceSheet:
 
         bs_assets['accounts_receivable'] = self.financial_model['working_cap']['accounts_receivable_eop']
         bs_assets['operating_account'] = self.financial_model['op_account']['balance_eop']
-        bs_assets['DSRA'] = self.financial_model['DSRA']['dsra_eop']
+        bs_assets['DSRA'] = self.financial_model['DSRA']['balance_eop']
         bs_assets['distribution_account'] = self.financial_model['distr_account']['balance_eop']
 
         bs_assets['total'] = (

@@ -97,6 +97,8 @@ class Audit:
 			# Fallback - shouldn't happen with current choices
 			debt_maturity_rounded = self.instance.debt_maturity
 
+		"""logger.error(final_repayment_date)
+		logger.error(debt_maturity_rounded)"""
 
 		debt_maturity_check = self._check_debt_maturity(final_repayment_date, debt_maturity_rounded)
 
@@ -233,8 +235,11 @@ class Audit:
 		Returns:
 			bool: True if all operating account balances are >= 0
 		"""
+
 		try:
 			operating_balance_eop = np.array(self.model['op_account']['balance_eop'])
+			logger.error(operating_balance_eop)
+
 			return np.all(operating_balance_eop >= -self.MATERIALITY_THRESHOLD)
 		except KeyError:
 			logger.warning("Operating account balance_eop not found in model")
@@ -261,9 +266,8 @@ class Audit:
 		Returns:
 			bool: True if DSRA is used (at least one period has dsra_release > 0)
 		"""
-		try:
-			dsra_release = np.array(self.model['ratios']['DSCR_effective'])
-			return np.any(dsra_release > 1)
+		try:		
+			return self.model['ratios']['DSCR_min'] > 1
 		except KeyError:
 			logger.warning("DSRA release not found in model")
 			return False

@@ -54,7 +54,7 @@ def extract_EoY_values_for_charts(financial_model):
 		'IRR': ['irr_curve'],
 		'ratios': ['DSCR_effective', 'LLCR', 'PLCR'],
 		'IS': ['retained_earnings_bop'],
-		'DSRA': ['dsra_bop'],
+		'DSRA': ['balance_bop'],
 		'capacity': ['degradation_factor'],
 
 	}

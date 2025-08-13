@@ -60,6 +60,10 @@ class FinancialModelIRR:
 		# Construct senior debt cash flows
 		debt_cash_flows = self._get_debt_cash_flows()
 
+
+		self.instance.financial_model["IRR"]["equity_cf"] = share_capital_cf
+		self.instance.financial_model["IRR"]["SHL_cf"] = SHL_cf
+
 		# ---- Calculate various IRRs ----
 		self.instance.financial_model["IRR"]["equity"] = calculate_xirr(dates_end, self.instance.equity_cf)
 		self.instance.financial_model["IRR"]["share_capital"] = calculate_xirr(dates_end, share_capital_cf)

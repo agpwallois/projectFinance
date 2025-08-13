@@ -52,7 +52,7 @@ class DSRAHelper:
 		)
 		
 	def calculate_dsra_movements(self, period: int, 
-								dsra_bop: float,
+								balance_bop: float,
 								initial_funding: float,
 								target: float,
 								cash_available: float) -> dict:
@@ -62,7 +62,7 @@ class DSRAHelper:
 		Parameters:
 		-----------
 		period: int - Current period index
-		dsra_bop: float - DSRA beginning balance
+		balance_bop: float - DSRA beginning balance
 		initial_funding: float - Initial funding for this period
 		target: float - DSRA target for this period
 		cash_available: float - Cash available for DSRA (can be negative for shortfalls)
@@ -72,7 +72,7 @@ class DSRAHelper:
 		dict with keys: additions, release, eop, mov
 		"""
 		# Current balance after initial funding
-		current_balance = dsra_bop + initial_funding
+		current_balance = balance_bop + initial_funding
 		effective_target = target + initial_funding
 		
 		additions = 0
@@ -106,7 +106,7 @@ class DSRAHelper:
 				release = abs(target_gap)
 		
 		# Calculate ending balance
-		eop = dsra_bop + initial_funding + additions - release
+		eop = balance_bop + initial_funding + additions - release
 		
 		# Apply target ceiling (should not exceed target)
 		if eop > effective_target:
@@ -115,7 +115,7 @@ class DSRAHelper:
 			eop = effective_target
 		
 		# Calculate net movement
-		mov = eop - dsra_bop
+		mov = eop - balance_bop
 		
 		return {
 			'additions': additions,

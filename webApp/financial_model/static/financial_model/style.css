@@ -1703,6 +1703,17 @@ input[type="checkbox"] {
     z-index: 1;
 }
 
+/* Specific minimum width for annual_op_account first column */
+#annual_op_account td:first-child,
+#annual_op_account th:first-child {
+    min-width: 250px !important; /* Set minimum width for first column */
+}
+
+#annual_dsra td:first-child,
+#annual_dsra th:first-child {
+    min-width: 250px !important; /* Set minimum width for first column */
+}
+
 /* Alternating Row Colors */
 .table_annual tbody tr:nth-child(even) {
     background-color: #f9f9f9;
