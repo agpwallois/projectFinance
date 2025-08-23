@@ -25,7 +25,9 @@ class Opex:
 
 	def _get_time_series(self) -> np.ndarray:
 		"""Retrieve the years during operations time series."""
-		return np.array(self._financial_model['time_series']['years_during_operations'])
+
+		time_series = np.array(self._financial_model['time_series']['years_during_operations']) * np.array(self._financial_model['time_series']['pct_in_operations_period'])                 
+		return time_series
 
 	def _get_indexed_costs(self, base_cost: float, index_type: str, sensitivity: float) -> np.ndarray:
 		"""

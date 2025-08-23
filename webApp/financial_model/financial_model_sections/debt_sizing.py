@@ -72,15 +72,15 @@ class SeniorDebtSizing:
 			self.instance.target_DSCR * fm['flags']['debt_amo']
 		)
 
-		logger.error(fm['debt_sizing']['CFADS_amo'])
+		"""logger.error(fm['debt_sizing']['CFADS_amo'])"""
 
 		# ----- 4) Target Debt (DSCR-based) -----
 		fm['debt_sizing']['target_DS'] = (
 			fm['debt_sizing']['CFADS_amo'] / self.instance.target_DSCR
 		)
 
-		logger.error(fm['debt_sizing']['target_DS'])
-		logger.error(fm['discount_factor']['discount_factor_cumul'])
+		"""logger.error(fm['debt_sizing']['target_DS'])
+		logger.error(fm['discount_factor']['discount_factor_cumul'])"""
 
 
 		fm['debt_sizing']['target_debt_DSCR'] = np.sum(

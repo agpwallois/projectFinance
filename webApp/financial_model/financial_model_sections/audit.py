@@ -238,7 +238,7 @@ class Audit:
 
 		try:
 			operating_balance_eop = np.array(self.model['op_account']['balance_eop'])
-			logger.error(operating_balance_eop)
+			"""logger.error(operating_balance_eop)"""
 
 			return np.all(operating_balance_eop >= -self.MATERIALITY_THRESHOLD)
 		except KeyError:

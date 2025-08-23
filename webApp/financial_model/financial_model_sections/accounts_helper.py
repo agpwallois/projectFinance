@@ -67,13 +67,13 @@ class AccountsHelper:
 		
 		# Cash available = CFADS - Senior Debt Service - DSRA movements - Min Cash
 		op_account['dsra_mov'][i] = self.model['DSRA']['dsra_mov'][i]
-		op_account['senior_debt_interests_paid'][i]  = self.model['senior_debt']['interests_operations'][i]
-		op_account['senior_debt_repayments'][i] = self.model['senior_debt']['repayments'][i]
+		op_account['senior_debt_interests_paid'][i]  = -1*self.model['senior_debt']['interests_operations'][i]
+		op_account['senior_debt_repayments'][i] = -1*self.model['senior_debt']['repayments'][i]
 
 		cash_available = (
 			self.model['op_account']['CFADS'][i]
-			- op_account['senior_debt_interests_paid'][i]
-			- op_account['senior_debt_repayments'][i]
+			+ op_account['senior_debt_interests_paid'][i]
+			+ op_account['senior_debt_repayments'][i]
 			- self.model['DSRA']['dsra_mov'][i]
 		)
 

@@ -32,6 +32,7 @@ class Dates:
 		Initializes the financial model's date ranges by:
 			1. Creating model-wide start/end date ranges.
 			2. Creating per-period start/end date ranges.
+			3. Creating year boundaries for each period.
 		"""
 		self.instance.financial_model['dates'] = {}
 
@@ -46,6 +47,14 @@ class Dates:
 				model_dates['end'],
 				period_dates
 			)
+		
+		# Calculate year boundaries for each period
+		self.instance.financial_model['dates']['year_boundaries'] = self._calculate_year_boundaries(
+			model_dates['start'],
+			model_dates['end']
+		)
+
+		"""logger.error(self.instance.financial_model['dates']['year_boundaries'])"""
 
 	def _initialize_model_dates(self) -> Dict[str, pd.Series]:
 		"""
@@ -101,11 +110,20 @@ class Dates:
 	) -> pd.Series:
 		"""Calculate start dates matching the end dates exactly"""
 		
-		first_day_construction = self._first_day_of_month(construction_start)
+		# Start exactly at construction_start, not first of month
+		first_construction_period_start = construction_start
 		construction_end_month = self._first_day_of_month(construction_end)
 		
-		# Construction range (monthly) - only until the month containing construction_end
-		construction_start_dates = pd.date_range(first_day_construction, construction_end_month, freq='MS')
+		# First period starts at construction_start
+		construction_start_dates = [pd.Timestamp(first_construction_period_start)]
+		
+		# Subsequent construction periods start on the 1st of each month
+		current_month = self._first_day_of_month(construction_start) + relativedelta(months=1)
+		while current_month <= construction_end_month:
+			construction_start_dates.append(pd.Timestamp(current_month))
+			current_month = current_month + relativedelta(months=1)
+		
+		construction_start_dates = pd.Series(construction_start_dates)
 		
 		# Operations start immediately after construction
 		first_operations_start = construction_end + datetime.timedelta(days=1)
@@ -213,20 +231,26 @@ class Dates:
 	) -> pd.Series:
 		"""Calculate end dates matching the start dates exactly"""
 		
-		first_day_construction = self._first_day_of_month(construction_start)
-		construction_end_month = self._first_day_of_month(construction_end)
-		
-		# Build construction end dates manually
+		# Build construction end dates
 		construction_end_dates = []
-		current_date = first_day_construction
+		
+		# First period ends at the last day of construction_start's month
+		first_period_end = self._last_day_of_month(construction_start)
+		construction_end_dates.append(first_period_end)
+		
+		# Subsequent periods end at month-end until we reach construction_end
+		current_date = self._first_day_of_month(construction_start) + relativedelta(months=1)
+		construction_end_month = self._first_day_of_month(construction_end)
 		
 		while current_date < construction_end_month:
 			month_end = self._last_day_of_month(current_date)
 			construction_end_dates.append(month_end)
 			current_date = current_date + relativedelta(months=1)
 		
-		# For the final construction month, use construction_end itself
-		construction_end_dates.append(construction_end)
+		# Final construction period ends exactly at construction_end
+		if construction_end_month.month == construction_end.month and construction_end_month.year == construction_end.year:
+			construction_end_dates.append(construction_end)
+		
 		construction_end_dates = pd.Series([pd.Timestamp(d) for d in construction_end_dates])
 		
 		# Calculate minimum first operations end date
@@ -388,3 +412,49 @@ class Dates:
 		"""
 		timeline_series = pd.to_datetime(pd.Series(timeline_list), dayfirst=True)
 		return timeline_series.clip(lower=pd.Timestamp(start_date), upper=pd.Timestamp(end_date))
+	
+	def _calculate_year_boundaries(self, start_dates: pd.Series, end_dates: pd.Series) -> Dict[str, list]:
+		"""
+		Calculate year boundaries for each period to identify which calendar years each period spans.
+		
+		Args:
+			start_dates: Series of period start dates
+			end_dates: Series of period end dates
+			
+		Returns:
+			Dictionary containing:
+			- 'years_spanned': List of lists, each containing the years a period spans
+			- 'days_per_year': List of dicts, each mapping year to days in that year for the period
+		"""
+		years_spanned = []
+		days_per_year = []
+		
+		for i in range(len(start_dates)):
+			start = pd.Timestamp(start_dates.iloc[i])
+			end = pd.Timestamp(end_dates.iloc[i])
+			
+			# Find all years this period spans
+			period_years = list(range(start.year, end.year + 1))
+			years_spanned.append(period_years)
+			
+			# Calculate days in each year for this period
+			period_days = {}
+			for year in period_years:
+				# Year boundaries
+				year_start = pd.Timestamp(year, 1, 1)
+				year_end = pd.Timestamp(year, 12, 31)
+				
+				# Clip period to year boundaries
+				period_start_in_year = max(start, year_start)
+				period_end_in_year = min(end, year_end)
+				
+				# Calculate days (inclusive)
+				days = (period_end_in_year - period_start_in_year).days + 1
+				period_days[year] = days
+			
+			days_per_year.append(period_days)
+		
+		return {
+			'years_spanned': years_spanned,
+			'days_per_year': days_per_year
+		}

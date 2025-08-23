@@ -154,7 +154,7 @@ class FinancialModelView(View):
 			raise ValueError(f"Unknown technology: {project.technology}")
 
 	""" GET METHOD """
-	@timer_decorator
+	"""@timer_decorator"""
 	def get(self, request, id: int):
 		# Check project access first
 		if not self._check_project_access(request, id):
@@ -169,7 +169,7 @@ class FinancialModelView(View):
 			
 		return render(request, "financial_model/project_view.html", context)
 	
-	@timer_decorator
+	"""@timer_decorator"""
 	def _process_get_request(self, request, project: Project) -> JsonResponse:
 		"""Process AJAX requests for financial model data"""
 		
@@ -230,7 +230,7 @@ class FinancialModelView(View):
 		project_form.save()
 		return self._create_financial_models(request, project, project_form)
 			
-	@timer_decorator
+	"""@timer_decorator"""
 	def _create_financial_models(self, request, project, project_form):
 		"""Create or update financial models based on the scenario and project form data."""
 
@@ -291,7 +291,7 @@ class FinancialModelView(View):
 		
 		return financial_models
 
-	@timer_decorator
+	"""@timer_decorator"""
 	def _get_financial_models(self, project: Project) -> Dict[str, Any]:
 		"""Retrieve all financial models for a project with optimized queries"""
 		model_class = self._get_model_class(project)
@@ -375,7 +375,7 @@ class FinancialModelView(View):
 		
 		return {model.identifier: model for model in existing_models}
 		
-	@timer_decorator
+	"""@timer_decorator"""
 	def _build_response_data(self, selected_fm, financial_models: Dict[str, Any]) -> JsonResponse:
 		"""Build the JSON response data for both GET and POST requests"""
 		# Generate dashboard data
@@ -504,7 +504,7 @@ class FinancialModelView(View):
 
 
 
-	@timer_decorator
+	"""@timer_decorator"""
 	def _create_fm(self, project: Project, scenario_id: str, scenario_config: dict):
 		"""
 		Create or update a financial model based on the given scenario configuration.

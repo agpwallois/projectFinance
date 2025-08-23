@@ -6,6 +6,9 @@ from pyxirr import xirr, InvalidPaymentsError
 from dateutil.parser import ParserError
 from dateutil import parser
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class FinancialModelIRR:
 	"""
@@ -203,7 +206,7 @@ class FinancialModelIRR:
 		current_date = pd.Timestamp(datetime.datetime.now().date())
 
 		# Days from each end date to current_date; negative => clip to 0
-		time_since_today = end_period.apply(lambda d: (current_date - d).days).clip(lower=0)
+		time_since_today = end_period.apply(lambda d: (d - current_date).days).clip(lower=0)
 
 		# Store the discount rate variations
 		fm_irr["eqt_discount_factor"] = self.instance.valuation_df

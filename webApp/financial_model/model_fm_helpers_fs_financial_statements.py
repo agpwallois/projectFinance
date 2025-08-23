@@ -45,8 +45,26 @@ def extract_fs_financial_statements_data(financial_model):
     """
     Calculates and reorders annual financial statements from a financial model dictionary.
     """
-    def process_series_sum(series, end_dates):
-        """Helper function to sum values by year."""
+    def process_series_sum(series, year_allocations):
+        """Helper function to sum values by year using year allocations."""
+        values = {}
+        for i in range(len(series)):
+            if i < len(series) and i < len(year_allocations):
+                val = series[i]
+                val = float(val) if isinstance(val, (int, float)) else 0.0
+                
+                # Get the allocation for this period
+                period_allocation = year_allocations[i]
+                
+                # Distribute the value across years based on allocation percentages
+                for year, percentage in period_allocation.items():
+                    allocated_value = val * percentage
+                    values[year] = values.get(year, 0.0) + allocated_value
+        
+        return values
+    
+    def process_series_sum_fallback(series, end_dates):
+        """Fallback helper function to sum values by year (original logic)."""
         values = {}
         for i, end_date in enumerate(end_dates):
             if i < len(series):
@@ -102,6 +120,9 @@ def extract_fs_financial_statements_data(financial_model):
         format='%d/%m/%Y',
         dayfirst=True
     )
+    
+    # Get year allocations if available
+    year_allocations = financial_model.get('time_series', {}).get('year_allocations', None)
 
     section_mapping = {
         'IS': 'annual_IS',
@@ -125,8 +146,12 @@ def extract_fs_financial_statements_data(financial_model):
                         # End of period balance - value as at 31/12 of current year
                         result = process_series_eoy(series, period_end_series)
                     else:
-                        # All other items - sum throughout the year
-                        result = process_series_sum(series, period_end_series)
+                        # All other items - sum throughout the year with proper allocation
+                        if year_allocations:
+                            result = process_series_sum(series, year_allocations)
+                        else:
+                            # Fallback to simple year assignment if no allocations available
+                            result = process_series_sum_fallback(series, period_end_series)
                     financial_statements[output_key][sub_key] = result
 
     # Reordering logic applied to all relevant sections

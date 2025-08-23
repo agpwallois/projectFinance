@@ -32,7 +32,7 @@ class Depreciation:
 		total_depreciable = np.array(fm["uses"]["total_depreciable"]).sum()
 		
 		# The fraction of each period that falls into the operating phase
-		years_during_operations = np.array(fm["time_series"]["years_during_operations"])
+		years_during_operations = np.array(fm["time_series"]["years_during_operations"]) * np.array(fm["time_series"]["pct_in_operations_period"]) 
 		
 		# Retrieve operating life, default to 1 to prevent division by zero
 		operating_life = self.instance.project.operating_life or 1

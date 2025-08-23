@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Times:
 	def __init__(self, instance):
@@ -18,6 +22,7 @@ class Times:
 		self._calculate_pct_in_operations_period()
 		self._calculate_years_from_base_dates()
 		self._calculate_pct_in_contract_period()
+		self._calculate_year_allocations()
 
 	def _initialize_time_series(self):
 		"""Ensure the 'time_series' section exists."""
@@ -99,7 +104,43 @@ class Times:
 			days_contract / days_operations,
 			0
 		)
-
+	
+	def _calculate_year_allocations(self):
+		"""
+		Calculate the percentage allocation of each period across calendar years.
+		This is used to properly allocate financial flows when periods span multiple years.
+		"""
+		if 'year_boundaries' not in self.financial_model['dates']:
+			# If year boundaries haven't been calculated, skip this
+			return
+		
+		year_boundaries = self.financial_model['dates']['year_boundaries']
+		days_per_year = year_boundaries['days_per_year']
+		
+		# Calculate percentage allocations for each period
+		year_allocations = []
+		
+		for period_days in days_per_year:
+			# Calculate total days in the period
+			total_days = sum(period_days.values())
+			
+			# Calculate percentage for each year
+			if total_days > 0:
+				year_percentages = {
+					year: days / total_days 
+					for year, days in period_days.items()
+				}
+			else:
+				year_percentages = {}
+			
+			year_allocations.append(year_percentages)
+		
+		# Store the allocations
+		self.financial_model['time_series']['year_allocations'] = year_allocations
+		self.financial_model['time_series']['years_spanned'] = year_boundaries['years_spanned']
+		self.financial_model['time_series']['days_per_year'] = days_per_year
+	
+		"""logger.error(self.financial_model['time_series']['year_allocations'])"""
 
 def get_quarters(date_list):
 	"""Return the quarter for each date in the list."""
